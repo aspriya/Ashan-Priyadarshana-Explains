@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head><title>OG Image Generator</title></head>
+<body style="background:#222;display:flex;flex-direction:column;align-items:center;padding:40px;font-family:sans-serif;color:#fff">
+<h2>OG Image Generator</h2>
+<p style="color:#aaa;margin-bottom:10px">Click the button to download, then place <strong>og-image.png</strong> in this same folder.</p>
+<button id="dl" style="margin-bottom:20px;padding:12px 32px;font-size:18px;background:#4fc3f7;color:#000;border:none;border-radius:8px;cursor:pointer;font-weight:bold">⬇ Download og-image.png</button>
+<canvas id="c" width="1200" height="630"></canvas>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+
+// Background gradient
+const bg = ctx.createLinearGradient(0, 0, 1200, 630);
+bg.addColorStop(0, '#0a1128');
+bg.addColorStop(0.5, '#0F1A3E');
+bg.addColorStop(1, '#1a0a2e');
+ctx.fillStyle = bg;
+ctx.fillRect(0, 0, 1200, 630);
+
+// Subtle grid pattern
+ctx.strokeStyle = 'rgba(100,140,255,0.06)';
+ctx.lineWidth = 1;
+for (let x = 0; x < 1200; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 630); ctx.stroke(); }
+for (let y = 0; y < 630; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1200, y); ctx.stroke(); }
+
+// Draw neural network nodes and connections
+const layers = [
+  [{x: 240, y: 230}, {x: 240, y: 400}],           // input
+  [{x: 480, y: 230}, {x: 480, y: 400}],           // hidden
+  [{x: 720, y: 315}]                                // output
+];
+
+// Connections with glow
+function drawConnection(x1, y1, x2, y2, color, alpha) {
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = alpha;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+}
+
+// Draw connections
+const connColors = ['#4fc3f7', '#81c784', '#ffb74d', '#f48fb1'];
+let ci = 0;
+for (let i = 0; i < layers.length - 1; i++) {
+  for (const from of layers[i]) {
+    for (const to of layers[i + 1]) {
+      drawConnection(from.x, from.y, to.x, to.y, connColors[ci % 4], 0.5);
+      ci++;
+    }
+  }
+}
+
+// Draw nodes with glow
+function drawNode(x, y, r, color, label) {
+  // Glow
+  const glow = ctx.createRadialGradient(x, y, r * 0.5, x, y, r * 3);
+  glow.addColorStop(0, color + '40');
+  glow.addColorStop(1, 'transparent');
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(x, y, r * 3, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Node
+  const grad = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.1, x, y, r);
+  grad.addColorStop(0, color);
+  grad.addColorStop(1, color + 'aa');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Label
+  if (label) {
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 16px "Segoe UI", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, x, y);
+  }
+}
+
+// Layer labels
+ctx.font = '600 15px "Segoe UI", sans-serif';
+ctx.textAlign = 'center';
+ctx.fillStyle = '#8899bb';
+ctx.fillText('INPUT', 240, 155);
+ctx.fillText('HIDDEN', 480, 155);
+ctx.fillText('OUTPUT', 720, 240);
+
+// Draw nodes
+drawNode(240, 230, 28, '#4fc3f7', 'x₁');
+drawNode(240, 400, 28, '#4fc3f7', 'x₂');
+drawNode(480, 230, 28, '#81c784', 'h₁');
+drawNode(480, 400, 28, '#81c784', 'h₂');
+drawNode(720, 315, 32, '#ffb74d', 'ŷ');
+
+// Weight labels on connections
+ctx.font = '600 13px "Courier New", monospace';
+ctx.fillStyle = '#e0e0e0';
+ctx.globalAlpha = 0.8;
+ctx.fillText('w₁', 345, 218);
+ctx.fillText('w₂', 345, 340);
+ctx.fillText('w₃', 590, 262);
+ctx.fillText('w₄', 590, 370);
+ctx.globalAlpha = 1;
+
+// Loss curve (small)
+const curveX = 810, curveY = 190, curveW = 320, curveH = 160;
+ctx.strokeStyle = 'rgba(100,140,255,0.3)';
+ctx.lineWidth = 1;
+ctx.strokeRect(curveX, curveY, curveW, curveH);
+
+ctx.font = '600 13px "Segoe UI", sans-serif';
+ctx.fillStyle = '#8899bb';
+ctx.textAlign = 'center';
+ctx.fillText('Loss Over Iterations', curveX + curveW / 2, curveY - 8);
+
+// Draw loss curve
+const lossValues = [0.32, 0.28, 0.24, 0.21, 0.19, 0.175, 0.16, 0.15, 0.145, 0.142];
+ctx.beginPath();
+ctx.strokeStyle = '#ff6b6b';
+ctx.lineWidth = 3;
+ctx.lineJoin = 'round';
+for (let i = 0; i < lossValues.length; i++) {
+  const px = curveX + 20 + (i / 9) * (curveW - 40);
+  const py = curveY + curveH - 20 - ((lossValues[i] - 0.1) / 0.25) * (curveH - 40);
+  if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+}
+ctx.stroke();
+
+// Dots on curve
+for (let i = 0; i < lossValues.length; i++) {
+  const px = curveX + 20 + (i / 9) * (curveW - 40);
+  const py = curveY + curveH - 20 - ((lossValues[i] - 0.1) / 0.25) * (curveH - 40);
+  ctx.fillStyle = '#ff6b6b';
+  ctx.beginPath();
+  ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// Title text
+ctx.textAlign = 'center';
+ctx.fillStyle = '#ffffff';
+ctx.font = 'bold 48px "Segoe UI", system-ui, sans-serif';
+ctx.fillText('Neural Network Learning Demo', 600, 510);
+
+// Subtitle
+ctx.font = '400 22px "Segoe UI", system-ui, sans-serif';
+ctx.fillStyle = '#99aabb';
+ctx.fillText('Interactive Step-by-Step  ·  Forward Pass  ·  Backpropagation  ·  Weight Updates', 600, 555);
+
+// Author badge
+ctx.font = '500 16px "Segoe UI", system-ui, sans-serif';
+ctx.fillStyle = '#667799';
+ctx.fillText('by Ashan Priyadarshana', 600, 595);
+
+// Top decorative line
+const topLine = ctx.createLinearGradient(200, 0, 1000, 0);
+topLine.addColorStop(0, 'transparent');
+topLine.addColorStop(0.3, '#4fc3f7');
+topLine.addColorStop(0.5, '#81c784');
+topLine.addColorStop(0.7, '#ffb74d');
+topLine.addColorStop(1, 'transparent');
+ctx.strokeStyle = topLine;
+ctx.lineWidth = 3;
+ctx.beginPath();
+ctx.moveTo(200, 12);
+ctx.lineTo(1000, 12);
+ctx.stroke();
+
+// Bottom decorative line
+ctx.beginPath();
+ctx.moveTo(200, 618);
+ctx.lineTo(1000, 618);
+ctx.stroke();
+
+document.getElementById('dl').onclick = function() {
+  const link = document.createElement('a');
+  link.download = 'og-image.png';
+  link.href = c.toDataURL('image/png');
+  link.click();
+};
+</script>
+</body>
+</html>
