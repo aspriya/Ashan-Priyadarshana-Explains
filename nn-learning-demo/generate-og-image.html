@@ -188,8 +188,8 @@ ctx.stroke();
 
 document.getElementById('dl').onclick = function() {
   const link = document.createElement('a');
-  link.download = 'og-image.png';
-  link.href = c.toDataURL('image/png');
+  link.download = 'og-image.jpg';
+  link.href = c.toDataURL('image/jpeg', 0.92);
   link.click();
 };
 </script>
