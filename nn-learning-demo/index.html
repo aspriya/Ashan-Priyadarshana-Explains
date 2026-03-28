@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Neural Network Learning Demo — Ashan Priyadarshana</title>
+<meta name="description" content="Interactive neural network learning demo for education. Step through forward pass, loss calculation, backpropagation, and weight updates." />
+<meta name="author" content="Ashan Priyadarshana" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0F1A3E; overflow-x: hidden; }
+  button { cursor: pointer; }
+  button:disabled { cursor: default; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #334; border-radius: 3px; }
+  #loading { display: flex; align-items: center; justify-content: center; height: 100vh; color: #8899AA; font-family: monospace; font-size: 14px; }
+</style>
+</head>
+<body>
+<div id="root"><div id="loading">Loading Neural Network Demo...</div></div>
+
+<!-- Dependencies in correct order -->
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.12.7/Recharts.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+
+<script type="text/babel" data-type="module">
+const { useState, useEffect, useCallback, useMemo, createElement: h } = React;
+const { LineChart, Line, XAxis, YAxis, Tooltip: RTooltip, ResponsiveContainer, CartesianGrid } = Recharts;
+
+// ─── Color System ───
+const C = {
+  navy: "#1A2B5E", navyLt: "#223070", white: "#FFFFFF", offWhite: "#F4F6FB",
+  charcoal: "#2D2D3A", blue: "#4C9BE8", blueDk: "#2B6CB0", amber: "#F4A340",
+  teal: "#38B2A0", tealDk: "#2A8A7C", purple: "#7C5CBF", orange: "#E8814C",
+  green: "#3BAA6E", red: "#E05555", muted: "#8899AA", cardBg: "#EAEEF8",
+  bg: "#0F1A3E",
+};
+const PC = { forward_hidden: C.teal, forward_output: C.blue, loss: C.red, backprop: C.purple, update: C.amber };
+const PL = { forward_hidden: "Forward Pass \u2014 Hidden Layer", forward_output: "Forward Pass \u2014 Output Layer", loss: "Loss Calculation", backprop: "Backpropagation", update: "Weight Update" };
+const PHASES = ["forward_hidden", "forward_output", "loss", "backprop", "update"];
+const SHORT_PL = ["Fwd (Hidden)", "Fwd (Output)", "Loss", "Backprop", "Update"];
+
+// ─── Dataset ───
+const DATASET = [
+  { id: 1, x1: 0.9, x2: 0.7, y: 1, label: "Pass" },
+  { id: 2, x1: 0.2, x2: 0.3, y: 0, label: "Fail" },
+  { id: 3, x1: 0.8, x2: 0.6, y: 1, label: "Pass" },
+  { id: 4, x1: 0.1, x2: 0.9, y: 0, label: "Fail" },
+  { id: 5, x1: 0.7, x2: 0.8, y: 1, label: "Pass" },
+  { id: 6, x1: 0.3, x2: 0.2, y: 0, label: "Fail" },
+  { id: 7, x1: 0.6, x2: 0.5, y: 1, label: "Pass" },
+  { id: 8, x1: 0.4, x2: 0.4, y: 0, label: "Fail" },
+  { id: 9, x1: 0.85, x2: 0.75, y: 1, label: "Pass" },
+  { id: 10, x1: 0.15, x2: 0.35, y: 0, label: "Fail" },
+];
+
+const TRAIN_RECORD = DATASET[2];
+const INPUT = { x1: TRAIN_RECORD.x1, x2: TRAIN_RECORD.x2 };
+const TARGET = TRAIN_RECORD.y;
+const NUM_ITER = 10;
+const LR = 0.5;
+
+// ─── Math ───
+const sigmoid = (x) => 1 / (1 + Math.exp(-x));
+const relu = (x) => Math.max(0, x);
+const sigmoidDeriv = (o) => o * (1 - o);
+const reluDeriv = (x) => (x > 0 ? 1 : 0);
+const fmt = (v, d = 4) => (v == null || isNaN(v)) ? "\u2014" : Number(v).toFixed(d);
+const fmt3 = (v) => fmt(v, 3);
+const fmt2 = (v) => fmt(v, 2);
+
+function computeAll() {
+  let w1 = 0.3, w2 = -0.2, w3 = 0.5, w4 = -0.4, b1 = 0.1, b2 = 0.1;
+  const iters = [];
+  for (let i = 0; i < NUM_ITER; i++) {
+    const it = {};
+    it.z_h1 = INPUT.x1 * w1 + b1; it.z_h2 = INPUT.x2 * w2 + b1;
+    it.h1 = relu(it.z_h1); it.h2 = relu(it.z_h2);
+    it.z_out = it.h1 * w3 + it.h2 * w4 + b2; it.yhat = sigmoid(it.z_out);
+    it.loss = Math.pow(TARGET - it.yhat, 2);
+    const dL_dy = -2 * (TARGET - it.yhat), dy_dz = sigmoidDeriv(it.yhat), d_out = dL_dy * dy_dz;
+    it.dL_dw3 = d_out * it.h1; it.dL_dw4 = d_out * it.h2; it.dL_db2 = d_out;
+    const dL_dh1 = d_out * w3, dL_dh2 = d_out * w4;
+    const dh1 = reluDeriv(it.z_h1), dh2 = reluDeriv(it.z_h2);
+    it.dL_dw1 = dL_dh1 * dh1 * INPUT.x1; it.dL_dw2 = dL_dh2 * dh2 * INPUT.x2;
+    it.dL_db1_h1 = dL_dh1 * dh1; it.dL_db1_h2 = dL_dh2 * dh2;
+    it.w1_old = w1; it.w2_old = w2; it.w3_old = w3; it.w4_old = w4; it.b1_old = b1; it.b2_old = b2;
+    w1 -= LR * it.dL_dw1; w2 -= LR * it.dL_dw2; w3 -= LR * it.dL_dw3; w4 -= LR * it.dL_dw4;
+    b1 -= LR * (it.dL_db1_h1 + it.dL_db1_h2); b2 -= LR * it.dL_db2;
+    it.w1_new = w1; it.w2_new = w2; it.w3_new = w3; it.w4_new = w4; it.b1_new = b1; it.b2_new = b2;
+    iters.push(it);
+  }
+  return iters;
+}
+
+const mono = "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace";
+
+// ─── Dataset Table ───
+function DatasetTable({ activeRecord }) {
+  return (
+    <div style={{ overflowX: "auto" }}>
+      <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0, fontSize: 13, fontFamily: mono }}>
+        <thead>
+          <tr>
+            {["#", "Hours Studied (x\u2081)", "Hours Slept (x\u2082)", "Result (y)"].map((hd, i) => (
+              <th key={i} style={{
+                padding: "10px 12px", textAlign: i === 0 ? "center" : "left",
+                background: C.navy, color: "#bbc", fontWeight: 600, fontSize: 12,
+                borderBottom: `2px solid ${C.teal}44`,
+                ...(i === 0 ? { borderRadius: "8px 0 0 0", width: 40 } : {}),
+                ...(i === 3 ? { borderRadius: "0 8px 0 0" } : {}),
+              }}>{hd}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {DATASET.map((r, idx) => {
+            const active = r.id === activeRecord;
+            return (
+              <tr key={r.id} style={{
+                background: active ? C.teal + "20" : idx % 2 === 0 ? "#ffffff06" : "transparent",
+                transition: "background 0.3s",
+              }}>
+                <td style={{ padding: "8px 12px", textAlign: "center", color: C.muted, borderLeft: active ? `3px solid ${C.teal}` : "3px solid transparent" }}>{r.id}</td>
+                <td style={{ padding: "8px 12px", color: "#dde" }}>{r.x1}</td>
+                <td style={{ padding: "8px 12px", color: "#dde" }}>{r.x2}</td>
+                <td style={{ padding: "8px 12px" }}>
+                  <span style={{
+                    display: "inline-block", padding: "3px 12px", borderRadius: 10, fontSize: 12, fontWeight: 600,
+                    background: r.y === 1 ? C.green + "25" : C.red + "25",
+                    color: r.y === 1 ? C.green : C.red,
+                  }}>{r.label} ({r.y})</span>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <div style={{ marginTop: 10, padding: "10px 14px", background: C.amber + "12", border: `1px solid ${C.amber}33`, borderRadius: 8, fontSize: 12, color: C.amber, fontFamily: mono, lineHeight: 1.6 }}>
+        {"\u25B6"} <strong>Training sample:</strong> Record #{TRAIN_RECORD.id} {"\u2014"} x{"\u2081"} = {INPUT.x1} (hours studied), x{"\u2082"} = {INPUT.x2} (hours slept), target = {TARGET} (Pass)<br/>
+        The network will iterate 10 times on this single record to demonstrate the learning loop.
+      </div>
+    </div>
+  );
+}
+
+// ─── Phase Indicator ───
+function PhaseIndicator({ currentPhase }) {
+  const idx = PHASES.indexOf(currentPhase);
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 3, flexWrap: "wrap", justifyContent: "center" }}>
+      {PHASES.map((p, i) => (
+        <div key={p} style={{ display: "flex", alignItems: "center", gap: 3 }}>
+          <div style={{
+            padding: "4px 9px", borderRadius: 16, fontSize: 11, fontWeight: i === idx ? 700 : 500,
+            fontFamily: mono, whiteSpace: "nowrap",
+            background: i === idx ? PC[p] : i < idx ? PC[p] + "30" : "#2a3a6a",
+            color: i === idx ? "#fff" : i < idx ? PC[p] : "#556",
+            border: i === idx ? `2px solid ${PC[p]}` : "2px solid transparent",
+            transition: "all 0.3s",
+          }}>{SHORT_PL[i]}</div>
+          {i < 4 && <span style={{ color: i < idx ? PC[PHASES[i + 1]] : "#334", fontSize: 9 }}>{"\u2192"}</span>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── SVG Network Diagram ───
+function NetworkDiagram({ iterData, currentPhase }) {
+  const pi = PHASES.indexOf(currentPhase);
+  const phaseAtLeast = (p) => pi >= PHASES.indexOf(p);
+
+  const nodes = {
+    x1: { cx: 80, cy: 110, label: "x\u2081", sublabel: `${INPUT.x1}`, desc: "Hrs Studied" },
+    x2: { cx: 80, cy: 280, label: "x\u2082", sublabel: `${INPUT.x2}`, desc: "Hrs Slept" },
+    h1: { cx: 300, cy: 110, label: "h\u2081" },
+    h2: { cx: 300, cy: 280, label: "h\u2082" },
+    y:  { cx: 510, cy: 195, label: "\u0177" },
+  };
+  const R = 38;
+  const showNew = currentPhase === "update" && iterData;
+
+  const edgeColor = (from) => {
+    if (currentPhase === "update") return C.amber;
+    if (currentPhase === "backprop") return C.purple;
+    if ((from === "x1" || from === "x2") && phaseAtLeast("forward_hidden")) return C.teal;
+    if ((from === "h1" || from === "h2") && phaseAtLeast("forward_output")) return C.blue;
+    return "#3a4570";
+  };
+  const edgeWidth = (from) => {
+    if (currentPhase === "update") return 3.5;
+    if (currentPhase === "backprop") return 3;
+    if ((from === "x1" || from === "x2") && currentPhase === "forward_hidden") return 3.5;
+    if ((from === "h1" || from === "h2") && currentPhase === "forward_output") return 3.5;
+    return 2;
+  };
+  const nodeColor = (id) => {
+    if (id === "x1" || id === "x2") return phaseAtLeast("forward_hidden") ? C.blue : "#4a5580";
+    if (id === "h1" || id === "h2") return phaseAtLeast("backprop") ? C.purple + "cc" : phaseAtLeast("forward_hidden") ? C.teal : "#4a5580";
+    if (id === "y") return phaseAtLeast("loss") ? C.red : phaseAtLeast("forward_output") ? C.blue : "#4a5580";
+    return "#4a5580";
+  };
+  const nodeVal = (id) => {
+    if (!iterData) return null;
+    if ((id === "h1") && phaseAtLeast("forward_hidden")) return fmt2(iterData.h1);
+    if ((id === "h2") && phaseAtLeast("forward_hidden")) return fmt2(iterData.h2);
+    if (id === "y" && phaseAtLeast("forward_output")) return fmt3(iterData.yhat);
+    return null;
+  };
+  const gradVal = (from, to) => {
+    if (!iterData || currentPhase !== "backprop") return null;
+    if (from === "x1" && to === "h1") return fmt3(iterData.dL_dw1);
+    if (from === "x2" && to === "h2") return fmt3(iterData.dL_dw2);
+    if (from === "h1" && to === "y") return fmt3(iterData.dL_dw3);
+    if (from === "h2" && to === "y") return fmt3(iterData.dL_dw4);
+    return null;
+  };
+
+  const edges = [
+    { from: "x1", to: "h1", wl: "w\u2081", wv: iterData ? iterData.w1_old : 0.3, wnKey: "w1_new" },
+    { from: "x2", to: "h2", wl: "w\u2082", wv: iterData ? iterData.w2_old : -0.2, wnKey: "w2_new" },
+    { from: "h1", to: "y",  wl: "w\u2083", wv: iterData ? iterData.w3_old : 0.5, wnKey: "w3_new" },
+    { from: "h2", to: "y",  wl: "w\u2084", wv: iterData ? iterData.w4_old : -0.4, wnKey: "w4_new" },
+  ];
+
+  return (
+    <svg viewBox="0 0 620 400" style={{ width: "100%", height: "auto" }}>
+      <defs>
+        <filter id="gs"><feGaussianBlur stdDeviation="5" result="b" /><feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+      </defs>
+
+      <text x={80} y={30} textAnchor="middle" fill={C.muted} fontSize={13} fontWeight={600} fontFamily={mono}>Input</text>
+      <text x={300} y={30} textAnchor="middle" fill={C.muted} fontSize={13} fontWeight={600} fontFamily={mono}>Hidden</text>
+      <text x={510} y={30} textAnchor="middle" fill={C.muted} fontSize={13} fontWeight={600} fontFamily={mono}>Output</text>
+
+      {edges.map((e) => {
+        const n1 = nodes[e.from], n2 = nodes[e.to];
+        const col = edgeColor(e.from), sw = edgeWidth(e.from);
+        const grad = gradVal(e.from, e.to);
+        const wVal = showNew ? iterData[e.wnKey] : e.wv;
+        const dx = n2.cx - n1.cx, dy = n2.cy - n1.cy, dist = Math.sqrt(dx * dx + dy * dy);
+        const ux = dx / dist, uy = dy / dist;
+        const sx = n1.cx + ux * (R + 4), sy = n1.cy + uy * (R + 4);
+        const ex = n2.cx - ux * (R + 4), ey = n2.cy - uy * (R + 4);
+        const mx = (sx + ex) / 2, my = (sy + ey) / 2;
+        const gap = 34;
+        const s1x = mx - ux * gap, s1y = my - uy * gap;
+        const s2x = mx + ux * gap, s2y = my + uy * gap;
+
+        return (
+          <g key={`${e.from}-${e.to}`}>
+            <line x1={sx} y1={sy} x2={s1x} y2={s1y} stroke={col} strokeWidth={sw} strokeLinecap="round" style={{ transition: "stroke 0.4s, stroke-width 0.3s" }} />
+            <line x1={s2x} y1={s2y} x2={ex} y2={ey} stroke={col} strokeWidth={sw} strokeLinecap="round" style={{ transition: "stroke 0.4s, stroke-width 0.3s" }} />
+            <rect x={mx - 32} y={my - 24} width={64} height={grad ? 52 : 36} rx={7}
+              fill={showNew ? C.amber + "22" : C.bg + "dd"} stroke={col + "88"} strokeWidth={1} style={{ transition: "fill 0.4s" }} />
+            <text x={mx} y={my - 10} textAnchor="middle" fill={col} fontSize={12} fontFamily={mono} fontWeight={700}>{e.wl}</text>
+            <text x={mx} y={my + 7} textAnchor="middle" fill={showNew ? C.amber : "#eee"} fontSize={12} fontFamily={mono} fontWeight={600}>{fmt3(wVal)}</text>
+            {grad && <text x={mx} y={my + 23} textAnchor="middle" fill={C.purple} fontSize={10} fontFamily={mono} fontWeight={600}>{"\u2207"} {grad}</text>}
+          </g>
+        );
+      })}
+
+      {iterData && phaseAtLeast("forward_hidden") && <text x={300} y={58} textAnchor="middle" fill={C.muted} fontSize={11} fontFamily={mono}>b{"\u2081"} = {fmt2(showNew ? iterData.b1_new : iterData.b1_old)}</text>}
+      {iterData && phaseAtLeast("forward_output") && <text x={510} y={58} textAnchor="middle" fill={C.muted} fontSize={11} fontFamily={mono}>b{"\u2082"} = {fmt2(showNew ? iterData.b2_new : iterData.b2_old)}</text>}
+
+      {Object.entries(nodes).map(([id, n]) => {
+        const col = nodeColor(id), val = nodeVal(id);
+        const active = (currentPhase === "forward_hidden" && ["h1","h2","x1","x2"].includes(id)) || ((currentPhase === "forward_output" || currentPhase === "loss") && id === "y");
+        return (
+          <g key={id}>
+            <circle cx={n.cx} cy={n.cy} r={R} fill={col} stroke={active ? "#fff" : col + "44"} strokeWidth={active ? 3 : 1}
+              filter={active ? "url(#gs)" : undefined} style={{ transition: "fill 0.5s, stroke 0.3s" }} />
+            <text x={n.cx} y={val ? n.cy - 7 : n.cy + 1} textAnchor="middle" dominantBaseline="middle" fill="#fff"
+              fontSize={val ? 15 : 18} fontWeight={700} fontFamily={mono}>{n.label}</text>
+            {val && <text x={n.cx} y={n.cy + 13} textAnchor="middle" dominantBaseline="middle" fill="#fff" fontSize={13} fontFamily={mono} fontWeight={600}>{val}</text>}
+            {n.sublabel && <text x={n.cx} y={n.cy + R + 18} textAnchor="middle" fill={C.muted} fontSize={12} fontFamily={mono}>{n.sublabel}</text>}
+            {n.desc && <text x={n.cx} y={n.cy + R + 32} textAnchor="middle" fill={C.muted + "bb"} fontSize={10} fontFamily={mono}>{n.desc}</text>}
+          </g>
+        );
+      })}
+
+      {iterData && phaseAtLeast("loss") && (
+        <g>
+          <rect x={462} y={252} width={96} height={48} rx={8} fill={C.red + "22"} stroke={C.red + "55"} strokeWidth={1} />
+          <text x={510} y={270} textAnchor="middle" fill={C.red} fontSize={11} fontFamily={mono}>Target: {TARGET}</text>
+          <text x={510} y={290} textAnchor="middle" fill={C.red} fontSize={12} fontWeight={700} fontFamily={mono}>Loss: {fmt(iterData.loss)}</text>
+        </g>
+      )}
+      {currentPhase === "backprop" && <text x={310} y={385} textAnchor="middle" fill={C.purple} fontSize={13} fontFamily={mono} fontWeight={700}>{"\u2190"} Error flows backward {"\u2190"}</text>}
+      {currentPhase === "update" && <text x={310} y={385} textAnchor="middle" fill={C.amber} fontSize={13} fontFamily={mono} fontWeight={700}>{"\u2726"} Weights updated {"\u2726"}</text>}
+    </svg>
+  );
+}
+
+// ─── Explanation Panel ───
+function ExplanationPanel({ iterData, currentPhase, iteration }) {
+  if (!iterData) return null;
+  const color = PC[currentPhase];
+  const box = (children) => <div style={{ background: "#0d1530", borderRadius: 8, padding: "12px 14px", marginBottom: 10 }}>{children}</div>;
+  const lbl = (text, col) => <div style={{ fontSize: 12, color: col || color, fontFamily: mono, marginBottom: 4, fontWeight: 600 }}>{text}</div>;
+  const mth = (children) => <div style={{ fontSize: 13, color: "#dde", fontFamily: mono, lineHeight: 1.9 }}>{children}</div>;
+  const tip = (emoji, text, col) => (
+    <div style={{ background: (col || color) + "15", border: `1px solid ${col || color}44`, borderRadius: 8, padding: "8px 12px", fontSize: 12, color: col || color, lineHeight: 1.5 }}>
+      {emoji} {text}
+    </div>
+  );
+
+  const S = (t) => <strong>{t}</strong>;
+  const TC = (v, col) => <strong style={{color: col}}>{v}</strong>;
+
+  const content = {
+    forward_hidden: () => (
+      <div>
+        <p style={{ color: "#ccd", fontSize: 13, lineHeight: 1.6, margin: "0 0 12px" }}>Each input {"\u00D7"} its weight + bias, then ReLU activation. ReLU outputs zero for negatives, passes positives through.</p>
+        {box(<>{lbl("Hidden Neuron h\u2081:")}{mth(<>z{"\u2081"} = x{"\u2081"} {"\u00D7"} w{"\u2081"} + b{"\u2081"}<br/>= {INPUT.x1} {"\u00D7"} {fmt3(iterData.w1_old)} + {fmt2(iterData.b1_old)} = {TC(fmt(iterData.z_h1), C.teal)}<br/>h{"\u2081"} = ReLU({fmt(iterData.z_h1)}) = {TC(fmt(iterData.h1), C.teal)}</>)}</>)}
+        {box(<>{lbl("Hidden Neuron h\u2082:")}{mth(<>z{"\u2082"} = x{"\u2082"} {"\u00D7"} w{"\u2082"} + b{"\u2081"}<br/>= {INPUT.x2} {"\u00D7"} {fmt3(iterData.w2_old)} + {fmt2(iterData.b1_old)} = {TC(fmt(iterData.z_h2), C.teal)}<br/>h{"\u2082"} = ReLU({fmt(iterData.z_h2)}) = {TC(fmt(iterData.h2), C.teal)}</>)}</>)}
+        {iterData.h2 === 0 && tip("\uD83D\uDCA1", <>{S("Notice:")} h{"\u2082"} = 0 because the weighted sum was negative. ReLU "killed" this neuron {"\u2014"} it contributes nothing this pass.</>, C.amber)}
+      </div>
+    ),
+    forward_output: () => (
+      <div>
+        <p style={{ color: "#ccd", fontSize: 13, lineHeight: 1.6, margin: "0 0 12px" }}>Hidden outputs {"\u00D7"} weights + bias {"\u2192"} Sigmoid {"\u2192"} probability between 0 and 1.</p>
+        {box(<>{lbl("Output Neuron \u0177:", C.blue)}{mth(<>z = h{"\u2081"}{"\u00D7"}w{"\u2083"} + h{"\u2082"}{"\u00D7"}w{"\u2084"} + b{"\u2082"}<br/>= {fmt(iterData.h1)}{"\u00D7"}{fmt3(iterData.w3_old)} + {fmt(iterData.h2)}{"\u00D7"}{fmt3(iterData.w4_old)} + {fmt2(iterData.b2_old)}<br/>= {TC(fmt(iterData.z_out), C.blue)}<br/>{"\u0177"} = {"\u03C3"}({fmt(iterData.z_out)}) = {TC(fmt(iterData.yhat), C.blue)}</>)}</>)}
+        {tip("\uD83C\uDFAF", <>{S("Prediction:")} {(iterData.yhat*100).toFixed(1)}% chance of passing. Target is {TARGET===1?"Pass (1.0)":"Fail (0.0)"}.</>)}
+      </div>
+    ),
+    loss: () => (
+      <div>
+        <p style={{ color: "#ccd", fontSize: 13, lineHeight: 1.6, margin: "0 0 12px" }}>MSE measures how far off the prediction is. Squaring penalizes large errors more.</p>
+        {box(<>{lbl("MSE Loss:", C.red)}{mth(<>Loss = (target {"\u2212"} {"\u0177"}){"\u00B2"}<br/>= ({TARGET} {"\u2212"} {fmt(iterData.yhat)}){"\u00B2"}<br/>= ({fmt(TARGET-iterData.yhat)}){"\u00B2"}<br/>= {TC(fmt(iterData.loss), C.red)}</>)}</>)}
+        {tip("\uD83D\uDCC9", <>{S("Goal:")} Push this loss toward zero. Backpropagation next will tell us which weights to adjust.</>, C.red)}
+      </div>
+    ),
+    backprop: () => (
+      <div>
+        <p style={{ color: "#ccd", fontSize: 13, lineHeight: 1.6, margin: "0 0 12px" }}>Error flows backward via the chain rule. Each weight gets a gradient {"\u2014"} its "blame score."</p>
+        {box(<>{lbl("Gradients (\u2202Loss/\u2202weight):", C.purple)}<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginTop:6}}>
+          {[{l:"\u2202L/\u2202w\u2081",v:iterData.dL_dw1},{l:"\u2202L/\u2202w\u2082",v:iterData.dL_dw2},{l:"\u2202L/\u2202w\u2083",v:iterData.dL_dw3},{l:"\u2202L/\u2202w\u2084",v:iterData.dL_dw4}].map(g=>(
+            <div key={g.l} style={{background:C.purple+"18",borderRadius:6,padding:"6px 8px",fontFamily:mono,fontSize:12}}>
+              <span style={{color:C.purple}}>{g.l}</span><span style={{color:"#dde",marginLeft:6}}>= {fmt(g.v)}</span>
+            </div>
+          ))}</div></>)}
+        {tip("\uD83D\uDD17", <>{S("Chain Rule:")} Negative gradient {"\u2192"} weight needs to increase. Positive {"\u2192"} decrease.</>, C.purple)}
+      </div>
+    ),
+    update: () => {
+      const u = [{l:"w\u2081",o:iterData.w1_old,g:iterData.dL_dw1,n:iterData.w1_new},{l:"w\u2082",o:iterData.w2_old,g:iterData.dL_dw2,n:iterData.w2_new},{l:"w\u2083",o:iterData.w3_old,g:iterData.dL_dw3,n:iterData.w3_new},{l:"w\u2084",o:iterData.w4_old,g:iterData.dL_dw4,n:iterData.w4_new}];
+      return (
+        <div>
+          <p style={{ color: "#ccd", fontSize: 13, lineHeight: 1.6, margin: "0 0 12px" }}>Each weight nudged to reduce loss. Learning rate = {LR}.</p>
+          {box(<>{lbl("w_new = w_old \u2212 lr \u00D7 gradient", C.amber)}<div style={{display:"flex",flexDirection:"column",gap:5,marginTop:8}}>
+            {u.map(w=>(
+              <div key={w.l} style={{display:"flex",alignItems:"center",gap:6,fontFamily:mono,fontSize:12,background:C.amber+"10",borderRadius:6,padding:"5px 8px"}}>
+                <span style={{color:C.amber,fontWeight:700,width:24}}>{w.l}</span>
+                <span style={{color:"#999"}}>{fmt3(w.o)}</span><span style={{color:"#666"}}>{"\u2192"}</span>
+                <span style={{color:C.amber,fontWeight:700}}>{fmt3(w.n)}</span>
+                <span style={{color:"#666",fontSize:10,marginLeft:"auto"}}>({fmt3(w.g)})</span>
+              </div>
+            ))}</div></>)}
+          {tip("\u2726", <>{S(`Iteration ${iteration+1} complete!`)} {iteration < NUM_ITER-1 ? "Click Next to continue training." : "All 10 iterations done! Check the loss chart."}</>, C.amber)}
+        </div>
+      );
+    },
+  };
+
+  return (
+    <div style={{ flex: 1, minWidth: 0, overflowY: "auto" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, borderBottom: `2px solid ${color}44`, paddingBottom: 8 }}>
+        <div style={{ width: 8, height: 8, borderRadius: "50%", background: color, boxShadow: `0 0 8px ${color}88` }} />
+        <span style={{ fontSize: 14, fontWeight: 700, color, fontFamily: mono }}>{PL[currentPhase]}</span>
+      </div>
+      {content[currentPhase]()}
+    </div>
+  );
+}
+
+// ─── Loss Chart ───
+function LossChartComponent({ allIter, curIter, curPhase }) {
+  const pi = PHASES.indexOf(curPhase);
+  const data = allIter.map((it, i) => ({
+    name: `${i+1}`,
+    loss: (i < curIter || (i === curIter && pi >= 2)) ? Number(it.loss.toFixed(4)) : null,
+  })).filter(d => d.loss !== null);
+  if (!data.length) return null;
+  return (
+    <div style={{ width: "100%", height: 160 }}>
+      <div style={{ fontSize: 12, color: C.muted, fontFamily: mono, marginBottom: 4, fontWeight: 600 }}>{"\uD83D\uDCC9"} Loss over iterations</div>
+      <ResponsiveContainer width="100%" height={138}>
+        <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
+          <CartesianGrid stroke="#ffffff08" />
+          <XAxis dataKey="name" tick={{ fontSize: 11, fill: C.muted }} axisLine={false} tickLine={false} />
+          <YAxis hide domain={[0, "auto"]} />
+          <RTooltip contentStyle={{ background: C.bg, border: `1px solid ${C.red}44`, borderRadius: 8, fontFamily: mono, fontSize: 12 }}
+            labelFormatter={(l) => `Iteration ${l}`} formatter={(v) => [v.toFixed(4), "Loss"]} />
+          <Line type="monotone" dataKey="loss" stroke={C.red} strokeWidth={2.5} dot={{ fill: C.red, r: 4 }} animationDuration={300} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// ─── Main App ───
+function NeuralNetworkDemo() {
+  const allIter = useMemo(() => computeAll(), []);
+  const totalSteps = NUM_ITER * PHASES.length;
+  const [step, setStep] = useState(0);
+  const [tab, setTab] = useState("demo");
+
+  const iter = Math.floor(step / PHASES.length);
+  const phaseIdx = step % PHASES.length;
+  const phase = PHASES[phaseIdx];
+  const iterData = allIter[iter] || allIter[allIter.length - 1];
+
+  const canNext = step < totalSteps - 1, canPrev = step > 0;
+  const next = useCallback(() => { if (canNext) setStep(s => s + 1); }, [canNext]);
+  const prev = useCallback(() => { if (canPrev) setStep(s => s - 1); }, [canPrev]);
+  const reset = useCallback(() => setStep(0), []);
+  const jumpToIter = useCallback((i) => setStep(i * PHASES.length), []);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); next(); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); prev(); }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [next, prev]);
+
+  return (
+    <div style={{ background: `linear-gradient(135deg, ${C.bg} 0%, ${C.navy} 100%)`, minHeight: "100vh", color: "#fff", fontFamily: "'Segoe UI', system-ui, sans-serif", display: "flex", flexDirection: "column" }}>
+
+      <div style={{ padding: "14px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #ffffff10", flexWrap: "wrap", gap: 10 }}>
+        <div>
+          <div style={{ fontSize: 20, fontWeight: 700, fontFamily: mono, display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ color: C.teal }}>{"\uD83E\uDDE0"}</span> Neural Network Learning Demo
+          </div>
+          <div style={{ fontSize: 13, color: C.muted, marginTop: 3, fontFamily: mono }}>
+            By <span style={{ color: C.amber, fontWeight: 600 }}>Ashan Priyadarshana</span> {"\u00B7"} For education &amp; demonstration purposes
+          </div>
+          <div style={{ fontSize: 11, color: C.muted + "99", marginTop: 2, fontFamily: mono }}>
+            Predicting student pass/fail {"\u00B7"} x{"\u2081"}={INPUT.x1} (studied) {"\u00B7"} x{"\u2082"}={INPUT.x2} (slept) {"\u00B7"} target={TARGET}
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 2, background: "#ffffff08", borderRadius: 10, padding: 3 }}>
+          {[["demo", "\uD83D\uDD2C Training Demo"], ["dataset", "\uD83D\uDCCA Dataset"]].map(([id, lb]) => (
+            <button key={id} onClick={() => setTab(id)} style={{
+              padding: "6px 14px", borderRadius: 8, border: "none", cursor: "pointer",
+              background: tab === id ? C.teal : "transparent", color: tab === id ? "#fff" : C.muted,
+              fontFamily: mono, fontSize: 12, fontWeight: tab === id ? 700 : 500, transition: "all 0.3s",
+            }}>{lb}</button>
+          ))}
+        </div>
+      </div>
+
+      {tab === "dataset" ? (
+        <div style={{ flex: 1, padding: "24px 20px", maxWidth: 720 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, fontFamily: mono, marginBottom: 8, color: C.teal }}>{"\uD83D\uDCCA"} Training Dataset</div>
+          <p style={{ color: "#aab", fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
+            10 student records with two features (hours studied, hours slept) and a binary target (pass/fail).
+            We train the network on record #3, iterating 10 times on this single example to demonstrate the complete learning loop.
+          </p>
+          <DatasetTable activeRecord={TRAIN_RECORD.id} />
+        </div>
+      ) : (
+        <>
+          <div style={{ padding: "10px 20px", background: "#ffffff04", borderBottom: "1px solid #ffffff08", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 3, flexShrink: 0 }}>
+              <span style={{ fontSize: 11, color: C.muted, fontFamily: mono, marginRight: 4 }}>Iter:</span>
+              {Array.from({ length: NUM_ITER }, (_, i) => (
+                <button key={i} onClick={() => jumpToIter(i)} style={{
+                  width: 26, height: 26, borderRadius: "50%", border: i === iter ? `2px solid ${C.teal}` : "2px solid transparent",
+                  background: i === iter ? C.teal : i < iter ? C.teal + "33" : "#2a3560",
+                  color: i <= iter ? "#fff" : "#556", fontSize: 11, fontWeight: 700, fontFamily: mono,
+                  cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s",
+                }}>{i + 1}</button>
+              ))}
+            </div>
+            <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+              <PhaseIndicator currentPhase={phase} />
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 16, padding: "12px 20px", flexWrap: "wrap", minHeight: 0 }}>
+            <div style={{ flex: "1 1 500px", minWidth: 300, background: "#ffffff06", borderRadius: 14, padding: "10px 14px", border: "1px solid #ffffff0a", maxHeight: 520 }}>
+              <NetworkDiagram iterData={iterData} currentPhase={phase} />
+            </div>
+            <div style={{ flex: "1 1 320px", minWidth: 260, background: "#ffffff06", borderRadius: 14, padding: 18, border: "1px solid #ffffff0a", display: "flex", flexDirection: "column", maxHeight: 520, overflowY: "auto" }}>
+              <ExplanationPanel iterData={iterData} currentPhase={phase} iteration={iter} />
+            </div>
+          </div>
+
+          <div style={{ padding: "14px 20px", borderTop: "1px solid #ffffff10", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, flex: "0 0 auto" }}>
+            <div style={{ flex: "1 1 360px", maxWidth: 440 }}>
+              <LossChartComponent allIter={allIter} curIter={iter} curPhase={phase} />
+            </div>
+            <div style={{ display: "flex", gap: 5, alignItems: "flex-end", flexWrap: "wrap" }}>
+              {allIter.map((it, i) => {
+                const vis = i < iter || (i === iter && PHASES.indexOf(phase) >= 1);
+                const pct = vis ? (it.yhat * 100).toFixed(0) : null;
+                return (
+                  <div key={i} style={{ textAlign: "center", fontFamily: mono, opacity: vis ? 1 : 0.25, transition: "opacity 0.3s", width: 34 }}>
+                    <div style={{ height: vis ? Math.max(10, it.yhat * 55) : 5, width: 22, margin: "0 auto 2px",
+                      background: vis ? (it.yhat > 0.5 ? C.green : C.red) : "#333", borderRadius: 3, transition: "all 0.3s" }} />
+                    <div style={{ fontSize: 10, color: vis ? "#ccc" : "#444", fontWeight: vis ? 600 : 400 }}>{pct ? `${pct}%` : "\u2014"}</div>
+                    <div style={{ fontSize: 9, color: "#556" }}>{i + 1}</div>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+              <button onClick={reset} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid #ffffff20", background: "transparent", color: C.muted, cursor: "pointer", fontFamily: mono, fontSize: 12 }}>{"\u21BA"} Reset</button>
+              <button onClick={prev} disabled={!canPrev} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid #ffffff20", background: canPrev ? "#ffffff10" : "transparent", color: canPrev ? "#ccc" : "#444", cursor: canPrev ? "pointer" : "default", fontFamily: mono, fontSize: 12 }}>{"\u2190"} Back</button>
+              <button onClick={next} disabled={!canNext} style={{
+                padding: "9px 22px", borderRadius: 8, border: "none",
+                background: canNext ? `linear-gradient(135deg, ${PC[PHASES[(phaseIdx + 1) % 5]]}cc, ${PC[phase]})` : C.green,
+                color: "#fff", cursor: canNext ? "pointer" : "default", fontFamily: mono, fontSize: 13, fontWeight: 700,
+                boxShadow: canNext ? `0 0 16px ${PC[phase]}44` : "none", transition: "all 0.3s",
+              }}>{canNext ? "Next Step \u2192" : "\u2713 Complete!"}</button>
+            </div>
+          </div>
+          <div style={{ textAlign: "center", padding: "3px 0 8px", fontSize: 10, color: "#445", fontFamily: mono }}>
+            Step {step + 1} of {totalSteps} {"\u00B7"} Press {"\u2192"} or Space to advance
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<NeuralNetworkDemo />);
+</script>
+</body>
+</html>
