@@ -46,23 +46,20 @@ const SHORT_PL = ["Fwd (Hidden)", "Fwd (Output)", "Loss", "Backprop", "Update"];
 
 // ─── Dataset ───
 const DATASET = [
-  { id: 1, x1: 0.9, x2: 0.7, y: 1, label: "Pass" },
-  { id: 2, x1: 0.2, x2: 0.3, y: 0, label: "Fail" },
+  { id: 1, x1: 0.9, x2: 0.8, y: 1, label: "Pass" },
+  { id: 2, x1: 0.15, x2: 0.25, y: 0, label: "Fail" },
   { id: 3, x1: 0.8, x2: 0.6, y: 1, label: "Pass" },
-  { id: 4, x1: 0.1, x2: 0.9, y: 0, label: "Fail" },
-  { id: 5, x1: 0.7, x2: 0.8, y: 1, label: "Pass" },
-  { id: 6, x1: 0.3, x2: 0.2, y: 0, label: "Fail" },
-  { id: 7, x1: 0.6, x2: 0.5, y: 1, label: "Pass" },
-  { id: 8, x1: 0.4, x2: 0.4, y: 0, label: "Fail" },
+  { id: 4, x1: 0.1, x2: 0.2, y: 0, label: "Fail" },
+  { id: 5, x1: 0.7, x2: 0.85, y: 1, label: "Pass" },
+  { id: 6, x1: 0.3, x2: 0.25, y: 0, label: "Fail" },
+  { id: 7, x1: 0.65, x2: 0.7, y: 1, label: "Pass" },
+  { id: 8, x1: 0.2, x2: 0.35, y: 0, label: "Fail" },
   { id: 9, x1: 0.85, x2: 0.75, y: 1, label: "Pass" },
-  { id: 10, x1: 0.15, x2: 0.35, y: 0, label: "Fail" },
+  { id: 10, x1: 0.25, x2: 0.15, y: 0, label: "Fail" },
 ];
 
-const TRAIN_RECORD = DATASET[2];
-const INPUT = { x1: TRAIN_RECORD.x1, x2: TRAIN_RECORD.x2 };
-const TARGET = TRAIN_RECORD.y;
 const NUM_ITER = 10;
-const LR = 0.5;
+const LR = 2.0;
 
 // ─── Math ───
 const sigmoid = (x) => 1 / (1 + Math.exp(-x));
@@ -74,23 +71,42 @@ const fmt3 = (v) => fmt(v, 3);
 const fmt2 = (v) => fmt(v, 2);
 
 function computeAll() {
-  let w1 = 0.3, w2 = -0.2, w3 = 0.5, w4 = -0.4, b1 = 0.1, b2 = 0.1;
+  let w1 = 0.8, w2 = 0.8, w3 = 0.5, w4 = 0.5, b1 = 0.1, b2 = 1.0;
   const iters = [];
   for (let i = 0; i < NUM_ITER; i++) {
+    const record = DATASET[i];
+    const x1 = record.x1, x2 = record.x2, target = record.y;
     const it = {};
-    it.z_h1 = INPUT.x1 * w1 + b1; it.z_h2 = INPUT.x2 * w2 + b1;
+    it.x1 = x1; it.x2 = x2; it.target = target; it.recordId = record.id; it.label = record.label;
+    // Forward pass for display record
+    it.z_h1 = x1 * w1 + b1; it.z_h2 = x2 * w2 + b1;
     it.h1 = relu(it.z_h1); it.h2 = relu(it.z_h2);
     it.z_out = it.h1 * w3 + it.h2 * w4 + b2; it.yhat = sigmoid(it.z_out);
-    it.loss = Math.pow(TARGET - it.yhat, 2);
-    const dL_dy = -2 * (TARGET - it.yhat), dy_dz = sigmoidDeriv(it.yhat), d_out = dL_dy * dy_dz;
-    it.dL_dw3 = d_out * it.h1; it.dL_dw4 = d_out * it.h2; it.dL_db2 = d_out;
-    const dL_dh1 = d_out * w3, dL_dh2 = d_out * w4;
-    const dh1 = reluDeriv(it.z_h1), dh2 = reluDeriv(it.z_h2);
-    it.dL_dw1 = dL_dh1 * dh1 * INPUT.x1; it.dL_dw2 = dL_dh2 * dh2 * INPUT.x2;
-    it.dL_db1_h1 = dL_dh1 * dh1; it.dL_db1_h2 = dL_dh2 * dh2;
+    it.loss = Math.pow(target - it.yhat, 2);
+    // Batch gradient descent: compute avg loss & avg gradients over ALL records
+    let totalLoss = 0, aw1 = 0, aw2 = 0, aw3 = 0, aw4 = 0, ab1 = 0, ab2 = 0;
+    for (let j = 0; j < DATASET.length; j++) {
+      const rr = DATASET[j];
+      const azh1 = rr.x1 * w1 + b1, azh2 = rr.x2 * w2 + b1;
+      const ah1 = relu(azh1), ah2 = relu(azh2);
+      const azo = ah1 * w3 + ah2 * w4 + b2, ayh = sigmoid(azo);
+      totalLoss += Math.pow(rr.y - ayh, 2);
+      const dd = -2 * (rr.y - ayh) * sigmoidDeriv(ayh);
+      aw3 += dd * ah1; aw4 += dd * ah2; ab2 += dd;
+      const dh1 = dd * w3, dh2 = dd * w4;
+      aw1 += dh1 * reluDeriv(azh1) * rr.x1; aw2 += dh2 * reluDeriv(azh2) * rr.x2;
+      ab1 += dh1 * reluDeriv(azh1) + dh2 * reluDeriv(azh2);
+    }
+    const N = DATASET.length;
+    it.avgLoss = totalLoss / N;
+    // Store avg gradients for display
+    it.dL_dw1 = aw1 / N; it.dL_dw2 = aw2 / N;
+    it.dL_dw3 = aw3 / N; it.dL_dw4 = aw4 / N;
+    it.dL_db2 = ab2 / N;
+    it.dL_db1_h1 = ab1 / N; it.dL_db1_h2 = 0;
     it.w1_old = w1; it.w2_old = w2; it.w3_old = w3; it.w4_old = w4; it.b1_old = b1; it.b2_old = b2;
     w1 -= LR * it.dL_dw1; w2 -= LR * it.dL_dw2; w3 -= LR * it.dL_dw3; w4 -= LR * it.dL_dw4;
-    b1 -= LR * (it.dL_db1_h1 + it.dL_db1_h2); b2 -= LR * it.dL_db2;
+    b1 -= LR * it.dL_db1_h1; b2 -= LR * it.dL_db2;
     it.w1_new = w1; it.w2_new = w2; it.w3_new = w3; it.w4_new = w4; it.b1_new = b1; it.b2_new = b2;
     iters.push(it);
   }
@@ -103,13 +119,13 @@ const mono = "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace";
 function DatasetTable({ activeRecord }) {
   return (
     <div style={{ overflowX: "auto" }}>
-      <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0, fontSize: 13, fontFamily: mono }}>
+      <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0, fontSize: 14, fontFamily: mono }}>
         <thead>
           <tr>
             {["#", "Hours Studied (x\u2081)", "Hours Slept (x\u2082)", "Result (y)"].map((hd, i) => (
               <th key={i} style={{
                 padding: "10px 12px", textAlign: i === 0 ? "center" : "left",
-                background: C.navy, color: "#bbc", fontWeight: 600, fontSize: 12,
+                background: C.navy, color: "#bbc", fontWeight: 600, fontSize: 13,
                 borderBottom: `2px solid ${C.teal}44`,
                 ...(i === 0 ? { borderRadius: "8px 0 0 0", width: 40 } : {}),
                 ...(i === 3 ? { borderRadius: "0 8px 0 0" } : {}),
@@ -130,7 +146,7 @@ function DatasetTable({ activeRecord }) {
                 <td style={{ padding: "8px 12px", color: "#dde" }}>{r.x2}</td>
                 <td style={{ padding: "8px 12px" }}>
                   <span style={{
-                    display: "inline-block", padding: "3px 12px", borderRadius: 10, fontSize: 12, fontWeight: 600,
+                    display: "inline-block", padding: "4px 14px", borderRadius: 12, fontSize: 13, fontWeight: 600,
                     background: r.y === 1 ? C.green + "25" : C.red + "25",
                     color: r.y === 1 ? C.green : C.red,
                   }}>{r.label} ({r.y})</span>
@@ -140,9 +156,9 @@ function DatasetTable({ activeRecord }) {
           })}
         </tbody>
       </table>
-      <div style={{ marginTop: 10, padding: "10px 14px", background: C.amber + "12", border: `1px solid ${C.amber}33`, borderRadius: 8, fontSize: 12, color: C.amber, fontFamily: mono, lineHeight: 1.6 }}>
-        {"\u25B6"} <strong>Training sample:</strong> Record #{TRAIN_RECORD.id} {"\u2014"} x{"\u2081"} = {INPUT.x1} (hours studied), x{"\u2082"} = {INPUT.x2} (hours slept), target = {TARGET} (Pass)<br/>
-        The network will iterate 10 times on this single record to demonstrate the learning loop.
+      <div style={{ marginTop: 12, padding: "12px 16px", background: C.amber + "12", border: `1px solid ${C.amber}33`, borderRadius: 10, fontSize: 14, color: C.amber, fontFamily: mono, lineHeight: 1.7 }}>
+        {"\u25B6"} <strong>Training:</strong> Each iteration uses a different record from the dataset (10 records, 10 iterations).<br/>
+        The highlighted record is the one being used in the current iteration.
       </div>
     </div>
   );
@@ -156,14 +172,14 @@ function PhaseIndicator({ currentPhase }) {
       {PHASES.map((p, i) => (
         <div key={p} style={{ display: "flex", alignItems: "center", gap: 3 }}>
           <div style={{
-            padding: "4px 9px", borderRadius: 16, fontSize: 11, fontWeight: i === idx ? 700 : 500,
+            padding: "5px 12px", borderRadius: 16, fontSize: 13, fontWeight: i === idx ? 700 : 500,
             fontFamily: mono, whiteSpace: "nowrap",
             background: i === idx ? PC[p] : i < idx ? PC[p] + "30" : "#2a3a6a",
             color: i === idx ? "#fff" : i < idx ? PC[p] : "#556",
             border: i === idx ? `2px solid ${PC[p]}` : "2px solid transparent",
             transition: "all 0.3s",
           }}>{SHORT_PL[i]}</div>
-          {i < 4 && <span style={{ color: i < idx ? PC[PHASES[i + 1]] : "#334", fontSize: 9 }}>{"\u2192"}</span>}
+          {i < 4 && <span style={{ color: i < idx ? PC[PHASES[i + 1]] : "#334", fontSize: 12, fontWeight: 700 }}>{"\u2192"}</span>}
         </div>
       ))}
     </div>
@@ -176,8 +192,8 @@ function NetworkDiagram({ iterData, currentPhase }) {
   const phaseAtLeast = (p) => pi >= PHASES.indexOf(p);
 
   const nodes = {
-    x1: { cx: 80, cy: 110, label: "x\u2081", sublabel: `${INPUT.x1}`, desc: "Hrs Studied" },
-    x2: { cx: 80, cy: 280, label: "x\u2082", sublabel: `${INPUT.x2}`, desc: "Hrs Slept" },
+    x1: { cx: 80, cy: 110, label: "x\u2081", sublabel: iterData ? `${iterData.x1}` : "", desc: "Hrs Studied" },
+    x2: { cx: 80, cy: 280, label: "x\u2082", sublabel: iterData ? `${iterData.x2}` : "", desc: "Hrs Slept" },
     h1: { cx: 300, cy: 110, label: "h\u2081" },
     h2: { cx: 300, cy: 280, label: "h\u2082" },
     y:  { cx: 510, cy: 195, label: "\u0177" },
@@ -286,9 +302,10 @@ function NetworkDiagram({ iterData, currentPhase }) {
 
       {iterData && phaseAtLeast("loss") && (
         <g>
-          <rect x={462} y={252} width={96} height={48} rx={8} fill={C.red + "22"} stroke={C.red + "55"} strokeWidth={1} />
-          <text x={510} y={270} textAnchor="middle" fill={C.red} fontSize={11} fontFamily={mono}>Target: {TARGET}</text>
-          <text x={510} y={290} textAnchor="middle" fill={C.red} fontSize={12} fontWeight={700} fontFamily={mono}>Loss: {fmt(iterData.loss)}</text>
+          <rect x={452} y={248} width={116} height={62} rx={8} fill={C.red + "22"} stroke={C.red + "55"} strokeWidth={1} />
+          <text x={510} y={266} textAnchor="middle" fill={C.red} fontSize={11} fontFamily={mono}>Target: {iterData.target}</text>
+          <text x={510} y={284} textAnchor="middle" fill={C.red} fontSize={11} fontFamily={mono}>Sample: {fmt(iterData.loss)}</text>
+          <text x={510} y={302} textAnchor="middle" fill={C.red} fontSize={12} fontWeight={700} fontFamily={mono}>Avg: {fmt(iterData.avgLoss)}</text>
         </g>
       )}
       {currentPhase === "backprop" && <text x={310} y={385} textAnchor="middle" fill={C.purple} fontSize={13} fontFamily={mono} fontWeight={700}>{"\u2190"} Error flows backward {"\u2190"}</text>}
@@ -301,11 +318,11 @@ function NetworkDiagram({ iterData, currentPhase }) {
 function ExplanationPanel({ iterData, currentPhase, iteration }) {
   if (!iterData) return null;
   const color = PC[currentPhase];
-  const box = (children) => <div style={{ background: "#0d1530", borderRadius: 8, padding: "12px 14px", marginBottom: 10 }}>{children}</div>;
-  const lbl = (text, col) => <div style={{ fontSize: 12, color: col || color, fontFamily: mono, marginBottom: 4, fontWeight: 600 }}>{text}</div>;
-  const mth = (children) => <div style={{ fontSize: 13, color: "#dde", fontFamily: mono, lineHeight: 1.9 }}>{children}</div>;
+  const box = (children) => <div style={{ background: "#0d1530", borderRadius: 10, padding: "14px 16px", marginBottom: 12 }}>{children}</div>;
+  const lbl = (text, col) => <div style={{ fontSize: 14, color: col || color, fontFamily: mono, marginBottom: 6, fontWeight: 600 }}>{text}</div>;
+  const mth = (children) => <div style={{ fontSize: 14, color: "#dde", fontFamily: mono, lineHeight: 2.0 }}>{children}</div>;
   const tip = (emoji, text, col) => (
-    <div style={{ background: (col || color) + "15", border: `1px solid ${col || color}44`, borderRadius: 8, padding: "8px 12px", fontSize: 12, color: col || color, lineHeight: 1.5 }}>
+    <div style={{ background: (col || color) + "15", border: `1px solid ${col || color}44`, borderRadius: 10, padding: "10px 14px", fontSize: 14, color: col || color, lineHeight: 1.6, marginTop: 8 }}>
       {emoji} {text}
     </div>
   );
@@ -316,32 +333,33 @@ function ExplanationPanel({ iterData, currentPhase, iteration }) {
   const content = {
     forward_hidden: () => (
       <div>
-        <p style={{ color: "#ccd", fontSize: 13, lineHeight: 1.6, margin: "0 0 12px" }}>Each input {"\u00D7"} its weight + bias, then ReLU activation. ReLU outputs zero for negatives, passes positives through.</p>
-        {box(<>{lbl("Hidden Neuron h\u2081:")}{mth(<>z{"\u2081"} = x{"\u2081"} {"\u00D7"} w{"\u2081"} + b{"\u2081"}<br/>= {INPUT.x1} {"\u00D7"} {fmt3(iterData.w1_old)} + {fmt2(iterData.b1_old)} = {TC(fmt(iterData.z_h1), C.teal)}<br/>h{"\u2081"} = ReLU({fmt(iterData.z_h1)}) = {TC(fmt(iterData.h1), C.teal)}</>)}</>)}
-        {box(<>{lbl("Hidden Neuron h\u2082:")}{mth(<>z{"\u2082"} = x{"\u2082"} {"\u00D7"} w{"\u2082"} + b{"\u2081"}<br/>= {INPUT.x2} {"\u00D7"} {fmt3(iterData.w2_old)} + {fmt2(iterData.b1_old)} = {TC(fmt(iterData.z_h2), C.teal)}<br/>h{"\u2082"} = ReLU({fmt(iterData.z_h2)}) = {TC(fmt(iterData.h2), C.teal)}</>)}</>)}
+        <p style={{ color: "#ccd", fontSize: 14, lineHeight: 1.7, margin: "0 0 14px" }}>Each input {"\u00D7"} its weight + bias, then ReLU activation. ReLU outputs zero for negatives, passes positives through.</p>
+        {box(<>{lbl("Hidden Neuron h\u2081:")}{mth(<>z{"\u2081"} = x{"\u2081"} {"\u00D7"} w{"\u2081"} + b{"\u2081"}<br/>= {iterData.x1} {"\u00D7"} {fmt3(iterData.w1_old)} + {fmt2(iterData.b1_old)} = {TC(fmt(iterData.z_h1), C.teal)}<br/>h{"\u2081"} = ReLU({fmt(iterData.z_h1)}) = {TC(fmt(iterData.h1), C.teal)}</>)}</>)}
+        {box(<>{lbl("Hidden Neuron h\u2082:")}{mth(<>z{"\u2082"} = x{"\u2082"} {"\u00D7"} w{"\u2082"} + b{"\u2081"}<br/>= {iterData.x2} {"\u00D7"} {fmt3(iterData.w2_old)} + {fmt2(iterData.b1_old)} = {TC(fmt(iterData.z_h2), C.teal)}<br/>h{"\u2082"} = ReLU({fmt(iterData.z_h2)}) = {TC(fmt(iterData.h2), C.teal)}</>)}</>)}
         {iterData.h2 === 0 && tip("\uD83D\uDCA1", <>{S("Notice:")} h{"\u2082"} = 0 because the weighted sum was negative. ReLU "killed" this neuron {"\u2014"} it contributes nothing this pass.</>, C.amber)}
       </div>
     ),
     forward_output: () => (
       <div>
-        <p style={{ color: "#ccd", fontSize: 13, lineHeight: 1.6, margin: "0 0 12px" }}>Hidden outputs {"\u00D7"} weights + bias {"\u2192"} Sigmoid {"\u2192"} probability between 0 and 1.</p>
+        <p style={{ color: "#ccd", fontSize: 14, lineHeight: 1.7, margin: "0 0 14px" }}>Hidden outputs {"\u00D7"} weights + bias {"\u2192"} Sigmoid {"\u2192"} probability between 0 and 1.</p>
         {box(<>{lbl("Output Neuron \u0177:", C.blue)}{mth(<>z = h{"\u2081"}{"\u00D7"}w{"\u2083"} + h{"\u2082"}{"\u00D7"}w{"\u2084"} + b{"\u2082"}<br/>= {fmt(iterData.h1)}{"\u00D7"}{fmt3(iterData.w3_old)} + {fmt(iterData.h2)}{"\u00D7"}{fmt3(iterData.w4_old)} + {fmt2(iterData.b2_old)}<br/>= {TC(fmt(iterData.z_out), C.blue)}<br/>{"\u0177"} = {"\u03C3"}({fmt(iterData.z_out)}) = {TC(fmt(iterData.yhat), C.blue)}</>)}</>)}
-        {tip("\uD83C\uDFAF", <>{S("Prediction:")} {(iterData.yhat*100).toFixed(1)}% chance of passing. Target is {TARGET===1?"Pass (1.0)":"Fail (0.0)"}.</>)}
+        {tip("\uD83C\uDFAF", <>{S("Prediction:")} {(iterData.yhat*100).toFixed(1)}% chance of passing. Target is {iterData.target===1?"Pass (1.0)":"Fail (0.0)"}.</>)}
       </div>
     ),
     loss: () => (
       <div>
-        <p style={{ color: "#ccd", fontSize: 13, lineHeight: 1.6, margin: "0 0 12px" }}>MSE measures how far off the prediction is. Squaring penalizes large errors more.</p>
-        {box(<>{lbl("MSE Loss:", C.red)}{mth(<>Loss = (target {"\u2212"} {"\u0177"}){"\u00B2"}<br/>= ({TARGET} {"\u2212"} {fmt(iterData.yhat)}){"\u00B2"}<br/>= ({fmt(TARGET-iterData.yhat)}){"\u00B2"}<br/>= {TC(fmt(iterData.loss), C.red)}</>)}</>)}
-        {tip("\uD83D\uDCC9", <>{S("Goal:")} Push this loss toward zero. Backpropagation next will tell us which weights to adjust.</>, C.red)}
+        <p style={{ color: "#ccd", fontSize: 14, lineHeight: 1.7, margin: "0 0 14px" }}>MSE measures how far off the prediction is. Squaring penalizes large errors more.</p>
+        {box(<>{lbl("Sample Loss (Record #" + iterData.recordId + "):", C.red)}{mth(<>Loss = (target {"\u2212"} {"\u0177"}){"\u00B2"}<br/>= ({iterData.target} {"\u2212"} {fmt(iterData.yhat)}){"\u00B2"}<br/>= ({fmt(iterData.target-iterData.yhat)}){"\u00B2"}<br/>= {TC(fmt(iterData.loss), C.red)}</>)}</>)}
+        {box(<>{lbl("Avg. Loss (all 10 records):", C.red)}{mth(<>= {TC(fmt(iterData.avgLoss), C.red)}</>)}</>)}
+        {tip("\uD83D\uDCC9", <>{S("Goal:")} Push avg loss toward zero. Gradients are computed over all records (batch GD).</>, C.red)}
       </div>
     ),
     backprop: () => (
       <div>
-        <p style={{ color: "#ccd", fontSize: 13, lineHeight: 1.6, margin: "0 0 12px" }}>Error flows backward via the chain rule. Each weight gets a gradient {"\u2014"} its "blame score."</p>
+        <p style={{ color: "#ccd", fontSize: 14, lineHeight: 1.7, margin: "0 0 14px" }}>Gradients averaged over all 10 records (batch gradient descent). Each weight gets a gradient {"\u2014"} its "blame score."</p>
         {box(<>{lbl("Gradients (\u2202Loss/\u2202weight):", C.purple)}<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginTop:6}}>
           {[{l:"\u2202L/\u2202w\u2081",v:iterData.dL_dw1},{l:"\u2202L/\u2202w\u2082",v:iterData.dL_dw2},{l:"\u2202L/\u2202w\u2083",v:iterData.dL_dw3},{l:"\u2202L/\u2202w\u2084",v:iterData.dL_dw4}].map(g=>(
-            <div key={g.l} style={{background:C.purple+"18",borderRadius:6,padding:"6px 8px",fontFamily:mono,fontSize:12}}>
+            <div key={g.l} style={{background:C.purple+"18",borderRadius:8,padding:"8px 10px",fontFamily:mono,fontSize:14}}>
               <span style={{color:C.purple}}>{g.l}</span><span style={{color:"#dde",marginLeft:6}}>= {fmt(g.v)}</span>
             </div>
           ))}</div></>)}
@@ -352,14 +370,14 @@ function ExplanationPanel({ iterData, currentPhase, iteration }) {
       const u = [{l:"w\u2081",o:iterData.w1_old,g:iterData.dL_dw1,n:iterData.w1_new},{l:"w\u2082",o:iterData.w2_old,g:iterData.dL_dw2,n:iterData.w2_new},{l:"w\u2083",o:iterData.w3_old,g:iterData.dL_dw3,n:iterData.w3_new},{l:"w\u2084",o:iterData.w4_old,g:iterData.dL_dw4,n:iterData.w4_new}];
       return (
         <div>
-          <p style={{ color: "#ccd", fontSize: 13, lineHeight: 1.6, margin: "0 0 12px" }}>Each weight nudged to reduce loss. Learning rate = {LR}.</p>
+          <p style={{ color: "#ccd", fontSize: 14, lineHeight: 1.7, margin: "0 0 14px" }}>Each weight nudged to reduce loss. Learning rate = {LR}.</p>
           {box(<>{lbl("w_new = w_old \u2212 lr \u00D7 gradient", C.amber)}<div style={{display:"flex",flexDirection:"column",gap:5,marginTop:8}}>
             {u.map(w=>(
-              <div key={w.l} style={{display:"flex",alignItems:"center",gap:6,fontFamily:mono,fontSize:12,background:C.amber+"10",borderRadius:6,padding:"5px 8px"}}>
-                <span style={{color:C.amber,fontWeight:700,width:24}}>{w.l}</span>
+              <div key={w.l} style={{display:"flex",alignItems:"center",gap:8,fontFamily:mono,fontSize:14,background:C.amber+"10",borderRadius:8,padding:"7px 10px"}}>
+                <span style={{color:C.amber,fontWeight:700,width:28}}>{w.l}</span>
                 <span style={{color:"#999"}}>{fmt3(w.o)}</span><span style={{color:"#666"}}>{"\u2192"}</span>
                 <span style={{color:C.amber,fontWeight:700}}>{fmt3(w.n)}</span>
-                <span style={{color:"#666",fontSize:10,marginLeft:"auto"}}>({fmt3(w.g)})</span>
+                <span style={{color:"#666",fontSize:12,marginLeft:"auto"}}>({fmt3(w.g)})</span>
               </div>
             ))}</div></>)}
           {tip("\u2726", <>{S(`Iteration ${iteration+1} complete!`)} {iteration < NUM_ITER-1 ? "Click Next to continue training." : "All 10 iterations done! Check the loss chart."}</>, C.amber)}
@@ -370,9 +388,9 @@ function ExplanationPanel({ iterData, currentPhase, iteration }) {
 
   return (
     <div style={{ flex: 1, minWidth: 0, overflowY: "auto" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, borderBottom: `2px solid ${color}44`, paddingBottom: 8 }}>
-        <div style={{ width: 8, height: 8, borderRadius: "50%", background: color, boxShadow: `0 0 8px ${color}88` }} />
-        <span style={{ fontSize: 14, fontWeight: 700, color, fontFamily: mono }}>{PL[currentPhase]}</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14, borderBottom: `2px solid ${color}44`, paddingBottom: 10 }}>
+        <div style={{ width: 10, height: 10, borderRadius: "50%", background: color, boxShadow: `0 0 10px ${color}88` }} />
+        <span style={{ fontSize: 16, fontWeight: 700, color, fontFamily: mono }}>{PL[currentPhase]}</span>
       </div>
       {content[currentPhase]()}
     </div>
@@ -384,18 +402,18 @@ function LossChartComponent({ allIter, curIter, curPhase }) {
   const pi = PHASES.indexOf(curPhase);
   const data = allIter.map((it, i) => ({
     name: `${i+1}`,
-    loss: (i < curIter || (i === curIter && pi >= 2)) ? Number(it.loss.toFixed(4)) : null,
+    loss: (i < curIter || (i === curIter && pi >= 2)) ? Number(it.avgLoss.toFixed(4)) : null,
   })).filter(d => d.loss !== null);
   if (!data.length) return null;
   return (
-    <div style={{ width: "100%", height: 160 }}>
-      <div style={{ fontSize: 12, color: C.muted, fontFamily: mono, marginBottom: 4, fontWeight: 600 }}>{"\uD83D\uDCC9"} Loss over iterations</div>
-      <ResponsiveContainer width="100%" height={138}>
+    <div style={{ width: "100%", height: 180 }}>
+      <div style={{ fontSize: 14, color: C.muted, fontFamily: mono, marginBottom: 6, fontWeight: 600 }}>{"\uD83D\uDCC9"} Avg. loss over iterations</div>
+      <ResponsiveContainer width="100%" height={155}>
         <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
           <CartesianGrid stroke="#ffffff08" />
-          <XAxis dataKey="name" tick={{ fontSize: 11, fill: C.muted }} axisLine={false} tickLine={false} />
+          <XAxis dataKey="name" tick={{ fontSize: 13, fill: C.muted }} axisLine={false} tickLine={false} />
           <YAxis hide domain={[0, "auto"]} />
-          <RTooltip contentStyle={{ background: C.bg, border: `1px solid ${C.red}44`, borderRadius: 8, fontFamily: mono, fontSize: 12 }}
+          <RTooltip contentStyle={{ background: C.bg, border: `1px solid ${C.red}44`, borderRadius: 10, fontFamily: mono, fontSize: 14 }}
             labelFormatter={(l) => `Iteration ${l}`} formatter={(v) => [v.toFixed(4), "Loss"]} />
           <Line type="monotone" dataKey="loss" stroke={C.red} strokeWidth={2.5} dot={{ fill: C.red, r: 4 }} animationDuration={300} />
         </LineChart>
@@ -434,24 +452,24 @@ function NeuralNetworkDemo() {
   return (
     <div style={{ background: `linear-gradient(135deg, ${C.bg} 0%, ${C.navy} 100%)`, minHeight: "100vh", color: "#fff", fontFamily: "'Segoe UI', system-ui, sans-serif", display: "flex", flexDirection: "column" }}>
 
-      <div style={{ padding: "14px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #ffffff10", flexWrap: "wrap", gap: 10 }}>
+      <div style={{ padding: "18px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #ffffff12", flexWrap: "wrap", gap: 12 }}>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 700, fontFamily: mono, display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ fontSize: 24, fontWeight: 700, fontFamily: mono, display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ color: C.teal }}>{"\uD83E\uDDE0"}</span> Neural Network Learning Demo
           </div>
-          <div style={{ fontSize: 13, color: C.muted, marginTop: 3, fontFamily: mono }}>
+          <div style={{ fontSize: 14, color: C.muted, marginTop: 4, fontFamily: mono }}>
             By <span style={{ color: C.amber, fontWeight: 600 }}>Ashan Priyadarshana</span> {"\u00B7"} For education &amp; demonstration purposes
           </div>
-          <div style={{ fontSize: 11, color: C.muted + "99", marginTop: 2, fontFamily: mono }}>
-            Predicting student pass/fail {"\u00B7"} x{"\u2081"}={INPUT.x1} (studied) {"\u00B7"} x{"\u2082"}={INPUT.x2} (slept) {"\u00B7"} target={TARGET}
+          <div style={{ fontSize: 13, color: C.muted + "bb", marginTop: 3, fontFamily: mono }}>
+            Predicting student pass/fail {"\u00B7"} Iteration {iter+1}: Record #{iterData.recordId} {"\u00B7"} x{"\u2081"}={iterData.x1} {"\u00B7"} x{"\u2082"}={iterData.x2} {"\u00B7"} target={iterData.target}
           </div>
         </div>
-        <div style={{ display: "flex", gap: 2, background: "#ffffff08", borderRadius: 10, padding: 3 }}>
+        <div style={{ display: "flex", gap: 3, background: "#ffffff08", borderRadius: 12, padding: 4 }}>
           {[["demo", "\uD83D\uDD2C Training Demo"], ["dataset", "\uD83D\uDCCA Dataset"]].map(([id, lb]) => (
             <button key={id} onClick={() => setTab(id)} style={{
-              padding: "6px 14px", borderRadius: 8, border: "none", cursor: "pointer",
+              padding: "8px 18px", borderRadius: 9, border: "none", cursor: "pointer",
               background: tab === id ? C.teal : "transparent", color: tab === id ? "#fff" : C.muted,
-              fontFamily: mono, fontSize: 12, fontWeight: tab === id ? 700 : 500, transition: "all 0.3s",
+              fontFamily: mono, fontSize: 14, fontWeight: tab === id ? 700 : 500, transition: "all 0.3s",
             }}>{lb}</button>
           ))}
         </div>
@@ -459,23 +477,23 @@ function NeuralNetworkDemo() {
 
       {tab === "dataset" ? (
         <div style={{ flex: 1, padding: "24px 20px", maxWidth: 720 }}>
-          <div style={{ fontSize: 15, fontWeight: 700, fontFamily: mono, marginBottom: 8, color: C.teal }}>{"\uD83D\uDCCA"} Training Dataset</div>
-          <p style={{ color: "#aab", fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
+          <div style={{ fontSize: 18, fontWeight: 700, fontFamily: mono, marginBottom: 10, color: C.teal }}>{"\uD83D\uDCCA"} Training Dataset</div>
+          <p style={{ color: "#aab", fontSize: 14, lineHeight: 1.7, marginBottom: 18 }}>
             10 student records with two features (hours studied, hours slept) and a binary target (pass/fail).
-            We train the network on record #3, iterating 10 times on this single example to demonstrate the complete learning loop.
+            Each iteration uses a different record from the dataset, cycling through all 10 to demonstrate the complete learning loop.
           </p>
-          <DatasetTable activeRecord={TRAIN_RECORD.id} />
+          <DatasetTable activeRecord={iterData.recordId} />
         </div>
       ) : (
         <>
-          <div style={{ padding: "10px 20px", background: "#ffffff04", borderBottom: "1px solid #ffffff08", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 3, flexShrink: 0 }}>
-              <span style={{ fontSize: 11, color: C.muted, fontFamily: mono, marginRight: 4 }}>Iter:</span>
+          <div style={{ padding: "12px 28px", background: "#ffffff04", borderBottom: "1px solid #ffffff08", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+              <span style={{ fontSize: 13, color: C.muted, fontFamily: mono, marginRight: 6, fontWeight: 600 }}>Iter:</span>
               {Array.from({ length: NUM_ITER }, (_, i) => (
                 <button key={i} onClick={() => jumpToIter(i)} style={{
-                  width: 26, height: 26, borderRadius: "50%", border: i === iter ? `2px solid ${C.teal}` : "2px solid transparent",
+                  width: 30, height: 30, borderRadius: "50%", border: i === iter ? `2px solid ${C.teal}` : "2px solid transparent",
                   background: i === iter ? C.teal : i < iter ? C.teal + "33" : "#2a3560",
-                  color: i <= iter ? "#fff" : "#556", fontSize: 11, fontWeight: 700, fontFamily: mono,
+                  color: i <= iter ? "#fff" : "#556", fontSize: 13, fontWeight: 700, fontFamily: mono,
                   cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s",
                 }}>{i + 1}</button>
               ))}
@@ -485,45 +503,45 @@ function NeuralNetworkDemo() {
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 16, padding: "12px 20px", flexWrap: "wrap", minHeight: 0 }}>
-            <div style={{ flex: "1 1 500px", minWidth: 300, background: "#ffffff06", borderRadius: 14, padding: "10px 14px", border: "1px solid #ffffff0a", maxHeight: 520 }}>
+          <div style={{ display: "flex", gap: 20, padding: "16px 28px", flexWrap: "wrap", minHeight: 0 }}>
+            <div style={{ flex: "1 1 500px", minWidth: 300, background: "#ffffff06", borderRadius: 16, padding: "14px 18px", border: "1px solid #ffffff0a", maxHeight: 540 }}>
               <NetworkDiagram iterData={iterData} currentPhase={phase} />
             </div>
-            <div style={{ flex: "1 1 320px", minWidth: 260, background: "#ffffff06", borderRadius: 14, padding: 18, border: "1px solid #ffffff0a", display: "flex", flexDirection: "column", maxHeight: 520, overflowY: "auto" }}>
+            <div style={{ flex: "1 1 340px", minWidth: 280, background: "#ffffff06", borderRadius: 16, padding: 22, border: "1px solid #ffffff0a", display: "flex", flexDirection: "column", maxHeight: 540, overflowY: "auto" }}>
               <ExplanationPanel iterData={iterData} currentPhase={phase} iteration={iter} />
             </div>
           </div>
 
-          <div style={{ padding: "14px 20px", borderTop: "1px solid #ffffff10", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, flex: "0 0 auto" }}>
-            <div style={{ flex: "1 1 360px", maxWidth: 440 }}>
+          <div style={{ padding: "20px 28px 16px", marginTop: 8, borderTop: "1px solid #ffffff12", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, flex: "0 0 auto" }}>
+            <div style={{ flex: "1 1 380px", maxWidth: 460 }}>
               <LossChartComponent allIter={allIter} curIter={iter} curPhase={phase} />
             </div>
-            <div style={{ display: "flex", gap: 5, alignItems: "flex-end", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 6, alignItems: "flex-end", flexWrap: "wrap" }}>
               {allIter.map((it, i) => {
                 const vis = i < iter || (i === iter && PHASES.indexOf(phase) >= 1);
                 const pct = vis ? (it.yhat * 100).toFixed(0) : null;
                 return (
-                  <div key={i} style={{ textAlign: "center", fontFamily: mono, opacity: vis ? 1 : 0.25, transition: "opacity 0.3s", width: 34 }}>
-                    <div style={{ height: vis ? Math.max(10, it.yhat * 55) : 5, width: 22, margin: "0 auto 2px",
-                      background: vis ? (it.yhat > 0.5 ? C.green : C.red) : "#333", borderRadius: 3, transition: "all 0.3s" }} />
-                    <div style={{ fontSize: 10, color: vis ? "#ccc" : "#444", fontWeight: vis ? 600 : 400 }}>{pct ? `${pct}%` : "\u2014"}</div>
-                    <div style={{ fontSize: 9, color: "#556" }}>{i + 1}</div>
+                  <div key={i} style={{ textAlign: "center", fontFamily: mono, opacity: vis ? 1 : 0.25, transition: "opacity 0.3s", width: 38 }}>
+                    <div style={{ height: vis ? Math.max(12, it.yhat * 60) : 6, width: 26, margin: "0 auto 3px",
+                      background: vis ? (it.yhat > 0.5 ? C.green : C.red) : "#333", borderRadius: 4, transition: "all 0.3s" }} />
+                    <div style={{ fontSize: 12, color: vis ? "#ccc" : "#444", fontWeight: vis ? 600 : 400 }}>{pct ? `${pct}%` : "\u2014"}</div>
+                    <div style={{ fontSize: 11, color: "#667" }}>{i + 1}</div>
                   </div>
                 );
               })}
             </div>
-            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-              <button onClick={reset} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid #ffffff20", background: "transparent", color: C.muted, cursor: "pointer", fontFamily: mono, fontSize: 12 }}>{"\u21BA"} Reset</button>
-              <button onClick={prev} disabled={!canPrev} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid #ffffff20", background: canPrev ? "#ffffff10" : "transparent", color: canPrev ? "#ccc" : "#444", cursor: canPrev ? "pointer" : "default", fontFamily: mono, fontSize: 12 }}>{"\u2190"} Back</button>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <button onClick={reset} style={{ padding: "9px 18px", borderRadius: 10, border: "1px solid #ffffff20", background: "transparent", color: C.muted, cursor: "pointer", fontFamily: mono, fontSize: 14 }}>{"\u21BA"} Reset</button>
+              <button onClick={prev} disabled={!canPrev} style={{ padding: "9px 18px", borderRadius: 10, border: "1px solid #ffffff20", background: canPrev ? "#ffffff10" : "transparent", color: canPrev ? "#ccc" : "#444", cursor: canPrev ? "pointer" : "default", fontFamily: mono, fontSize: 14 }}>{"\u2190"} Back</button>
               <button onClick={next} disabled={!canNext} style={{
-                padding: "9px 22px", borderRadius: 8, border: "none",
+                padding: "11px 28px", borderRadius: 10, border: "none",
                 background: canNext ? `linear-gradient(135deg, ${PC[PHASES[(phaseIdx + 1) % 5]]}cc, ${PC[phase]})` : C.green,
-                color: "#fff", cursor: canNext ? "pointer" : "default", fontFamily: mono, fontSize: 13, fontWeight: 700,
-                boxShadow: canNext ? `0 0 16px ${PC[phase]}44` : "none", transition: "all 0.3s",
+                color: "#fff", cursor: canNext ? "pointer" : "default", fontFamily: mono, fontSize: 15, fontWeight: 700,
+                boxShadow: canNext ? `0 0 20px ${PC[phase]}44` : "none", transition: "all 0.3s",
               }}>{canNext ? "Next Step \u2192" : "\u2713 Complete!"}</button>
             </div>
           </div>
-          <div style={{ textAlign: "center", padding: "3px 0 8px", fontSize: 10, color: "#445", fontFamily: mono }}>
+          <div style={{ textAlign: "center", padding: "6px 0 12px", fontSize: 13, color: "#556", fontFamily: mono }}>
             Step {step + 1} of {totalSteps} {"\u00B7"} Press {"\u2192"} or Space to advance
           </div>
         </>
