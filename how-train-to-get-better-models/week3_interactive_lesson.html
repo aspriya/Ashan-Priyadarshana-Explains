@@ -1,0 +1,2347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 3: The Deep Learning Balance</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Fraunces:ital,wght@0,300;0,700;1,300;1,700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --navy: #0D1B2A;
+  --navy2: #1A2B3C;
+  --navy3: #243447;
+  --teal: #00D4AA;
+  --teal2: #00A882;
+  --blue: #4C9BE8;
+  --purple: #8B5CF6;
+  --amber: #F59E0B;
+  --red: #EF4444;
+  --orange: #F97316;
+  --green: #10B981;
+  --white: #F0F4F8;
+  --muted: #64748B;
+  --card: rgba(255,255,255,0.04);
+  --border: rgba(255,255,255,0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--navy);
+  color: var(--white);
+}
+
+/* ── SLIDE SYSTEM ── */
+.slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  opacity: 0; pointer-events: none;
+  transform: translateX(60px);
+  transition: opacity 0.5s cubic-bezier(.4,0,.2,1), transform 0.5s cubic-bezier(.4,0,.2,1);
+  overflow: hidden;
+  overflow-y: auto;
+}
+.slide.active {
+  opacity: 1; pointer-events: all;
+  transform: translateX(0);
+}
+.slide.exit {
+  opacity: 0; transform: translateX(-60px);
+  pointer-events: none;
+}
+
+/* ── NAV ── */
+#nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;
+  height: 64px;
+  background: rgba(13,27,42,0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px;
+}
+.nav-left { display: flex; align-items: center; gap: 16px; }
+.nav-dots { display: flex; gap: 6px; }
+.nav-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--muted); cursor: pointer;
+  transition: all 0.3s;
+}
+.nav-dot.active { background: var(--teal); transform: scale(1.5); }
+.nav-dot.visited { background: var(--teal2); opacity: 0.5; }
+.slide-label { font-size: 13px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.nav-counter { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+.btn-nav {
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--white); padding: 8px 20px; border-radius: 8px;
+  cursor: pointer; font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px; font-weight: 500;
+  transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+}
+.btn-nav:hover { background: rgba(255,255,255,0.1); border-color: var(--teal); color: var(--teal); }
+.btn-nav.primary { background: var(--teal); border-color: var(--teal); color: var(--navy); font-weight: 700; }
+.btn-nav.primary:hover { background: var(--teal2); }
+.btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ── COMMON LAYOUT ── */
+.slide-inner {
+  flex: 1; display: flex; flex-direction: column;
+  padding: 40px 60px 84px;
+  overflow-y: auto;
+  min-height: 0;
+}
+.slide-inner::-webkit-scrollbar { width: 5px; }
+.slide-inner::-webkit-scrollbar-track { background: transparent; }
+.slide-inner::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+.slide-inner::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+.slide-header {
+  margin-bottom: 32px; flex-shrink: 0;
+}
+.section-tag {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 2px;
+  padding: 4px 12px; border-radius: 100px;
+  margin-bottom: 12px;
+  background: rgba(0,212,170,0.15);
+  color: var(--teal);
+  border: 1px solid rgba(0,212,170,0.3);
+}
+.slide-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(28px, 3.5vw, 46px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--white);
+}
+.slide-title span { color: var(--teal); }
+.slide-sub {
+  font-size: 16px; color: #94A3B8; margin-top: 8px;
+  font-weight: 400; line-height: 1.5;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 24px;
+  backdrop-filter: blur(10px);
+}
+.card-accent-teal { border-left: 3px solid var(--teal); }
+.card-accent-red { border-left: 3px solid var(--red); }
+.card-accent-green { border-left: 3px solid var(--green); }
+.card-accent-blue { border-left: 3px solid var(--blue); }
+.card-accent-purple { border-left: 3px solid var(--purple); }
+.card-accent-amber { border-left: 3px solid var(--amber); }
+.card-accent-orange { border-left: 3px solid var(--orange); }
+
+/* ── GRID ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.col { display: flex; flex-direction: column; gap: 16px; }
+
+/* ── TYPOGRAPHY ── */
+.label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+.body { font-size: 14px; color: #94A3B8; line-height: 1.7; }
+.highlight { color: var(--teal); font-weight: 600; }
+.code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px; color: var(--teal); }
+
+/* ── PILL TAGS ── */
+.pill { display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: 12px; font-weight: 600; }
+.pill-teal { background: rgba(0,212,170,0.15); color: var(--teal); border: 1px solid rgba(0,212,170,0.3); }
+.pill-red { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+.pill-green { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+.pill-blue { background: rgba(76,155,232,0.15); color: var(--blue); border: 1px solid rgba(76,155,232,0.3); }
+.pill-amber { background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
+.pill-purple { background: rgba(139,92,246,0.15); color: var(--purple); border: 1px solid rgba(139,92,246,0.3); }
+.pill-orange { background: rgba(249,115,22,0.15); color: var(--orange); border: 1px solid rgba(249,115,22,0.3); }
+
+/* ── RANGE INPUT ── */
+input[type=range] {
+  -webkit-appearance: none; width: 100%; height: 6px;
+  border-radius: 3px; background: var(--navy2);
+  outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px;
+  border-radius: 50%; background: var(--teal);
+  box-shadow: 0 0 0 3px rgba(0,212,170,0.3);
+  cursor: pointer; transition: box-shadow 0.2s;
+}
+input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212,170,0.2); }
+
+/* ── BTN ── */
+.btn {
+  padding: 10px 20px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--card); color: var(--white); cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 500;
+  transition: all 0.2s;
+}
+.btn:hover { border-color: var(--teal); color: var(--teal); background: rgba(0,212,170,0.08); }
+.btn.active-btn { background: rgba(0,212,170,0.15); border-color: var(--teal); color: var(--teal); }
+
+/* ── BG GRID ── */
+.bg-grid {
+  position: absolute; inset: 0; z-index: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+.bg-glow {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); pointer-events: none; z-index: 0;
+}
+
+/* ── PROGRESS BAR ── */
+.progress-bar {
+  height: 3px; background: var(--navy3);
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--teal), var(--blue));
+  transition: width 0.4s ease; border-radius: 0 2px 2px 0;
+}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 0 — TITLE
+═══════════════════════════════════════════════════ */
+#s0 { background: var(--navy); justify-content: center; align-items: center; }
+#s0 .bg-glow:nth-child(1) { width: 600px; height: 600px; background: rgba(0,212,170,0.06); top: -200px; left: -200px; }
+#s0 .bg-glow:nth-child(2) { width: 400px; height: 400px; background: rgba(76,155,232,0.06); bottom: -100px; right: -100px; }
+.title-center { position: relative; z-index: 1; text-align: center; max-width: 900px; }
+.title-week { font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 4px; color: var(--teal); margin-bottom: 24px; }
+.title-main { font-family: 'Fraunces', serif; font-size: clamp(40px, 6vw, 80px); font-weight: 700; line-height: 1.05; }
+.title-main em { font-style: italic; color: var(--teal); }
+.title-tagline { font-size: 18px; color: #64748B; margin-top: 24px; font-weight: 300; }
+.title-pills { display: flex; gap: 10px; justify-content: center; margin-top: 32px; flex-wrap: wrap; }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 1 — GOLDILOCKS
+═══════════════════════════════════════════════════ */
+.goldilocks-grid {
+  display: flex; flex-direction: column; gap: 12px;
+  flex: 1; padding-right: 4px;
+}
+.goldilocks-grid::-webkit-scrollbar { width: 4px; }
+.goldilocks-grid::-webkit-scrollbar-track { background: transparent; }
+.goldilocks-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+.gk-card {
+  display: grid; grid-template-columns: 1fr 1.4fr; gap: 24px; align-items: center;
+  border-radius: 16px; padding: 20px 24px;
+  cursor: pointer; transition: all 0.35s ease; position: relative; overflow: hidden;
+  min-height: 0; flex-shrink: 0;
+}
+.gk-card::before {
+  content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s;
+}
+.gk-card:hover::before { opacity: 1; }
+.gk-card:hover { transform: translateY(-2px); }
+.goldilocks-grid.has-expanded .gk-card { opacity: 0.4; transform: scale(0.98); filter: blur(1px); }
+.goldilocks-grid.has-expanded .gk-card.gk-expanded { opacity: 1; transform: scale(1.01); filter: none; box-shadow: 0 0 30px rgba(255,255,255,0.06); z-index: 2; }
+.gk-bad { background: rgba(239,68,68,0.06); border: 2px solid rgba(239,68,68,0.2); }
+.gk-bad::before { background: rgba(239,68,68,0.04); }
+.gk-good { background: rgba(16,185,129,0.06); border: 2px solid rgba(16,185,129,0.35); box-shadow: 0 0 30px rgba(16,185,129,0.08); }
+.gk-good::before { background: rgba(16,185,129,0.04); }
+.gk-text { display: flex; flex-direction: column; gap: 6px; }
+.gk-header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.gk-icon { font-size: 28px; flex-shrink: 0; }
+.gk-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; line-height: 1.2; }
+.gk-subtitle { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.5; }
+.gk-detail { font-size: 13px; line-height: 1.5; color: #94A3B8; }
+.gk-diagnosis { font-size: 12px; line-height: 1.4; color: var(--teal); font-style: italic; padding: 6px 10px; background: rgba(0,212,170,0.06); border-radius: 6px; border-left: 2px solid var(--teal); }
+.gk-stat { display: flex; gap: 16px; }
+.stat-row { display: flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.gk-chart-wrap { position: relative; height: 220px; min-width: 0; }
+.gk-chart-wrap canvas { width: 100% !important; height: 100% !important; }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 2 — LIVE LOSS CURVES
+═══════════════════════════════════════════════════ */
+.loss-layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; flex: 1; min-height: 0; }
+.chart-box { position: relative; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; }
+.chart-wrap { flex: 1; min-height: 0; position: relative; }
+.mode-btns { display: flex; gap: 8px; margin-bottom: 16px; }
+.loss-info { display: flex; flex-direction: column; gap: 12px; }
+.loss-metric { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+.metric-val { font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 600; }
+.metric-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.legend-row { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.legend-line { width: 24px; height: 3px; border-radius: 2px; }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 3 — BIAS VARIANCE
+═══════════════════════════════════════════════════ */
+.bv-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; min-height: 380px; flex-shrink: 0; }
+.bv-chart-box { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; min-height: 340px; }
+.bv-slider-box { display: flex; flex-direction: column; gap: 20px; }
+.complexity-display { text-align: center; padding: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; }
+.complexity-val { font-family: 'JetBrains Mono', monospace; font-size: 48px; font-weight: 700; }
+.bv-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bv-mini-card { padding: 14px; border-radius: 10px; background: var(--card); border: 1px solid var(--border); }
+.bv-number { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 4 — ENSEMBLES INTRO
+═══════════════════════════════════════════════════ */
+.voting-demo {
+  flex: 1; display: flex; flex-direction: column; gap: 20px;
+}
+.voters-row {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+}
+.voter {
+  width: 80px; text-align: center; cursor: pointer;
+  transition: transform 0.2s;
+}
+.voter:hover { transform: translateY(-4px); }
+.voter-icon {
+  width: 60px; height: 60px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; margin: 0 auto 8px;
+  border: 2px solid var(--border); background: var(--card);
+  transition: all 0.3s;
+}
+.voter.voted-yes .voter-icon { border-color: var(--green); background: rgba(16,185,129,0.15); box-shadow: 0 0 20px rgba(16,185,129,0.2); }
+.voter.voted-no .voter-icon { border-color: var(--red); background: rgba(239,68,68,0.15); box-shadow: 0 0 20px rgba(239,68,68,0.2); }
+.voter-label { font-size: 11px; color: var(--muted); }
+.vote-btn { font-size: 20px; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); cursor: pointer; transition: all 0.2s; }
+.vote-btn:hover { transform: scale(1.1); }
+.result-display {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 24px; text-align: center;
+}
+.result-big { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 700; }
+.confidence-bar-wrap { height: 8px; background: var(--navy2); border-radius: 4px; margin-top: 12px; overflow: hidden; }
+.confidence-bar { height: 100%; border-radius: 4px; transition: width 0.5s ease, background 0.3s; }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 5 — BAGGING
+═══════════════════════════════════════════════════ */
+.bagging-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; flex: 1; min-height: 0; }
+.tree-vis { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 16px; padding: 20px; overflow: hidden; }
+#baggingCanvas { width: 100%; height: 100%; }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 6 — BOOSTING
+═══════════════════════════════════════════════════ */
+.boost-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; min-height: 0; }
+.learner-chain { display: flex; flex-direction: column; gap: 10px; }
+.learner-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; border-radius: 10px;
+  background: var(--card); border: 1px solid var(--border);
+  transition: all 0.4s; opacity: 0.4;
+}
+.learner-item.active { opacity: 1; border-color: var(--amber); background: rgba(245,158,11,0.08); }
+.learner-item.done { opacity: 0.7; border-color: var(--green); background: rgba(16,185,129,0.05); }
+.learner-num { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; background: rgba(245,158,11,0.2); color: var(--amber); flex-shrink: 0; }
+.learner-acc { font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-left: auto; }
+.weight-dots { display: flex; flex-wrap: wrap; gap: 4px; max-height: 200px; overflow-y: auto; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 12px; }
+.w-dot { width: 16px; height: 16px; border-radius: 50%; transition: all 0.4s; cursor: default; }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 7 — REGULARIZATION
+═══════════════════════════════════════════════════ */
+.reg-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+.reg-tab { padding: 8px 18px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; color: var(--muted); }
+.reg-tab.active { background: rgba(0,212,170,0.15); border-color: var(--teal); color: var(--teal); }
+.reg-content { display: none; flex: 1; }
+.reg-content.active { display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
+.weight-bars { display: flex; align-items: flex-end; gap: 6px; height: 150px; padding: 12px 12px 8px; background: rgba(0,0,0,0.25); border-radius: 12px; border: 1px solid var(--border); }
+.w-bar { flex: 1; border-radius: 4px 4px 0 0; transition: height 0.5s cubic-bezier(.4,0,.2,1), background 0.3s; min-width: 0; }
+.reg-sidebar .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); }
+.reg-sidebar .label { color: var(--teal); font-size: 11px; font-weight: 700; letter-spacing: 1.5px; margin-bottom: 8px; }
+.reg-sidebar .body, .reg-sidebar div[style*="font-size:13px"] { color: #CBD5E1 !important; }
+.reg-sidebar .body strong, .reg-sidebar strong { color: var(--white); }
+.dropout-net { position: relative; background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+#dropoutCanvas { width: 100%; height: 260px; }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 8 — OPTIMIZERS
+═══════════════════════════════════════════════════ */
+.optim-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; flex: 1; min-height: 0; }
+#optimCanvas { width: 100%; height: 100%; }
+.optim-controls { display: flex; flex-direction: column; gap: 16px; }
+.optim-selector { display: flex; flex-direction: column; gap: 8px; }
+.optim-btn { padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); cursor: pointer; text-align: left; transition: all 0.2s; font-family: 'Space Grotesk', sans-serif; }
+.optim-btn:hover { border-color: var(--teal); }
+.optim-btn.selected { border-color: var(--teal); background: rgba(0,212,170,0.1); }
+.optim-btn .ob-name { font-weight: 600; font-size: 15px; }
+.optim-btn .ob-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.stat-box { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 9 — LEARNING RATE
+═══════════════════════════════════════════════════ */
+.lr-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; min-height: 0; }
+#lrCanvas { width: 100%; height: 100%; }
+.lr-controls { display: flex; flex-direction: column; gap: 20px; }
+.lr-display { font-family: 'JetBrains Mono', monospace; font-size: 36px; font-weight: 700; color: var(--teal); text-align: center; }
+.lr-status { text-align: center; padding: 12px; border-radius: 10px; font-weight: 600; transition: all 0.3s; }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 10 — CHECKLIST
+═══════════════════════════════════════════════════ */
+.checklist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex: 1; align-content: start; }
+.check-item {
+  padding: 16px 20px; border-radius: 12px; border: 1px solid var(--border);
+  background: var(--card); cursor: pointer; transition: all 0.25s;
+  display: flex; align-items: flex-start; gap: 14px;
+}
+.check-item:hover { border-color: var(--teal); transform: translateY(-2px); }
+.check-item.resolved { background: rgba(16,185,129,0.08); border-color: var(--green); }
+.check-circle { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--muted); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.3s; margin-top: 2px; }
+.check-item.resolved .check-circle { background: var(--green); border-color: var(--green); }
+.check-indicator { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+.check-title { font-weight: 600; font-size: 14px; }
+.check-body { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+.check-action { font-size: 12px; color: var(--teal); margin-top: 6px; font-weight: 500; display: none; }
+.check-item.resolved .check-action { display: block; }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 11 — YOU ARE A BUILDER
+═══════════════════════════════════════════════════ */
+#s11 { background: var(--navy); justify-content: center; align-items: center; }
+#s11 .bg-glow:nth-child(1) { width: 700px; height: 700px; background: rgba(0,212,170,0.05); top: -300px; right: -200px; }
+#s11 .bg-glow:nth-child(2) { width: 500px; height: 500px; background: rgba(139,92,246,0.05); bottom: -200px; left: -100px; }
+.builder-content { position: relative; z-index: 1; max-width: 1100px; width: 100%; }
+.builder-headline { font-family: 'Fraunces', serif; font-size: clamp(32px, 4.5vw, 60px); font-weight: 700; text-align: center; margin-bottom: 12px; }
+.builder-sub { text-align: center; font-size: 16px; color: var(--muted); margin-bottom: 40px; }
+.flip-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+.flip-card { perspective: 1000px; height: 160px; cursor: pointer; }
+.flip-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
+.flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+.flip-face {
+  position: absolute; inset: 0; backface-visibility: hidden;
+  border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: center;
+}
+.flip-front { background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+.flip-back { transform: rotateY(180deg); border: 1px solid var(--teal); background: rgba(0,212,170,0.08); }
+.flip-before { font-size: 13px; color: var(--muted); font-style: italic; }
+.flip-after { font-size: 14px; color: var(--white); font-weight: 500; line-height: 1.5; }
+.quote-block { text-align: center; padding: 24px; background: rgba(0,212,170,0.05); border: 1px solid rgba(0,212,170,0.2); border-radius: 16px; font-family: 'Fraunces', serif; font-size: 18px; font-style: italic; color: var(--teal); line-height: 1.5; }
+.progress-track { display: flex; gap: 4px; justify-content: center; margin-top: 20px; }
+.prog-seg { flex: 1; max-width: 60px; height: 4px; border-radius: 2px; }
+
+/* ═══════════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════════ */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+@keyframes spin { to { transform: rotate(360deg); } }
+.animate-in { animation: fadeUp 0.5s ease forwards; }
+.animate-in:nth-child(1) { animation-delay: 0.05s; }
+.animate-in:nth-child(2) { animation-delay: 0.15s; }
+.animate-in:nth-child(3) { animation-delay: 0.25s; }
+.animate-in:nth-child(4) { animation-delay: 0.35s; }
+.animate-in:nth-child(5) { animation-delay: 0.45s; }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<!-- ═══ SLIDE 0: TITLE ═══ -->
+<div class="slide active" id="s0">
+  <div class="bg-glow"></div>
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+  <div class="title-center">
+    <div class="title-week">WEEK 03 · CORE AI PRINCIPLES</div>
+    <h1 class="title-main">The Deep<br><em>Learning Balance</em></h1>
+    <p class="title-tagline">Solving the Goldilocks Problem — making models that actually generalize</p>
+    <div class="title-pills">
+      <span class="pill pill-red">Overfitting</span>
+      <span class="pill pill-blue">Bias-Variance</span>
+      <span class="pill pill-teal">Regularization</span>
+      <span class="pill pill-amber">Bagging &amp; Boosting</span>
+      <span class="pill pill-purple">Optimizers</span>
+      <span class="pill pill-orange">Learning Rate</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 1: GOLDILOCKS ═══ -->
+<div class="slide" id="s1">
+  <div class="bg-grid"></div>
+  <div class="slide-inner" style="position:relative;z-index:1">
+    <div class="slide-header">
+      <div class="section-tag">SECTION 01</div>
+      <h2 class="slide-title">The <span>Goldilocks</span> Problem</h2>
+      <p class="slide-sub">Your model can fail in two opposite directions — click each to explore</p>
+    </div>
+    <div class="goldilocks-grid">
+      <!-- Underfitting -->
+      <div class="gk-card gk-bad" onclick="expandGK(0)">
+        <div class="gk-text">
+          <div class="gk-header">
+            <div class="gk-icon">🥶</div>
+            <div>
+              <div class="gk-title" style="color:var(--red)">Too Simple</div>
+              <div class="gk-subtitle">Underfitting</div>
+            </div>
+            <span class="pill pill-red" style="margin-left:auto">High Bias</span>
+          </div>
+          <div class="gk-detail">The model is too simple to capture the underlying pattern. It misses signal everywhere — poor on both seen and unseen data.</div>
+          <div class="gk-diagnosis">🔍 Look for: Both curves plateau <strong>HIGH</strong> and stay close together</div>
+          <div class="gk-stat">
+            <div class="stat-row"><span style="color:var(--muted)">Train:</span><span style="color:var(--red)">HIGH ↑</span></div>
+            <div class="stat-row"><span style="color:var(--muted)">Val:</span><span style="color:var(--red)">HIGH ↑</span></div>
+          </div>
+        </div>
+        <div class="gk-chart-wrap"><canvas id="gkChart0"></canvas></div>
+      </div>
+      <!-- Good Fit -->
+      <div class="gk-card gk-good" onclick="expandGK(1)">
+        <div class="gk-text">
+          <div class="gk-header">
+            <div class="gk-icon">✅</div>
+            <div>
+              <div class="gk-title" style="color:var(--green)">Just Right</div>
+              <div class="gk-subtitle">Good Generalization</div>
+            </div>
+            <span class="pill pill-green" style="margin-left:auto">TARGET</span>
+          </div>
+          <div class="gk-detail">The model captures the true underlying pattern. Performs well on both training data and new, unseen data.</div>
+          <div class="gk-diagnosis">🔍 Look for: Both curves converge <strong>LOW</strong> and move together — this is the goal</div>
+          <div class="gk-stat">
+            <div class="stat-row"><span style="color:var(--muted)">Train:</span><span style="color:var(--green)">LOW ✓</span></div>
+            <div class="stat-row"><span style="color:var(--muted)">Val:</span><span style="color:var(--green)">LOW ✓</span></div>
+          </div>
+        </div>
+        <div class="gk-chart-wrap"><canvas id="gkChart1"></canvas></div>
+      </div>
+      <!-- Overfitting -->
+      <div class="gk-card gk-bad" onclick="expandGK(2)">
+        <div class="gk-text">
+          <div class="gk-header">
+            <div class="gk-icon">🔥</div>
+            <div>
+              <div class="gk-title" style="color:var(--orange)">Too Complex</div>
+              <div class="gk-subtitle">Overfitting</div>
+            </div>
+            <span class="pill pill-orange" style="margin-left:auto">High Variance</span>
+          </div>
+          <div class="gk-detail">Model memorizes training data including noise. Fails catastrophically on new, unseen examples.</div>
+          <div class="gk-diagnosis">🔍 Look for: Train drops <strong>LOW</strong> but Val <strong>rises</strong> — the widening gap is the warning sign</div>
+          <div class="gk-stat">
+            <div class="stat-row"><span style="color:var(--muted)">Train:</span><span style="color:var(--green)">LOW ✓</span></div>
+            <div class="stat-row"><span style="color:var(--muted)">Val:</span><span style="color:var(--orange)">HIGH ↑</span></div>
+          </div>
+        </div>
+        <div class="gk-chart-wrap"><canvas id="gkChart2"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 2: LIVE LOSS CURVES ═══ -->
+<div class="slide" id="s2">
+  <div class="bg-grid"></div>
+  <div class="slide-inner" style="position:relative;z-index:1">
+    <div class="slide-header">
+      <div class="section-tag">SECTION 02</div>
+      <h2 class="slide-title">Reading <span>Loss Curves</span></h2>
+      <p class="slide-sub">Your model's health monitor — switch modes to see each pattern animate live</p>
+    </div>
+    <div class="loss-layout">
+      <div class="chart-box">
+        <div class="mode-btns">
+          <button class="btn active-btn" onclick="setLossMode('good')">✅ Good Fit</button>
+          <button class="btn" onclick="setLossMode('overfit')">🔥 Overfitting</button>
+          <button class="btn" onclick="setLossMode('underfit')">🥶 Underfitting</button>
+        </div>
+        <div class="chart-wrap"><canvas id="lossChart"></canvas></div>
+        <div style="display:flex;gap:20px;margin-top:12px">
+          <div class="legend-row"><div class="legend-line" style="background:var(--blue)"></div><span style="font-size:13px">Training Loss</span></div>
+          <div class="legend-row"><div class="legend-line" style="background:var(--orange);border-top:2px dashed var(--orange);height:0"></div><span style="font-size:13px">Validation Loss</span></div>
+        </div>
+      </div>
+      <div class="loss-info">
+        <div class="loss-metric card" id="trainMetric">
+          <div class="metric-val" id="trainVal" style="color:var(--blue)">—</div>
+          <div class="metric-label">Training Loss</div>
+        </div>
+        <div class="loss-metric card" id="valMetric">
+          <div class="metric-val" id="valVal" style="color:var(--orange)">—</div>
+          <div class="metric-label">Validation Loss</div>
+        </div>
+        <div class="card" id="lossExplanation">
+          <div class="h3">Select a mode</div>
+          <div class="body">Click a mode above to see how the loss curves look — and what they tell you about your model's health.</div>
+        </div>
+        <div class="card card-accent-teal">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:4px">RULE OF THUMB</div>
+          <div style="font-size:13px;line-height:1.6">If validation loss diverges from training loss — you have a generalization problem. Act before it gets worse.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 3: BIAS-VARIANCE ═══ -->
+<div class="slide" id="s3">
+  <div class="bg-grid"></div>
+  <div class="slide-inner" style="position:relative;z-index:1">
+    <div class="slide-header">
+      <div class="section-tag">SECTION 03</div>
+      <h2 class="slide-title">The <span>Bias-Variance</span> Tradeoff</h2>
+      <p class="slide-sub">Drag the complexity slider and watch bias, variance, and total error update live</p>
+    </div>
+    <div class="bv-layout">
+      <div class="bv-chart-box">
+        <div class="chart-wrap" style="flex:1"><canvas id="bvChart"></canvas></div>
+        <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">
+          <div class="legend-row"><div class="legend-line" style="background:var(--red)"></div><span style="font-size:12px">Bias²</span></div>
+          <div class="legend-row"><div class="legend-line" style="background:var(--blue)"></div><span style="font-size:12px">Variance</span></div>
+          <div class="legend-row"><div class="legend-line" style="background:var(--white)"></div><span style="font-size:12px">Total Error</span></div>
+          <div class="legend-row"><div class="legend-line" style="background:var(--teal);width:8px;height:8px;border-radius:50%"></div><span style="font-size:12px">Your Model</span></div>
+        </div>
+      </div>
+      <div class="bv-slider-box">
+        <div class="complexity-display">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px">MODEL COMPLEXITY</div>
+          <div class="complexity-val" id="complexityVal" style="color:var(--teal)">5</div>
+          <div id="complexityLabel" style="font-size:14px;color:var(--muted);margin-top:4px">Balanced</div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:8px">
+            <span>Simple (High Bias)</span><span>Complex (High Variance)</span>
+          </div>
+          <input type="range" min="1" max="10" value="5" id="complexitySlider" oninput="updateBV(this.value)">
+        </div>
+        <div class="bv-cards">
+          <div class="bv-mini-card" style="border-color:rgba(239,68,68,0.3)">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">BIAS²</div>
+            <div class="bv-number" id="biasVal" style="color:var(--red)">—</div>
+          </div>
+          <div class="bv-mini-card" style="border-color:rgba(76,155,232,0.3)">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">VARIANCE</div>
+            <div class="bv-number" id="varVal" style="color:var(--blue)">—</div>
+          </div>
+          <div class="bv-mini-card" style="border-color:rgba(255,255,255,0.15);grid-column:span 2">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">TOTAL ERROR</div>
+            <div class="bv-number" id="totalVal" style="color:var(--white)">—</div>
+          </div>
+        </div>
+        <div class="card card-accent-teal" id="bvTip">
+          <div style="font-size:13px;line-height:1.6">Drag the slider to find the sweet spot where total error is lowest.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EDUCATIONAL SECTION ── -->
+    <div style="margin-top:32px;display:flex;flex-direction:column;gap:20px">
+      <h3 style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--white)">Understanding the <span style="color:var(--teal)">Concepts</span></h3>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <!-- BIAS CARD -->
+        <div class="card" style="border-left:3px solid var(--red);display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">🎯</span>
+            <div>
+              <div style="font-size:16px;font-weight:700;color:var(--red)">Bias</div>
+              <div style="font-size:11px;color:var(--muted);letter-spacing:1px">HOW FAR OFF ON AVERAGE</div>
+            </div>
+          </div>
+          <div style="font-size:13px;line-height:1.7;color:#94A3B8">
+            <strong style="color:var(--white)">Think of it as:</strong> How wrong is your model <em>on average</em>? 
+            Bias measures the gap between your model's average prediction and the true answer.
+          </div>
+          <div style="font-size:13px;line-height:1.7;color:#94A3B8">
+            <strong style="color:var(--white)">Analogy:</strong> Imagine throwing darts at a target. <strong style="color:var(--red)">High bias</strong> = your darts consistently land in the <em>wrong area</em> (far from the bullseye), even if they're grouped together. The aim itself is off.
+          </div>
+          <div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--white);line-height:1.8">
+            <div style="color:var(--muted);font-size:10px;margin-bottom:4px">FORMULA</div>
+            Bias = E[ŷ] − y<sub>true</sub><br>
+            <span style="color:var(--muted)">// Average prediction minus the true value</span><br><br>
+            Bias² = (E[ŷ] − y<sub>true</sub>)²<br>
+            <span style="color:var(--muted)">// We square it so direction doesn't matter</span>
+          </div>
+          <div style="font-size:12px;padding:8px 12px;background:rgba(239,68,68,0.08);border-radius:6px;color:#94A3B8;line-height:1.5">
+            <strong style="color:var(--red)">High bias →</strong> model is too simple → it <em>underfits</em> → misses the real pattern
+          </div>
+        </div>
+
+        <!-- VARIANCE CARD -->
+        <div class="card" style="border-left:3px solid var(--blue);display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">🎲</span>
+            <div>
+              <div style="font-size:16px;font-weight:700;color:var(--blue)">Variance</div>
+              <div style="font-size:11px;color:var(--muted);letter-spacing:1px">HOW MUCH PREDICTIONS JUMP AROUND</div>
+            </div>
+          </div>
+          <div style="font-size:13px;line-height:1.7;color:#94A3B8">
+            <strong style="color:var(--white)">Think of it as:</strong> How much does your model's prediction <em>change</em> when trained on different data? 
+            Variance measures how sensitive the model is to the specific training set it saw.
+          </div>
+          <div style="font-size:13px;line-height:1.7;color:#94A3B8">
+            <strong style="color:var(--white)">Analogy:</strong> Back to darts — <strong style="color:var(--blue)">High variance</strong> = your darts are <em>scattered everywhere</em>. Each throw lands in a very different spot. The model is unstable.
+          </div>
+          <div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--white);line-height:1.8">
+            <div style="color:var(--muted);font-size:10px;margin-bottom:4px">FORMULA</div>
+            Var = E[(ŷ − E[ŷ])²]<br>
+            <span style="color:var(--muted)">// How spread out are predictions</span><br>
+            <span style="color:var(--muted)">// around their own average?</span>
+          </div>
+          <div style="font-size:12px;padding:8px 12px;background:rgba(76,155,232,0.08);border-radius:6px;color:#94A3B8;line-height:1.5">
+            <strong style="color:var(--blue)">High variance →</strong> model is too complex → it <em>overfits</em> → memorizes noise
+          </div>
+        </div>
+      </div>
+
+      <!-- TOTAL ERROR EQUATION -->
+      <div class="card" style="border-left:3px solid var(--teal);display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:24px">📐</span>
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--teal)">The Total Error Equation</div>
+            <div style="font-size:11px;color:var(--muted);letter-spacing:1px">WHY YOU CAN'T MINIMIZE BOTH AT ONCE</div>
+          </div>
+        </div>
+        <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:16px 20px;text-align:center">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--white);letter-spacing:1px">
+            <span style="color:var(--white)">Total Error</span>
+            <span style="color:var(--muted)"> = </span>
+            <span style="color:var(--red)">Bias²</span>
+            <span style="color:var(--muted)"> + </span>
+            <span style="color:var(--blue)">Variance</span>
+            <span style="color:var(--muted)"> + </span>
+            <span style="color:#94A3B8">σ²</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:8px;font-family:'JetBrains Mono',monospace">
+            E[(y − ŷ)²] = (E[ŷ] − y<sub>true</sub>)² + E[(ŷ − E[ŷ])²] + σ²
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div style="font-size:12px;line-height:1.5;color:#94A3B8;text-align:center;padding:8px;background:rgba(239,68,68,0.06);border-radius:6px">
+            <strong style="color:var(--red)">Bias²</strong><br>Error from wrong assumptions.<br>Decreases with complexity.
+          </div>
+          <div style="font-size:12px;line-height:1.5;color:#94A3B8;text-align:center;padding:8px;background:rgba(76,155,232,0.06);border-radius:6px">
+            <strong style="color:var(--blue)">Variance</strong><br>Error from sensitivity to data.<br>Increases with complexity.
+          </div>
+          <div style="font-size:12px;line-height:1.5;color:#94A3B8;text-align:center;padding:8px;background:rgba(255,255,255,0.03);border-radius:6px">
+            <strong style="color:#94A3B8">σ² (Irreducible)</strong><br>Noise in the data itself.<br>Can never be eliminated.
+          </div>
+        </div>
+        <div style="font-size:13px;line-height:1.7;color:#94A3B8">
+          <strong style="color:var(--teal)">The tradeoff:</strong> As you make your model more complex, <span style="color:var(--red)">bias drops</span> but <span style="color:var(--blue)">variance rises</span>. The sweet spot is where their <em>sum</em> is minimized — that's the U-shaped curve you see in the chart above.
+        </div>
+      </div>
+
+      <!-- DART BOARD VISUAL SUMMARY -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+        <div style="text-align:center;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px">
+          <div style="font-size:32px;margin-bottom:6px">🎯</div>
+          <div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:4px">Low Bias · Low Var</div>
+          <div style="font-size:11px;color:#94A3B8">Tight cluster on bullseye<br><strong style="color:var(--green)">Perfect!</strong></div>
+        </div>
+        <div style="text-align:center;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px">
+          <div style="font-size:32px;margin-bottom:6px">⬇️</div>
+          <div style="font-size:11px;font-weight:600;color:var(--red);margin-bottom:4px">High Bias · Low Var</div>
+          <div style="font-size:11px;color:#94A3B8">Tight cluster, wrong spot<br><strong style="color:var(--red)">Underfitting</strong></div>
+        </div>
+        <div style="text-align:center;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px">
+          <div style="font-size:32px;margin-bottom:6px">💥</div>
+          <div style="font-size:11px;font-weight:600;color:var(--blue);margin-bottom:4px">Low Bias · High Var</div>
+          <div style="font-size:11px;color:#94A3B8">Scattered around bullseye<br><strong style="color:var(--blue)">Overfitting</strong></div>
+        </div>
+        <div style="text-align:center;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px">
+          <div style="font-size:32px;margin-bottom:6px">🚫</div>
+          <div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:4px">High Bias · High Var</div>
+          <div style="font-size:11px;color:#94A3B8">Scattered & wrong area<br><strong style="color:var(--orange)">Worst case</strong></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ SLIDE 4: ENSEMBLES ═══ -->
+<div class="slide" id="s4">
+  <div class="bg-grid"></div>
+  <div class="slide-inner" style="position:relative;z-index:1">
+    <div class="slide-header">
+      <div class="section-tag">SECTION 04</div>
+      <h2 class="slide-title">Ensemble Methods — <span>Wisdom of the Crowd</span></h2>
+      <p class="slide-sub">Why ask one model when you can ask many? See how combining decisions beats any single model.</p>
+    </div>
+
+    <!-- SCENARIO CONTEXT -->
+    <div class="card" style="border-left:3px solid var(--amber);margin-bottom:24px;display:flex;gap:16px;align-items:flex-start">
+      <div style="font-size:32px;flex-shrink:0">📧</div>
+      <div>
+        <div style="font-size:16px;font-weight:700;color:var(--amber);margin-bottom:6px">The Scenario: Is This Email Spam?</div>
+        <div style="font-size:13px;line-height:1.7;color:#94A3B8;margin-bottom:10px">
+          Imagine you've received a suspicious email: <em style="color:var(--white)">"Congratulations! You've won a $10,000 gift card. Click here to claim now!"</em>
+        </div>
+        <div style="font-size:13px;line-height:1.7;color:#94A3B8;margin-bottom:10px">
+          Instead of relying on <strong style="color:var(--white)">one model</strong> to decide, you ask <strong style="color:var(--teal)">8 different models</strong> — each trained with a different algorithm. Some will get it right, some won't. But when they <strong style="color:var(--teal)">vote together</strong>, the majority usually wins.
+        </div>
+        <div style="font-size:12px;color:var(--teal);font-style:italic">👇 Try it below — click ✅ (Spam) or ❌ (Not Spam) for each model and watch the ensemble decide</div>
+      </div>
+    </div>
+
+    <!-- VOTING INTERACTIVE -->
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <!-- LEFT: MODELS PANEL -->
+        <div class="card" style="padding:20px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:14px;font-weight:600;color:var(--white)">🤖 Individual Models</div>
+            <div style="display:flex;gap:6px">
+              <button class="btn" onclick="voteAll('yes')" style="padding:6px 12px;font-size:12px;border-color:var(--green);color:var(--green)">All Spam</button>
+              <button class="btn" onclick="voteAll('no')" style="padding:6px 12px;font-size:12px;border-color:var(--red);color:var(--red)">All Not Spam</button>
+              <button class="btn" onclick="resetVotes()" style="padding:6px 12px;font-size:12px">Reset</button>
+            </div>
+          </div>
+          <div class="voters-row" id="votersRow" style="gap:8px"></div>
+          <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:-4px">Each model was trained with a different algorithm — they see the email differently</div>
+        </div>
+
+        <!-- RIGHT: VERDICT PANEL -->
+        <div class="card" style="padding:20px;display:flex;flex-direction:column;gap:16px;border-color:rgba(0,212,170,0.2)">
+          <div style="font-size:14px;font-weight:600;color:var(--white)">📊 Ensemble Verdict</div>
+          <div style="text-align:center;padding:20px 0">
+            <div class="result-big" id="ensembleVerdict" style="font-size:32px">—</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:8px" id="voteCount">Cast votes to see the crowd's decision</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:11px;color:var(--muted);white-space:nowrap">CONFIDENCE</span>
+            <div class="confidence-bar-wrap" style="flex:1">
+              <div class="confidence-bar" id="confidenceBar" style="width:0%;background:var(--teal)"></div>
+            </div>
+          </div>
+          <div class="card" id="ensembleInsight" style="padding:10px 14px;background:rgba(0,212,170,0.06);border-color:rgba(0,212,170,0.15);font-size:12px;line-height:1.5;color:#94A3B8">
+            <strong style="color:var(--teal)">💡 Key insight:</strong> Even if 2-3 models are wrong, the majority still gets it right — that's the power of ensembles.
+          </div>
+        </div>
+      </div>
+
+      <!-- WHY + FLAVOURS ROW -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="card card-accent-teal">
+          <div class="h3">Why Ensembles Work</div>
+          <div class="body" style="margin-top:8px">Think of it like asking <span class="highlight">a panel of doctors</span> instead of just one. Each model has <span class="highlight">different strengths and blind spots</span>. When they disagree, the majority usually finds the truth. When they agree, you can be very confident.</div>
+          <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+            <div style="text-align:center;padding:10px;background:rgba(0,0,0,0.15);border-radius:8px">
+              <div style="font-size:20px;margin-bottom:4px">🌲</div>
+              <div style="font-size:11px;color:#94A3B8">Sees <strong style="color:var(--white)">feature A</strong></div>
+            </div>
+            <div style="text-align:center;padding:10px;background:rgba(0,0,0,0.15);border-radius:8px">
+              <div style="font-size:20px;margin-bottom:4px">🧠</div>
+              <div style="font-size:11px;color:#94A3B8">Sees <strong style="color:var(--white)">feature B</strong></div>
+            </div>
+            <div style="text-align:center;padding:10px;background:rgba(0,0,0,0.15);border-radius:8px">
+              <div style="font-size:20px;margin-bottom:4px">📐</div>
+              <div style="font-size:11px;color:#94A3B8">Sees <strong style="color:var(--white)">feature C</strong></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="card card-accent-blue" style="flex:1">
+            <div class="h3" style="color:var(--blue)">Two Flavours of Ensembles</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <span class="pill pill-blue" style="flex-shrink:0;margin-top:2px">Bagging</span>
+                <span class="body">Train models <strong>independently</strong> on random subsets → reduces <strong style="color:var(--blue)">variance</strong>. <em>Example: Random Forest</em></span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <span class="pill pill-amber" style="flex-shrink:0;margin-top:2px">Boosting</span>
+                <span class="body">Train models <strong>sequentially</strong>, each fixing the last → reduces <strong style="color:var(--amber)">bias</strong>. <em>Example: XGBoost</em></span>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:14px">
+            <div style="text-align:center">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:2px">REAL WORLD</div>
+              <div style="font-size:12px;font-weight:600;color:var(--white)">Random Forest</div>
+              <span class="pill pill-blue" style="font-size:10px;margin-top:4px">Bagging</span>
+            </div>
+            <div style="text-align:center">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:2px">KAGGLE WINNER</div>
+              <div style="font-size:12px;font-weight:600;color:var(--white)">XGBoost</div>
+              <span class="pill pill-amber" style="font-size:10px;margin-top:4px">Boosting</span>
+            </div>
+            <div style="text-align:center">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:2px">PRODUCTION</div>
+              <div style="font-size:12px;font-weight:600;color:var(--white)">Stacking</div>
+              <span class="pill pill-teal" style="font-size:10px;margin-top:4px">Hybrid</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ SLIDE 5: BAGGING ═══ -->
+<div class="slide" id="s5">
+  <div class="bg-grid"></div>
+  <div class="slide-inner" style="position:relative;z-index:1">
+    <div class="slide-header">
+      <div class="section-tag">SECTION 05 · BAGGING</div>
+      <h2 class="slide-title">Bagging & <span>Random Forests</span></h2>
+      <p class="slide-sub">Bootstrap AGGregating — train many trees on random subsets, then average their votes</p>
+    </div>
+    <div class="bagging-layout">
+      <div class="tree-vis">
+        <canvas id="baggingCanvas" height="300"></canvas>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card card-accent-blue">
+          <div class="h3">The Bootstrap Trick</div>
+          <div class="body">For each tree, randomly sample <span class="highlight">~63%</span> of the training data <em>with replacement</em>. Each tree sees a different version of reality — so each learns different patterns.</div>
+        </div>
+        <div class="card card-accent-teal">
+          <div class="h3">Random Feature Selection</div>
+          <div class="body">At each split, consider only a <span class="highlight">random subset of features</span> (typically √n features). This further decorrelates the trees and prevents any one strong feature from dominating.</div>
+        </div>
+        <div class="card card-accent-green">
+          <div class="h3">Why Averaging Helps</div>
+          <div class="body">Each tree has <span class="highlight">high variance</span> (it's sensitive to its training subset). But averaging many high-variance models dramatically reduces the overall variance — without increasing bias.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="card" style="text-align:center">
+            <div style="font-size:11px;color:var(--muted)">BIAS</div>
+            <div style="font-size:22px;font-weight:700;color:var(--teal);font-family:'JetBrains Mono',monospace">≈ same</div>
+            <div style="font-size:11px;color:var(--muted)">as one tree</div>
+          </div>
+          <div class="card" style="text-align:center">
+            <div style="font-size:11px;color:var(--muted)">VARIANCE</div>
+            <div style="font-size:22px;font-weight:700;color:var(--green);font-family:'JetBrains Mono',monospace">↓ much</div>
+            <div style="font-size:11px;color:var(--muted)">lower</div>
+          </div>
+        </div>
+        <button class="btn" onclick="animateBagging()" style="border-color:var(--blue);color:var(--blue)">▶ Animate Bootstrap Sampling</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 6: BOOSTING ═══ -->
+<div class="slide" id="s6">
+  <div class="bg-grid"></div>
+  <div class="slide-inner" style="position:relative;z-index:1">
+    <div class="slide-header">
+      <div class="section-tag">SECTION 06 · BOOSTING</div>
+      <h2 class="slide-title">Boosting — <span>Learning from Mistakes</span></h2>
+      <p class="slide-sub">Each weak learner focuses on the errors of all previous learners. Click to step through.</p>
+    </div>
+    <div class="boost-layout">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:13px;color:var(--muted);font-weight:600">SEQUENTIAL LEARNER CHAIN:</div>
+        <div class="learner-chain" id="learnerChain"></div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="btn" onclick="stepBoost()" id="boostStepBtn" style="border-color:var(--amber);color:var(--amber)">▶ Add Next Learner</button>
+          <button class="btn" onclick="resetBoost()">↺ Reset</button>
+        </div>
+        <div class="card" id="boostInfo">
+          <div class="h3">Boosting Intuition</div>
+          <div class="body">Start with a weak model. Find what it got wrong. Train the next model specifically on those hard examples. Repeat — each model <span class="highlight">fills the gaps</span> of the previous ones.</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:13px;color:var(--muted);font-weight:600">SAMPLE WEIGHTS (harder samples get higher weight):</div>
+        <div class="weight-dots" id="weightDots"></div>
+        <div class="card card-accent-amber">
+          <div class="h3" style="color:var(--amber)">AdaBoost vs Gradient Boosting</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+            <div><span class="pill pill-amber">AdaBoost</span><div class="body" style="margin-top:4px">Re-weights misclassified samples. Learners are decision stumps (depth-1 trees).</div></div>
+            <div><span class="pill pill-orange">Gradient Boosting</span><div class="body" style="margin-top:4px">Fits each learner to the <em>residual errors</em> (gradients) of the previous ensemble. Powers XGBoost, LightGBM, CatBoost.</div></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="card" style="text-align:center">
+            <div style="font-size:11px;color:var(--muted)">BIAS</div>
+            <div style="font-size:22px;font-weight:700;color:var(--green);font-family:'JetBrains Mono',monospace">↓ much</div>
+            <div style="font-size:11px;color:var(--muted)">lower</div>
+          </div>
+          <div class="card" style="text-align:center">
+            <div style="font-size:11px;color:var(--muted)">VARIANCE</div>
+            <div style="font-size:22px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace">watch it</div>
+            <div style="font-size:11px;color:var(--muted)">can overfit</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 7: REGULARIZATION ═══ -->
+<div class="slide" id="s7">
+  <div class="bg-grid"></div>
+  <div class="slide-inner" style="position:relative;z-index:1">
+    <div class="slide-header">
+      <div class="section-tag">SECTION 07</div>
+      <h2 class="slide-title"><span>Regularization</span> Techniques</h2>
+      <p class="slide-sub">Four ways to prevent overfitting — click each tab to explore interactively</p>
+    </div>
+    <div class="reg-tabs">
+      <button class="reg-tab active" onclick="setRegTab('l1')">L1 (Lasso)</button>
+      <button class="reg-tab" onclick="setRegTab('l2')">L2 (Ridge)</button>
+      <button class="reg-tab" onclick="setRegTab('dropout')">Dropout</button>
+      <button class="reg-tab" onclick="setRegTab('early')">Early Stopping</button>
+    </div>
+    <!-- L1 -->
+    <div class="reg-content active" id="reg-l1">
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px">
+        <div class="card card-accent-blue">
+          <div class="h3">L1 Regularization (Lasso)</div>
+          <div class="body">Adds the sum of <span class="highlight">absolute values</span> of weights to the loss: <span class="code">Loss = Loss + λ·Σ|w|</span></div>
+          <div class="body" style="margin-top:8px">Effect: Drives some weights to <span class="highlight">exactly zero</span> — automatic feature selection. Only the most important features survive.</div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px">λ (regularization strength):</div>
+          <input type="range" min="0" max="100" value="30" id="l1Slider" oninput="updateL1(this.value)">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px"><span>No penalty</span><span>Strong penalty</span></div>
+        </div>
+        <div style="font-size:13px;color:var(--muted)">Weight magnitudes (grey = zeroed out):</div>
+        <div class="weight-bars" id="l1Bars"></div>
+      </div>
+      <div class="reg-sidebar" style="display:flex;flex-direction:column;gap:12px">
+        <div class="card"><div class="label">WHEN TO USE</div><div class="body">When you suspect many input features are <strong>irrelevant</strong>. L1 will zero them out automatically, giving you a sparse, interpretable model.</div></div>
+        <div class="card"><div class="label">ANALOGY</div><div class="body">Imagine paying rent for every feature you use. L1 charges <strong>full price</strong> — so you only keep features worth paying for.</div></div>
+        <div class="card card-accent-blue"><div class="label">IN PRACTICE</div><div style="font-size:13px;color:#CBD5E1;line-height:1.6">Start with <span class="code">λ = 0.001</span>. Increase until you see the desired sparsity. Monitor which features get zeroed.</div></div>
+      </div>
+    </div>
+    <!-- L2 -->
+    <div class="reg-content" id="reg-l2">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card card-accent-purple">
+          <div class="h3">L2 Regularization (Ridge / Weight Decay)</div>
+          <div class="body">Adds the sum of <span class="highlight">squared values</span> of weights: <span class="code">Loss = Loss + λ·Σw²</span></div>
+          <div class="body" style="margin-top:8px">Effect: Shrinks <span class="highlight">all weights</span> proportionally toward zero but rarely to exactly zero. Keeps all features but small.</div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px">λ (regularization strength):</div>
+          <input type="range" min="0" max="100" value="30" id="l2Slider" oninput="updateL2(this.value)">
+        </div>
+        <div style="font-size:13px;color:var(--muted)">Weight magnitudes (all shrink proportionally):</div>
+        <div class="weight-bars" id="l2Bars"></div>
+      </div>
+      <div class="reg-sidebar" style="display:flex;flex-direction:column;gap:12px">
+        <div class="card"><div class="label">L1 vs L2</div><div style="display:flex;flex-direction:column;gap:8px;margin-top:6px"><div class="stat-row" style="font-size:13px;color:#CBD5E1"><span>L1 penalty</span><span class="code">|w|</span></div><div class="stat-row" style="font-size:13px;color:#CBD5E1"><span>L2 penalty</span><span class="code">w²</span></div><div style="font-size:12px;color:#94A3B8;margin-top:4px">Squaring punishes large weights heavily but lets small weights survive — <strong style="color:var(--white)">none reach exactly zero</strong>.</div></div></div>
+        <div class="card"><div class="label">ANALOGY</div><div class="body">Progressive tax — the bigger your weight, the more you pay. <strong>Everyone stays in the game</strong>, but no one gets too powerful.</div></div>
+        <div class="card card-accent-purple"><div class="label">IN DEEP LEARNING</div><div style="font-size:13px;color:#CBD5E1;line-height:1.6">L2 is often called <span class="code">weight decay</span> in deep learning frameworks. Adam + weight decay = <span class="highlight">AdamW</span>, the default for training LLMs.</div></div>
+      </div>
+    </div>
+    <!-- DROPOUT -->
+    <div class="reg-content" id="reg-dropout">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card card-accent-teal">
+          <div class="h3">Dropout</div>
+          <div class="body">Randomly <span class="highlight">deactivates neurons</span> during training. Each forward pass uses a different subset of the network.</div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Dropout rate (fraction of neurons dropped):</div>
+          <input type="range" min="0" max="80" value="30" id="dropoutSlider" oninput="updateDropout(this.value)">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px"><span>0% (no dropout)</span><span>80% (heavy dropout)</span></div>
+        </div>
+        <div style="display:flex;gap:12px;font-size:11px;color:#94A3B8;margin:-4px 0">
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:14px;border-radius:50%;background:rgba(0,212,170,0.25);border:2px solid #00D4AA;display:inline-block"></span> Active neuron</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:14px;border-radius:50%;background:rgba(239,68,68,0.15);border:2px dashed rgba(239,68,68,0.5);display:inline-block"></span> Dropped out</span>
+        </div>
+        <div class="dropout-net">
+          <canvas id="dropoutCanvas"></canvas>
+        </div>
+        <div id="dropoutStatus" style="font-size:12px;color:var(--muted);text-align:center"></div>
+      </div>
+      <div class="reg-sidebar" style="display:flex;flex-direction:column;gap:12px">
+        <div class="card"><div class="label">INTUITION</div><div class="body">Training a sports team where <strong>random players sit out</strong> each practice. Every player learns every role — no one becomes indispensable.</div></div>
+        <div class="card"><div class="label">TRAINING vs INFERENCE</div><div class="body">During <strong>training</strong>: neurons randomly dropped. During <strong>inference</strong>: all neurons active, outputs scaled proportionally by <span class="code">1 - dropout_rate</span>.</div></div>
+        <div class="card card-accent-teal"><div class="label">TYPICAL VALUES</div><div style="font-size:13px;color:#CBD5E1;line-height:1.6">Dense layers: <span class="code">0.3–0.5</span><br>Conv layers: <span class="code">0.1–0.2</span><br>Too high → underfitting</div></div>
+      </div>
+    </div>
+    <!-- EARLY STOPPING -->
+    <div class="reg-content" id="reg-early">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card card-accent-green">
+          <div class="h3">Early Stopping</div>
+          <div class="body">Monitor validation loss. Stop training when it stops improving. Save the weights from the <span class="highlight">best checkpoint</span>.</div>
+        </div>
+        <div style="position:relative;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:12px;padding:16px">
+          <canvas id="earlyChart" height="200"></canvas>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" onclick="runEarlyStop()" style="border-color:var(--green);color:var(--green)">▶ Run Training</button>
+          <button class="btn" onclick="resetEarlyStop()">↺ Reset</button>
+        </div>
+      </div>
+      <div class="reg-sidebar" style="display:flex;flex-direction:column;gap:12px">
+        <div class="card"><div class="label">PATIENCE</div><div class="body">How many epochs to wait before accepting no improvement. Typical: <span class="code">patience = 10</span> epochs.<br><br>Too low → stops prematurely. Too high → wastes compute.</div></div>
+        <div class="card"><div class="label">WHY IT WORKS</div><div class="body">The model is most generalized <em>just before</em> it starts memorizing. Early stopping <strong>freezes it at that peak moment</strong>.</div></div>
+        <div class="card card-accent-green"><div class="label">COST</div><div style="font-size:13px;color:#CBD5E1;line-height:1.6">Essentially <span class="highlight">free</span>. No extra computation, no new hyperparameters beyond patience. <strong>Try this first!</strong></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 8: OPTIMIZERS ═══ -->
+<div class="slide" id="s8">
+  <div class="bg-grid"></div>
+  <div class="slide-inner" style="position:relative;z-index:1">
+    <div class="slide-header">
+      <div class="section-tag">SECTION 08</div>
+      <h2 class="slide-title"><span>Optimizers</span> — Finding the Valley</h2>
+      <p class="slide-sub">Watch different optimizers navigate a loss landscape — select one and press Go</p>
+    </div>
+    <div class="optim-layout">
+      <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;flex-direction:column">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">LOSS LANDSCAPE (click to set start position)</div>
+        <div style="flex:1;position:relative"><canvas id="optimCanvas" style="width:100%;height:100%;cursor:crosshair"></canvas></div>
+        <div style="display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap">
+          <button class="btn" onclick="runOptimizer()" id="runOptBtn" style="border-color:var(--teal);color:var(--teal)">▶ Run</button>
+          <button class="btn" onclick="resetOptimizer()">↺ Reset</button>
+          <div style="flex:1"></div>
+          <div style="display:flex;gap:10px;font-size:11px;color:#94A3B8;align-items:center">
+            <span style="display:inline-flex;align-items:center;gap:3px"><span style="width:7px;height:7px;border-radius:50%;background:#EF4444"></span>SGD</span>
+            <span style="display:inline-flex;align-items:center;gap:3px"><span style="width:7px;height:7px;border-radius:50%;background:#4C9BE8"></span>Mom</span>
+            <span style="display:inline-flex;align-items:center;gap:3px"><span style="width:7px;height:7px;border-radius:50%;background:#00D4AA"></span>Adam</span>
+            <span style="margin-left:6px;padding-left:6px;border-left:1px solid rgba(255,255,255,0.1)">🟢 Valley &nbsp;🟠 Peak</span>
+          </div>
+        </div>
+      </div>
+      <div class="optim-controls">
+        <div style="font-size:13px;color:var(--muted);font-weight:600">SELECT OPTIMIZER:</div>
+        <div class="optim-selector">
+          <button class="optim-btn selected" onclick="selectOptimizer('sgd', this)">
+            <div class="ob-name">SGD</div>
+            <div class="ob-desc">Stochastic Gradient Descent — simple, sometimes noisy</div>
+          </button>
+          <button class="optim-btn" onclick="selectOptimizer('momentum', this)">
+            <div class="ob-name">SGD + Momentum</div>
+            <div class="ob-desc">Adds velocity — smooths path, escapes local minima</div>
+          </button>
+          <button class="optim-btn" onclick="selectOptimizer('adam', this)">
+            <div class="ob-name" style="color:var(--teal)">Adam ⭐</div>
+            <div class="ob-desc">Adaptive rates per weight — fast, robust, most used in practice</div>
+          </button>
+        </div>
+        <div class="stat-box">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">CURRENT LOSS</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:var(--teal)" id="currentLoss">—</div>
+        </div>
+        <div class="stat-box">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">STEPS TAKEN</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700" id="stepsTaken">0</div>
+        </div>
+        <div class="card card-accent-teal" style="font-size:12px;color:#94A3B8;line-height:1.6" id="optimNote">
+          Select an optimizer to see how it navigates the loss landscape.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 9: LEARNING RATE ═══ -->
+<div class="slide" id="s9">
+  <div class="bg-grid"></div>
+  <div class="slide-inner" style="position:relative;z-index:1">
+    <div class="slide-header">
+      <div class="section-tag">SECTION 09</div>
+      <h2 class="slide-title">Learning Rate — <span>The Most Important</span> Hyperparameter</h2>
+      <p class="slide-sub">Drag the slider and watch how the learning rate affects training — live</p>
+    </div>
+    <div class="lr-layout">
+      <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:16px;padding:20px;display:flex;flex-direction:column">
+        <div class="chart-wrap" style="flex:1"><canvas id="lrChart"></canvas></div>
+        <div style="display:flex;gap:16px;margin-top:12px">
+          <div class="legend-row"><div class="legend-line" style="background:var(--teal)"></div><span style="font-size:12px">Training Loss</span></div>
+          <div class="legend-row"><div class="legend-line" style="background:var(--orange)"></div><span style="font-size:12px">Validation Loss</span></div>
+        </div>
+      </div>
+      <div class="lr-controls">
+        <div class="card">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px">LEARNING RATE</div>
+          <div class="lr-display" id="lrDisplay">0.01</div>
+          <input type="range" min="1" max="100" value="20" id="lrSlider" oninput="updateLR(this.value)" style="margin-top:16px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px"><span>0.0001</span><span>1.0</span></div>
+        </div>
+        <div class="lr-status card" id="lrStatus">
+          Select a learning rate
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="card">
+            <div class="label">LR SCHEDULES</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+              <div><span class="pill pill-blue">Step Decay</span><div class="body" style="margin-top:4px">Reduce by factor every N epochs</div></div>
+              <div><span class="pill pill-teal">Cosine Annealing</span><div class="body" style="margin-top:4px">Smooth cosine curve to near-zero</div></div>
+              <div><span class="pill pill-purple">Warmup + Decay</span><div class="body" style="margin-top:4px">Used for Transformer training (BERT, GPT)</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card card-accent-teal">
+          <div style="font-size:13px;line-height:1.6" id="lrTip">A good learning rate makes loss decrease <strong>steadily and smoothly</strong>. Too high = chaos. Too low = crawl.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 10: CHECKLIST ═══ -->
+<div class="slide" id="s10">
+  <div class="bg-grid"></div>
+  <div class="slide-inner" style="position:relative;z-index:1">
+    <div class="slide-header">
+      <div class="section-tag">SECTION 10</div>
+      <h2 class="slide-title">The <span>Practical Checklist</span></h2>
+      <p class="slide-sub">Click each symptom to reveal the diagnosis and action plan</p>
+    </div>
+    <div class="checklist-grid" id="checklistGrid"></div>
+  </div>
+</div>
+
+<!-- ═══ SLIDE 11: BUILDER ═══ -->
+<div class="slide" id="s11">
+  <div class="bg-glow"></div>
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+  <div class="slide-inner" style="position:relative;z-index:1;justify-content:center;align-items:center">
+    <div class="builder-content">
+      <div class="builder-headline">You Are No Longer a User.<br><em style="color:var(--teal)">You Are a Builder.</em></div>
+      <div class="builder-sub">Click each card to flip it — see what changed.</div>
+      <div class="flip-cards" id="flipCards"></div>
+      <div class="quote-block">"The engineers who built GPT, Gemini, and Claude sat in lectures just like this one.<br>The difference is — <strong>you are here now.</strong>"</div>
+      <div class="progress-track">
+        <div class="prog-seg" style="background:var(--teal)"></div>
+        <div class="prog-seg" style="background:var(--teal)"></div>
+        <div class="prog-seg" style="background:var(--teal)"></div>
+        <div class="prog-seg" style="background:var(--navy3)"></div>
+        <div class="prog-seg" style="background:var(--navy3)"></div>
+        <div class="prog-seg" style="background:var(--navy3)"></div>
+        <div class="prog-seg" style="background:var(--navy3)"></div>
+        <div class="prog-seg" style="background:var(--navy3)"></div>
+      </div>
+      <div style="text-align:center;font-size:12px;color:var(--muted);margin-top:8px">Week 3 of 8 — Foundation locked in. Agentic systems ahead.</div>
+    </div>
+  </div>
+</div>
+
+<div id="nav">
+  <div class="nav-left">
+    <div class="nav-dots" id="navDots"></div>
+    <div class="slide-label" id="slideLabel">Introduction</div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-counter" id="navCounter">1 / 12</div>
+    <button class="btn-nav" id="prevBtn" onclick="navigate(-1)" disabled>← Prev</button>
+    <button class="btn-nav primary" id="nextBtn" onclick="navigate(1)">Next →</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// SLIDE ENGINE
+// ═══════════════════════════════════════════════
+const SLIDE_LABELS = [
+  'Introduction','Goldilocks Problem','Live Loss Curves',
+  'Bias-Variance Tradeoff','Ensemble Methods',
+  'Bagging & Random Forests','Boosting',
+  'Regularization','Optimizers','Learning Rate',
+  'Practical Checklist','You Are a Builder'
+];
+const TOTAL = 12;
+let current = 0;
+
+const slides = Array.from(document.querySelectorAll('.slide'));
+const dots = document.getElementById('navDots');
+SLIDE_LABELS.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'nav-dot' + (i===0?' active':'');
+  d.onclick = () => goTo(i);
+  d.title = SLIDE_LABELS[i];
+  dots.appendChild(d);
+});
+
+function goTo(idx) {
+  if (idx < 0 || idx >= TOTAL) return;
+  slides[current].classList.remove('active');
+  slides[current].classList.add('exit');
+  setTimeout(() => slides[current]?.classList.remove('exit'), 500);
+  current = idx;
+  slides[current].classList.add('active');
+  updateNav();
+  onSlideEnter(current);
+}
+function navigate(dir) { goTo(current + dir); }
+
+function updateNav() {
+  document.querySelectorAll('.nav-dot').forEach((d,i) => {
+    d.className = 'nav-dot' + (i===current?' active':i<current?' visited':'');
+  });
+  document.getElementById('slideLabel').textContent = SLIDE_LABELS[current];
+  document.getElementById('navCounter').textContent = (current+1)+' / '+TOTAL;
+  document.getElementById('prevBtn').disabled = current===0;
+  document.getElementById('nextBtn').textContent = current===TOTAL-1 ? 'Finish ✓' : 'Next →';
+  document.getElementById('progressFill').style.width = ((current+1)/TOTAL*100)+'%';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight'||e.key==='ArrowDown') navigate(1);
+  if (e.key==='ArrowLeft'||e.key==='ArrowUp') navigate(-1);
+});
+
+// ═══════════════════════════════════════════════
+// SLIDE ENTER HOOKS
+// ═══════════════════════════════════════════════
+function onSlideEnter(idx) {
+  if (idx===1) initGoldilocks();
+  if (idx===2) initLossChart();
+  if (idx===3) initBVChart();
+  if (idx===4) initVoting();
+  if (idx===5) initBagging();
+  if (idx===6) initBoosting();
+  if (idx===7) initRegularization();
+  if (idx===8) initOptimizer();
+  if (idx===9) initLRChart();
+  if (idx===10) initChecklist();
+  if (idx===11) initBuilder();
+}
+
+// ═══════════════════════════════════════════════
+// GOLDILOCKS MINI CURVES
+// ═══════════════════════════════════════════════
+let gkCharts = [];
+function initGoldilocks() {
+  gkCharts.forEach(c => c && c.destroy());
+  gkCharts = [];
+  const configs = [
+    {train:[.9,.85,.82,.81,.80,.80],val:[.92,.88,.86,.85,.85,.85],tc:'#EF4444',vc:'#F97316'},
+    {train:[.9,.7,.5,.3,.2,.15],val:[.92,.72,.53,.33,.24,.2],tc:'#10B981',vc:'#34D399'},
+    {train:[.9,.6,.4,.2,.1,.05],val:[.92,.65,.5,.55,.65,.75],tc:'#4C9BE8',vc:'#F97316'},
+  ];
+  const epochs = ['Ep 1','Ep 2','Ep 3','Ep 4','Ep 5','Ep 6'];
+  configs.forEach((c,i) => {
+    const el = document.getElementById('gkChart'+i);
+    if (!el) return;
+    gkCharts[i] = new Chart(el, {
+      type:'line',
+      data:{
+        labels: epochs,
+        datasets:[
+          { label:'Train Loss', data:c.train, borderColor:c.tc, backgroundColor:c.tc+'44',
+            pointRadius:5, pointHoverRadius:8, pointBackgroundColor:c.tc, pointBorderColor:c.tc,
+            borderWidth:2.5, tension:0.3, fill:false },
+          { label:'Val Loss', data:c.val, borderColor:c.vc, backgroundColor:c.vc+'44',
+            pointRadius:5, pointHoverRadius:8, pointBackgroundColor:c.vc, pointBorderColor:c.vc,
+            borderWidth:2.5, borderDash:[6,3], tension:0.3, fill:false }
+        ]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        animation:{ duration:900, easing:'easeOutQuart' },
+        plugins:{
+          legend:{ display:true, position:'top',
+            labels:{ color:'#94A3B8', font:{family:'Space Grotesk',size:11},
+              boxWidth:14, padding:10, usePointStyle:true, pointStyleWidth:10 }
+          },
+          tooltip:{ backgroundColor:'rgba(13,27,42,0.95)', titleColor:'#F0F4F8',
+            bodyColor:'#94A3B8', borderColor:'rgba(255,255,255,0.1)', borderWidth:1,
+            padding:10, displayColors:true,
+            callbacks:{ label: function(ctx){return ctx.dataset.label+': '+ctx.parsed.y.toFixed(2);} }
+          }
+        },
+        scales:{
+          x:{ title:{display:true,text:'Epoch',color:'#64748B',font:{family:'Space Grotesk',size:11,weight:'600'}},
+            ticks:{color:'#64748B',font:{size:10}},
+            grid:{color:'rgba(255,255,255,0.04)'}
+          },
+          y:{ title:{display:true,text:'Loss',color:'#64748B',font:{family:'Space Grotesk',size:11,weight:'600'}},
+            ticks:{color:'#64748B',font:{size:10},stepSize:0.2},
+            grid:{color:'rgba(255,255,255,0.04)'},
+            min:0, max:1
+          }
+        },
+        interaction:{ mode:'index', intersect:false }
+      }
+    });
+  });
+}
+
+let expandedGK = -1;
+function expandGK(idx) {
+  const grid = document.querySelector('.goldilocks-grid');
+  const cards = grid.querySelectorAll('.gk-card');
+  if (expandedGK === idx) {
+    expandedGK = -1;
+    grid.classList.remove('has-expanded');
+    cards.forEach(c => c.classList.remove('gk-expanded'));
+  } else {
+    expandedGK = idx;
+    grid.classList.add('has-expanded');
+    cards.forEach((c, i) => c.classList.toggle('gk-expanded', i === idx));
+  }
+}
+
+// ═══════════════════════════════════════════════
+// LOSS CHART
+// ═══════════════════════════════════════════════
+let lossChart = null, lossMode = 'good';
+const lossExplanations = {
+  good: {title:'Good Fit ✅', body:'Both curves converge and plateau together at a low loss value. The model has learned the real pattern without memorizing noise. This is what you are aiming for.', color:'var(--green)'},
+  overfit: {title:'Overfitting 🔥', body:'Training loss keeps falling — but validation loss starts rising. The model memorized training data. Add regularization, dropout, or stop earlier.', color:'var(--orange)'},
+  underfit: {title:'Underfitting 🥶', body:'Both curves plateau high and close together. The model is too simple. Increase capacity, reduce regularization, or train for longer.', color:'var(--red)'},
+};
+const lossData = {
+  good: {
+    train:[.95,.78,.62,.48,.36,.27,.22,.18,.16,.15,.14,.14],
+    val:  [.97,.81,.66,.52,.41,.33,.28,.25,.23,.22,.22,.22],
+  },
+  overfit: {
+    train:[.95,.75,.55,.38,.24,.15,.09,.06,.04,.03,.02,.02],
+    val:  [.97,.78,.60,.48,.44,.46,.50,.55,.60,.66,.72,.78],
+  },
+  underfit: {
+    train:[.95,.85,.80,.77,.75,.74,.73,.73,.72,.72,.72,.72],
+    val:  [.97,.88,.84,.81,.79,.78,.77,.77,.77,.77,.77,.77],
+  }
+};
+
+function initLossChart() {
+  if (lossChart) { lossChart.destroy(); lossChart = null; }
+  const ctx = document.getElementById('lossChart').getContext('2d');
+  const labels = Array.from({length:12},(_,i)=>'Epoch '+(i+1));
+  lossChart = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'Training',data:[],borderColor:'#4C9BE8',backgroundColor:'rgba(76,155,232,0.1)',tension:.4,borderWidth:2.5,pointRadius:0,fill:true},
+        {label:'Validation',data:[],borderColor:'#F97316',backgroundColor:'rgba(249,115,22,0.05)',tension:.4,borderWidth:2.5,pointRadius:0,borderDash:[6,3],fill:true},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      animation:{duration:800,easing:'easeInOutQuart'},
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748B',font:{size:11}}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748B',font:{size:11}},min:0,max:1.1}
+      }
+    }
+  });
+  setLossMode('good');
+}
+
+function setLossMode(mode) {
+  lossMode = mode;
+  document.querySelectorAll('#s2 .mode-btns .btn').forEach(b => b.classList.remove('active-btn'));
+  event?.target?.classList.add('active-btn');
+  const d = lossData[mode];
+  const e = lossExplanations[mode];
+  if (lossChart) {
+    lossChart.data.datasets[0].data = d.train;
+    lossChart.data.datasets[1].data = d.val;
+    lossChart.update();
+    const last = d.train.length-1;
+    document.getElementById('trainVal').textContent = d.train[last].toFixed(2);
+    document.getElementById('valVal').textContent = d.val[last].toFixed(2);
+    document.getElementById('lossExplanation').innerHTML = '<div class="h3" style="color:'+e.color+'">'+e.title+'</div><div class="body" style="margin-top:8px">'+e.body+'</div>';
+  }
+}
+
+// ═══════════════════════════════════════════════
+// BIAS-VARIANCE CHART
+// ═══════════════════════════════════════════════
+let bvChart = null;
+function initBVChart() {
+  if (bvChart) { bvChart.destroy(); bvChart = null; }
+  const ctx = document.getElementById('bvChart').getContext('2d');
+  const labels = Array.from({length:10},(_,i)=>(i+1)+'');
+  bvChart = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'Bias²',data:[],borderColor:'#EF4444',backgroundColor:'rgba(239,68,68,0.1)',tension:.4,borderWidth:2.5,pointRadius:0,fill:true},
+        {label:'Variance',data:[],borderColor:'#4C9BE8',backgroundColor:'rgba(76,155,232,0.1)',tension:.4,borderWidth:2.5,pointRadius:0,fill:true},
+        {label:'Total Error',data:[],borderColor:'#F0F4F8',backgroundColor:'transparent',tension:.4,borderWidth:2,pointRadius:0},
+        {label:'You',data:[],borderColor:'#00D4AA',backgroundColor:'#00D4AA',pointRadius:8,pointStyle:'circle',showLine:false},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{enabled:false}},
+      scales:{
+        x:{title:{display:true,text:'Model Complexity',color:'#64748B'},grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748B',font:{size:11}}},
+        y:{title:{display:true,text:'Error',color:'#64748B'},grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748B',font:{size:11}},min:0,max:1}
+      }
+    }
+  });
+  updateBV(5);
+}
+
+function updateBV(v) {
+  const c = parseInt(v);
+  document.getElementById('complexityVal').textContent = c;
+  const labels = {1:'Very Simple',2:'Simple',3:'Simple',4:'Moderate',5:'Balanced',6:'Moderate',7:'Complex',8:'Complex',9:'Very Complex',10:'Extremely Complex'};
+  document.getElementById('complexityLabel').textContent = labels[c]||'';
+  const bias = Array.from({length:10},(_,i) => Math.max(0, 0.9 - i*0.09 + 0.005*i*i));
+  const variance = Array.from({length:10},(_,i) => 0.01 + 0.01*i*i*0.8);
+  const total = bias.map((b,i) => Math.min(1, b + variance[i] + 0.05));
+  const optIdx = total.indexOf(Math.min(...total));
+  if (bvChart) {
+    bvChart.data.datasets[0].data = bias;
+    bvChart.data.datasets[1].data = variance;
+    bvChart.data.datasets[2].data = total;
+    const youData = Array(10).fill(null); youData[c-1] = total[c-1];
+    bvChart.data.datasets[3].data = youData;
+    bvChart.update('none');
+  }
+  const bi = bias[c-1], va = variance[c-1], tot = total[c-1];
+  document.getElementById('biasVal').textContent = bi.toFixed(2);
+  document.getElementById('varVal').textContent = va.toFixed(2);
+  document.getElementById('totalVal').textContent = tot.toFixed(2);
+  const tips = {
+    1:'Very high bias. The model is too simple — it cannot capture real patterns (underfitting).',
+    2:'High bias. Model still too simple.',3:'High bias, low variance.',
+    4:'Bias reducing, variance low.',5:'Approaching the sweet spot.',
+    6:'Near optimal! Good balance.',7:'Variance rising. Watch for overfitting.',
+    8:'High variance. Model starts to overfit.',9:'Very high variance.',
+    10:'Severe overfitting. Memorizing noise.',
+  };
+  document.getElementById('bvTip').innerHTML = '<div style="font-size:13px;line-height:1.6">'+tips[c]+'</div>';
+  const complexityEl = document.getElementById('complexityVal');
+  if (c<=3) complexityEl.style.color='var(--red)';
+  else if (c<=7) complexityEl.style.color='var(--teal)';
+  else complexityEl.style.color='var(--orange)';
+}
+
+// ═══════════════════════════════════════════════
+// VOTING / ENSEMBLES
+// ═══════════════════════════════════════════════
+const voters = [
+  {name:'Tree 1',emoji:'🌲'},{name:'Tree 2',emoji:'🌳'},{name:'Tree 3',emoji:'🌴'},
+  {name:'KNN',emoji:'📍'},{name:'SVM',emoji:'📐'},{name:'LogReg',emoji:'📊'},
+  {name:'Neural',emoji:'🧠'},{name:'Boost',emoji:'⚡'},
+];
+let votes = {};
+function initVoting() {
+  const row = document.getElementById('votersRow');
+  if (row.children.length) return;
+  voters.forEach((v,i) => {
+    const div = document.createElement('div');
+    div.className='voter'; div.id='voter-'+i;
+    div.innerHTML=`<div class="voter-icon" id="vi-${i}">${v.emoji}</div><div class="voter-label">${v.name}</div><div style="display:flex;gap:4px;justify-content:center;margin-top:6px"><button class="vote-btn" onclick="castVote(${i},'yes')" title="Vote: Spam">✅</button><button class="vote-btn" onclick="castVote(${i},'no')" title="Vote: Not Spam">❌</button></div>`;
+    row.appendChild(div);
+  });
+}
+function castVote(i,v) {
+  votes[i]=v;
+  const el = document.getElementById('voter-'+i);
+  el.className='voter voted-'+v;
+  updateEnsemble();
+}
+function voteAll(v) { voters.forEach((_,i)=>castVote(i,v)); }
+function resetVotes() {
+  votes={};
+  voters.forEach((_,i)=>{ const el=document.getElementById('voter-'+i); if(el) el.className='voter'; });
+  document.getElementById('ensembleVerdict').textContent='—';
+  document.getElementById('voteCount').textContent='Cast votes to see result';
+  document.getElementById('confidenceBar').style.width='0%';
+}
+function updateEnsemble() {
+  const yes=Object.values(votes).filter(v=>v==='yes').length;
+  const no=Object.values(votes).filter(v=>v==='no').length;
+  const total=yes+no;
+  if (!total) return;
+  const majority=yes>no?'SPAM':'NOT SPAM';
+  const conf=Math.max(yes,no)/total;
+  const color=yes>no?'var(--red)':'var(--green)';
+  document.getElementById('ensembleVerdict').textContent=majority;
+  document.getElementById('ensembleVerdict').style.color=color;
+  document.getElementById('voteCount').textContent=`${yes} spam vs ${no} not spam (${Math.round(conf*100)}% confidence)`;
+  document.getElementById('confidenceBar').style.width=(conf*100)+'%';
+  document.getElementById('confidenceBar').style.background=color;
+  // Dynamic insight
+  const insight = document.getElementById('ensembleInsight');
+  if (insight) {
+    let msg = '';
+    if (total < 3) {
+      msg = '<strong style="color:var(--teal)">💡 Keep voting:</strong> With only '+total+' vote'+(total>1?'s':'')+', the ensemble is unreliable. More models = more confidence.';
+    } else if (conf >= 0.875) {
+      msg = '<strong style="color:var(--green)">✅ Strong consensus!</strong> '+Math.max(yes,no)+'/'+total+' models agree. When most models agree, you can be very confident in the prediction.';
+    } else if (conf >= 0.625) {
+      msg = '<strong style="color:var(--amber)">⚖️ Moderate agreement:</strong> The vote is '+yes+'-'+no+'. Some models disagree — this is where ensembles shine by going with the majority.';
+    } else {
+      msg = '<strong style="color:var(--red)">⚠️ Close call!</strong> The models are nearly split '+yes+'-'+no+'. Low confidence suggests the email is ambiguous — maybe add more diverse models.';
+    }
+    insight.innerHTML = msg;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// BAGGING CANVAS
+// ═══════════════════════════════════════════════
+let baggingAnimFrame=null;
+function initBagging() {
+  drawBaggingStatic();
+}
+function drawBaggingStatic() {
+  const canvas=document.getElementById('baggingCanvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight||300;
+  const W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='rgba(255,255,255,0.04)';
+  ctx.fillRect(0,0,W,H);
+
+  // Original dataset
+  const dx=W*0.08, dy=H*0.15, dw=W*0.22, dh=H*0.7;
+  ctx.fillStyle='rgba(76,155,232,0.15)'; ctx.strokeStyle='rgba(76,155,232,0.4)';
+  ctx.lineWidth=1.5; roundRect(ctx,dx,dy,dw,dh,10); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#4C9BE8'; ctx.font='bold 13px Space Grotesk';
+  ctx.textAlign='center'; ctx.fillText('Dataset',dx+dw/2,dy-8);
+  for(let i=0;i<20;i++){
+    const sx=dx+12+Math.random()*(dw-24), sy=dy+12+Math.random()*(dh-24);
+    ctx.fillStyle=`hsl(${120+Math.random()*80},60%,60%)`; ctx.beginPath();
+    ctx.arc(sx,sy,4,0,Math.PI*2); ctx.fill();
+  }
+
+  // 3 trees
+  const treeColors=['#10B981','#8B5CF6','#F59E0B'];
+  const treeX=[W*0.42, W*0.63, W*0.84];
+  treeX.forEach((tx,i) => {
+    const th=H*0.28, tw=W*0.15;
+    const ty=H*0.12+i*(H*0.28+8);
+    ctx.fillStyle=`rgba(${i===0?'16,185,129':i===1?'139,92,246':'245,158,11'},0.1)`;
+    ctx.strokeStyle=treeColors[i]; ctx.lineWidth=1.5;
+    roundRect(ctx,tx-tw/2,ty,tw,th,8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=treeColors[i]; ctx.font='bold 11px Space Grotesk';
+    ctx.textAlign='center'; ctx.fillText('Tree '+(i+1),tx,ty-6);
+    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='10px Space Grotesk';
+    ctx.fillText('~63% sample',tx,ty+th/2);
+    ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.setLineDash([4,4]); ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(dx+dw,dy+dh*0.5); ctx.lineTo(tx-tw/2,ty+th/2); ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // Aggregation
+  const ax=W*0.88, ay=H*0.38, aw=W*0.1, ah=H*0.24;
+  ctx.fillStyle='rgba(0,212,170,0.12)'; ctx.strokeStyle='var(--teal)'; ctx.lineWidth=2;
+  roundRect(ctx,ax-aw/2,ay,aw,ah,10); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='var(--teal)'; ctx.font='bold 12px Space Grotesk';
+  ctx.textAlign='center'; ctx.fillText('VOTE',ax,ay+ah/2-6); ctx.fillText('AVERAGE',ax,ay+ah/2+10);
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath(); ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+}
+
+function animateBagging() {
+  const canvas=document.getElementById('baggingCanvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  let frame=0;
+  const particles=[];
+  for(let t=0;t<3;t++) {
+    for(let p=0;p<8;p++) {
+      particles.push({
+        sx:W*0.3, sy:H*(0.12+t*0.3)+H*0.14,
+        tx:W*(0.42+t*0.21), ty:H*(0.12+t*0.28)+H*0.14,
+        t,p,progress:0,delay:p*3+t*5,
+        color:`hsl(${120+Math.random()*80},60%,60%)`
+      });
+    }
+  }
+  function loop() {
+    drawBaggingStatic();
+    frame++;
+    particles.forEach(p => {
+      if(frame < p.delay) return;
+      p.progress = Math.min(1,(frame-p.delay)/30);
+      const x=p.sx+(p.tx-p.sx)*p.progress;
+      const y=p.sy+(p.ty-p.sy)*p.progress;
+      ctx.globalAlpha=1-p.progress*0.3;
+      ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fill();
+      ctx.globalAlpha=1;
+    });
+    if(frame < 100) baggingAnimFrame=requestAnimationFrame(loop);
+    else drawBaggingStatic();
+  }
+  if(baggingAnimFrame) cancelAnimationFrame(baggingAnimFrame);
+  loop();
+}
+
+// ═══════════════════════════════════════════════
+// BOOSTING
+// ═══════════════════════════════════════════════
+const boostLearners=[
+  {acc:0.52,note:'Weak — slightly better than random',focusMsg:'All samples have equal weight'},
+  {acc:0.65,note:'Better — focuses on previous errors',focusMsg:'Misclassified samples get higher weight'},
+  {acc:0.74,note:'Improving — errors from rounds 1+2 corrected',focusMsg:'Hardest samples weighted heavily'},
+  {acc:0.81,note:'Strong — compounding corrections',focusMsg:'Model concentrates on remaining mistakes'},
+  {acc:0.87,note:'Very strong ensemble',focusMsg:'Near-optimal weight distribution'},
+];
+let boostStep=0;
+function initBoosting() {
+  resetBoost();
+}
+function resetBoost() {
+  boostStep=0;
+  const chain=document.getElementById('learnerChain');
+  chain.innerHTML='';
+  boostLearners.forEach((_,i) => {
+    const div=document.createElement('div');
+    div.className='learner-item'; div.id='learner-'+i;
+    div.innerHTML=`<div class="learner-num">${i+1}</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Learner ${i+1}</div><div style="font-size:11px;color:var(--muted)" id="learner-note-${i}">—</div></div><div class="learner-acc" id="learner-acc-${i}" style="color:var(--muted)">—</div>`;
+    chain.appendChild(div);
+  });
+  initWeightDots(1);
+  document.getElementById('boostStepBtn').disabled=false;
+}
+function initWeightDots(round) {
+  const dotsEl=document.getElementById('weightDots');
+  dotsEl.innerHTML='';
+  for(let i=0;i<40;i++) {
+    const d=document.createElement('div');
+    d.className='w-dot'; d.id='wdot-'+i;
+    const isHard = round>1 && (i%Math.max(1,7-round)===0);
+    const size = isHard ? 20 : 12;
+    const color = isHard ? 'var(--amber)' : 'var(--blue)';
+    d.style.cssText=`width:${size}px;height:${size}px;background:${color};opacity:${isHard?1:0.5}`;
+    d.title=isHard?'Hard sample (misclassified)':'Easy sample';
+    dotsEl.appendChild(d);
+  }
+}
+function stepBoost() {
+  if(boostStep>=boostLearners.length) return;
+  const l=boostLearners[boostStep];
+  const el=document.getElementById('learner-'+boostStep);
+  if(boostStep>0) document.getElementById('learner-'+(boostStep-1))?.classList.replace('active','done');
+  el.classList.add('active');
+  document.getElementById('learner-acc-'+boostStep).textContent=(l.acc*100).toFixed(0)+'%';
+  document.getElementById('learner-acc-'+boostStep).style.color=boostStep===0?'var(--muted)':'var(--green)';
+  document.getElementById('learner-note-'+boostStep).textContent=l.note;
+  document.getElementById('boostInfo').innerHTML=`<div class="h3">Round ${boostStep+1}</div><div class="body" style="margin-top:6px">${l.focusMsg}</div>`;
+  initWeightDots(boostStep+1);
+  boostStep++;
+  if(boostStep>=boostLearners.length) {
+    document.getElementById('learner-'+(boostStep-1))?.classList.replace('active','done');
+    document.getElementById('boostStepBtn').disabled=true;
+    document.getElementById('boostInfo').innerHTML='<div class="h3" style="color:var(--teal)">Ensemble Complete!</div><div class="body" style="margin-top:6px">Final ensemble accuracy: <strong style="color:var(--teal)">'+Math.round(boostLearners[boostLearners.length-1].acc*100)+'%</strong> — much better than any single learner.</div>';
+  }
+}
+
+// ═══════════════════════════════════════════════
+// REGULARIZATION
+// ═══════════════════════════════════════════════
+const baseWeights=[0.85,0.62,0.94,0.31,0.78,0.55,0.89,0.41,0.73,0.66];
+let earlyChart=null, earlyTimer=null, earlyEpoch=0;
+
+function initRegularization() {
+  updateL1(30); updateL2(30); updateDropout(30);
+  initEarlyChart();
+}
+
+function setRegTab(tab) {
+  document.querySelectorAll('.reg-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.reg-content').forEach(c=>c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('reg-'+tab).classList.add('active');
+  if(tab==='dropout') setTimeout(()=>drawDropout(30),50);
+  if(tab==='early') initEarlyChart();
+}
+
+function renderBars(containerId,heights,colors) {
+  const cont=document.getElementById(containerId);
+  if(!cont) return;
+  const bars=cont.querySelectorAll('.w-bar');
+  if(!bars.length) {
+    heights.forEach((_,i) => {
+      const b=document.createElement('div'); b.className='w-bar';
+      cont.appendChild(b);
+    });
+    renderBars(containerId,heights,colors); return;
+  }
+  bars.forEach((b,i) => {
+    b.style.height=(heights[i]*100)+'%';
+    b.style.background=colors[i]||'var(--teal)';
+  });
+}
+
+function updateL1(v) {
+  const lam=v/100;
+  const h=baseWeights.map(w=>Math.max(0, w-lam*1.2));
+  const colors=h.map(w=>w<0.01?'var(--muted)':'var(--blue)');
+  renderBars('l1Bars',h,colors);
+}
+function updateL2(v) {
+  const lam=v/100;
+  const h=baseWeights.map(w=>w*(1-lam*0.7));
+  const colors=h.map(()=>'var(--purple)');
+  renderBars('l2Bars',h,colors);
+}
+function updateDropout(v) {
+  drawDropout(v);
+}
+function drawDropout(rate) {
+  const canvas=document.getElementById('dropoutCanvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight||260;
+  const W=canvas.width, H=canvas.height;
+  const pad={x:60,y:30};
+  ctx.clearRect(0,0,W,H);
+  // Network structure: 5 layers with different neuron counts
+  const layerSizes=[1,3,4,3,1];
+  const layerLabels=['Input','Hidden 1','Hidden 2','Hidden 3','Output'];
+  const layerX=layerSizes.map((_,i)=>pad.x+(W-pad.x*2)*(i/(layerSizes.length-1)));
+  const dropout=parseFloat(rate)/100;
+  const neurons=[];
+  let totalNeurons=0, droppedCount=0;
+  layerSizes.forEach((size,li)=>{
+    const spacing=(H-pad.y*2)/(size+1);
+    for(let ni=0;ni<size;ni++){
+      const x=layerX[li];
+      const y=pad.y+spacing*(ni+1);
+      const isDrop=li>0&&li<layerSizes.length-1&&Math.random()<dropout;
+      neurons.push({li,ni,x,y,isDrop,size});
+      if(li>0&&li<layerSizes.length-1){totalNeurons++;if(isDrop)droppedCount++;}
+    }
+  });
+  // Draw connections first (behind neurons)
+  neurons.forEach(n=>{
+    if(n.li>=layerSizes.length-1) return;
+    const nextLayer=neurons.filter(m=>m.li===n.li+1);
+    nextLayer.forEach(m=>{
+      const bothActive=!n.isDrop&&!m.isDrop;
+      const eitherDrop=n.isDrop||m.isDrop;
+      ctx.beginPath(); ctx.moveTo(n.x,n.y); ctx.lineTo(m.x,m.y);
+      if(eitherDrop){
+        ctx.strokeStyle='rgba(239,68,68,0.08)'; ctx.lineWidth=1;
+        ctx.setLineDash([4,4]);
+      } else {
+        ctx.strokeStyle='rgba(0,212,170,0.25)'; ctx.lineWidth=1.5;
+        ctx.setLineDash([]);
+      }
+      ctx.stroke(); ctx.setLineDash([]);
+    });
+  });
+  // Draw neurons
+  const activeColors=['#00D4AA','#4C9BE8','#8B5CF6','#4C9BE8','#00D4AA'];
+  neurons.forEach(n=>{
+    const r=14;
+    if(n.isDrop){
+      // Dropped neuron: red dashed circle with X
+      ctx.beginPath(); ctx.arc(n.x,n.y,r,0,Math.PI*2);
+      ctx.fillStyle='rgba(239,68,68,0.08)'; ctx.fill();
+      ctx.strokeStyle='rgba(239,68,68,0.5)'; ctx.lineWidth=2;
+      ctx.setLineDash([4,3]); ctx.stroke(); ctx.setLineDash([]);
+      // X mark
+      ctx.strokeStyle='rgba(239,68,68,0.7)'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(n.x-5,n.y-5); ctx.lineTo(n.x+5,n.y+5); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(n.x+5,n.y-5); ctx.lineTo(n.x-5,n.y+5); ctx.stroke();
+    } else {
+      // Active neuron: solid colored circle with glow
+      const col=activeColors[n.li];
+      ctx.shadowColor=col; ctx.shadowBlur=12;
+      ctx.beginPath(); ctx.arc(n.x,n.y,r,0,Math.PI*2);
+      ctx.fillStyle=col+'30'; ctx.fill();
+      ctx.strokeStyle=col; ctx.lineWidth=2.5; ctx.stroke();
+      ctx.shadowBlur=0;
+      // Inner dot
+      ctx.beginPath(); ctx.arc(n.x,n.y,4,0,Math.PI*2);
+      ctx.fillStyle=col; ctx.fill();
+    }
+  });
+  // Layer labels at bottom
+  ctx.font='600 10px Space Grotesk, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='top';
+  layerLabels.forEach((lbl,i)=>{
+    ctx.fillStyle=(i===0||i===layerLabels.length-1)?'#94A3B8':'#64748B';
+    ctx.fillText(lbl,layerX[i],H-18);
+  });
+  // Status text
+  const statusEl=document.getElementById('dropoutStatus');
+  if(statusEl){
+    if(dropout===0) statusEl.innerHTML='No dropout — all neurons active. The network may <strong style="color:var(--orange)">memorize</strong> instead of learn.';
+    else statusEl.innerHTML='<strong style="color:var(--teal)">'+droppedCount+'/'+totalNeurons+'</strong> hidden neurons dropped ('+Math.round(dropout*100)+'%). Each forward pass creates a <strong style="color:var(--white)">different sub-network</strong>.';
+  }
+}
+
+function initEarlyChart() {
+  if(earlyChart) { earlyChart.destroy(); earlyChart=null; }
+  earlyEpoch=0;
+  const ctx=document.getElementById('earlyChart')?.getContext('2d');
+  if(!ctx) return;
+  earlyChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:[],
+      datasets:[
+        {label:'Train',data:[],borderColor:'#4C9BE8',tension:.4,borderWidth:2,pointRadius:0},
+        {label:'Validation',data:[],borderColor:'#F97316',tension:.4,borderWidth:2,pointRadius:0,borderDash:[5,3]},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},annotation:{annotations:{}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748B',maxTicksLimit:10}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748B'},min:0,max:1.1}
+      }
+    }
+  });
+}
+function runEarlyStop() {
+  if(earlyTimer) clearInterval(earlyTimer);
+  initEarlyChart();
+  let ep=0, bestVal=Infinity, patience=0, stopped=false, bestEp=-1;
+  const PAT=5;
+  function genPt(e) {
+    const tr=Math.max(0.04, 0.9-e*0.055+Math.random()*0.02);
+    const val=ep<10 ? 0.9-e*0.04+Math.random()*0.03 : 0.35+Math.random()*0.02+(e-10)*0.03;
+    return {tr,val};
+  }
+  earlyTimer=setInterval(()=>{
+    if(stopped||ep>30) { clearInterval(earlyTimer); return; }
+    const pt=genPt(ep);
+    earlyChart.data.labels.push('E'+(ep+1));
+    earlyChart.data.datasets[0].data.push(pt.tr);
+    earlyChart.data.datasets[1].data.push(pt.val);
+    if(pt.val<bestVal) { bestVal=pt.val; patience=0; bestEp=ep; }
+    else { patience++; }
+    if(patience>=PAT&&!stopped) {
+      stopped=true;
+      earlyChart.data.datasets[0].data.push(null);
+      earlyChart.data.datasets[1].data.push(null);
+    }
+    earlyChart.update('none');
+    ep++;
+  },150);
+}
+function resetEarlyStop() { if(earlyTimer) clearInterval(earlyTimer); initEarlyChart(); }
+
+// ═══════════════════════════════════════════════
+// OPTIMIZER
+// ═══════════════════════════════════════════════
+let optimCtx, optimAnimFrame;
+const OPTIM_START={x:0.82,y:0.18};
+let optimState={x:OPTIM_START.x,y:OPTIM_START.y,vx:0,vy:0,m1x:0,m1y:0,m2x:0,m2y:0,step:0,path:[],optimizer:'sgd',running:false};
+const OPTIM_NOTES={
+  sgd:'SGD takes fixed steps in the gradient direction. Fast but noisy — can oscillate around the minimum.',
+  momentum:'Momentum accumulates velocity — it builds speed downhill and dampens oscillations. Escapes saddle points faster.',
+  adam:'Adam adapts the step size per parameter and tracks gradient history. Rarely needs tuning — just works.',
+};
+
+function initOptimizer() {
+  const canvas=document.getElementById('optimCanvas');
+  if(!canvas) return;
+  canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight||400;
+  optimCtx=canvas.getContext('2d');
+  canvas.onclick=e=>{
+    if(optimState.running) return;
+    const r=canvas.getBoundingClientRect();
+    optimState.x=(e.clientX-r.left)/canvas.width;
+    optimState.y=(e.clientY-r.top)/canvas.height;
+    optimState.vx=optimState.vy=0;
+    optimState.m1x=optimState.m1y=optimState.m2x=optimState.m2y=0;
+    optimState.path=[];
+    optimState.step=0;
+    drawLandscape();
+    document.getElementById('currentLoss').textContent=loss(optimState.x,optimState.y).toFixed(4);
+    document.getElementById('stepsTaken').textContent='0';
+  };
+  drawLandscape();
+}
+
+// Rich loss landscape with multiple hills, valleys, saddle points, and one global minimum
+// Minima positions used everywhere
+const GLOBAL_MIN={x:0.35,y:0.58};
+const LOCAL_MIN={x:0.72,y:0.28};
+
+function loss(x,y) {
+  const gx=GLOBAL_MIN.x, gy=GLOBAL_MIN.y;
+  const lx=LOCAL_MIN.x, ly=LOCAL_MIN.y;
+  // Gentle quadratic base (centered mid-canvas)
+  const base = 0.35 + 0.9*((x-0.5)**2 + (y-0.5)**2);
+  // Deep Gaussian well at global min — deepest point
+  const globalWell = -0.50*Math.exp(-((x-gx)**2+(y-gy)**2)*35);
+  // Shallower Gaussian well at local min
+  const localWell = -0.28*Math.exp(-((x-lx)**2+(y-ly)**2)*28);
+  // Terrain texture/ridges — suppressed near both minima so they stay put
+  const dg = (x-gx)**2+(y-gy)**2;
+  const dl = (x-lx)**2+(y-ly)**2;
+  const suppress = Math.min(1, dg*25) * Math.min(1, dl*25);
+  const ridge = suppress * 0.10*Math.sin(x*7)*Math.sin(y*6);
+  // Hills / peaks
+  const hill1 = 0.28*Math.exp(-((x-0.15)**2+(y-0.15)**2)*14);
+  const hill2 = 0.20*Math.exp(-((x-0.85)**2+(y-0.80)**2)*14);
+  // Edge pressure
+  const edge = (Math.max(0,0.05-x)**2+Math.max(0,x-0.95)**2+Math.max(0,0.05-y)**2+Math.max(0,y-0.95)**2)*40;
+  return Math.max(0, base + globalWell + localWell + ridge + hill1 + hill2 + edge);
+}
+
+function grad(x,y) {
+  const h=0.001;
+  return {gx:(loss(x+h,y)-loss(x-h,y))/(2*h),gy:(loss(x,y+h)-loss(x,y-h))/(2*h)};
+}
+
+function drawLandscape() {
+  const canvas=document.getElementById('optimCanvas');
+  if(!canvas||!optimCtx) return;
+  const W=canvas.width, H=canvas.height;
+  const ctx=optimCtx;
+
+  // Sample loss values for normalization
+  let maxL=0;
+  const grid=[];
+  const RES=2; // sample every 2px for speed
+  for(let py=0;py<H;py+=RES){
+    const row=[];
+    for(let px=0;px<W;px+=RES){
+      const l=loss(px/W,py/H);
+      if(l>maxL) maxL=l;
+      row.push(l);
+    }
+    grid.push(row);
+  }
+
+  // Draw terrain with a proper colormap (deep blue valleys → teal mid → orange peaks)
+  const img=ctx.createImageData(W,H);
+  for(let py=0;py<H;py++){
+    const gy=Math.floor(py/RES);
+    for(let px=0;px<W;px++){
+      const gx=Math.floor(px/RES);
+      const row=grid[Math.min(gy,grid.length-1)];
+      const l=row?row[Math.min(gx,row.length-1)]:0;
+      const t=Math.min(1,l/Math.max(maxL,0.01));
+      let r,g,b;
+      if(t<0.3){
+        // Deep valley: dark navy-teal
+        const s=t/0.3;
+        r=Math.round(10+s*5); g=Math.round(20+s*30); b=Math.round(50+s*20);
+      } else if(t<0.55){
+        // Mid slopes: teal-green
+        const s=(t-0.3)/0.25;
+        r=Math.round(15+s*15); g=Math.round(50+s*60); b=Math.round(70-s*10);
+      } else if(t<0.8){
+        // Upper slopes: amber
+        const s=(t-0.55)/0.25;
+        r=Math.round(30+s*130); g=Math.round(110-s*30); b=Math.round(60-s*30);
+      } else {
+        // Peaks: orange-red
+        const s=(t-0.8)/0.2;
+        r=Math.round(160+s*80); g=Math.round(80-s*40); b=Math.round(30-s*10);
+      }
+      const idx=(py*W+px)*4;
+      img.data[idx]=r; img.data[idx+1]=g; img.data[idx+2]=b; img.data[idx+3]=255;
+    }
+  }
+  ctx.putImageData(img,0,0);
+
+  // Contour lines from global min
+  const contourLevels=[0.08,0.15,0.25,0.4,0.6,0.85,1.1];
+  contourLevels.forEach(lv=>{
+    ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=0.8;
+    ctx.beginPath();
+    let started=false;
+    for(let angle=0;angle<Math.PI*2;angle+=0.04){
+      for(let dist=0.01;dist<0.8;dist+=0.005){
+        const tx=GLOBAL_MIN.x+Math.cos(angle)*dist;
+        const ty=GLOBAL_MIN.y+Math.sin(angle)*dist;
+        if(tx<0||tx>1||ty<0||ty>1) break;
+        const l=loss(tx,ty);
+        if(Math.abs(l-lv)<0.025){
+          if(!started){ctx.moveTo(tx*W,ty*H);started=true;}
+          else ctx.lineTo(tx*W,ty*H);
+          break;
+        }
+      }
+    }
+    if(started) ctx.stroke();
+  });
+
+  // Label: Global minimum
+  const gmx=GLOBAL_MIN.x*W, gmy=GLOBAL_MIN.y*H;
+  ctx.fillStyle='rgba(0,212,170,0.9)';
+  ctx.beginPath(); ctx.arc(gmx,gmy,7,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='rgba(0,212,170,0.6)'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(gmx,gmy,12,0,Math.PI*2); ctx.stroke();
+  ctx.fillStyle='#00D4AA'; ctx.font='bold 10px Space Grotesk,sans-serif';
+  ctx.textAlign='center'; ctx.fillText('GLOBAL MIN',gmx,gmy-18);
+
+  // Label: Local minimum
+  const lmx=LOCAL_MIN.x*W, lmy=LOCAL_MIN.y*H;
+  ctx.fillStyle='rgba(249,115,22,0.8)';
+  ctx.beginPath(); ctx.arc(lmx,lmy,5,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='rgba(249,115,22,0.5)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(lmx,lmy,9,0,Math.PI*2); ctx.stroke();
+  ctx.fillStyle='#F97316'; ctx.font='bold 9px Space Grotesk,sans-serif';
+  ctx.fillText('LOCAL MIN',lmx,lmy-14);
+
+  // Label: Hill/peak area
+  ctx.fillStyle='rgba(239,68,68,0.5)'; ctx.font='bold 9px Space Grotesk,sans-serif';
+  ctx.fillText('HILL',0.15*W,0.18*H);
+
+  // Path
+  if(optimState.path.length>1){
+    const colors={sgd:'#EF4444',momentum:'#4C9BE8',adam:'#00D4AA'};
+    const col=colors[optimState.optimizer]||'#fff';
+    // Trail shadow
+    ctx.strokeStyle='rgba(0,0,0,0.4)'; ctx.lineWidth=4;
+    ctx.beginPath();
+    optimState.path.forEach((p,i)=>{const px=p.x*W,py=p.y*H;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);});
+    ctx.stroke();
+    // Main path
+    ctx.strokeStyle=col; ctx.lineWidth=2.5; ctx.globalAlpha=0.85;
+    ctx.beginPath();
+    optimState.path.forEach((p,i)=>{const px=p.x*W,py=p.y*H;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);});
+    ctx.stroke(); ctx.globalAlpha=1;
+    // Dots along path every N steps
+    ctx.fillStyle=col;
+    optimState.path.forEach((p,i)=>{
+      if(i%15===0||i===optimState.path.length-1){
+        ctx.beginPath(); ctx.arc(p.x*W,p.y*H,3,0,Math.PI*2); ctx.fill();
+      }
+    });
+    // Start marker
+    if(optimState.path.length>0){
+      const sp=optimState.path[0];
+      ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.beginPath(); ctx.arc(sp.x*W,sp.y*H,10,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#fff'; ctx.font='bold 8px Space Grotesk,sans-serif';
+      ctx.textAlign='center'; ctx.fillText('START',sp.x*W,sp.y*H-14);
+    }
+  }
+
+  // Current position pointer
+  ctx.fillStyle='#fff'; ctx.shadowColor='rgba(255,255,255,0.6)'; ctx.shadowBlur=10;
+  ctx.beginPath(); ctx.arc(optimState.x*W,optimState.y*H,6,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle='rgba(0,0,0,0.5)'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(optimState.x*W,optimState.y*H,6,0,Math.PI*2); ctx.stroke();
+}
+
+function selectOptimizer(name, btn) {
+  if(optimAnimFrame) cancelAnimationFrame(optimAnimFrame);
+  optimState.optimizer=name;
+  optimState.running=false;
+  // Reset to start position
+  optimState.x=OPTIM_START.x; optimState.y=OPTIM_START.y;
+  optimState.vx=optimState.vy=0;
+  optimState.m1x=optimState.m1y=optimState.m2x=optimState.m2y=0;
+  optimState.path=[]; optimState.step=0;
+  document.querySelectorAll('.optim-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('optimNote').textContent=OPTIM_NOTES[name];
+  document.getElementById('currentLoss').textContent=loss(optimState.x,optimState.y).toFixed(4);
+  document.getElementById('stepsTaken').textContent='0';
+  drawLandscape();
+}
+
+function runOptimizer() {
+  if(optimAnimFrame) cancelAnimationFrame(optimAnimFrame);
+  let s=optimState;
+  if(s.step>=200){
+    // If already finished, reset to start first
+    s.x=OPTIM_START.x; s.y=OPTIM_START.y;
+  }
+  s.path=[{x:s.x,y:s.y}];
+  s.vx=s.vy=0; s.m1x=s.m1y=s.m2x=s.m2y=1e-8; s.step=0;
+  s.running=true;
+  const LR=0.008, BETA1=0.9, BETA2=0.999, EPS=1e-8;
+  function step() {
+    if(s.step>=300){s.running=false;return;}
+    const g=grad(s.x,s.y);
+    if(s.optimizer==='sgd') {
+      // Add noise for realism
+      s.x-=LR*g.gx+(Math.random()-0.5)*0.002;
+      s.y-=LR*g.gy+(Math.random()-0.5)*0.002;
+    } else if(s.optimizer==='momentum') {
+      s.vx=0.9*s.vx+LR*g.gx; s.vy=0.9*s.vy+LR*g.gy;
+      s.x-=s.vx; s.y-=s.vy;
+    } else {
+      s.step++;
+      s.m1x=BETA1*s.m1x+(1-BETA1)*g.gx; s.m1y=BETA1*s.m1y+(1-BETA1)*g.gy;
+      s.m2x=BETA2*s.m2x+(1-BETA2)*g.gx**2; s.m2y=BETA2*s.m2y+(1-BETA2)*g.gy**2;
+      const m1xc=s.m1x/(1-BETA1**s.step), m1yc=s.m1y/(1-BETA1**s.step);
+      const m2xc=s.m2x/(1-BETA2**s.step), m2yc=s.m2y/(1-BETA2**s.step);
+      s.x-=LR*m1xc/(Math.sqrt(m2xc)+EPS);
+      s.y-=LR*m1yc/(Math.sqrt(m2yc)+EPS);
+    }
+    s.x=Math.max(0.05,Math.min(0.95,s.x)); s.y=Math.max(0.05,Math.min(0.95,s.y));
+    s.path.push({x:s.x,y:s.y}); s.step++;
+    drawLandscape();
+    document.getElementById('currentLoss').textContent=loss(s.x,s.y).toFixed(4);
+    document.getElementById('stepsTaken').textContent=Math.floor(s.step/2);
+    // Early stop if converged
+    if(s.path.length>20){
+      const last=s.path.slice(-10);
+      const dx=Math.abs(last[0].x-last[9].x)+Math.abs(last[0].y-last[9].y);
+      if(dx<0.001){s.running=false;return;}
+    }
+    if(s.step<300) optimAnimFrame=requestAnimationFrame(step);
+    else s.running=false;
+  }
+  step();
+}
+
+function resetOptimizer() {
+  if(optimAnimFrame) cancelAnimationFrame(optimAnimFrame);
+  optimState.running=false;
+  optimState.x=OPTIM_START.x; optimState.y=OPTIM_START.y;
+  optimState.vx=optimState.vy=0;
+  optimState.m1x=optimState.m1y=optimState.m2x=optimState.m2y=0;
+  optimState.path=[]; optimState.step=0;
+  drawLandscape();
+  document.getElementById('currentLoss').textContent=loss(OPTIM_START.x,OPTIM_START.y).toFixed(4);
+  document.getElementById('stepsTaken').textContent='0';
+}
+
+// ═══════════════════════════════════════════════
+// LEARNING RATE
+// ═══════════════════════════════════════════════
+let lrChart=null;
+function initLRChart() {
+  if(lrChart) { lrChart.destroy(); lrChart=null; }
+  const ctx=document.getElementById('lrChart').getContext('2d');
+  lrChart=new Chart(ctx,{
+    type:'line',
+    data:{labels:Array.from({length:30},(_,i)=>'E'+(i+1)),datasets:[
+      {label:'Train',data:[],borderColor:'#00D4AA',tension:.3,borderWidth:2.5,pointRadius:0},
+      {label:'Val',data:[],borderColor:'#F97316',tension:.3,borderWidth:2,pointRadius:0,borderDash:[5,3]},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748B',maxTicksLimit:8}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#64748B'},min:0,max:1.2}
+      }
+    }
+  });
+  updateLR(20);
+}
+function updateLR(v) {
+  // Log-scale: v=1 → 0.00001, v=50 → ~0.003, v=100 → 1.0
+  const lr=0.00001*Math.pow(100000,(v-1)/99);
+  const lrText=lr<0.001?lr.toExponential(1):lr<0.1?lr.toFixed(4):lr.toFixed(2);
+  document.getElementById('lrDisplay').textContent=lrText;
+  let train=[],val=[];
+  if(lr>0.3) {
+    // Too high — chaotic diverging loss
+    for(let i=0;i<30;i++){
+      const chaos=Math.min(lr*2,3);
+      train.push(Math.min(1.2,0.5+Math.sin(i*0.7+Math.random())*0.25*chaos+Math.random()*0.15*chaos));
+      val.push(Math.min(1.2,0.6+Math.sin(i*0.9+1)*0.3*chaos+Math.random()*0.2*chaos));
+    }
+    document.getElementById('lrStatus').innerHTML='<span style="color:var(--red);font-size:15px">🚀 TOO HIGH — Training unstable!</span>';
+    document.getElementById('lrStatus').style.borderColor='var(--red)';
+    document.getElementById('lrTip').textContent='Loss is oscillating or diverging. The optimizer is taking steps so large it overshoots the minimum every time.';
+  } else if(lr<0.0005) {
+    // Too low — barely moves
+    const speed=lr*1000; // 0 to 0.5
+    for(let i=0;i<30;i++){
+      train.push(0.90-i*0.002*Math.max(speed,0.1));
+      val.push(0.92-i*0.0015*Math.max(speed,0.08));
+    }
+    document.getElementById('lrStatus').innerHTML='<span style="color:var(--orange);font-size:15px">🐢 TOO LOW — Barely moving</span>';
+    document.getElementById('lrStatus').style.borderColor='var(--orange)';
+    document.getElementById('lrTip').textContent='Training is progressing far too slowly. It will take thousands of epochs to converge — if it ever does.';
+  } else if(lr>0.1) {
+    // Slightly too high — oscillating but somewhat learning
+    for(let i=0;i<30;i++){
+      const osc=0.1*(lr/0.1);
+      train.push(0.8*Math.exp(-i*0.04)+0.15+Math.sin(i*0.6)*osc+Math.random()*0.05);
+      val.push(0.85*Math.exp(-i*0.03)+0.22+Math.sin(i*0.7)*osc*1.2+Math.random()*0.06);
+    }
+    document.getElementById('lrStatus').innerHTML='<span style="color:#FBBF24;font-size:15px">⚠️ A BIT HIGH — Noisy convergence</span>';
+    document.getElementById('lrStatus').style.borderColor='#FBBF24';
+    document.getElementById('lrTip').textContent='Loss is decreasing but with significant oscillation. Slightly lower would give smoother training.';
+  } else {
+    // Good range (0.0005 to 0.1) — smooth convergence
+    const speed=Math.log10(lr/0.0005)/Math.log10(0.1/0.0005); // 0 to 1 within good range
+    const decay=2+speed*4; // faster decay for higher LR in good range
+    for(let i=0;i<30;i++){
+      const t=i/29;
+      train.push(0.9*Math.exp(-t*decay)+0.08+Math.random()*0.02);
+      val.push(0.9*Math.exp(-t*decay*0.8)+0.14+Math.random()*0.03);
+    }
+    document.getElementById('lrStatus').innerHTML='<span style="color:var(--green);font-size:15px">✅ GOOD — Smooth convergence</span>';
+    document.getElementById('lrStatus').style.borderColor='var(--green)';
+    document.getElementById('lrTip').textContent='Loss is decreasing steadily. The optimizer is taking appropriately-sized steps toward the minimum.';
+  }
+  if(lrChart){lrChart.data.datasets[0].data=train;lrChart.data.datasets[1].data=val;lrChart.update('none');}
+}
+
+// ═══════════════════════════════════════════════
+// CHECKLIST
+// ═══════════════════════════════════════════════
+const checkItems=[
+  {indicator:'var(--red)',title:'Loss not decreasing at all',body:'Training is stuck from the start.',action:'→ Check learning rate. Verify data pipeline. Increase model capacity.'},
+  {indicator:'var(--red)',title:'Training loss low, validation loss high',body:'Classic overfitting signature.',action:'→ Add Dropout, L2 regularization, or Early Stopping. Consider more data.'},
+  {indicator:'var(--orange)',title:'Both losses high and flat',body:'Severe underfitting — model too simple.',action:'→ Increase model size, train longer, or reduce regularization strength.'},
+  {indicator:'var(--orange)',title:'Training is unstable / oscillating',body:'Learning rate is almost certainly too high.',action:'→ Lower learning rate. Switch to Adam optimizer.'},
+  {indicator:'var(--amber)',title:'Overfitting despite regularization',body:'Regularization alone isn\'t enough.',action:'→ Get more training data. Reduce model complexity. Try ensemble methods.'},
+  {indicator:'var(--blue)',title:'Slow convergence despite good LR',body:'Wrong optimizer or bad initialization.',action:'→ Switch to Adam. Use He/Xavier initialization. Add batch normalization.'},
+  {indicator:'var(--purple)',title:'Validation loss plateaus early',body:'Model hit capacity ceiling.',action:'→ Increase model depth/width. Try different architecture.'},
+  {indicator:'var(--green)',title:'Both losses converge low and plateau',body:'This is what success looks like.',action:'→ Evaluate on held-out test set. If good — you are done!'},
+];
+function initChecklist() {
+  const grid=document.getElementById('checklistGrid');
+  if(grid.children.length) return;
+  checkItems.forEach((item,i) => {
+    const div=document.createElement('div');
+    div.className='check-item'; div.onclick=()=>resolveCheck(div);
+    div.innerHTML=`<div class="check-circle"><span style="display:none">✓</span></div><div style="flex:1"><div class="check-title"><span class="check-indicator" style="display:inline-block;background:${item.indicator}"></span> ${item.title}</div><div class="check-body">${item.body}</div><div class="check-action">${item.action}</div></div>`;
+    grid.appendChild(div);
+  });
+}
+function resolveCheck(el) {
+  el.classList.toggle('resolved');
+  const circle=el.querySelector('.check-circle');
+  const check=circle.querySelector('span');
+  if(el.classList.contains('resolved')){check.style.display='';circle.innerHTML='<span style="color:white">✓</span>';}
+  else{circle.innerHTML='<span style="display:none">✓</span>';}
+}
+
+// ═══════════════════════════════════════════════
+// BUILDER / CLOSING
+// ═══════════════════════════════════════════════
+const flips=[
+  {before:'"I don\'t know how AI works"',after:'I understand the learning loop, the optimizer, and why models generalize — not just that they do.'},
+  {before:'"AI is a black box"',after:'I can read loss curves, diagnose overfitting, and know exactly which tool fixes which problem.'},
+  {before:'"I just use AI tools"',after:'I understand the machinery underneath every AI product I use — weights, loss, backprop, optimization.'},
+  {before:'"GenAI just magically works"',after:'I know that Adam optimizer, dropout, and validation sets shaped every LLM I\'ve ever used.'},
+  {before:'"I couldn\'t explain what training means"',after:'Training = forward pass → loss → backprop → weight update → repeat. I own this now.'},
+  {before:'"Ensembles sounded complicated"',after:'Bagging reduces variance (Random Forest). Boosting reduces bias (XGBoost). I know when to use each.'},
+];
+function initBuilder() {
+  const fc=document.getElementById('flipCards');
+  if(fc.children.length) return;
+  flips.forEach(f => {
+    const div=document.createElement('div');
+    div.className='flip-card';
+    div.onclick=()=>div.classList.toggle('flipped');
+    div.innerHTML=`<div class="flip-inner"><div class="flip-face flip-front"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">BEFORE →</div><div class="flip-before">${f.before}</div></div><div class="flip-face flip-back"><div style="font-size:12px;color:var(--teal);margin-bottom:6px">AFTER ✓</div><div class="flip-after">${f.after}</div></div></div>`;
+    fc.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+updateNav();
+</script>
+</body>
+</html>
