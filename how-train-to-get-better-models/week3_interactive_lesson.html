@@ -479,8 +479,20 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
 ═══════════════════════════════════════════════════ */
 @media (max-width: 768px) {
   /* ── SLIDE SYSTEM ── */
+  html, body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+  .slide {
+    overflow: hidden;
+    overflow-y: hidden;
+  }
   .slide-inner {
-    padding: 20px 16px 80px;
+    padding: 20px 16px 64px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
+    min-height: 0;
   }
   .slide-header {
     margin-bottom: 16px;
@@ -498,15 +510,23 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
 
   /* ── NAV BAR ── */
   #nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
     height: 54px;
     padding: 0 10px;
+    box-sizing: border-box;
+    overflow: hidden;
   }
+  .nav-left { flex: 0 1 auto; min-width: 0; }
   .nav-dots { display: none; }
   .nav-brand { display: none !important; }
-  .slide-label { font-size: 11px; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .nav-counter { font-size: 11px; }
-  .btn-nav { padding: 6px 12px; font-size: 12px; }
-  .nav-right { gap: 6px; }
+  .slide-label { font-size: 11px; max-width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nav-counter { font-size: 11px; white-space: nowrap; }
+  .btn-nav { padding: 6px 12px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+  .nav-right { gap: 6px; flex-shrink: 0; }
 
   /* ── TITLE SLIDE (s0) ── */
   .title-center { padding: 0 8px; }
@@ -627,7 +647,7 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
    SMALL PHONES (≤480px)
 ═══════════════════════════════════════════════════ */
 @media (max-width: 480px) {
-  .slide-inner { padding: 14px 10px 72px; }
+  .slide-inner { padding: 14px 10px 56px; }
   .slide-title { font-size: clamp(20px, 5.5vw, 26px); }
   .title-main { font-size: clamp(24px, 7vw, 36px); }
 
@@ -653,8 +673,10 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
   #s_split .split-chunk { font-size: 9px !important; }
 
   /* Tighter nav */
+  #nav { height: 48px; padding: 0 8px; }
   .btn-nav { padding: 5px 10px; font-size: 11px; }
-  .slide-label { max-width: 70px; }
+  .slide-label { max-width: 60px; font-size: 10px; }
+  .slide-inner { padding-bottom: 56px; }
 }
 </style>
 </head>
