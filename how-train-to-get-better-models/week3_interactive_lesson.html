@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -245,7 +245,8 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
 .title-main { font-family: 'Fraunces', serif; font-size: clamp(40px, 6vw, 80px); font-weight: 700; line-height: 1.05; }
 .title-main em { font-style: italic; color: var(--teal); }
 .title-tagline { font-size: 18px; color: #64748B; margin-top: 24px; font-weight: 300; }
-.title-pills { display: flex; gap: 10px; justify-content: center; margin-top: 32px; flex-wrap: wrap; }
+.title-pills { display: flex; gap: 12px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
+.title-pills .pill { font-size: 15px; padding: 6px 16px; border-width: 1.5px; }
 
 /* ═══════════════════════════════════════════════════
    SLIDE 1 — GOLDILOCKS
@@ -487,6 +488,9 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
     <div class="title-week">WEEK 03 · CORE AI PRINCIPLES</div>
     <h1 class="title-main">The Deep<br><em>Learning Balance</em></h1>
     <p class="title-tagline">Solving the Goldilocks Problem — making models that actually generalize</p>
+      <div class="title-author" style="margin-top: 24px; font-size: 15px; color: var(--muted); font-family: 'JetBrains Mono', monospace;">
+        By <span style="color: var(--white); font-weight: 600;">Ashan Priyadarshana</span> <span style="opacity: 0.5; margin: 0 8px;">|</span> <span style="color: var(--teal); font-weight: 600;">eLearning.lk</span>
+      </div>
     <div class="title-pills">
       <span class="pill pill-red">Overfitting</span>
       <span class="pill pill-blue">Bias-Variance</span>
@@ -499,11 +503,78 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
 </div>
 
 <!-- ═══ SLIDE 1: GOLDILOCKS ═══ -->
-<div class="slide" id="s1">
+<div class="slide" id="s_split">
   <div class="bg-grid"></div>
   <div class="slide-inner" style="position:relative;z-index:1">
     <div class="slide-header">
       <div class="section-tag">SECTION 01</div>
+      <h2 class="slide-title">The Three <span>Data Splits</span></h2>
+      <p class="slide-sub">Understanding what data the model actually "learning" from versus what is used for testing.</p>
+    </div>
+    
+    <div class="split-container" style="background:var(--card); border:1px solid var(--border); border-radius:16px; padding:32px;">
+      <h3 style="font-family:'Space Grotesk'; font-size:18px; margin-bottom:16px;">The Complete Dataset (100%)</h3>
+      
+      <!-- The Bar -->
+      <div class="split-bar" style="display:flex; height:60px; width:100%; border-radius:12px; overflow:hidden; margin-bottom:32px; border:1px solid rgba(255,255,255,0.1);">
+        <div class="split-chunk split-train" onclick="showSplit(0)" style="width:70%; background:rgba(0,212,170,0.15); color:var(--teal); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono', monospace; font-weight:600; cursor:pointer; transition:0.3s; border-right:1px solid rgba(255,255,255,0.1);">70% TRAIN</div>
+        <div class="split-chunk split-val" onclick="showSplit(1)" style="width:15%; background:rgba(249,115,22,0.15); color:var(--orange); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono', monospace; font-weight:600; cursor:pointer; transition:0.3s; border-right:1px solid rgba(255,255,255,0.1);">15% VAL</div>
+        <div class="split-chunk split-test" onclick="showSplit(2)" style="width:15%; background:rgba(239,68,68,0.15); color:var(--red); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono', monospace; font-weight:600; cursor:pointer; transition:0.3s;">15% TEST</div>
+      </div>
+
+              <!-- Info Cards -->
+        <div class="grid-3 split-cards" style="align-items: stretch; flex: 1;">
+          
+          <!-- Train -->
+          <div class="card card-accent-teal split-info" id="infoTrain" style="transition:all 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; cursor: pointer; border-radius: 20px; border-width: 2px;" onclick="showSplit(0)">
+            <div class="label" style="color:var(--teal); font-size: 12px;">The Textbooks</div>
+            <h3 class="h3" style="font-size: 24px; color: #ffffff;">Training Set</h3>
+            <p class="body" style="margin-bottom:16px; font-size: 15px; color: #E2E8F0;">This is the only data the model actually learns from.</p>
+            <ul style="color:#CBD5E1; font-size:15px; line-height:1.7; margin-left:18px; margin-bottom: 24px;">
+              <li>Calculates the <b>Loss</b>.</li>
+              <li>Runs <b>Backpropagation</b>.</li>
+              <li>Executes <b>Weight Updates</b>.</li>
+            </ul>
+            <div style="margin-top:auto; padding:12px; background:rgba(0,212,170,0.15); border-radius:8px; color:var(--teal); font-size:14px; font-weight:600; display:flex; align-items:center; gap:8px;"><span style="font-size:18px;">🧠</span> "I see it, I learn from it"</div>
+          </div>
+  
+          <!-- Val -->
+          <div class="card card-accent-orange split-info" id="infoVal" style="transition:all 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; cursor: pointer; border-radius: 20px; border-width: 2px;" onclick="showSplit(1)">
+            <div class="label" style="color:var(--orange); font-size: 12px;">The Practice Exam</div>
+            <h3 class="h3" style="font-size: 24px; color: #ffffff;">Validation Set</h3>
+            <p class="body" style="margin-bottom:16px; font-size: 15px; color: #E2E8F0;">Used to tune the model and stop overfitting.</p>
+            <ul style="color:#CBD5E1; font-size:15px; line-height:1.7; margin-left:18px; margin-bottom: 24px;">
+              <li>Calculates <b>Validation Loss</b>.</li>
+              <li><span style="color:var(--red); font-weight: 600;">No</span> Backpropagation.</li>
+              <li><span style="color:var(--red); font-weight: 600;">No</span> Weight Updates.</li>
+            </ul>
+            <div style="margin-top:auto; padding:12px; background:rgba(249,115,22,0.15); border-radius:8px; color:var(--orange); font-size:14px; font-weight:600; display:flex; align-items:center; gap:8px;"><span style="font-size:18px;">👀</span> "I am tested on it, but I can't memorize it"</div>
+          </div>
+  
+          <!-- Test -->
+          <div class="card card-accent-red split-info" id="infoTest" style="transition:all 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; cursor: pointer; border-radius: 20px; border-width: 2px;" onclick="showSplit(2)">
+            <div class="label" style="color:var(--red); font-size: 12px;">The Final Exam</div>
+            <h3 class="h3" style="font-size: 24px; color: #ffffff;">Test Set</h3>
+            <p class="body" style="margin-bottom:16px; font-size: 15px; color: #E2E8F0;">Completely locked away until the very end.</p>
+            <ul style="color:#CBD5E1; font-size:15px; line-height:1.7; margin-left:18px; margin-bottom: 24px;">
+              <li>Evaluates True Generalization.</li>
+              <li><span style="color:var(--red); font-weight: 600;">No</span> hyperparameter tuning allowed.</li>
+              <li>Used exactly <b>once</b>.</li>
+            </ul>
+            <div style="margin-top:auto; padding:12px; background:rgba(239,68,68,0.15); border-radius:8px; color:var(--red); font-size:14px; font-weight:600; display:flex; align-items:center; gap:8px;"><span style="font-size:18px;">🔒</span> "Locked in the vault"</div>
+          </div>
+  
+        </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s1">
+  <div class="bg-grid"></div>
+  <div class="slide-inner" style="position:relative;z-index:1">
+    <div class="slide-header">
+      <div class="section-tag">SECTION 02</div>
       <h2 class="slide-title">The <span>Goldilocks</span> Problem</h2>
       <p class="slide-sub">Your model can fail in two opposite directions — click each to explore</p>
     </div>
@@ -577,7 +648,7 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
   <div class="bg-grid"></div>
   <div class="slide-inner" style="position:relative;z-index:1">
     <div class="slide-header">
-      <div class="section-tag">SECTION 02</div>
+      <div class="section-tag">SECTION 03</div>
       <h2 class="slide-title">Reading <span>Loss Curves</span></h2>
       <p class="slide-sub">Your model's health monitor — switch modes to see each pattern animate live</p>
     </div>
@@ -621,8 +692,8 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
   <div class="bg-grid"></div>
   <div class="slide-inner" style="position:relative;z-index:1">
     <div class="slide-header">
-      <div class="section-tag">SECTION 03</div>
-      <h2 class="slide-title">The <span>Bias-Variance</span> Tradeoff</h2>
+      <div class="section-tag">SECTION 04</div>
+        <h2 class="slide-title">The <span>Bias-Variance</span> Tradeoff</h2>
       <p class="slide-sub">Drag the complexity slider and watch bias, variance, and total error update live</p>
     </div>
     <div class="bv-layout">
@@ -800,7 +871,7 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
   <div class="bg-grid"></div>
   <div class="slide-inner" style="position:relative;z-index:1">
     <div class="slide-header">
-      <div class="section-tag">SECTION 04</div>
+      <div class="section-tag">SECTION 05</div>
       <h2 class="slide-title">Ensemble Methods — <span>Wisdom of the Crowd</span></h2>
       <p class="slide-sub">Why ask one model when you can ask many? See how combining decisions beats any single model.</p>
     </div>
@@ -919,7 +990,7 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
   <div class="bg-grid"></div>
   <div class="slide-inner" style="position:relative;z-index:1">
     <div class="slide-header">
-      <div class="section-tag">SECTION 05 · BAGGING</div>
+      <div class="section-tag">SECTION 06 · BAGGING</div>
       <h2 class="slide-title">Bagging & <span>Random Forests</span></h2>
       <p class="slide-sub">Bootstrap AGGregating — train many trees on random subsets, then average their votes</p>
     </div>
@@ -963,7 +1034,7 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
   <div class="bg-grid"></div>
   <div class="slide-inner" style="position:relative;z-index:1">
     <div class="slide-header">
-      <div class="section-tag">SECTION 06 · BOOSTING</div>
+      <div class="section-tag">SECTION 07 · BOOSTING</div>
       <h2 class="slide-title">Boosting — <span>Learning from Mistakes</span></h2>
       <p class="slide-sub">Each weak learner focuses on the errors of all previous learners. Click to step through.</p>
     </div>
@@ -1012,8 +1083,8 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
   <div class="bg-grid"></div>
   <div class="slide-inner" style="position:relative;z-index:1">
     <div class="slide-header">
-      <div class="section-tag">SECTION 07</div>
-      <h2 class="slide-title"><span>Regularization</span> Techniques</h2>
+      <div class="section-tag">SECTION 08</div>
+        <h2 class="slide-title"><span>Regularization</span> Techniques</h2>
       <p class="slide-sub">Four ways to prevent overfitting — click each tab to explore interactively</p>
     </div>
     <div class="reg-tabs">
@@ -1121,8 +1192,8 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
   <div class="bg-grid"></div>
   <div class="slide-inner" style="position:relative;z-index:1">
     <div class="slide-header">
-      <div class="section-tag">SECTION 08</div>
-      <h2 class="slide-title"><span>Optimizers</span> — Finding the Valley</h2>
+      <div class="section-tag">SECTION 09</div>
+        <h2 class="slide-title"><span>Optimizers</span> — Finding the Valley</h2>
       <p class="slide-sub">Watch different optimizers navigate a loss landscape — select one and press Go</p>
     </div>
     <div class="optim-layout">
@@ -1178,8 +1249,8 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
   <div class="bg-grid"></div>
   <div class="slide-inner" style="position:relative;z-index:1">
     <div class="slide-header">
-      <div class="section-tag">SECTION 09</div>
-      <h2 class="slide-title">Learning Rate — <span>The Most Important</span> Hyperparameter</h2>
+      <div class="section-tag">SECTION 10</div>
+        <h2 class="slide-title">Learning Rate — <span>The Most Important</span> Hyperparameter</h2>
       <p class="slide-sub">Drag the slider and watch how the learning rate affects training — live</p>
     </div>
     <div class="lr-layout">
@@ -1223,8 +1294,8 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
   <div class="bg-grid"></div>
   <div class="slide-inner" style="position:relative;z-index:1">
     <div class="slide-header">
-      <div class="section-tag">SECTION 10</div>
-      <h2 class="slide-title">The <span>Practical Checklist</span></h2>
+      <div class="section-tag">SECTION 11</div>
+        <h2 class="slide-title">The <span>Practical Checklist</span></h2>
       <p class="slide-sub">Click each symptom to reveal the diagnosis and action plan</p>
     </div>
     <div class="checklist-grid" id="checklistGrid"></div>
@@ -1258,7 +1329,8 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
 </div>
 
 <div id="nav">
-  <div class="nav-left">
+  <div class="nav-brand" style="position: absolute; left: 50%; transform: translateX(-50%); font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.4); pointer-events: none; letter-spacing: 0.5px; z-index: -1;">Ashan Priyadarshana <span style="margin:0 8px; opacity:0.5;">|</span> <span style="color: var(--teal); opacity: 0.8; font-weight: 600;">eLearning.lk</span></div>
+    <div class="nav-left">
     <div class="nav-dots" id="navDots"></div>
     <div class="slide-label" id="slideLabel">Introduction</div>
   </div>
@@ -1274,13 +1346,13 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
 // SLIDE ENGINE
 // ═══════════════════════════════════════════════
 const SLIDE_LABELS = [
-  'Introduction','Goldilocks Problem','Live Loss Curves',
+  'Introduction','Data Splits','Goldilocks Problem','Live Loss Curves',
   'Bias-Variance Tradeoff','Ensemble Methods',
   'Bagging & Random Forests','Boosting',
   'Regularization','Optimizers','Learning Rate',
   'Practical Checklist','You Are a Builder'
 ];
-const TOTAL = 12;
+const TOTAL = 13;
 let current = 0;
 
 const slides = Array.from(document.querySelectorAll('.slide'));
@@ -1325,17 +1397,57 @@ document.addEventListener('keydown', e => {
 // SLIDE ENTER HOOKS
 // ═══════════════════════════════════════════════
 function onSlideEnter(idx) {
-  if (idx===1) initGoldilocks();
-  if (idx===2) initLossChart();
-  if (idx===3) initBVChart();
-  if (idx===4) initVoting();
-  if (idx===5) initBagging();
-  if (idx===6) initBoosting();
-  if (idx===7) initRegularization();
-  if (idx===8) initOptimizer();
-  if (idx===9) initLRChart();
-  if (idx===10) initChecklist();
-  if (idx===11) initBuilder();
+  if (idx===1) initDataSplits();
+  if (idx===2) initGoldilocks();
+  if (idx===3) initLossChart();
+  if (idx===4) initBVChart();
+  if (idx===5) initVoting();
+  if (idx===6) initBagging();
+  if (idx===7) initBoosting();
+  if (idx===8) initRegularization();
+  if (idx===9) initOptimizer();
+  if (idx===10) initLRChart();
+  if (idx===11) initChecklist();
+  if (idx===12) initBuilder();
+}
+
+
+// ═══════════════════════════════════════════════
+// DATA SPLITS
+// ═══════════════════════════════════════════════
+function initDataSplits() {
+  showSplit(0);
+}
+function showSplit(idx) {
+  const cards = document.querySelectorAll('.split-info');
+  const chunks = document.querySelectorAll('.split-chunk');
+  cards.forEach((c,i) => {
+    // Give them a dim scale, but NOT invisible
+    c.style.opacity = i===idx ? '1' : '0.6';
+    c.style.transform = i===idx ? 'scale(1)' : 'scale(0.96)';
+    c.style.filter = i===idx ? 'blur(0)' : 'blur(0.5px)';
+    
+    // Dim the text inside gracefully without totally muting color
+    const ul = c.querySelector('ul');
+    if (ul) ul.style.opacity = i===idx ? '1' : '0.4';
+    
+    // Change accent border to show it is active or inactive 
+    c.style.borderColor = i===idx ? 'var(--' + (i===0?'teal':i===1?'orange':'red') + ')' : 'rgba(255,255,255,0.08)';
+    
+    c.style.zIndex = i===idx ? '10' : '1';
+    
+    // Active shading
+    c.style.backgroundColor = i===idx ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.02)';
+  });
+  chunks.forEach((c,i) => {
+    if (i===idx) {
+      c.style.opacity = '1';
+      c.style.backgroundColor = i===0 ? 'rgba(0,212,170,0.25)' : i===1 ? 'rgba(249,115,22,0.25)' : 'rgba(239,68,68,0.25)';
+    } else {
+      c.style.opacity = '0.5';
+      c.style.backgroundColor = i===0 ? 'rgba(0,212,170,0.05)' : i===1 ? 'rgba(249,115,22,0.05)' : 'rgba(239,68,68,0.05)';
+    }
+  });
 }
 
 // ═══════════════════════════════════════════════
@@ -2369,3 +2481,10 @@ updateNav();
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
