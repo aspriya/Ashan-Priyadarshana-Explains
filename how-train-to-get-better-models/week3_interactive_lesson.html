@@ -473,6 +473,189 @@ input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(0,212
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; }
+
+/* ═══════════════════════════════════════════════════
+   MOBILE RESPONSIVE (≤768px)
+═══════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* ── SLIDE SYSTEM ── */
+  .slide-inner {
+    padding: 20px 16px 80px;
+  }
+  .slide-header {
+    margin-bottom: 16px;
+  }
+  .slide-title {
+    font-size: clamp(22px, 6vw, 32px);
+  }
+  .slide-sub {
+    font-size: 14px;
+  }
+  .section-tag {
+    font-size: 10px;
+    padding: 3px 10px;
+  }
+
+  /* ── NAV BAR ── */
+  #nav {
+    height: 54px;
+    padding: 0 10px;
+  }
+  .nav-dots { display: none; }
+  .nav-brand { display: none !important; }
+  .slide-label { font-size: 11px; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nav-counter { font-size: 11px; }
+  .btn-nav { padding: 6px 12px; font-size: 12px; }
+  .nav-right { gap: 6px; }
+
+  /* ── TITLE SLIDE (s0) ── */
+  .title-center { padding: 0 8px; }
+  .title-week { font-size: 10px; letter-spacing: 2px; margin-bottom: 16px; }
+  .title-main { font-size: clamp(28px, 8vw, 48px); }
+  .title-tagline { font-size: 14px; margin-top: 16px; }
+  .title-pills { gap: 8px; margin-top: 24px; }
+  .title-pills .pill { font-size: 12px; padding: 4px 12px; }
+
+  /* ── COMMON GRIDS → SINGLE COLUMN ── */
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+
+  /* ── CARDS ── */
+  .card { padding: 16px; border-radius: 12px; }
+
+  /* ── TYPOGRAPHY ── */
+  .h3 { font-size: 16px; }
+  .body { font-size: 13px; }
+  .metric-val { font-size: 22px; }
+
+  /* ── DATA SPLITS (s_split) ── */
+  .split-cards { grid-template-columns: 1fr !important; }
+  #s_split .split-container { padding: 16px !important; }
+  #s_split .split-bar { height: 44px !important; }
+  #s_split .split-chunk { font-size: 10px !important; }
+
+  /* ── GOLDILOCKS (s1) ── */
+  .gk-card {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 16px;
+  }
+  .gk-chart-wrap { height: 180px; }
+  .gk-title { font-size: 17px; }
+  .gk-icon { font-size: 24px; }
+  .gk-detail { font-size: 12px; }
+  .gk-diagnosis { font-size: 11px; }
+
+  /* ── LOSS CURVES (s2) ── */
+  .loss-layout { grid-template-columns: 1fr; }
+  .mode-btns { flex-wrap: wrap; }
+  .mode-btns .btn { font-size: 12px; padding: 8px 14px; }
+
+  /* ── BIAS-VARIANCE (s3) ── */
+  .bv-layout { grid-template-columns: 1fr; min-height: auto; }
+  .bv-chart-box { min-height: 260px; }
+  .bv-cards { grid-template-columns: 1fr 1fr; }
+  .bv-mini-card { grid-column: span 1 !important; }
+  .complexity-val { font-size: 36px; }
+  /* Inline grids in s3 educational section */
+  #s3 [style*="grid-template-columns:1fr 1fr;"],
+  #s3 [style*="grid-template-columns: 1fr 1fr;"],
+  #s3 [style*="grid-template-columns:1fr 1fr 1fr"],
+  #s3 [style*="grid-template-columns: 1fr 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  #s3 [style*="repeat(4"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* ── ENSEMBLES (s4) ── */
+  #s4 [style*="grid-template-columns:1fr 1fr"],
+  #s4 [style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  #s4 [style*="grid-template-columns:1fr 1fr 1fr"],
+  #s4 [style*="grid-template-columns: 1fr 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  .voter { width: 70px; }
+  .voter-icon { width: 52px; height: 52px; font-size: 22px; }
+  .vote-btn { width: 32px; height: 32px; font-size: 16px; }
+
+  /* ── BAGGING (s5) ── */
+  .bagging-layout { grid-template-columns: 1fr; }
+  .tree-vis { min-height: 220px; }
+
+  /* ── BOOSTING (s6) ── */
+  .boost-layout { grid-template-columns: 1fr; }
+  #s6 [style*="grid-template-columns:1fr 1fr"],
+  #s6 [style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ── REGULARIZATION (s7) ── */
+  .reg-content.active { grid-template-columns: 1fr; }
+  .reg-tabs { flex-wrap: wrap; gap: 6px; }
+  .reg-tab { font-size: 12px; padding: 6px 12px; }
+  #dropoutCanvas { height: 220px !important; }
+
+  /* ── OPTIMIZERS (s8) ── */
+  .optim-layout { grid-template-columns: 1fr; }
+  #s8 .chart-wrap,
+  #s8 [style*="flex-direction:column"] canvas { min-height: 260px; }
+  .optim-btn { padding: 10px 14px; }
+  .optim-btn .ob-name { font-size: 14px; }
+
+  /* ── LEARNING RATE (s9) ── */
+  .lr-layout { grid-template-columns: 1fr; }
+  .lr-display { font-size: 28px; }
+
+  /* ── CHECKLIST (s10) ── */
+  .checklist-grid { grid-template-columns: 1fr; }
+
+  /* ── BUILDER (s11) ── */
+  .flip-cards { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .flip-card { height: 140px; }
+  .flip-front, .flip-back { padding: 14px; }
+  .flip-before { font-size: 12px; }
+  .flip-after { font-size: 12px; }
+  .builder-headline { font-size: clamp(22px, 6vw, 36px); }
+  .builder-sub { font-size: 14px; margin-bottom: 24px; }
+  .quote-block { font-size: 14px; padding: 16px; }
+  .builder-content { padding: 0 8px; }
+}
+
+/* ═══════════════════════════════════════════════════
+   SMALL PHONES (≤480px)
+═══════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .slide-inner { padding: 14px 10px 72px; }
+  .slide-title { font-size: clamp(20px, 5.5vw, 26px); }
+  .title-main { font-size: clamp(24px, 7vw, 36px); }
+
+  /* Flip cards → single column on phones */
+  .flip-cards { grid-template-columns: 1fr; }
+  .flip-card { height: 120px; }
+
+  /* Smaller voters */
+  .voter { width: 60px; }
+  .voter-icon { width: 44px; height: 44px; font-size: 18px; }
+  .voter-label { font-size: 10px; }
+
+  /* BV cards full width */
+  .bv-cards { grid-template-columns: 1fr; }
+
+  /* Dart board grid → single col */
+  #s3 [style*="repeat(4"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Split bar shorter */
+  #s_split .split-bar { height: 40px !important; }
+  #s_split .split-chunk { font-size: 9px !important; }
+
+  /* Tighter nav */
+  .btn-nav { padding: 5px 10px; font-size: 11px; }
+  .slide-label { max-width: 70px; }
+}
 </style>
 </head>
 <body>
@@ -1392,6 +1575,20 @@ document.addEventListener('keydown', e => {
   if (e.key==='ArrowRight'||e.key==='ArrowDown') navigate(1);
   if (e.key==='ArrowLeft'||e.key==='ArrowUp') navigate(-1);
 });
+
+// Touch swipe navigation
+let _swipeX=0, _swipeY=0;
+document.addEventListener('touchstart', e => {
+  _swipeX=e.changedTouches[0].screenX;
+  _swipeY=e.changedTouches[0].screenY;
+}, {passive:true});
+document.addEventListener('touchend', e => {
+  const dx=e.changedTouches[0].screenX-_swipeX;
+  const dy=e.changedTouches[0].screenY-_swipeY;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>60){
+    if(dx<0) navigate(1); else navigate(-1);
+  }
+}, {passive:true});
 
 // ═══════════════════════════════════════════════
 // SLIDE ENTER HOOKS
