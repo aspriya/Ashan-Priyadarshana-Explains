@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devin AI — Mock Interview Prep (Day 11 & 12)</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,400;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0a06;
+    --surface: #151009;
+    --surface2: #1c1610;
+    --border: #2a2010;
+    --accent: #f5a623;
+    --accent2: #ff6b35;
+    --accent3: #22d3ee;
+    --accent4: #4ade80;
+    --text: #f0ede6;
+    --text-dim: #a09880;
+    --text-muted: #504838;
+    --danger: #f87171;
+    --success: #4ade80;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Lora',Georgia,serif; min-height:100vh; overflow-x:hidden; }
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,166,35,0.06) 0%, transparent 70%);
+  }
+
+  .layout { display:grid; grid-template-columns:300px 1fr; min-height:100vh; position:relative; z-index:1; }
+
+  /* ── SIDEBAR ── */
+  .sidebar { background:var(--surface); border-right:1px solid var(--border); padding:28px 0; position:sticky; top:0; height:100vh; overflow-y:auto; display:flex; flex-direction:column; }
+  .sidebar-header { padding:0 24px 24px; border-bottom:1px solid var(--border); margin-bottom:16px; }
+  .final-badge {
+    display:inline-flex; align-items:center; gap:8px; margin-bottom:14px;
+    background:rgba(245,166,35,0.12); border:1px solid rgba(245,166,35,0.3);
+    border-radius:6px; padding:6px 12px;
+  }
+  .badge-icon { font-size:14px; }
+  .badge-text { font-family:'DM Mono',monospace; font-size:10px; color:var(--accent); text-transform:uppercase; letter-spacing:0.14em; }
+  .sidebar-title { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; line-height:1.15; color:var(--text); }
+  .sidebar-sub { font-family:'DM Mono',monospace; font-size:10px; color:var(--text-muted); margin-top:6px; text-transform:uppercase; letter-spacing:0.1em; }
+
+  /* Day tabs */
+  .day-tabs { display:flex; gap:6px; padding:0 16px 16px; border-bottom:1px solid var(--border); }
+  .day-tab { flex:1; padding:8px; border-radius:8px; border:1px solid var(--border); background:none; font-family:'Syne',sans-serif; font-size:12px; font-weight:700; color:var(--text-muted); cursor:pointer; transition:all 0.2s; }
+  .day-tab.active { background:rgba(245,166,35,0.15); border-color:rgba(245,166,35,0.4); color:var(--accent); }
+
+  .module-list { padding:12px 12px 0; flex:1; }
+  .section-label { font-family:'DM Mono',monospace; font-size:9px; text-transform:uppercase; letter-spacing:0.15em; color:var(--text-muted); padding:10px 6px 6px; }
+  .module-btn { width:100%; background:none; border:none; border-radius:8px; padding:10px 12px; cursor:pointer; text-align:left; margin-bottom:3px; transition:background 0.2s; display:flex; align-items:center; gap:10px; }
+  .module-btn:hover { background:var(--surface2); }
+  .module-btn.active { background:rgba(245,166,35,0.1); outline:1px solid rgba(245,166,35,0.3); }
+  .module-btn.active .mod-num { color:var(--accent); }
+  .module-btn.active .mod-name { color:var(--text); }
+  .mod-num { font-family:'DM Mono',monospace; font-size:10px; color:var(--text-muted); min-width:26px; }
+  .mod-meta { flex:1; min-width:0; }
+  .mod-name { font-family:'Syne',sans-serif; font-size:12px; font-weight:600; color:var(--text-dim); line-height:1.3; }
+  .mod-type { font-family:'DM Mono',monospace; font-size:9px; color:var(--text-muted); margin-top:2px; }
+  .mod-done { width:7px; height:7px; border-radius:50%; background:var(--accent4); flex-shrink:0; opacity:0; transition:opacity 0.3s; }
+  .module-btn.done .mod-done { opacity:1; }
+
+  .sidebar-footer { padding:16px 20px 0; border-top:1px solid var(--border); margin-top:auto; }
+  .progress-label { font-family:'DM Mono',monospace; font-size:10px; color:var(--text-muted); margin-bottom:8px; }
+  .progress-bar-bg { height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .progress-bar-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:2px; width:0%; transition:width 0.5s; }
+
+  /* ── MAIN ── */
+  .main { padding:44px 52px; max-width:920px; }
+
+  .module-header { margin-bottom:32px; animation:fadeUp 0.4s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  .module-eyebrow { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+  .eyebrow-tag { font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.14em; padding:4px 10px; border-radius:4px; }
+  .tag-day { color:var(--accent); background:rgba(245,166,35,0.1); }
+  .tag-type { color:var(--accent3); background:rgba(34,211,238,0.1); }
+  .tag-dur { color:var(--text-muted); font-family:'DM Mono',monospace; font-size:10px; }
+
+  .module-heading { font-family:'Syne',sans-serif; font-size:34px; font-weight:800; line-height:1.1; letter-spacing:-0.02em; color:var(--text); margin-bottom:10px; }
+  .module-heading span { color:var(--accent); }
+  .module-sub { font-size:15px; color:var(--text-dim); font-style:italic; line-height:1.65; }
+
+  /* ── PLAYER ── */
+  .player-bar { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 22px; margin-bottom:28px; display:flex; align-items:center; gap:18px; }
+  .btn-play { width:50px; height:50px; border-radius:50%; background:var(--accent); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform 0.15s,box-shadow 0.2s; box-shadow:0 0 22px rgba(245,166,35,0.35); }
+  .btn-play:hover { transform:scale(1.08); box-shadow:0 0 36px rgba(245,166,35,0.55); }
+  .btn-play svg { fill:#0d0a06; }
+  .btn-play.playing svg.play-icon { display:none; }
+  .btn-play.playing svg.pause-icon { display:block!important; }
+  .player-info { flex:1; min-width:0; }
+  .player-track { font-family:'Syne',sans-serif; font-size:12px; font-weight:600; color:var(--text); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .player-progress-bg { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .player-progress-fill { height:100%; background:var(--accent); width:0%; transition:width 0.5s linear; }
+  .player-right { display:flex; align-items:center; gap:8px; }
+  .btn-ctrl { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:6px 12px; font-family:'DM Mono',monospace; font-size:10px; color:var(--text-dim); cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+  .btn-ctrl:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-ctrl.active { background:rgba(74,222,128,0.1); border-color:var(--accent4); color:var(--accent4); }
+
+  /* ── SCRIPT CONTAINER ── */
+  .script-container { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; animation:fadeUp 0.4s ease; }
+  .script-tabs { display:flex; border-bottom:1px solid var(--border); padding:0 22px; }
+  .tab-btn { background:none; border:none; padding:13px 14px; font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; margin-bottom:-1px; }
+  .tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
+  .script-body { padding:30px 34px; max-height:64vh; overflow-y:auto; scroll-behavior:smooth; }
+  .script-body::-webkit-scrollbar { width:4px; }
+  .script-body::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+
+  /* ── CONTENT BLOCKS ── */
+  .script-intro { background:linear-gradient(135deg,rgba(245,166,35,0.07),rgba(255,107,53,0.07)); border:1px solid rgba(245,166,35,0.18); border-radius:10px; padding:16px 20px; margin-bottom:26px; font-family:'DM Mono',monospace; font-size:11.5px; color:var(--accent); line-height:1.75; }
+  .script-p { font-size:15.5px; line-height:1.88; color:var(--text-dim); margin-bottom:18px; }
+  .script-p.highlight { color:var(--text); font-size:16.5px; }
+  .section-head { font-family:'Syne',sans-serif; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; color:var(--accent2); margin:30px 0 12px; display:flex; align-items:center; gap:8px; }
+  .section-head::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* ── Q&A INTERVIEW CARDS ── */
+  .qa-card {
+    border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:20px;
+    transition:border-color 0.2s;
+  }
+  .qa-card:hover { border-color:rgba(245,166,35,0.3); }
+  .qa-question {
+    background:var(--surface2); padding:16px 20px; cursor:pointer;
+    display:flex; align-items:flex-start; gap:12px;
+    font-family:'Syne',sans-serif; font-size:14px; font-weight:700; color:var(--text);
+    line-height:1.4; user-select:none;
+    border:none; width:100%; text-align:left;
+  }
+  .qa-question:hover { background:rgba(245,166,35,0.07); }
+  .q-num { font-family:'DM Mono',monospace; font-size:10px; color:var(--accent); background:rgba(245,166,35,0.12); border:1px solid rgba(245,166,35,0.25); border-radius:4px; padding:2px 8px; flex-shrink:0; margin-top:1px; white-space:nowrap; }
+  .q-text { flex:1; }
+  .q-chevron { font-size:12px; color:var(--text-muted); flex-shrink:0; margin-top:2px; transition:transform 0.25s; }
+  .qa-card.open .q-chevron { transform:rotate(180deg); }
+  .qa-answer {
+    display:none; padding:20px 22px; border-top:1px solid var(--border);
+    background:var(--bg);
+  }
+  .qa-card.open .qa-answer { display:block; }
+  .answer-label { font-family:'DM Mono',monospace; font-size:9px; text-transform:uppercase; letter-spacing:0.14em; color:var(--accent4); margin-bottom:14px; }
+  .answer-p { font-size:14.5px; line-height:1.85; color:var(--text-dim); margin-bottom:14px; }
+  .answer-p:last-child { margin-bottom:0; }
+  .answer-p strong { color:var(--text); }
+  .answer-key { background:rgba(245,166,35,0.07); border-left:3px solid var(--accent); padding:12px 16px; border-radius:0 8px 8px 0; font-size:13.5px; color:var(--text-dim); line-height:1.7; margin:12px 0; }
+  .answer-key strong { color:var(--accent); }
+
+  /* ── GOTCHA CARDS ── */
+  .gotcha-card { border-radius:10px; padding:16px 20px; margin-bottom:14px; display:flex; gap:14px; }
+  .gotcha-card.red { background:rgba(248,113,113,0.07); border:1px solid rgba(248,113,113,0.2); }
+  .gotcha-card.amber { background:rgba(245,166,35,0.07); border:1px solid rgba(245,166,35,0.2); }
+  .gotcha-card.green { background:rgba(74,222,128,0.07); border:1px solid rgba(74,222,128,0.2); }
+  .gotcha-card.blue { background:rgba(34,211,238,0.07); border:1px solid rgba(34,211,238,0.2); }
+  .gotcha-icon { font-size:18px; flex-shrink:0; line-height:1.4; }
+  .gotcha-content { flex:1; }
+  .gotcha-title { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; color:var(--text); margin-bottom:6px; }
+  .gotcha-text { font-size:13.5px; line-height:1.75; color:var(--text-dim); }
+
+  /* ── CALLOUT ── */
+  .callout { border-left:3px solid var(--accent); background:rgba(245,166,35,0.07); padding:14px 18px; border-radius:0 8px 8px 0; margin:18px 0; font-size:14.5px; color:var(--text-dim); line-height:1.75; font-style:italic; }
+  .callout strong { color:var(--accent); font-style:normal; }
+  .callout.cyan { border-left-color:var(--accent3); background:rgba(34,211,238,0.07); }
+  .callout.cyan strong { color:var(--accent3); }
+  .callout.green { border-left-color:var(--accent4); background:rgba(74,222,128,0.07); }
+  .callout.green strong { color:var(--accent4); }
+
+  /* ── EXERCISE BOX ── */
+  .exercise-box { background:var(--surface2); border:1px dashed rgba(245,166,35,0.35); border-radius:12px; padding:20px 22px; margin-top:28px; }
+  .exercise-label { font-family:'DM Mono',monospace; font-size:9px; text-transform:uppercase; letter-spacing:0.15em; color:var(--accent); margin-bottom:10px; }
+  .exercise-text { font-size:14.5px; line-height:1.8; color:var(--text-dim); }
+  .exercise-text strong { color:var(--text); }
+
+  /* ── SCORECARD ── */
+  .scorecard { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:20px 22px; margin:18px 0; }
+  .scorecard-title { font-family:'Syne',sans-serif; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-dim); margin-bottom:14px; }
+  .score-row { display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid var(--border); }
+  .score-row:last-child { border-bottom:none; }
+  .score-label { font-size:13px; color:var(--text-dim); flex:1; }
+  .score-bar-bg { width:120px; height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .score-bar-fill { height:100%; border-radius:2px; }
+  .score-val { font-family:'DM Mono',monospace; font-size:10px; color:var(--text-muted); min-width:32px; text-align:right; }
+
+  /* ── KEY POINTS TAB ── */
+  .kp-group { margin-bottom:24px; }
+  .kp-group-label { font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.12em; color:var(--accent2); margin-bottom:10px; }
+  .key-point { display:flex; gap:12px; padding:11px 0; border-bottom:1px solid var(--border); align-items:flex-start; }
+  .key-point:last-child { border-bottom:none; }
+  .kp-bullet { width:20px; height:20px; border-radius:50%; background:rgba(245,166,35,0.12); border:1px solid rgba(245,166,35,0.25); display:flex; align-items:center; justify-content:center; font-family:'DM Mono',monospace; font-size:9px; color:var(--accent); flex-shrink:0; margin-top:1px; }
+  .kp-text { font-size:13.5px; line-height:1.7; color:var(--text-dim); }
+  .kp-text strong { color:var(--text); }
+
+  /* ── NAV ── */
+  .module-nav { display:flex; gap:10px; margin-top:28px; padding-top:22px; border-top:1px solid var(--border); }
+  .btn-nav { padding:11px 22px; border-radius:10px; font-family:'Syne',sans-serif; font-size:12px; font-weight:700; cursor:pointer; border:1px solid var(--border); background:var(--surface); color:var(--text-dim); transition:all 0.2s; display:flex; align-items:center; gap:8px; }
+  .btn-nav:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-nav.primary { background:var(--accent); color:#0d0a06; border-color:var(--accent); margin-left:auto; }
+  .btn-nav.primary:hover { background:#f7ba4a; box-shadow:0 0 28px rgba(245,166,35,0.5); }
+
+  /* ── FINISH BANNER ── */
+  .finish-banner { background:linear-gradient(135deg,rgba(245,166,35,0.1),rgba(255,107,53,0.08)); border:1px solid rgba(245,166,35,0.3); border-radius:14px; padding:28px 30px; text-align:center; margin-top:28px; }
+  .finish-icon { font-size:40px; margin-bottom:12px; }
+  .finish-title { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--text); margin-bottom:8px; }
+  .finish-sub { font-size:15px; color:var(--text-dim); line-height:1.65; }
+
+  @media(max-width:900px){
+    .layout{grid-template-columns:1fr} .sidebar{position:static;height:auto} .main{padding:22px 18px}
+    .module-heading{font-size:26px}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="final-badge"><span class="badge-icon">🎯</span><span class="badge-text">Final Phase</span></div>
+      <div class="sidebar-title">Mock Interview<br>Prep</div>
+      <div class="sidebar-sub">Day 11 & 12 · 12 Sessions</div>
+    </div>
+
+    <div class="day-tabs" id="dayTabs">
+      <button class="day-tab active" onclick="filterDay('all')">All</button>
+      <button class="day-tab" onclick="filterDay('11')">Day 11</button>
+      <button class="day-tab" onclick="filterDay('12')">Day 12</button>
+    </div>
+
+    <div class="module-list" id="moduleList"></div>
+
+    <div class="sidebar-footer">
+      <div class="progress-label" id="progressLabel">0 of 12 completed</div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar"></div></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" id="mainContent"></main>
+</div>
+
+<script>
+const synth = window.speechSynthesis;
+let utterance=null, isPlaying=false, speechRate=1.0;
+let currentModule=0, doneModules=new Set(), fullText='';
+const speeds=[0.8,1.0,1.25,1.5,1.75,2.0]; let speedIdx=1;
+
+// ── ALL MODULES ─────────────────────────────────────────────────────────────
+const modules = [
+
+// ══════════════════ DAY 11 ════════════════════════════════════════════════
+
+{
+  day:"11", idx:0,
+  eyeLabel:"Day 11 · Q1", typeLabel:"Teach it Back",
+  title:"How to <span>Onboard</span> Devin",
+  subtitle:"Full answer script for: 'How would you onboard Devin to a new project?'",
+  duration:"~12 min",
+  script:[
+    {type:'intro', text:"🎯 INTERVIEW QUESTION 1 of 5\n\nQuestion: 'How would you onboard Devin to a new project from scratch?'\n\nListen to the full model answer. Then close this and deliver it from memory. Record yourself."},
+    {type:'p', text:"This question tests whether you understand Devin as infrastructure — not just a chat tool you open and type in. A weak answer describes steps vaguely. A strong answer delivers a clear, sequential process with specific names for each step and the reasoning behind the order.", highlight:true},
+    {type:'section', text:"Model Answer — Deliver This Out Loud"},
+    {type:'p', text:"Great question. Onboarding Devin to a new project is a five-step process, and the order matters. Let me walk through it."},
+    {type:'p', text:"Step one is repository connection. You go to Devin's integrations settings and connect your source control provider — GitHub, GitLab, or Bitbucket. You grant Devin read-write access so it can create branches and open pull requests. The principle of least privilege applies here — only connect the repositories Devin actually needs."},
+    {type:'p', text:"Step two is repository indexing. Once connected, you index the repository. Indexing is the process where Devin builds a semantic understanding of your codebase — its structure, how files relate to each other, which patterns are used, what the dependencies are. Without indexing, Devin navigates your code blindly. With indexing, it can answer questions like 'where is the authentication logic?' intelligently."},
+    {type:'p', text:"Step three is VPN configuration, if your project requires access to private infrastructure. If Devin needs to talk to internal APIs, a staging environment, or a private artifact registry, you set this up before the first working session. This step doesn't apply to every project, but it's critical when it does."},
+    {type:'p', text:"Step four is Knowledge onboarding. You create Knowledge items that cover everything a new developer would need to know about this codebase — coding standards, PR naming conventions, deployment workflows, how to run tests locally, how to interact with proprietary tools. Knowledge items are automatically recalled by Devin when relevant. You can pin them globally or to specific repositories. Critically: one outdated Knowledge item can degrade every session for your entire team, so reviewing and maintaining the Knowledge base is an ongoing responsibility."},
+    {type:'p', text:"Step five is writing the AGENTS.md file. This is a markdown file you commit to the root of your repository. Devin reads it automatically at the start of every session in that repository. Think of it as the briefing document you'd hand to a contractor on their first day — project overview, tech stack, how to build and run locally, coding conventions, which directories are off-limits, and any known quirks."},
+    {type:'callout', text:"<strong>Closing Statement to add:</strong> 'Do all five before the first working session, and Devin will perform dramatically better than if you just opened a session cold. The upfront investment pays dividends on every future session.'"},
+    {type:'exercise', text:"🎙️ DRILL: Close this. Set a 2-minute timer. Deliver the five-step answer from memory. Name each step, give one concrete detail for each, and end with the closing statement. Repeat until you can do it fluidly with zero hesitation."}
+  ],
+  qa:[],
+  keyPoints:[
+    {text:"<strong>Step 1:</strong> Connect repository (GitHub/GitLab/Bitbucket) — principle of least privilege"},
+    {text:"<strong>Step 2:</strong> Index the repo — Devin builds semantic codebase understanding"},
+    {text:"<strong>Step 3:</strong> VPN config (if needed) — private infrastructure access"},
+    {text:"<strong>Step 4:</strong> Knowledge items — persistent context; one outdated item degrades all sessions"},
+    {text:"<strong>Step 5:</strong> AGENTS.md in repo root — read automatically at every session start"},
+    {text:"<strong>Key insight:</strong> Order matters. All five before the first working session."}
+  ]
+},
+
+{
+  day:"11", idx:1,
+  eyeLabel:"Day 11 · Q2", typeLabel:"Teach it Back",
+  title:"Playbooks <span>vs.</span> Knowledge",
+  subtitle:"Full answer for: 'What's the difference between a Playbook and a Knowledge document?'",
+  duration:"~10 min",
+  script:[
+    {type:'intro', text:"🎯 INTERVIEW QUESTION 2 of 5\n\nQuestion: 'What's the difference between a Playbook and a Knowledge document in Devin?'\n\nThis is a precision question. Many candidates will blur the two. A sharp answer distinguishes them clearly with examples."},
+    {type:'p', text:"This question separates candidates who read the docs from those who just watched a demo. The distinction is subtle but important, and getting it exactly right signals depth.", highlight:true},
+    {type:'section', text:"Model Answer — Deliver This Out Loud"},
+    {type:'p', text:"Both Playbooks and Knowledge are ways to give Devin persistent, reusable context — but they serve completely different purposes, and using them correctly is the difference between a Devin setup that scales and one that creates confusion."},
+    {type:'p', text:"Knowledge is for general, codebase-level context that Devin should always have available. Think of it as the background understanding you'd give a new developer joining your team. Examples: our codebase uses PostgreSQL and all queries go through our ORM layer. Our PR titles must follow this naming convention. Here's how to run the test suite locally. Knowledge items are automatically recalled by Devin when their trigger context matches the session. You pin them globally for organization-wide conventions, or to a specific repo for repository-specific context."},
+    {type:'p', text:"Playbooks are for step-by-step procedures tied to a specific type of task. A Playbook is what you create when you find yourself writing the same multi-step instructions to Devin over and over. It's like a custom system prompt for a recurring task. For example: a Playbook for fixing CI failures might say — Step 1, identify the failing tests. Step 2, check the CI logs for the root cause. Step 3, reproduce locally. Step 4, apply the fix. Step 5, verify CI passes before opening a PR. That's a Playbook."},
+    {type:'callout', text:"<strong>The One-Sentence Distinction:</strong> Knowledge answers 'what should Devin always know?' — Playbooks answer 'what should Devin do, step by step, for this type of task?'"},
+    {type:'p', text:"Playbooks are also shareable — across your organization and the Devin community gallery. They support macros — so you can attach a Playbook to a session by just typing its shortcut. And they maintain version history, so you can revert to an earlier version if an edit made things worse."},
+    {type:'p', text:"The practical rule: if information applies broadly across all sessions — put it in Knowledge. If it's a repeatable procedure for a specific kind of task — put it in a Playbook. And use Session Insights after sessions to see which Knowledge items were actually used and which Playbooks worked well, so you can continuously improve both."},
+    {type:'exercise', text:"🎙️ DRILL: Explain the distinction using this format — 'If I were onboarding Devin to a React codebase, I'd put X in Knowledge and Y in a Playbook because...' Fill in real examples and deliver it out loud until it feels effortless."}
+  ],
+  qa:[],
+  keyPoints:[
+    {text:"<strong>Knowledge</strong> = general background context, always available, recalled by trigger"},
+    {text:"<strong>Playbooks</strong> = step-by-step procedures for specific recurring task types"},
+    {text:"<strong>One-liner:</strong> Knowledge = 'what to always know'; Playbooks = 'how to do this specific thing'"},
+    {text:"<strong>Playbooks are shareable</strong>, version-controlled, support macros for instant invocation"},
+    {text:"<strong>Use Session Insights</strong> to audit which Knowledge items and Playbooks are actually helping"}
+  ]
+},
+
+{
+  day:"11", idx:2,
+  eyeLabel:"Day 11 · Q3", typeLabel:"Teach it Back",
+  title:"Devin <span>Going</span> Off-Track",
+  subtitle:"Full answer for: 'A dev says Devin keeps going off-track. What do you advise?'",
+  duration:"~12 min",
+  script:[
+    {type:'intro', text:"🎯 INTERVIEW QUESTION 3 of 5\n\nQuestion: 'A developer on your team says Devin keeps going off-track on their tasks. What advice do you give them?'\n\nThis tests operational knowledge — do you know the actual root causes and fixes, or will you give generic advice?"},
+    {type:'p', text:"This is a practical troubleshooting question. The interviewer wants to know if you can diagnose the problem systematically rather than giving vague advice like 'write better prompts.' Demonstrate structured diagnostic thinking.", highlight:true},
+    {type:'section', text:"Model Answer — Deliver This Out Loud"},
+    {type:'p', text:"The first thing I'd ask is: what does the task look like? 'Devin going off-track' almost always has one of four root causes, and each has a specific fix."},
+    {type:'p', text:"Root cause one: the prompt is under-specified. If the task description doesn't include a specific file or function to start from, doesn't define what 'done' looks like, and doesn't give Devin a way to verify its work, Devin will make judgment calls — and those calls may not align with what the developer expected. The fix is to use Ask Devin first. Don't go straight to Agent mode. Spend time in Ask mode working with Devin to plan the approach, identify the relevant files, and agree on the implementation strategy. Then launch Agent mode with that high-context plan already in place."},
+    {type:'p', text:"Root cause two: missing or outdated Knowledge. If there are Knowledge items that give Devin incorrect information about your codebase — like a deployment workflow that changed three months ago — Devin will follow that incorrect information faithfully. Use Session Insights after any problem session. The Knowledge Usage tab will show exactly which Knowledge items Devin recalled and whether they helped or caused problems. Remove or update any Knowledge item that's misleading."},
+    {type:'p', text:"Root cause three: the task is too large. The official Devin guidance is clear: keep sessions under ten ACUs. Performance degrades in very long sessions. If Devin is taking a very long path to complete a task, it's often because the task itself was too broadly scoped. Break it into smaller, focused sub-tasks that can each be verified independently."},
+    {type:'p', text:"Root cause four: missing feedback signals. If Devin has no automated way to check its own work — no test suite, no CI pipeline check, no linter — it has no way to self-correct. Always tell Devin to run the test suite after each iteration, ensure the CI pipeline passes, and run the linter before committing. Automated checks are Devin's self-correction mechanism."},
+    {type:'callout', text:"<strong>Closing Recommendation:</strong> Trigger Session Insights on the problematic sessions. It will show you an improved prompt suggestion, concrete Action Items for environment fixes, and Knowledge usage data. Let the data diagnose the problem rather than guessing."},
+    {type:'exercise', text:"🎙️ DRILL: A friend says 'Devin keeps rewriting the wrong files.' Walk through your diagnostic process out loud in under 90 seconds. Name all four root causes and their fixes without looking at notes."}
+  ],
+  qa:[],
+  keyPoints:[
+    {text:"<strong>Root cause 1:</strong> Under-specified prompt — fix with Ask Devin planning before Agent mode"},
+    {text:"<strong>Root cause 2:</strong> Outdated Knowledge — audit with Session Insights Knowledge Usage tab"},
+    {text:"<strong>Root cause 3:</strong> Task too large — break into sub-tasks, keep under 10 ACUs"},
+    {text:"<strong>Root cause 4:</strong> No feedback signals — always specify test suite, CI check, linter"},
+    {text:"<strong>Diagnostic tool:</strong> Session Insights gives improved prompts, action items, and Knowledge audit"}
+  ]
+},
+
+{
+  day:"11", idx:3,
+  eyeLabel:"Day 11 · Q4", typeLabel:"Teach it Back",
+  title:"Jira to GitHub <span>Workflow</span>",
+  subtitle:"Full answer for: 'How does Devin integrate with our Jira and GitHub workflow?'",
+  duration:"~10 min",
+  script:[
+    {type:'intro', text:"🎯 INTERVIEW QUESTION 4 of 5\n\nQuestion: 'Walk me through how Devin integrates with our existing Jira and GitHub workflow.'\n\nThis is the workflow fluency test. Can you narrate a complete, realistic lifecycle end to end?"},
+    {type:'p', text:"This question is often asked by engineering managers or tech leads who want to know if Devin will actually fit into their existing process — or require them to change it. The answer should make them feel like Devin disappears into what they already do.", highlight:true},
+    {type:'section', text:"Model Answer — Deliver This Out Loud"},
+    {type:'p', text:"Great question — this is one of Devin's strongest selling points. The integration is designed so that the workflow barely changes for your team. Let me walk through a full lifecycle."},
+    {type:'p', text:"It starts in Jira. You have a ticket — say, a bug report. An engineer decides this is a good Devin task: it's well-defined, verifiable, and scoped to a few files. They add the 'Devin' label to the Jira issue. That single label action is the trigger."},
+    {type:'p', text:"Within minutes, Devin comments directly on the Jira issue. It has analyzed the codebase, found the relevant code, written an implementation plan, and reported its confidence level — green, yellow, or red. The engineer reviews the comment, sees a green confidence score and a solid plan, and approves it."},
+    {type:'p', text:"Devin then starts a session. It creates a branch on GitHub, makes the code changes following any AGENTS.md instructions and Knowledge items relevant to this repo, runs the test suite, ensures the CI pipeline passes, and opens a pull request. The PR description follows the team's GitHub Pull Request Template."},
+    {type:'p', text:"On GitHub, the PR shows a commit status check from Devin Review — visible right on the PR without leaving GitHub. An engineer opens Devin Review, sees the full analysis of what changed and why, and is satisfied. They merge the PR."},
+    {type:'p', text:"Finally, the engineer triggers Session Insights on that session. If any learnings are worth capturing — a pattern that worked well, an edge case that caused a problem — those get added to the Knowledge base, making every future session smarter."},
+    {type:'callout', text:"<strong>Key Point to Emphasize:</strong> The engineer never had to leave Jira to delegate the task, and never had to leave GitHub to review and merge the result. Devin is invisible in the workflow — it's just a team member that moves fast."},
+    {type:'exercise', text:"🎙️ DRILL: Narrate the entire lifecycle in under 90 seconds without notes. Use present tense: 'The engineer adds the Devin label. Devin comments on the ticket. Devin opens a PR...' Make it sound like you've done this a hundred times."}
+  ],
+  qa:[],
+  keyPoints:[
+    {text:"<strong>Trigger:</strong> add 'Devin' label to Jira issue — no other action needed"},
+    {text:"<strong>Devin comments on Jira</strong> with code analysis, implementation plan, and confidence score"},
+    {text:"<strong>GitHub:</strong> Devin creates branch → writes code → runs tests → CI passes → opens PR"},
+    {text:"<strong>PR follows team template</strong> — configured via GitHub Pull Request Templates integration"},
+    {text:"<strong>Devin Review</strong> shows as commit status check on GitHub — no context switch needed"},
+    {text:"<strong>Session Insights</strong> → learnings → Knowledge base → every future session benefits"}
+  ]
+},
+
+{
+  day:"11", idx:4,
+  eyeLabel:"Day 11 · Q5", typeLabel:"Teach it Back",
+  title:"What <span>NOT</span> to Give Devin",
+  subtitle:"Full answer for: 'What tasks should you NEVER give Devin?'",
+  duration:"~10 min",
+  script:[
+    {type:'intro', text:"🎯 INTERVIEW QUESTION 5 of 5\n\nQuestion: 'What tasks should you never give Devin, and why?'\n\nThis is the judgment test. Knowing the limits shows you understand the tool deeply — not just its features, but its failure modes."},
+    {type:'p', text:"Many candidates can explain what Devin does well. Fewer can clearly articulate what it doesn't do well — and that's what separates someone who's read the docs from someone who's thought critically about the technology.", highlight:true},
+    {type:'section', text:"Model Answer — Deliver This Out Loud"},
+    {type:'p', text:"Understanding Devin's limits is as important as understanding its strengths. There are four categories of tasks where Devin is the wrong tool."},
+    {type:'p', text:"First: large, vaguely scoped tasks. If you can't clearly describe what 'done' looks like in a paragraph, don't give it to Devin as a single task. Break it into smaller, verifiable pieces first. The docs are explicit: Devin performs much better on smaller, clearly scoped work. If a task would take a human more than three hours, break it up."},
+    {type:'p', text:"Second: tasks that require strong aesthetic judgment. Devin can build functional frontends but cannot make good visual design decisions on its own. The docs say directly — Devin doesn't have great eyesight. For any UI work that depends on good aesthetics, always provide a Figma file, design spec, or specific reference design. Never ask Devin to 'make it look better' without that reference."},
+    {type:'p', text:"Third: mobile development without clear testing criteria. Devin has no phone emulator to test with. It can write mobile code, but it cannot tap through a screen to validate it. For mobile tasks, you need to compensate with very explicit text-based testing criteria and acceptance tests."},
+    {type:'p', text:"Fourth: tasks involving raw credentials in the prompt. Never ask Devin to 'use this API key' and then paste the key in your message. Always use the Secrets Manager. Credentials in prompts are session data — they're visible in logs, shareable in session exports, and aren't access-controlled. The Secrets Manager is the right tool, always."},
+    {type:'p', text:"And a fifth that's worth adding: don't give Devin tasks that require significant strategic or architectural judgment calls without explicit direction. Devin is an executor, not an architect. You need to make the important design decisions yourself and tell Devin what to implement — not ask it to design the system and then implement it."},
+    {type:'callout', text:"<strong>The Litmus Test from the Docs:</strong> Think of Devin as a junior engineer. A junior engineer can implement a clearly defined task brilliantly. They should not be left alone to make major architectural decisions or redesign a system from scratch."},
+    {type:'exercise', text:"🎙️ DRILL: List all five 'never give Devin' categories from memory with one concrete example for each. Say them out loud in under 60 seconds. Speed matters — this signals true fluency."}
+  ],
+  qa:[],
+  keyPoints:[
+    {text:"<strong>Never:</strong> large vague tasks without clear 'done' criteria — break them first"},
+    {text:"<strong>Never:</strong> 'make it look better' UI requests — always provide Figma/mockup/spec"},
+    {text:"<strong>Never:</strong> mobile tasks without text-based testing criteria — no emulator"},
+    {text:"<strong>Never:</strong> paste credentials in prompts — always use Secrets Manager"},
+    {text:"<strong>Never:</strong> ask Devin to make major architectural decisions — you architect, Devin implements"},
+    {text:"<strong>Litmus test:</strong> could you give this task to a smart junior engineer with clear instructions?"}
+  ]
+},
+
+// ══════════════════ DAY 12 ════════════════════════════════════════════════
+
+{
+  day:"12", idx:5,
+  eyeLabel:"Day 12 · Edge Cases", typeLabel:"Gotcha Review",
+  title:"The <span>Gotcha</span> Questions",
+  subtitle:"Subtle traps, misconceptions, and trick questions interviewers use to test real vs. surface-level Devin knowledge.",
+  duration:"~15 min",
+  script:[
+    {type:'intro', text:"⚠️ GOTCHA REVIEW — Day 12\n\nThese are questions designed to expose candidates who only skimmed the docs. Read each one. For each gotcha, think about what the wrong answer would be — then deliver the right one."},
+    {type:'p', text:"Day 12 is about edge cases, gotchas, and the subtle details that only careful doc readers know. These are the questions that reveal whether your knowledge is real or surface-level.", highlight:true},
+    {type:'section', text:"Gotcha 1 — The Knowledge vs. Prompt Confusion"},
+    {type:'gotcha', variant:'red', icon:'⚠️', title:"Trap Question", text:"'If I want Devin to always follow our ESLint config, should I put that in every session prompt?'"},
+    {type:'gotcha', variant:'green', icon:'✅', title:"Correct Answer", text:"No. That's exactly what Knowledge items are for. Persistent, cross-session conventions belong in Knowledge — not repeated in every prompt. Write it once as a Knowledge item, pin it globally, and Devin will recall it whenever relevant without you having to repeat it. Repeating it in every prompt wastes tokens and creates inconsistency."},
+    {type:'section', text:"Gotcha 2 — The Ask Mode Misunderstanding"},
+    {type:'gotcha', variant:'red', icon:'⚠️', title:"Trap Question", text:"'Ask Devin mode and Agent mode both let Devin work on my code, right?'"},
+    {type:'gotcha', variant:'green', icon:'✅', title:"Correct Answer", text:"No. Ask mode is read-only. It explores your codebase and plans tasks but makes zero code changes. Agent mode is where Devin actually executes — writes code, runs commands, opens PRs. This distinction is fundamental. Never go straight to Agent mode for complex tasks — use Ask mode to plan first."},
+    {type:'section', text:"Gotcha 3 — The AGENTS.md Timing"},
+    {type:'gotcha', variant:'red', icon:'⚠️', title:"Trap Question", text:"'Do I need to mention AGENTS.md in every prompt for Devin to use it?'"},
+    {type:'gotcha', variant:'green', icon:'✅', title:"Correct Answer", text:"No. AGENTS.md is read automatically at the start of every session in that repository. You never reference it explicitly. That's the entire point — it's ambient context that's always present, reducing the cognitive overhead of every session prompt."},
+    {type:'section', text:"Gotcha 4 — The Session Insights Trigger"},
+    {type:'gotcha', variant:'red', icon:'⚠️', title:"Trap Question", text:"'Session Insights runs automatically after every session, right?'"},
+    {type:'gotcha', variant:'green', icon:'✅', title:"Correct Answer", text:"No. Session Insights is explicitly on-demand. You must trigger the analysis yourself — either through the UI button or via the API. It's not automatic. This catches people who assume it runs in the background. Knowing this also means: you have to build the habit of triggering it after important sessions."},
+    {type:'section', text:"Gotcha 5 — The Linear MCP Double-Configuration"},
+    {type:'gotcha', variant:'red', icon:'⚠️', title:"Trap Question", text:"'I've set up the Linear native integration. Should I also enable the Linear MCP in the marketplace for maximum coverage?'"},
+    {type:'gotcha', variant:'green', icon:'✅', title:"Correct Answer", text:"No. The docs explicitly state: if you have the Linear native integration connected, you do not need the Linear MCP separately. The native integration already provides all Linear tools. Adding both would create redundancy and potential conflicts. Use one or the other — the native integration is preferred."},
+    {type:'section', text:"Gotcha 6 — The Personal API Key for Production"},
+    {type:'gotcha', variant:'red', icon:'⚠️', title:"Trap Question", text:"'I want to automate Devin session creation in our CI pipeline. I'll use my personal API key for authentication.'"},
+    {type:'gotcha', variant:'green', icon:'✅', title:"Correct Answer", text:"That's a security anti-pattern. Personal API keys are tied to individuals — if that person leaves the company, the key becomes invalid and breaks the integration. The correct approach is to create a service user specifically for programmatic access, and assign it only the RBAC permissions the CI integration needs. Service users are the official recommendation for all production API integrations."},
+    {type:'section', text:"Gotcha 7 — The DeepWiki vs. Devin MCP Confusion"},
+    {type:'gotcha', variant:'amber', icon:'🔶', title:"Precision Question", text:"'What's the difference between the DeepWiki MCP and the Devin MCP?'"},
+    {type:'gotcha', variant:'green', icon:'✅', title:"Correct Answer", text:"DeepWiki MCP: free, public, no authentication required. Works only with public GitHub repositories. Provides read-only access to repository documentation and Q&A. Anyone can use it. Devin MCP: requires a Devin API key. Works with your private Devin account. Provides full control over sessions, Knowledge, Playbooks, schedules, and integrations. Completely different scope and purpose — one is a public knowledge tool, the other is your private Devin management interface."},
+    {type:'exercise', text:"🎙️ DRILL: Have someone quiz you on these seven gotchas verbally. For each one, give the correct answer in under 20 seconds without notes. The goal is instant, confident recall — not careful deliberation."}
+  ],
+  qa:[],
+  keyPoints:[
+    {text:"<strong>Knowledge ≠ prompt</strong> — persistent conventions belong in Knowledge, not repeated per session"},
+    {text:"<strong>Ask mode = read-only</strong> — zero code changes; Agent mode is where execution happens"},
+    {text:"<strong>AGENTS.md is automatic</strong> — read at every session start; never needs to be referenced in a prompt"},
+    {text:"<strong>Session Insights is manual</strong> — must be triggered; it does not run automatically"},
+    {text:"<strong>Linear: native OR MCP, not both</strong> — native integration is complete; MCP is redundant"},
+    {text:"<strong>Service users for API</strong> — never personal API keys for production integrations"},
+    {text:"<strong>DeepWiki MCP = public/free; Devin MCP = authenticated/private management</strong>"}
+  ]
+},
+
+{
+  day:"12", idx:6,
+  eyeLabel:"Day 12 · Limitations", typeLabel:"Deep Dive",
+  title:"Limitations <span>Deep</span> Dive",
+  subtitle:"Mastering the honest, nuanced answer about what Devin can't do — a mark of expert-level understanding.",
+  duration:"~12 min",
+  script:[
+    {type:'intro', text:"📖 Source: docs.devin.ai → Limitations section + Session Insights patterns\n\nExperts know the limits as well as they know the features. This section gives you a complete, honest limitations picture you can articulate with precision."},
+    {type:'p', text:"Being able to articulate Devin's limitations thoughtfully and precisely is actually a trust signal in an interview. It shows you understand the technology deeply enough to use it responsibly — not just sell it.", highlight:true},
+    {type:'section', text:"Limitation 1 — Reliability and Off-Track Behavior"},
+    {type:'p', text:"Devin will sometimes go off-track. The official docs acknowledge this directly. The primary mitigations are: writing prompts with explicit completion criteria, using Ask Devin to plan before execution, providing automated feedback signals like test suites and CI, and keeping session scope tight. Session Insights is the diagnostic tool when things go wrong."},
+    {type:'section', text:"Limitation 2 — Large-Scale, Ambiguous Tasks"},
+    {type:'p', text:"Devin performs better on smaller, clearly scoped tasks. For complex edits, the recommended approach is to break the project into smaller, isolated tasks that run in separate sessions and build on each other. When parallelism is needed, batch sessions via Advanced Mode or the API allow multiple Devins to work simultaneously on independent work packages."},
+    {type:'section', text:"Limitation 3 — Visual and UI Judgment"},
+    {type:'p', text:"The official documentation states this plainly: Devin doesn't have great eyesight. It can build functional frontends but cannot make good aesthetic decisions independently. All visual work requires explicit design references — Figma files via MCP, mockups, or detailed written specifications. 'Make it look better' is a task you must never assign without those references."},
+    {type:'section', text:"Limitation 4 — Mobile Development"},
+    {type:'p', text:"Devin has no access to a phone or emulator. It can write mobile code but cannot test it on a real device or simulated device. For mobile tasks, testing criteria must be expressed explicitly in text form — what the feature should do, how it should behave, what error states to handle. Human testing of mobile output is mandatory."},
+    {type:'section', text:"Limitation 5 — Security and Credential Handling"},
+    {type:'p', text:"Devin is a highly capable AI operating in your infrastructure. The Cognition team flags this themselves: exercise caution when sharing credentials with Devin. Always use the Secrets Manager rather than pasting credentials in prompts. Never give Devin broader repository access than it needs for the task at hand."},
+    {type:'section', text:"Limitation 6 — Long Session Performance"},
+    {type:'p', text:"Performance degrades in sessions that consume many ACUs. The official guidance is to keep sessions under ten ACUs where possible. If Session Insights consistently classifies your sessions as Large or Extra-Large, it's a signal to break those tasks into smaller, more focused sessions — which also produce better results."},
+    {type:'callout', text:"<strong>The Expert Framing:</strong> None of these limitations are fundamental flaws — they're design constraints that come directly from what Devin is: a junior engineer, not a senior architect. Knowing how to work within the constraints is what makes you an expert user.", variant:'green'},
+    {type:'exercise', text:"🎙️ DRILL: Explain Devin's limitations to a CTO who says 'I've heard Devin can do anything a developer can do.' Give an honest, balanced, confident response that neither oversells nor undersells. You should finish with: 'Given these constraints, here's how our team would get the most value from it...' Practice this transition."}
+  ],
+  qa:[],
+  keyPoints:[
+    {text:"<strong>Reliability:</strong> Devin goes off-track — mitigate with Ask mode, explicit criteria, automated feedback"},
+    {text:"<strong>Large tasks:</strong> break into isolated sub-tasks or use batch sessions for parallel work"},
+    {text:"<strong>UI/aesthetics:</strong> always provide design references — never 'make it look better' cold"},
+    {text:"<strong>Mobile:</strong> no emulator — provide explicit text-based testing criteria, mandatory human QA"},
+    {text:"<strong>Security:</strong> Secrets Manager always, minimal repo access, audit permissions carefully"},
+    {text:"<strong>Long sessions:</strong> keep under 10 ACUs; Large/XL session warnings in Session Insights"}
+  ]
+},
+
+{
+  day:"12", idx:7,
+  eyeLabel:"Day 12 · Prompting", typeLabel:"Deep Dive",
+  title:"Good vs. Bad <span>Instructions</span>",
+  subtitle:"Final review of instruction quality — the most operationally important skill for any Devin user.",
+  duration:"~12 min",
+  script:[
+    {type:'intro', text:"📖 Source: docs.devin.ai → Good vs. Bad Instructions, Instructing Devin Effectively\n\nPrompt quality is the single highest-leverage skill for a Devin user. This final review cements it in memory."},
+    {type:'p', text:"You've studied this before in Module 3. This is your final consolidation. By now, identifying good vs. bad instructions should feel immediate and instinctive — not something you have to think about.", highlight:true},
+    {type:'section', text:"The Five Pillars of a Great Devin Prompt"},
+    {type:'p', text:"Pillar one: Specificity. Name the repository. Name the file. Name the function. 'Fix the bug' is not a Devin prompt. 'In the orderService.js file, the getOrderDetails function returns null when order_id is zero — add a null check at line 47 and update the corresponding unit test' is a Devin prompt."},
+    {type:'p', text:"Pillar two: Purpose. State the broader goal. Why does this change matter? Context helps Devin make better micro-decisions throughout the task — especially when it encounters unexpected situations mid-session."},
+    {type:'p', text:"Pillar three: Step-by-step breakdown. For any task with more than one moving part, enumerate the steps explicitly. Don't assume Devin will infer the correct sequence. Tell it: Step 1. Step 2. Step 3."},
+    {type:'p', text:"Pillar four: Reference material. Share direct links to documentation. Use @ mentions to reference specific files. Connect MCP integrations so Devin can access Figma designs or database schemas directly. Provide templates to follow. The more Devin can see and reference, the better its output."},
+    {type:'p', text:"Pillar five: Success criteria and feedback loops. Tell Devin exactly what done looks like. 'Run npm test after each change.' 'Ensure the CircleCI pipeline passes.' 'ESLint must report zero errors.' Automated signals are Devin's self-correction mechanism. Without them, it has no way to know if it went wrong."},
+    {type:'callout', text:"<strong>The Prompt Improvement Button:</strong> Before launching any session, click the yellow warning circle in the session creation interface. It gives you automated feedback on whether your prompt is well-specified. Use it every time until writing good prompts becomes second nature."},
+    {type:'section', text:"The Anti-Patterns to Eliminate Forever"},
+    {type:'gotcha', variant:'red', icon:'❌', title:"Anti-Pattern: Vague Outcome", text:"'Improve our database performance.' — No specific query, no target metric, no file, no definition of 'improved'. Devin cannot succeed at this."},
+    {type:'gotcha', variant:'red', icon:'❌', title:"Anti-Pattern: Open Architecture", text:"'Build the backend for our new AI feature.' — No scope, no tech stack constraints, no file references, no design decisions made for Devin. This will go off-track."},
+    {type:'gotcha', variant:'red', icon:'❌', title:"Anti-Pattern: No Feedback Signal", text:"'Refactor the authentication module.' without 'Run all auth tests after each change and ensure CI passes.' — Devin has no way to know if it broke something."},
+    {type:'gotcha', variant:'green', icon:'✅', title:"Strong Pattern: Specific + Scoped + Verifiable", text:"'In auth/sessionManager.ts, refactor the createSession function to use async/await instead of callbacks, following the pattern in auth/tokenRefresh.ts. Run npm test after each change. Ensure the auth test suite in __tests__/auth/ passes completely before opening a PR.'"},
+    {type:'exercise', text:"🎙️ FINAL DRILL: Take one real task from a project you know. Write a bad version of the prompt (vague, no files, no success criteria). Then rewrite it as a perfect Devin prompt (specific files, steps, reference material, success criteria, feedback loop). Deliver both versions out loud. Explain to yourself why the second one is better."}
+  ],
+  qa:[],
+  keyPoints:[
+    {text:"<strong>Pillar 1:</strong> Specificity — name the repo, file, function, line number"},
+    {text:"<strong>Pillar 2:</strong> Purpose — state the broader why; helps Devin make good micro-decisions"},
+    {text:"<strong>Pillar 3:</strong> Step-by-step — enumerate steps explicitly; don't assume Devin infers sequence"},
+    {text:"<strong>Pillar 4:</strong> Reference material — links, @ mentions, MCP connections, templates"},
+    {text:"<strong>Pillar 5:</strong> Success criteria — 'Run npm test', 'CI must pass', 'ESLint zero errors'"},
+    {text:"<strong>Use the Prompt Improvement Button</strong> — yellow circle in session creation UI"}
+  ]
+},
+
+{
+  day:"12", idx:8,
+  eyeLabel:"Day 12 · Scenario", typeLabel:"Simulation",
+  title:"The <span>Security</span> Objection",
+  subtitle:"Handling the CTO question: 'Our security team is worried about giving Devin access to our repos.'",
+  duration:"~10 min",
+  script:[
+    {type:'intro', text:"🎭 SCENARIO SIMULATION\n\nSetting: You're in a technical interview. The CTO asks: 'Our security team is concerned about giving an AI access to our production codebase. What assurances can you give us?'\n\nDeliver a complete, confident answer covering all the real security controls."},
+    {type:'p', text:"This is a scenario that will come up in any serious enterprise conversation about Devin. The wrong answer is to be defensive or vague. The right answer demonstrates specific knowledge of the actual security controls.", highlight:true},
+    {type:'section', text:"Model Response — Deliver This Out Loud"},
+    {type:'p', text:"That's a completely valid concern, and it's one the Cognition team has taken seriously. Let me walk you through the actual security controls, because there are more than most people realize."},
+    {type:'p', text:"First, Secrets Manager. Any credentials Devin needs — API keys, database passwords, authentication tokens — go into the Cognition Secrets Manager, not into session prompts. Prompts can be logged and shared; the Secrets Manager is a proper credential vault with access controls. We'd enforce this as a team policy from day one."},
+    {type:'p', text:"Second, data isolation. For enterprise customers, all data is stored within your dedicated tenant — not in a shared environment. There's also the option of VPC deployment for complete infrastructure isolation if your compliance requirements demand it."},
+    {type:'p', text:"Third, role-based access control. The Devin API and the platform itself use RBAC. You control who on your team can do what. You can restrict who has access to Advanced Mode, which MCP integrations are permitted, and which repositories Devin can access. Enterprise plans include an MCP allowlist — your security team approves which external tools Devin can connect to."},
+    {type:'p', text:"Fourth, audit logs. All session activity is logged and accessible. For compliance-sensitive environments, the enterprise API provides full audit trail retrieval. This means you can review exactly what Devin did in any session."},
+    {type:'p', text:"Fifth, principle of least privilege. We'd configure Devin's repository access to only include the repos it needs to work with. We'd use service users with scoped API permissions for any automation. And we'd use Secure Mode if additional isolation is needed — which disables Devin's native internet deployment capabilities entirely."},
+    {type:'callout', text:"<strong>Closing Statement:</strong> 'None of this means the security team doesn't need to evaluate the tool — they absolutely should. But these are real controls, not marketing assurances. I'd be happy to walk them through the technical documentation directly.'", variant:'green'},
+    {type:'exercise', text:"🎙️ DRILL: Practice this response cold. Imagine a skeptical security engineer asking follow-up questions: 'What happens to our code after a session?' Answer it. 'Can Devin access files outside the repositories we give it?' Answer it. 'Who at Cognition can see our session data?' Answer it. Research any answer you're uncertain about."}
+  ],
+  qa:[],
+  keyPoints:[
+    {text:"<strong>Secrets Manager</strong> — credentials never in prompts; proper vault with access control"},
+    {text:"<strong>Data isolation</strong> — enterprise tenants get dedicated SaaS or VPC deployment"},
+    {text:"<strong>RBAC</strong> — granular control over who can do what; custom roles for restriction"},
+    {text:"<strong>MCP allowlist</strong> — enterprise admins approve which external tools Devin can connect to"},
+    {text:"<strong>Audit logs</strong> — full session activity accessible via API for compliance"},
+    {text:"<strong>Secure Mode</strong> — disables native internet deployment for maximum isolation"}
+  ]
+},
+
+{
+  day:"12", idx:9,
+  eyeLabel:"Day 12 · Scenario", typeLabel:"Simulation",
+  title:"The API <span>Integration</span> Question",
+  subtitle:"'Can you describe how you'd use the Devin API to automate session creation in a CI/CD pipeline?'",
+  duration:"~12 min",
+  script:[
+    {type:'intro', text:"🎭 SCENARIO SIMULATION\n\nSetting: Senior engineering interview. Question: 'Walk me through how you'd integrate the Devin API into a CI/CD pipeline to automatically create sessions when test failures are detected.'\n\nThis tests your API knowledge AND your systems thinking."},
+    {type:'p', text:"This is a technical depth question. It expects you to demonstrate: understanding of the v3 API architecture, authentication best practices, the session creation process, and how to wire it into an existing pipeline.", highlight:true},
+    {type:'section', text:"Model Response — Deliver This Out Loud"},
+    {type:'p', text:"Great scenario. Let me walk through the architecture. The Devin v3 API is what we'd use — it's the current, stable API at api.devin.ai/v3/organizations. The first thing I'd do is create a service user with a scoped role. Not a personal API key — a service user. This ensures the integration doesn't break when people leave the team, and follows the principle of least privilege — the CI service only gets permission to create sessions, not to manage Knowledge or delete Playbooks."},
+    {type:'p', text:"The CI/CD integration works like this. When a test suite failure is detected in our pipeline, the CI system calls a webhook or post-build script. That script uses the Devin API to create a new session. In the session creation request, we pass: the prompt — which includes the failure logs, the test output, and specific instructions to diagnose and fix the failing tests. We attach a Playbook — a 'Fix Failing Tests' Playbook pre-created by our team that gives Devin the standard procedure for this codebase. We set a tag — like 'ci-fix' — so we can filter and search these sessions later. And we set an ACU limit to prevent runaway sessions."},
+    {type:'p', text:"Devin then runs the session autonomously. It reads the failure logs, explores the relevant code, implements a fix, runs the tests, ensures they pass, and opens a pull request on GitHub. The PR triggers our normal review workflow."},
+    {type:'p', text:"On the monitoring side, we can poll the session status via the API, or use Session Insights via the API to retrieve the analysis after completion. Over time, if the same type of failure keeps occurring, Session Insights will flag the pattern, and we add a Knowledge item to prevent future sessions from hitting the same wall."},
+    {type:'callout', text:"<strong>Scale Perspective:</strong> This same pattern can run for hundreds of failures simultaneously using batch sessions. The API can launch parallel Devin sessions for each independent failure, all running in isolated VMs, all reporting back through the same API.", variant:'green'},
+    {type:'exercise', text:"🎙️ DRILL: Walk through the API call structure conceptually. Say out loud: 'The request goes to this base URL, authenticated with a service user token, with a JSON body containing these fields: prompt, playbook_id, tags, acu_limit.' Explain what each field does. Internalize the shape of the API call even without memorizing exact parameter names."}
+  ],
+  qa:[],
+  keyPoints:[
+    {text:"<strong>Use v3 API</strong> at api.devin.ai/v3/organizations — current, stable, preferred"},
+    {text:"<strong>Service user with scoped RBAC</strong> — not personal API key; survives team changes"},
+    {text:"<strong>Session creation payload:</strong> prompt + failure logs, Playbook ID, tags, ACU limit"},
+    {text:"<strong>Devin autonomously:</strong> reads logs → finds code → fixes → tests → opens PR"},
+    {text:"<strong>Poll session status or trigger Session Insights via API</strong> for programmatic monitoring"},
+    {text:"<strong>Scale with batch sessions</strong> — hundreds of parallel sessions for parallel failures"}
+  ]
+},
+
+{
+  day:"12", idx:10,
+  eyeLabel:"Day 12 · Final", typeLabel:"Full Simulation",
+  title:"The 5-Minute <span>Pitch</span>",
+  subtitle:"'Why should our engineering team use Devin? Give me your best case.'",
+  duration:"~15 min",
+  script:[
+    {type:'intro', text:"🎯 THE FINAL SIMULATION\n\nThis is the interview closer. Question: 'Convince me. Why should our engineering team adopt Devin?'\n\nThis is not a technical question — it is a judgment, synthesis, and communication question. Everything you've learned in 10 days leads here."},
+    {type:'p', text:"A great answer to this question shows you can synthesize technical knowledge into a clear business case. You're not listing features — you're making an argument about value, workflow fit, and ROI.", highlight:true},
+    {type:'section', text:"Full 5-Minute Pitch — Internalize and Deliver"},
+    {type:'p', text:"Every engineering team I know has the same problem: the backlog never empties. There's always more work than bandwidth. Features get delayed, bugs linger, technical debt compounds. Devin doesn't solve this by replacing engineers — it solves it by making each engineer dramatically more leveraged."},
+    {type:'p', text:"Here's the concrete case. Every engineering team has tasks that are important but not urgent enough to prioritize: small bug fixes, dependency updates, test coverage improvements, documentation maintenance, lint fixes, CI investigations. These are exactly the tasks that clog the backlog. Devin handles all of them in parallel, autonomously, while your engineers focus on the work that requires creative and architectural judgment."},
+    {type:'p', text:"The workflow integration is seamless. You connect Devin to your GitHub and Jira. An engineer adds a 'Devin' label to a ticket. Within minutes, Devin has analyzed the codebase, commented on the Jira ticket with an implementation plan and confidence score, started a session, written the fix, and opened a pull request following your PR template. The engineer reviews and merges. That's it. The workflow barely changes — Devin becomes an always-available team member who never has sprint capacity issues."},
+    {type:'p', text:"For larger migrations and refactors — the kind of work that takes a sprint and nobody wants to volunteer for — Devin can parallelize. You describe the migration, Devin breaks it into independent work packages, spins up parallel sessions, and delivers a queue of pull requests. What would take a team weeks can take hours."},
+    {type:'p', text:"The compounding benefit is real. Every session feeds Session Insights. Insights become Knowledge items. Knowledge items make every future session smarter. Playbooks capture what works and let anyone on the team replicate success. Over time, Devin doesn't just execute tasks — it gets better at executing your specific codebase's tasks."},
+    {type:'p', text:"On risk and security: Cognition built the platform with enterprise requirements in mind. Secrets Manager for credentials, dedicated tenants for data isolation, RBAC for access control, audit logs for compliance. This is not a tool you hide from your security team — it's one you bring them into."},
+    {type:'callout', text:"<strong>Closing Line:</strong> 'The question isn't whether your team can afford to use Devin. It's whether you can afford not to, while your competitors are shipping twice as fast.'", variant:'green'},
+    {type:'exercise', text:"🎙️ FINAL EXERCISE: Record yourself delivering this pitch in under 5 minutes. No notes. Listen back. Is it confident? Is it specific? Does it feel like someone who's used Devin in production — not just read about it? Adjust and record again until it does."}
+  ],
+  qa:[],
+  keyPoints:[
+    {text:"<strong>Frame:</strong> not 'replace engineers' but 'make each engineer more leveraged'"},
+    {text:"<strong>The backlog argument:</strong> Devin handles the important-but-not-urgent work in parallel"},
+    {text:"<strong>Workflow seamlessness:</strong> Jira label → plan comment → session → PR → merge — workflow barely changes"},
+    {text:"<strong>Parallelization:</strong> large migrations broken into parallel sessions — weeks → hours"},
+    {text:"<strong>Compounding value:</strong> Insights → Knowledge → Playbooks → each session smarter than the last"},
+    {text:"<strong>Enterprise-ready:</strong> security controls, data isolation, audit logs — bring your security team"}
+  ]
+},
+
+{
+  day:"12", idx:11,
+  eyeLabel:"Day 12 · Final", typeLabel:"Readiness Check",
+  title:"You're <span>Ready</span>",
+  subtitle:"Final consolidation, confidence calibration, and what to do in the 24 hours before your interview.",
+  duration:"~8 min",
+  script:[
+    {type:'intro', text:"🏁 COURSE COMPLETION — Day 12, Final Module\n\nYou've covered the complete Devin documentation across 12 days. This final module is about consolidation, confidence, and interview-day strategy."},
+    {type:'p', text:"You have now systematically worked through every major area of the Devin documentation. That is not a small thing. Most people who use Devin daily haven't done what you've done over these twelve days. Let that confidence be grounded.", highlight:true},
+    {type:'section', text:"What You Know That Others Don't"},
+    {type:'p', text:"You know the junior engineer mental model and why it matters for prompting. You know the five-step onboarding sequence. You know the difference between Ask mode and Agent mode and when to use each. You know the five pillars of a great Devin prompt. You know what Playbooks and Knowledge are and when to use which. You know how to diagnose sessions that go off-track. You know the complete Jira-to-GitHub lifecycle. You know the security controls well enough to satisfy a skeptical CTO. You know the v3 API architecture, service users, and RBAC. You know what never to give Devin. And you know all seven gotchas that trip up surface-level candidates."},
+    {type:'section', text:"The 24 Hours Before Your Interview"},
+    {type:'p', text:"The night before: don't try to learn anything new. Do one final pass through the Key Points tabs of the five modules you felt least confident about. Listen to the five Teach-It-Back modules one more time at 1.5 times speed while doing something else — walking, cooking, anything. This passive reinforcement works."},
+    {type:'p', text:"The morning of: record yourself doing the 5-minute pitch one more time. Not to perfect it — to warm up your verbal recall. The act of speaking the material activates it in your memory differently than reading it does."},
+    {type:'p', text:"In the interview itself: when you don't know something specific, bridge to what you do know. 'I'd need to verify the exact parameter name in the docs, but the pattern is...' is a confident, honest answer that shows both real knowledge and intellectual honesty. That is always better than guessing and being wrong."},
+    {type:'callout', text:"<strong>The One Thing:</strong> Devin is a junior engineer. Everything else you know — the prompting, the onboarding, the integrations, the security, the API — all of it flows from that one mental model. If you can explain the junior engineer analogy deeply and confidently, you can derive most other answers from first principles.", variant:'green'},
+    {type:'section', text:"Final Words"},
+    {type:'p', text:"You came here wanting to be a master of Devin. You put in twelve days of systematic, disciplined audio learning. That is the kind of effort that shows up in interviews — not as nervousness, but as confidence. Not as memorized answers, but as genuine understanding.", highlight:true},
+    {type:'p', text:"Go demonstrate what you know. Good luck — though at this point, it's less about luck and more about showing up as the person who did the work."},
+    {type:'exercise', text:"🎙️ FINAL RITUAL: Say this out loud right now — 'I know what Devin is. I know how to use it. I know its limits. I know how to deploy it safely. I know how to make it smarter over time. I am ready.' Say it like you mean it. Because you do."}
+  ],
+  qa:[],
+  keyPoints:[
+    {text:"<strong>Core mental model:</strong> junior engineer — derive everything else from this"},
+    {text:"<strong>Night before:</strong> passive re-listen at 1.5× speed; no new material"},
+    {text:"<strong>Morning of:</strong> record the 5-minute pitch once to warm up verbal recall"},
+    {text:"<strong>In the interview:</strong> bridge uncertainty with 'the pattern is...' — honesty + knowledge wins"},
+    {text:"<strong>You've covered:</strong> all 10 docs modules, 5 teach-it-back scripts, 7 gotchas, 3 scenarios, the pitch"},
+    {text:"<strong>You are ready. Go get it. 🎯</strong>"}
+  ]
+}
+];
+
+// ── SIDEBAR BUILD ────────────────────────────────────────────────────────────
+function buildSidebar(filter='all') {
+  const list = document.getElementById('moduleList');
+  list.innerHTML = '';
+
+  const day11 = modules.filter(m=>m.day==='11');
+  const day12 = modules.filter(m=>m.day==='12');
+
+  function addGroup(label, items) {
+    if(!items.length) return;
+    const lbl = document.createElement('div');
+    lbl.className='section-label'; lbl.textContent=label;
+    list.appendChild(lbl);
+    items.forEach(m=>{
+      const btn = document.createElement('button');
+      btn.className='module-btn'+(m.idx===currentModule?' active':'')+(doneModules.has(m.idx)?' done':'');
+      btn.id='btn'+m.idx;
+      btn.onclick=()=>loadModule(m.idx);
+      btn.innerHTML=`
+        <span class="mod-num">${m.eyeLabel.split('·')[1].trim()}</span>
+        <div class="mod-meta">
+          <div class="mod-name">${m.title.replace(/<[^>]+>/g,'')}</div>
+          <div class="mod-type">${m.typeLabel} · ${m.duration}</div>
+        </div>
+        <div class="mod-done"></div>`;
+      list.appendChild(btn);
+    });
+  }
+
+  if(filter==='all'||filter==='11') addGroup('Day 11 — Teach it Back', day11);
+  if(filter==='all'||filter==='12') addGroup('Day 12 — Edge Cases & Gotchas', day12);
+}
+
+function filterDay(day) {
+  document.querySelectorAll('.day-tab').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
+  buildSidebar(day);
+}
+
+// ── RENDER MODULE ────────────────────────────────────────────────────────────
+function renderModule(idx) {
+  const m = modules[idx];
+
+  // Build TTS text
+  fullText = m.script.map(b=>{
+    if(['intro','p','section','exercise'].includes(b.type)) return (b.text||'').replace(/<[^>]+>/g,'');
+    if(b.type==='callout') return b.text.replace(/<[^>]+>/g,'');
+    if(b.type==='gotcha') return b.title+': '+b.text;
+    return '';
+  }).filter(Boolean).join('\n\n');
+
+  // Build script HTML
+  let scriptHTML='';
+  m.script.forEach(block=>{
+    const t=block.type;
+    if(t==='intro') scriptHTML+=`<div class="script-intro">${block.text.replace(/\n/g,'<br>')}</div>`;
+    else if(t==='p') scriptHTML+=`<p class="script-p ${block.highlight?'highlight':''}">${block.text}</p>`;
+    else if(t==='section') scriptHTML+=`<div class="section-head">${block.text}</div>`;
+    else if(t==='callout') scriptHTML+=`<div class="callout ${block.variant||''}">${block.text}</div>`;
+    else if(t==='gotcha') {
+      scriptHTML+=`<div class="gotcha-card ${block.variant}">
+        <div class="gotcha-icon">${block.icon}</div>
+        <div class="gotcha-content">
+          <div class="gotcha-title">${block.title}</div>
+          <div class="gotcha-text">${block.text}</div>
+        </div></div>`;
+    }
+    else if(t==='exercise') scriptHTML+=`<div class="exercise-box"><div class="exercise-label">🎙️ Exercise / Drill</div><div class="exercise-text">${block.text}</div></div>`;
+  });
+
+  // Key points HTML
+  let kpHTML = m.keyPoints.map((kp,i)=>`
+    <div class="key-point">
+      <div class="kp-bullet">${i+1}</div>
+      <div class="kp-text">${kp.text}</div>
+    </div>`).join('');
+
+  // Nav
+  const prevIdx = idx>0?idx-1:-1;
+  const nextIdx = idx<modules.length-1?idx+1:-1;
+  let navHTML='';
+  if(prevIdx>=0) navHTML+=`<button class="btn-nav" onclick="loadModule(${prevIdx})">← ${modules[prevIdx].title.replace(/<[^>]+>/g,'').slice(0,20)}...</button>`;
+  if(nextIdx>=0) navHTML+=`<button class="btn-nav primary" onclick="loadModule(${nextIdx})">Next →</button>`;
+  else navHTML+=`<button class="btn-nav primary" onclick="showFinish()">🎯 Complete Course</button>`;
+
+  // Check if this is last module
+  const isLast = idx===modules.length-1;
+
+  document.getElementById('mainContent').innerHTML=`
+    <div class="module-header">
+      <div class="module-eyebrow">
+        <span class="eyebrow-tag tag-day">${m.eyeLabel}</span>
+        <span class="eyebrow-tag tag-type">${m.typeLabel}</span>
+        <span class="tag-dur">${m.duration}</span>
+      </div>
+      <h1 class="module-heading">${m.title}</h1>
+      <p class="module-sub">${m.subtitle}</p>
+    </div>
+
+    <div class="player-bar">
+      <button class="btn-play" id="playBtn" onclick="togglePlay()">
+        <svg class="play-icon" width="18" height="18" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="pause-icon" width="18" height="18" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+      <div class="player-info">
+        <div class="player-track">${m.eyeLabel} — ${m.title.replace(/<[^>]+>/g,'')}</div>
+        <div class="player-progress-bg"><div class="player-progress-fill" id="playerProgress"></div></div>
+      </div>
+      <div class="player-right">
+        <button class="btn-ctrl" onclick="changeSpeed()"><span id="speedLabel">${speechRate}×</span></button>
+        <button class="btn-ctrl ${doneModules.has(idx)?'active':''}" id="markDoneBtn" onclick="markDone(${idx})">${doneModules.has(idx)?'✓ Done':'Mark Done'}</button>
+      </div>
+    </div>
+
+    <div class="script-container">
+      <div class="script-tabs">
+        <button class="tab-btn active" onclick="switchTab('script',this)">📜 Audio Script</button>
+        <button class="tab-btn" onclick="switchTab('notes',this)">📌 Key Points</button>
+      </div>
+      <div class="script-body">
+        <div class="tab-content active" id="tab-script">${scriptHTML}</div>
+        <div class="tab-content" id="tab-notes">${kpHTML}</div>
+      </div>
+    </div>
+
+    ${isLast?`<div class="finish-banner">
+      <div class="finish-icon">🎯</div>
+      <div class="finish-title">Course Complete. You Are Ready.</div>
+      <div class="finish-sub">You've completed all 12 days of Devin AI mastery training — foundation through advanced through interview prep. Go show them what you know.</div>
+    </div>`:''}
+
+    <div class="module-nav">${navHTML}</div>`;
+}
+
+function switchTab(name,el){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+function loadModule(idx){
+  stopSpeech(); currentModule=idx;
+  buildSidebar();
+  renderModule(idx);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function markDone(idx){
+  doneModules.add(idx);
+  document.getElementById('btn'+idx)?.classList.add('done');
+  document.getElementById('markDoneBtn').textContent='✓ Done';
+  document.getElementById('markDoneBtn').classList.add('active');
+  const pct=(doneModules.size/modules.length)*100;
+  document.getElementById('progressBar').style.width=pct+'%';
+  document.getElementById('progressLabel').textContent=doneModules.size+' of '+modules.length+' completed';
+}
+
+function showFinish(){ alert('🎯 You have completed the full Devin AI Mastery Course. 12 days. 10 knowledge modules. 5 mock interview answers. 7 gotchas. 3 scenarios. The pitch. Go get that job, Ashan.'); }
+
+// TTS
+function togglePlay(){ isPlaying?pauseSpeech():startSpeech(); }
+function startSpeech(){
+  if(synth.paused&&utterance){synth.resume();isPlaying=true;document.getElementById('playBtn')?.classList.add('playing');return;}
+  synth.cancel();
+  utterance=new SpeechSynthesisUtterance(fullText);
+  utterance.rate=speechRate; utterance.lang='en-US'; isPlaying=true;
+  document.getElementById('playBtn')?.classList.add('playing');
+  utterance.onboundary=e=>{
+    if(e.name==='word'){
+      const pct=Math.min(100,(e.charIndex/fullText.length)*100);
+      const el=document.getElementById('playerProgress');
+      if(el) el.style.width=pct+'%';
+    }
+  };
+  utterance.onend=()=>{
+    isPlaying=false;
+    document.getElementById('playBtn')?.classList.remove('playing');
+    const p=document.getElementById('playerProgress');
+    if(p) p.style.width='100%';
+  };
+  synth.speak(utterance);
+}
+function pauseSpeech(){ synth.pause(); isPlaying=false; document.getElementById('playBtn')?.classList.remove('playing'); }
+function stopSpeech(){ synth.cancel(); isPlaying=false; utterance=null; }
+function changeSpeed(){
+  speedIdx=(speedIdx+1)%speeds.length; speechRate=speeds[speedIdx];
+  document.getElementById('speedLabel').textContent=speechRate+'×';
+  if(isPlaying){stopSpeech();startSpeech();}
+}
+
+// Init
+buildSidebar();
+renderModule(0);
+</script>
+</body>
+</html>

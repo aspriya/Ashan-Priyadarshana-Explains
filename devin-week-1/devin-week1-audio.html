@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devin AI — Week 1 Audio Learning</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,400;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181c24;
+    --border: #1e2330;
+    --accent: #00d4aa;
+    --accent2: #f5a623;
+    --accent3: #7c6af7;
+    --text: #e8eaf0;
+    --text-dim: #8890a4;
+    --text-muted: #4a5068;
+    --danger: #ff6b6b;
+    --glow: rgba(0,212,170,0.15);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events:none;
+    z-index:0;
+    opacity:0.4;
+  }
+
+  .layout { 
+    display:grid; 
+    grid-template-columns: 280px 1fr; 
+    min-height:100vh;
+    position:relative;
+    z-index:1;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 28px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .sidebar-header {
+    padding: 0 24px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .sidebar-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .sidebar-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--text);
+  }
+
+  .module-list { padding: 0 12px; flex:1; }
+
+  .module-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 14px;
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 4px;
+    transition: background 0.2s, transform 0.1s;
+    display:flex;
+    align-items:center;
+    gap: 12px;
+  }
+  .module-btn:hover { background: var(--surface2); }
+  .module-btn.active { background: rgba(0,212,170,0.1); outline: 1px solid rgba(0,212,170,0.3); }
+  .module-btn.active .mod-num { color: var(--accent); }
+  .module-btn.active .mod-name { color: var(--text); }
+
+  .mod-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    min-width: 28px;
+    font-weight: 500;
+  }
+  .mod-meta { flex:1; min-width:0; }
+  .mod-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-dim);
+    line-height:1.3;
+  }
+  .mod-dur {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top:2px;
+  }
+  .mod-done { 
+    width:8px; height:8px; border-radius:50%; 
+    background: var(--accent); 
+    flex-shrink:0;
+    opacity:0;
+    transition:opacity 0.3s;
+  }
+  .module-btn.done .mod-done { opacity:1; }
+
+  .sidebar-footer {
+    padding: 16px 24px 0;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+  .progress-label {
+    font-family:'DM Mono',monospace;
+    font-size:10px;
+    color:var(--text-muted);
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    margin-bottom:8px;
+  }
+  .progress-bar-bg {
+    height:4px;
+    background:var(--border);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .progress-bar-fill {
+    height:100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    border-radius:2px;
+    width:0%;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* MAIN */
+  .main {
+    padding: 48px 56px;
+    max-width: 900px;
+  }
+
+  .module-header {
+    margin-bottom: 36px;
+    animation: slideIn 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  @keyframes slideIn {
+    from { opacity:0; transform:translateY(12px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+
+  .module-eyebrow {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:16px;
+  }
+  .module-day {
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.15em;
+    color:var(--accent);
+    background:rgba(0,212,170,0.1);
+    padding:4px 10px;
+    border-radius:4px;
+  }
+  .module-duration {
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    color:var(--text-muted);
+  }
+
+  .module-heading {
+    font-family:'Syne',sans-serif;
+    font-size:36px;
+    font-weight:800;
+    line-height:1.1;
+    letter-spacing:-0.02em;
+    color:var(--text);
+    margin-bottom:12px;
+  }
+  .module-heading span { color:var(--accent); }
+
+  .module-sub {
+    font-size:16px;
+    color:var(--text-dim);
+    font-style:italic;
+    line-height:1.6;
+  }
+
+  /* PLAYER CONTROLS */
+  .player-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+    display:flex;
+    align-items:center;
+    gap: 20px;
+  }
+
+  .btn-play {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    transition: transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 0 24px rgba(0,212,170,0.3);
+  }
+  .btn-play:hover { transform:scale(1.08); box-shadow:0 0 32px rgba(0,212,170,0.5); }
+  .btn-play svg { fill: #0a0c10; }
+  .btn-play.playing svg.play-icon { display:none; }
+  .btn-play.playing svg.pause-icon { display:block !important; }
+
+  .player-info { flex:1; min-width:0; }
+  .player-track {
+    font-family:'Syne',sans-serif;
+    font-size:13px;
+    font-weight:600;
+    color:var(--text);
+    margin-bottom:6px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .player-progress-bg {
+    height:3px;
+    background:var(--border);
+    border-radius:2px;
+    overflow:hidden;
+    cursor:pointer;
+  }
+  .player-progress-fill {
+    height:100%;
+    background: var(--accent);
+    width:0%;
+    transition:width 0.5s linear;
+    border-radius:2px;
+  }
+
+  .player-controls-right {
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .btn-ctrl {
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:7px 14px;
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    color:var(--text-dim);
+    cursor:pointer;
+    transition:all 0.2s;
+    white-space:nowrap;
+  }
+  .btn-ctrl:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-ctrl.active { background:rgba(245,166,35,0.1); border-color:var(--accent2); color:var(--accent2); }
+
+  .speed-display {
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    color:var(--text-dim);
+    min-width:36px;
+    text-align:center;
+  }
+
+  /* SCRIPT CONTENT */
+  .script-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    animation: slideIn 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .script-tabs {
+    display:flex;
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+  }
+  .tab-btn {
+    background:none;
+    border:none;
+    padding:14px 16px;
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--text-muted);
+    cursor:pointer;
+    border-bottom: 2px solid transparent;
+    transition:all 0.2s;
+    margin-bottom:-1px;
+  }
+  .tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+  .script-body {
+    padding: 32px 36px;
+    max-height: 65vh;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+  .script-body::-webkit-scrollbar { width:4px; }
+  .script-body::-webkit-scrollbar-track { background:transparent; }
+  .script-body::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+
+  /* SCRIPT TEXT STYLES */
+  .script-intro {
+    background: linear-gradient(135deg, rgba(0,212,170,0.08), rgba(124,106,247,0.08));
+    border: 1px solid rgba(0,212,170,0.2);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+    font-family:'DM Mono',monospace;
+    font-size:12px;
+    color:var(--accent);
+    line-height:1.7;
+  }
+
+  .script-p {
+    font-size:16px;
+    line-height:1.85;
+    color:var(--text-dim);
+    margin-bottom:20px;
+  }
+  .script-p.highlight {
+    color: var(--text);
+    font-size:17px;
+  }
+
+  .section-head {
+    font-family:'Syne',sans-serif;
+    font-size:13px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    color:var(--accent2);
+    margin: 32px 0 14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .section-head::after {
+    content:'';
+    flex:1;
+    height:1px;
+    background:var(--border);
+  }
+
+  .callout {
+    background: rgba(245,166,35,0.08);
+    border-left: 3px solid var(--accent2);
+    padding: 14px 20px;
+    border-radius: 0 8px 8px 0;
+    margin: 20px 0;
+    font-size:15px;
+    color:var(--text-dim);
+    line-height:1.7;
+    font-style:italic;
+  }
+  .callout strong { color:var(--accent2); font-style:normal; }
+
+  .callout.teal {
+    background:rgba(0,212,170,0.08);
+    border-left-color:var(--accent);
+  }
+  .callout.teal strong { color:var(--accent); }
+
+  .callout.purple {
+    background:rgba(124,106,247,0.08);
+    border-left-color:var(--accent3);
+  }
+  .callout.purple strong { color:var(--accent3); }
+
+  .inline-code {
+    font-family:'DM Mono',monospace;
+    font-size:13px;
+    background:var(--surface2);
+    border:1px solid var(--border);
+    padding:1px 7px;
+    border-radius:4px;
+    color:var(--accent);
+  }
+
+  .compare-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin:20px 0;
+  }
+  .compare-card {
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:16px;
+  }
+  .compare-card.bad { border-color:rgba(255,107,107,0.3); }
+  .compare-card.good { border-color:rgba(0,212,170,0.3); }
+  .compare-label {
+    font-family:'DM Mono',monospace;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    margin-bottom:8px;
+  }
+  .compare-card.bad .compare-label { color:var(--danger); }
+  .compare-card.good .compare-label { color:var(--accent); }
+  .compare-text { font-size:13px; line-height:1.6; color:var(--text-dim); }
+
+  .exercise-box {
+    background: var(--surface2);
+    border: 1px dashed var(--accent3);
+    border-radius:12px;
+    padding: 20px 24px;
+    margin-top: 32px;
+  }
+  .exercise-label {
+    font-family:'DM Mono',monospace;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.15em;
+    color:var(--accent3);
+    margin-bottom:10px;
+  }
+  .exercise-text {
+    font-size:15px;
+    line-height:1.75;
+    color:var(--text-dim);
+  }
+  .exercise-text strong { color:var(--text); }
+
+  /* NOTES TAB */
+  .key-point {
+    display:flex;
+    gap:14px;
+    padding:14px 0;
+    border-bottom:1px solid var(--border);
+    align-items:flex-start;
+  }
+  .key-point:last-child { border-bottom:none; }
+  .kp-bullet {
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:rgba(0,212,170,0.15);
+    border:1px solid rgba(0,212,170,0.3);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'DM Mono',monospace;
+    font-size:10px;
+    color:var(--accent);
+    flex-shrink:0;
+    margin-top:1px;
+  }
+  .kp-text {
+    font-size:14px;
+    line-height:1.7;
+    color:var(--text-dim);
+  }
+  .kp-text strong { color:var(--text); }
+
+  /* Nav */
+  .module-nav {
+    display:flex;
+    gap:12px;
+    margin-top:32px;
+    padding-top:24px;
+    border-top:1px solid var(--border);
+  }
+  .btn-nav {
+    padding:12px 24px;
+    border-radius:10px;
+    font-family:'Syne',sans-serif;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text-dim);
+    transition:all 0.2s;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .btn-nav:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-nav.primary {
+    background:var(--accent);
+    color:#0a0c10;
+    border-color:var(--accent);
+    margin-left:auto;
+  }
+  .btn-nav.primary:hover { background:#00f0c4; box-shadow:0 0 24px rgba(0,212,170,0.4); }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns:1fr; }
+    .sidebar { position:static; height:auto; }
+    .main { padding:24px 20px; }
+    .compare-grid { grid-template-columns:1fr; }
+    .module-heading { font-size:26px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-tag">🎧 Audio Learning Series</div>
+      <div class="sidebar-title">Devin AI<br>Week 1 — Foundation</div>
+    </div>
+    <div class="module-list" id="moduleList">
+      <button class="module-btn active" onclick="loadModule(0)" id="btn0">
+        <span class="mod-num">D1</span>
+        <div class="mod-meta">
+          <div class="mod-name">What IS Devin?</div>
+          <div class="mod-dur">30 min · Module 1</div>
+        </div>
+        <div class="mod-done"></div>
+      </button>
+      <button class="module-btn" onclick="loadModule(1)" id="btn1">
+        <span class="mod-num">D2</span>
+        <div class="mod-meta">
+          <div class="mod-name">Your First Session</div>
+          <div class="mod-dur">30 min · Module 2</div>
+        </div>
+        <div class="mod-done"></div>
+      </button>
+      <button class="module-btn" onclick="loadModule(2)" id="btn2">
+        <span class="mod-num">D3</span>
+        <div class="mod-meta">
+          <div class="mod-name">Essential Guidelines</div>
+          <div class="mod-dur">45 min · Module 3</div>
+        </div>
+        <div class="mod-done"></div>
+      </button>
+      <button class="module-btn" onclick="loadModule(3)" id="btn3">
+        <span class="mod-num">D4</span>
+        <div class="mod-meta">
+          <div class="mod-name">Onboarding Devin</div>
+          <div class="mod-dur">45 min · Module 4</div>
+        </div>
+        <div class="mod-done"></div>
+      </button>
+      <button class="module-btn" onclick="loadModule(4)" id="btn4">
+        <span class="mod-num">D5</span>
+        <div class="mod-meta">
+          <div class="mod-name">Working With Devin</div>
+          <div class="mod-dur">45 min · Module 5</div>
+        </div>
+        <div class="mod-done"></div>
+      </button>
+    </div>
+    <div class="sidebar-footer">
+      <div class="progress-label" id="progressLabel">0 of 5 completed</div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar"></div></div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main" id="mainContent">
+    <!-- Rendered by JS -->
+  </main>
+
+</div>
+
+<script>
+const synth = window.speechSynthesis;
+let utterance = null;
+let isPlaying = false;
+let speechRate = 1.0;
+let currentModule = 0;
+let doneModules = new Set();
+let charIndex = 0;
+let fullText = '';
+let progressInterval = null;
+
+// ─── MODULE DATA ────────────────────────────────────────────────
+const modules = [
+{
+  day: "Day 1 — Module 1",
+  title: "What <span>IS</span> Devin?",
+  subtitle: "Understanding the world's first AI software engineer — its identity, strengths, workspace, and limits.",
+  duration: "~30 min",
+  script: [
+    { type: 'intro', text: "📖 Source: docs.devin.ai → Introducing Devin\nThis script is written for audio. Read it aloud, or press Play to listen. Take notes on the key terms." },
+    { type: 'p', text: "Welcome to Module 1 of your Devin AI mastery journey. By the end of this session, you'll be able to explain exactly what Devin is, what it can do brilliantly, where it struggles, and how its workspace is structured — all from memory.", highlight: true },
+    { type: 'section', text: "Part 1 — The Core Identity" },
+    { type: 'p', text: "Let's start with the single most important sentence from the official Devin documentation: Devin is the AI software engineer, built to help ambitious engineering teams crush their backlogs." },
+    { type: 'p', text: "Notice the specific word choice here — software engineer. Not a code autocomplete tool. Not a chat assistant that happens to know code. Devin is architected to behave like an actual engineer: it writes code, runs it, tests it, debugs it, and opens pull requests — all autonomously." },
+    { type: 'callout', text: "<strong>The Rule of Thumb:</strong> If a task would take you three hours or less, Devin can most likely do it. For longer tasks, break them into smaller focused sessions.", variant: 'teal' },
+    { type: 'p', text: "The official docs describe Devin as a junior engineer. This framing is deliberate and important. A junior engineer is capable, enthusiastic, and productive — but they work best when they have clear instructions, defined scope, and a way to verify their work. That is exactly how you should think about Devin." },
+    { type: 'section', text: "Part 2 — The Four Strength Categories" },
+    { type: 'p', text: "According to the official docs, Devin excels across four major categories. Let's go through each one." },
+    { type: 'p', text: "Category one: Tackling many small tasks in parallel, before they clog your backlog. This means targeted refactors, small feature requests, bug fixes, improving test coverage, fixing CI failures, addressing lint errors, and handling CVE remediations and dependency security updates. In other words, all the small-but-important work that slows down a team." },
+    { type: 'p', text: "Category two: Code migrations, refactors, and modernization. Language migrations like JavaScript to TypeScript. Framework upgrades like Angular 16 to 18. Monorepo to submodule conversions. Removing old feature flags. Extracting shared code into libraries. These are tedious, time-consuming jobs — perfect for Devin." },
+    { type: 'p', text: "Category three: Common, repetitive engineering tasks. Pull request reviews, codebase Q-and-A, reproducing and fixing bugs, writing unit tests, maintaining documentation. The stuff that's always on the to-do list but never urgent enough to prioritize." },
+    { type: 'p', text: "Category four: Customer engineering support. Building new integrations, working with unfamiliar APIs, creating customized demos, prototyping solutions, building internal tools. Devin can explore documentation on its own, read API specs, and implement against them." },
+    { type: 'section', text: "Part 3 — The Workspace: Shell, IDE, and Browser" },
+    { type: 'p', text: "Now let's talk about how Devin actually works. When you start a Devin session, you get access to a full development workspace. It has three key tools.", highlight: true },
+    { type: 'p', text: "First, the Shell. This is Devin's terminal. You can watch commands being executed in real time and view output logs. You can copy shell output for debugging. If you want to run commands directly yourself, you use the IDE's built-in shell rather than this view." },
+    { type: 'p', text: "Second, the IDE. This is an embedded code editor — just like VS Code — with all the tools and shortcuts you already know. You can watch Devin edit files in real time, and critically, you can take over at any moment to make direct edits, run commands, or test Devin's work yourself." },
+    { type: 'p', text: "Third, the Browser. This lets you watch Devin navigate the web — reading documentation, testing web applications, downloading data, filling forms. You can even jump in and control the browser manually when Devin needs human help navigating something." },
+    { type: 'callout', text: "<strong>Key Insight:</strong> The Shell, IDE, and Browser together mean Devin lives in the same environment a human developer does. It doesn't just suggest code — it executes, tests, and iterates in a real machine.", variant: 'purple' },
+    { type: 'section', text: "Part 4 — The Limitations" },
+    { type: 'p', text: "Now, let's talk about what Devin cannot do well. Knowing the limitations is just as important as knowing the strengths — this is what separates a power user from someone who gets frustrated." },
+    { type: 'p', text: "Large-scale, poorly-scoped tasks are hard for Devin. For complex edits, break the project into smaller isolated tasks across separate sessions that build on each other. Devin performs much better on well-defined, bounded work." },
+    { type: 'p', text: "Reliability can be an issue. Devin will sometimes go off-track. Giving it clear completion criteria upfront — and using Ask Devin to plan before executing — are the two biggest ways to improve reliability." },
+    { type: 'p', text: "UI aesthetics are a weak point. Devin can build functional frontends, but it lacks good visual judgment. As the docs put it plainly: Devin doesn't have great eyesight. Provide Figma files, mockups, or detailed specs rather than expecting Devin to design from scratch." },
+    { type: 'p', text: "Mobile development is limited. Devin doesn't have a phone or emulator to test with, so mobile app work requires extra guidance from you." },
+    { type: 'p', text: "And finally, security. You should always use the Secrets Manager to pass credentials to Devin — never paste API keys or passwords directly into your prompt." },
+    { type: 'section', text: "Part 5 — The Most Successful Workflows" },
+    { type: 'p', text: "The docs highlight three workflows where Devin shines the most. These are worth memorizing." },
+    { type: 'p', text: "Workflow one: Tag Devin on a Slack or Teams thread about a bug you're discussing with coworkers. Devin picks up the conversation context and gets to work immediately." },
+    { type: 'p', text: "Workflow two: Delegate a complex task via the web app, then take over in Devin's IDE once it gives you a good first draft. You provide creative direction; Devin handles execution." },
+    { type: 'p', text: "Workflow three: Carve out tasks from your to-do list at the start of the day, let Devin work in the background, then return to review draft pull requests waiting for your approval." },
+    { type: 'callout', text: "<strong>The Core Philosophy:</strong> Devin is most effective when it's part of your team and part of your existing workflow — not a separate, occasional tool you use in isolation.", variant: 'teal' },
+    { type: 'exercise', text: "🎙️ Audio Exercise: Close this window. Explain Devin to an imaginary hiring manager in 2 minutes. Cover: what it is, its 4 strength areas, the 3 workspace tools, and 2 key limitations. Record yourself if you can — this builds real recall." }
+  ],
+  keyPoints: [
+    { text: "<strong>Devin = autonomous AI software engineer</strong> — writes, runs, tests code end-to-end" },
+    { text: "<strong>Junior engineer mental model</strong> — capable but needs clear scope and success criteria" },
+    { text: "<strong>3-hour rule:</strong> if you can do it in 3 hours, Devin probably can too" },
+    { text: "<strong>4 strength areas:</strong> small parallel tasks, migrations, repetitive work, customer engineering" },
+    { text: "<strong>3 workspace tools:</strong> Shell (terminal), IDE (code editor), Browser (web navigation)" },
+    { text: "<strong>Limitations:</strong> large vague tasks, UI aesthetics, mobile (no emulator), reliability, security" },
+    { text: "<strong>Best workflows:</strong> Slack tagging, delegation + takeover, morning task carving" }
+  ]
+},
+{
+  day: "Day 2 — Module 2",
+  title: "Your First <span>Session</span>",
+  subtitle: "Navigating the two-mode interface, using @ mentions, agents, and taking over from Devin mid-flow.",
+  duration: "~30 min",
+  script: [
+    { type: 'intro', text: "📖 Source: docs.devin.ai → Your First Session\nThis module walks you through the complete interface — from Ask mode to Agent mode — and how to collaborate mid-session." },
+    { type: 'p', text: "Welcome to Module 2. Today you're going to internalize how a Devin session actually works from start to finish. After this, you should be able to walk someone through the full flow purely from memory.", highlight: true },
+    { type: 'section', text: "Part 1 — Before You Start: Repository Setup" },
+    { type: 'p', text: "The first thing the official docs tell you before starting your first session is this: make sure you've indexed and set up your repositories. This is foundational. Without it, Devin doesn't understand your codebase and can't navigate it intelligently." },
+    { type: 'p', text: "We'll cover the full details of repository setup in Module 4. For now, hold this as a prerequisite: repos first, sessions second." },
+    { type: 'section', text: "Part 2 — The Two Modes: Ask and Agent" },
+    { type: 'p', text: "When you start a new session, you immediately see two primary modes: Ask and Agent. This distinction is one of the most important things to understand about Devin.", highlight: true },
+    { type: 'callout', text: "<strong>The Official Recommendation:</strong> Unless you already have a fully scoped plan, start with Ask mode to collaborate on a plan with Devin — then switch to Agent mode to execute it.", variant: 'teal' },
+    { type: 'p', text: "Ask mode is a lightweight, read-only planning environment. It lets you explore your codebase and plan tasks with Devin without making any changes to actual code. In Ask mode, you can ask questions like: how does this authentication flow work? Which files handle the payment processing logic? Ask mode now supports both codebase questions and full task planning." },
+    { type: 'p', text: "Agent mode is where Devin actually executes. It writes code, runs commands, tests changes, and opens pull requests. Once you've used Ask mode to agree on an approach, you switch to Agent mode and Devin gets to work." },
+    { type: 'p', text: "Think of it this way: Ask mode is the planning meeting; Agent mode is when your engineer rolls up their sleeves and starts building." },
+    { type: 'section', text: "Part 3 — Choosing Your Agent Configuration" },
+    { type: 'p', text: "Within a session, you can choose which agent configuration Devin uses. There are currently three available." },
+    { type: 'p', text: "The default Devin agent is a general-purpose AI software engineer. Use this for building features, fixing bugs, refactoring code, and most standard development tasks. When in doubt, this is your starting point." },
+    { type: 'p', text: "Fast Mode is an optimized agent for quick, well-scoped tasks. If you have something small and clearly defined, Fast Mode can execute it more efficiently." },
+    { type: 'p', text: "Dana is the data analyst agent, optimized for querying databases, analyzing data, and creating visualizations. We'll cover Dana in more depth in Week 2." },
+    { type: 'section', text: "Part 4 — Using @ Mentions for Precision" },
+    { type: 'p', text: "One of the most powerful features in the session interface is the @ mention system. When you type the @ symbol in the chat input, a dropdown appears with available resources you can reference.", highlight: true },
+    { type: 'p', text: "You can @ mention specific files, so Devin focuses on exactly the right part of the codebase. You can @ mention repositories to scope Devin's work to a particular project. And critically, you can @ mention Playbooks — which are detailed prompt templates that guide Devin's behavior for specific types of tasks." },
+    { type: 'callout', text: "<strong>Pro Tip:</strong> Using @file mentions instead of describing files by name significantly increases Devin's accuracy. It removes ambiguity about which exact file you mean in a large codebase.", variant: 'purple' },
+    { type: 'section', text: "Part 5 — Following Devin's Work in Real Time" },
+    { type: 'p', text: "Once a session is running in Agent mode, you have full visibility into everything Devin is doing. The Progress tab brings the Shell, IDE, and Browser together in one unified view." },
+    { type: 'p', text: "You can click on any step within a Devin session to see the details of what happened at that point. All shell commands, code edits, and browser activity are logged in a unified view. You can jump to any moment in the session by clicking on commands in the history." },
+    { type: 'p', text: "Shell commands that are greyed out are commands run at a future point in time in the session — a subtle but useful visual signal while the session is in progress." },
+    { type: 'section', text: "Part 6 — Taking Over From Devin" },
+    { type: 'p', text: "At any point during a session, you can jump in and take over. You can edit files directly in the IDE, run commands in the shell, or navigate the browser manually. This is one of Devin's most powerful collaborative features.", highlight: true },
+    { type: 'p', text: "There is one critical rule here, directly from the docs: if you take over and make changes, always tell Devin about those changes when you hand back control. If Devin doesn't know you edited a file, it may overwrite your work or make conflicting decisions." },
+    { type: 'callout', text: "<strong>Rule:</strong> If you make changes while taking over a session, always communicate those changes back to Devin before resuming its autonomy.", variant: 'teal' },
+    { type: 'section', text: "Part 7 — Ending a Session" },
+    { type: 'p', text: "When a session is complete or idle, you have two options: put Devin to sleep, or terminate the session. Devin does not consume ACUs — Agent Compute Units — while sleeping, and it will sleep automatically after a small period of inactivity. Terminating a session ends it permanently. Sleep is appropriate for pausing; termination is for closing out." },
+    { type: 'exercise', text: "🎙️ Audio Exercise: Walk through a mock first session out loud. Narrate: 'I open Devin. I type @ to reference the payments.js file. I ask Devin in Ask mode to outline how it would add input validation. I review its plan. I switch to Agent mode. Devin starts working. I see its shell commands. I take over to fix one file. I tell Devin what I changed. Devin finishes and opens a PR.' Practice this narration until it flows naturally." }
+  ],
+  keyPoints: [
+    { text: "<strong>Two modes:</strong> Ask (plan, read-only) and Agent (execute, writes code)" },
+    { text: "<strong>Start with Ask</strong> unless you already have a fully scoped plan" },
+    { text: "<strong>3 agent configs:</strong> Devin (default), Fast Mode (quick tasks), Dana (data analyst)" },
+    { text: "<strong>@ mentions:</strong> reference files, repos, playbooks for precision" },
+    { text: "<strong>Progress tab:</strong> unified view of shell, IDE, browser activity" },
+    { text: "<strong>Takeover rule:</strong> always tell Devin about changes you made before handing back control" },
+    { text: "<strong>Session end:</strong> Sleep (pause, no ACUs) vs. Terminate (permanent close)" }
+  ]
+},
+{
+  day: "Day 3 — Module 3",
+  title: "The Essential <span>Guidelines</span>",
+  subtitle: "The most important module: when to use Devin, how to write powerful instructions, and where Devin fits in your SDLC.",
+  duration: "~45 min",
+  script: [
+    { type: 'intro', text: "📖 Source: docs.devin.ai → When to Use Devin, Instructing Devin Effectively, Good vs. Bad Instructions, SDLC Integration\nThis is the most operationally important section of all Devin docs. Master this and you'll outperform 90% of Devin users." },
+    { type: 'p', text: "Welcome to Module 3 — the Essential Guidelines. If you only deeply internalize one module from this entire course, make it this one. The difference between a good and bad Devin user is almost entirely about how they write instructions and how they choose their tasks.", highlight: true },
+    { type: 'section', text: "Part 1 — When Should You Use Devin?" },
+    { type: 'p', text: "The official docs frame this with a clear decision filter. Before assigning any task to Devin, ask yourself three questions." },
+    { type: 'p', text: "First: Can I describe clear success criteria? Tasks with test suites, CI checks, or verifiable outcomes yield the best results. If you can't articulate what 'done' looks like, Devin can't either." },
+    { type: 'p', text: "Second: Is there enough context? Have you provided relevant files, patterns, documentation links, or examples? The more context Devin has, the better the output." },
+    { type: 'p', text: "Third: Would breaking this down help? For very large projects, split the work into focused sessions that build on each other. You can even run them in parallel with multiple Devin instances." },
+    { type: 'callout', text: "<strong>The Rule of Thumb:</strong> If a task would take you three hours or less, Devin can most likely handle it. For longer tasks, break them into smaller well-scoped sessions.", variant: 'teal' },
+    { type: 'section', text: "Part 2 — The Single Most Important Instruction Principle" },
+    { type: 'p', text: "The official documentation opens the instruction guide with this sentence: The most important thing to remember when instructing Devin is to be as specific as possible. Just as you would provide a detailed spec when asking a coworker to code something, you should do the same with Devin.", highlight: true },
+    { type: 'p', text: "This is not a soft suggestion. It is the core principle that everything else builds on. Vague instructions produce vague results. Specific instructions with clear boundaries produce reliable, high-quality output." },
+    { type: 'section', text: "Part 3 — The Anatomy of a Great Prompt" },
+    { type: 'p', text: "Let's break down what makes a great Devin prompt. The docs give us a real example from the Devin codebase itself, which I'll paraphrase for audio." },
+    { type: 'p', text: "A well-structured prompt does five things. One: it names the specific repository or file. Two: it states the broader purpose of the task. Three: it breaks the work into explicit numbered steps. Four: it provides architectural guidance — like which patterns to follow, which files to reference. Five: it defines a success criterion — like 'CI must pass' or 'ESLint must show no errors.'" },
+    { type: 'callout', text: "<strong>The Prompt Improvement Button:</strong> In the session creation interface, there's a yellow warning circle button. Click it to get automated feedback on whether your prompt is well-specified before you launch a session.", variant: 'purple' },
+    { type: 'section', text: "Part 4 — The Do's and Don'ts" },
+    { type: 'p', text: "Let's go through the official dos and don'ts directly from the docs. This section is worth memorizing.", highlight: true },
+    { type: 'p', text: "Do: Make important decisions and judgment calls for Devin. Offer specific design choices and implementation strategies. Define clear scope, boundaries, and success criteria." },
+    { type: 'p', text: "Don't: Leave decisions open-ended. Vague instructions lead Devin to implement solutions that don't match your needs. Avoid statements that require Devin to make significant design decisions without guidance." },
+    { type: 'compare', items: [
+      { type: 'bad', label: "❌ Don't", text: '"Improve our database\'s performance."' },
+      { type: 'good', label: "✅ Do", text: '"Optimize the getOrderDetails query in orderService.js by adding a composite index on order_id and product_id in the order_items table."' }
+    ]},
+    { type: 'compare', items: [
+      { type: 'bad', label: "❌ Don't", text: '"Develop the entire backend infrastructure for our new gen AI feature."' },
+      { type: 'good', label: "✅ Do", text: '"Build the session creation endpoint in api/sessions.ts. Follow the pattern in api/users.ts. Include input validation and a 201 response with the session ID."' }
+    ]},
+    { type: 'section', text: "Part 5 — Providing Context and References" },
+    { type: 'p', text: "The docs give explicit guidance on how to give Devin the right context. Provide examples, modules, and templates for Devin to follow. Share direct links to documentation sites so Devin can read API details it might not know about. Share specific filenames. Connect MCP integrations to give Devin access to Figma designs, databases, and monitoring tools." },
+    { type: 'p', text: "For visual tasks: provide Figma files via the Figma MCP, or reference designs with detailed specs. Devin can build from references but will not invent good aesthetics on its own." },
+    { type: 'p', text: "For mobile apps: since Devin has no phone emulator, provide clear testing criteria in text form so Devin knows what success looks like without being able to tap through a screen." },
+    { type: 'section', text: "Part 6 — Feedback Loops and Test-Driven Delegation" },
+    { type: 'p', text: "The docs emphasize one more critical point: set up feedback mechanisms before you start. This means using tests — unit tests and integration tests — to confirm correctness. Maintain build validations, lint checks, and static analysis for code quality. Then tell Devin to use them.", highlight: true },
+    { type: 'callout', text: '<strong>Examples from the official docs:</strong> "Run npm test after each iteration." — "Ensure the pipeline on CircleCI doesn\'t fail." — "Pass ESLint/Prettier checks before pushing any commits."', variant: 'teal' },
+    { type: 'p', text: "Without feedback signals, Devin won't know if its solutions meet your standards. Automated checks are the most reliable way to keep Devin on track throughout a session." },
+    { type: 'section', text: "Part 7 — Using Playbooks and Knowledge for Consistency" },
+    { type: 'p', text: "For recurring tasks, the docs recommend Playbooks — reusable, shareable prompt templates. For example, if you want Devin to address CI build failures every time one occurs, create a playbook with the standard steps Devin should follow each time." },
+    { type: 'p', text: "For persistent context — like coding standards, common bug patterns, deployment workflows, or how to use internal tools — use Knowledge. Knowledge items are automatically recalled by Devin when relevant. You can pin them to specific repos or apply them globally." },
+    { type: 'callout', text: "<strong>Playbooks vs. Knowledge:</strong> Use Playbooks for step-by-step procedures tied to specific tasks. Use Knowledge for general conventions and context that apply broadly across all sessions.", variant: 'purple' },
+    { type: 'exercise', text: "🎙️ Audio Exercise: Read these bad instructions aloud, then immediately rewrite them verbally as good ones. 1) 'Fix the login bug.' 2) 'Make the app faster.' 3) 'Refactor the codebase.' For each one, add: a specific file, a concrete action, a success criterion, and a feedback mechanism. Do this without looking at notes." }
+  ],
+  keyPoints: [
+    { text: "<strong>Pre-task checklist:</strong> clear success criteria? enough context? should this be broken down?" },
+    { text: "<strong>Core principle:</strong> be as specific as possible — treat Devin like a junior engineer with a detailed spec" },
+    { text: "<strong>Great prompts:</strong> name the repo/file, state purpose, list explicit steps, provide architectural guidance, define success" },
+    { text: "<strong>Use the Prompt Improvement Button</strong> — yellow circle in the session creation UI" },
+    { text: "<strong>Don't leave decisions open-ended</strong> — make judgment calls for Devin, don't ask it to invent strategy" },
+    { text: "<strong>Set up feedback loops:</strong> npm test, CI pipelines, ESLint — give Devin verifiable signals" },
+    { text: "<strong>Playbooks</strong> = reusable task templates. <strong>Knowledge</strong> = persistent cross-session context" }
+  ]
+},
+{
+  day: "Day 4 — Module 4",
+  title: "Onboarding <span>Devin</span>",
+  subtitle: "Setting up repositories, indexing codebases, VPN, knowledge onboarding, and the powerful AGENTS.md file.",
+  duration: "~45 min",
+  script: [
+    { type: 'intro', text: "📖 Source: docs.devin.ai → Repo Setup, Index a Repository, VPN Configuration, Knowledge Onboarding, AGENTS.md\nThis module is about making Devin effective from day one on any codebase." },
+    { type: 'p', text: "Welcome to Module 4. Today is about onboarding — how you bring Devin into a new project and give it everything it needs to work intelligently. This is the difference between a Devin that feels lost in your codebase and one that navigates it like a senior team member.", highlight: true },
+    { type: 'section', text: "Part 1 — Repository Setup" },
+    { type: 'p', text: "Before Devin can do anything useful, you need to connect your repositories. The docs describe this as the foundational step. Through the Devin settings, you connect your version control provider — whether GitHub, GitLab, or Bitbucket — and grant Devin access to the repositories it will work with." },
+    { type: 'p', text: "When setting up a repository, think carefully about the scope of access you grant. Devin needs read-write access to create branches and open pull requests, but you should follow the principle of least privilege — only give access to the repositories Devin actually needs to touch." },
+    { type: 'section', text: "Part 2 — Indexing a Repository" },
+    { type: 'p', text: "Once a repository is connected, the next step is indexing. Indexing is the process by which Devin builds a deep semantic understanding of your codebase — its structure, relationships between files, naming conventions, patterns, and dependencies.", highlight: true },
+    { type: 'p', text: "When you index a repository, Devin analyzes the code and creates an internal representation it can query during sessions. This is what allows Devin to navigate large codebases intelligently — finding the right files, understanding how components relate, and following existing patterns rather than inventing new ones." },
+    { type: 'callout', text: "<strong>Key Insight:</strong> An indexed repository means Devin can answer questions like 'where is the authentication logic?' or 'what pattern do we use for database queries?' without you having to explain every file manually.", variant: 'teal' },
+    { type: 'section', text: "Part 3 — VPN Configuration" },
+    { type: 'p', text: "For teams working with private infrastructure, internal APIs, or self-hosted services, Devin supports VPN configuration. This allows Devin to access your private network resources — internal documentation portals, staging environments, databases, and private artifact registries." },
+    { type: 'p', text: "Setting up VPN access is an enterprise-level configuration and typically requires coordination with your infrastructure or DevOps team. The key point is that Devin can be fully integrated into a private network stack — it's not limited to working only with public resources." },
+    { type: 'section', text: "Part 4 — Knowledge Onboarding" },
+    { type: 'p', text: "Now we come to one of the most powerful onboarding tools: Knowledge. Knowledge items are pieces of persistent context that Devin automatically recalls when relevant across all sessions. You don't have to repeat them in every prompt.", highlight: true },
+    { type: 'p', text: "What should go into Knowledge? Think of everything you'd tell a new developer joining your team. Your coding standards and style guide. Common bugs and their known fixes. Your deployment workflows. How to use internal tools. Authentication patterns specific to your codebase. Environment setup instructions." },
+    { type: 'p', text: "You can pin Knowledge items to specific repositories — so they only apply when Devin is working in that repo — or apply them globally across all sessions. Over time, building a rich Knowledge base is one of the highest-leverage things you can do to improve Devin's performance on your codebase." },
+    { type: 'callout', text: "<strong>Warning from the docs:</strong> A single outdated Knowledge item can degrade session quality across your entire team. Regularly review and update your Knowledge base — remove or correct anything that's no longer accurate.", variant: 'teal' },
+    { type: 'section', text: "Part 5 — AGENTS.md: Devin's Briefing Document" },
+    { type: 'p', text: "The AGENTS.md file is arguably the most important onboarding artifact you can create for Devin. Think of it as the briefing document you'd give to a contractor on their first day.", highlight: true },
+    { type: 'p', text: "The AGENTS.md file lives in the root of your repository and is automatically read by Devin at the start of every session. It gives Devin persistent, repository-specific instructions that apply to all work in that codebase." },
+    { type: 'p', text: "What should an AGENTS.md file contain? Typically: an overview of the project's purpose and architecture. The tech stack and key dependencies. How to build, run, and test the project locally. Coding conventions specific to this repo. Which files or directories are off-limits. Any known quirks or gotchas." },
+    { type: 'callout', text: "<strong>The AGENTS.md Mental Model:</strong> Imagine writing a README specifically for an AI engineer that will execute tasks autonomously. Be explicit, be structured, and cover the 'how we do things here' details that a new hire would need to ask about.", variant: 'purple' },
+    { type: 'p', text: "A well-crafted AGENTS.md dramatically reduces the amount of context you need to provide in each individual session. It's a one-time investment that pays dividends on every future session in that repository." },
+    { type: 'section', text: "Part 6 — The Complete Onboarding Sequence" },
+    { type: 'p', text: "Let's put it all together. The correct sequence for onboarding Devin to a new project is: Step one — connect the repository through Devin's integrations settings. Step two — index the repository so Devin builds semantic understanding of the code. Step three — configure VPN if your project requires access to private infrastructure. Step four — create Knowledge items covering conventions, patterns, and team context. Step five — write and commit an AGENTS.md file to the repository root with project-specific guidance." },
+    { type: 'p', text: "Do all five of these before your first working session, and Devin will perform significantly better than if you just threw it a prompt on a cold, unconfigured repository." },
+    { type: 'exercise', text: "🎙️ Audio Exercise: Explain what AGENTS.md is to an imaginary new team member who has never heard of it. Cover: what it is, where it lives, when Devin reads it, and what 3 specific things you'd put in it for a real project you know. Say it out loud. No notes." }
+  ],
+  keyPoints: [
+    { text: "<strong>Repo setup first</strong> — connect GitHub/GitLab/Bitbucket before any session" },
+    { text: "<strong>Indexing</strong> = Devin builds semantic understanding of your codebase structure and patterns" },
+    { text: "<strong>VPN config</strong> — enables Devin to access private infrastructure, staging environments, internal APIs" },
+    { text: "<strong>Knowledge items</strong> — persistent context recalled automatically; pin to specific repos or apply globally" },
+    { text: "<strong>Outdated Knowledge is dangerous</strong> — one bad item degrades quality across all sessions" },
+    { text: "<strong>AGENTS.md</strong> — repo-root file, read by Devin at every session start; acts as your AI briefing doc" },
+    { text: "<strong>Onboarding sequence:</strong> connect repo → index → VPN → Knowledge items → AGENTS.md" }
+  ]
+},
+{
+  day: "Day 5 — Module 5",
+  title: "Working <span>With</span> Devin",
+  subtitle: "Slash commands, Ask Devin for planning, Devin Review, and mastering the session tools for daily collaboration.",
+  duration: "~45 min",
+  script: [
+    { type: 'intro', text: "📖 Source: docs.devin.ai → Devin Review, Devin Session Tools, Slash Commands, Ask Devin\nThis module teaches you the daily operational layer — how to interact with Devin efficiently every day." },
+    { type: 'p', text: "Welcome to Module 5 — the final module of Week 1. By now you understand what Devin is, how to start a session, how to write good instructions, and how to onboard it to a codebase. Today we go deeper into the tools and commands that power users use every single day.", highlight: true },
+    { type: 'section', text: "Part 1 — Ask Devin: Planning Before Execution" },
+    { type: 'p', text: "We touched on Ask mode in Module 2, but let's go deeper. Ask Devin is not just a question-answering tool — it's a collaborative planning environment that runs before a single line of code is written.", highlight: true },
+    { type: 'p', text: "When you're facing a complex task, the recommended workflow is to open a session in Ask mode, describe the goal, and work with Devin to explore the codebase and scope the approach. Devin can analyze your code, identify the relevant files, understand the impact of changes, and auto-generate a high-context prompt for the actual execution session." },
+    { type: 'p', text: "This is powerful because it separates thinking from doing. You're not asking Devin to plan and execute at the same time — you're giving it a focused planning phase first. Then when you switch to Agent mode, Devin starts with a much better understanding of the problem." },
+    { type: 'callout', text: "<strong>Advanced Use:</strong> Use Ask Devin to investigate the codebase and outline your approach for complex tasks. Let Devin auto-generate a high-context prompt — then use that prompt to launch the Agent mode session.", variant: 'teal' },
+    { type: 'section', text: "Part 2 — Slash Commands" },
+    { type: 'p', text: "Slash commands are the keyboard shortcuts of Devin power users. They let you trigger specific behaviors or modes instantly from the chat input.", highlight: true },
+    { type: 'p', text: "While the full list of slash commands is documented at docs.devin.ai under Slash Commands, here are the concepts behind them. Slash commands let you quickly switch contexts, reference resources, invoke specific behaviors, or modify how Devin is operating — without having to navigate through the UI." },
+    { type: 'p', text: "Power users memorize the most frequently used slash commands the same way they memorize keyboard shortcuts in their IDE. The speed of interaction compounds over time — each command you know means one fewer interruption to your flow state." },
+    { type: 'callout', text: "<strong>Recommendation:</strong> Go to docs.devin.ai/work-with-devin/slash-commands and read the full list. Pick your top 5 most relevant commands. Practice typing them from memory until they're automatic.", variant: 'purple' },
+    { type: 'section', text: "Part 3 — Devin Session Tools in Depth" },
+    { type: 'p', text: "Let's revisit the session tools with deeper detail. Recall from Module 1: Shell, IDE, and Browser. The Progress tab unifies all three." },
+    { type: 'p', text: "The Shell gives you full command-line access to Devin's environment. In addition to monitoring, you have a command history feature that shows every command Devin executed, with output previews. You can copy commands and their outputs with one click. This is extremely useful for debugging or for writing session summaries." },
+    { type: 'p', text: "The IDE is a full VS Code-equivalent environment embedded in the Devin interface. You can edit any file directly. You can run build commands, test suites, or custom scripts. Think of it as your safety net — if Devin takes a wrong turn, you can step in, make corrections, and hand control back." },
+    { type: 'p', text: "The Browser lets you watch Devin navigate web pages in real time — reading API documentation, testing web applications it builds, filling in forms. The Interactive Browser mode lets you take manual control of the browser during a session. This is useful when Devin hits a CAPTCHA, needs you to log in, or requires a human to make a judgment call about a web interface." },
+    { type: 'section', text: "Part 4 — Devin Review" },
+    { type: 'p', text: "Devin Review is the quality gate at the end of a session. After Devin completes its work and opens a pull request, the Devin Review interface gives you a structured way to evaluate what it produced.", highlight: true },
+    { type: 'p', text: "In Devin Review, you can see a summary of all changes made, with the context of why each change was made based on the original task. You can approve changes, request revisions, or take over and edit directly. The review workflow integrates with your existing pull request process on GitHub, GitLab, or Bitbucket." },
+    { type: 'p', text: "One thing to always do after a Devin session: run the full test suite and CI pipeline before merging. Devin should have already done this — but verifying it yourself is non-negotiable for production code." },
+    { type: 'section', text: "Part 5 — The Power of Parallel Sessions" },
+    { type: 'p', text: "One of Devin's most underutilized capabilities is running multiple sessions in parallel. Because Devin operates autonomously, you can delegate five independent tasks to five separate Devin sessions simultaneously — and return when they're all ready for review.", highlight: true },
+    { type: 'p', text: "This is the multiplier effect. Instead of working sequentially — assign, wait, review, assign, wait, review — you can carve out your backlog at the start of the day, launch parallel Devin sessions, do your other work, and return to a queue of pull requests ready for review." },
+    { type: 'callout', text: "<strong>The Workflow of Devin Power Users:</strong> Morning — carve tasks, launch parallel sessions. Afternoon — review draft PRs, give feedback. Evening — Devin iterates overnight. You merge in the morning.", variant: 'teal' },
+    { type: 'section', text: "Part 6 — Week 1 Synthesis" },
+    { type: 'p', text: "Let's bring Week 1 together. You now know what Devin is: an autonomous AI software engineer with a Shell, IDE, and Browser workspace. You know how sessions work: Ask mode for planning, Agent mode for execution. You know the essential guidelines: be specific, provide context, define success criteria, set up feedback loops. You know how to onboard Devin: repos, indexing, VPN, Knowledge, AGENTS.md. And you know the daily tools: Ask Devin, slash commands, session tools, and Devin Review.", highlight: true },
+    { type: 'p', text: "Week 2 will take you into the advanced features: Playbooks, Scheduled Sessions, Knowledge in depth, integrations with Slack and Jira, the MCP Marketplace, and the Devin API. But everything in Week 2 builds on this foundation." },
+    { type: 'exercise', text: "🎙️ Final Audio Exercise: Without looking at any notes, explain the full Devin workflow from scratch. Start with: 'A developer wants to use Devin for the first time on a new project.' Walk through every step — onboarding, first session, writing a good prompt, monitoring progress, reviewing the output, and merging the PR. Time yourself. Aim for 3–4 minutes. Record it if you can." }
+  ],
+  keyPoints: [
+    { text: "<strong>Ask Devin</strong> = collaborative planning before execution; auto-generates high-context prompts" },
+    { text: "<strong>Slash commands</strong> = power-user shortcuts; memorize your top 5 from the docs" },
+    { text: "<strong>Session Tools:</strong> Shell (command history + copy), IDE (full edit + run), Browser (interactive takeover)" },
+    { text: "<strong>Devin Review</strong> = structured QA gate; see all changes with context before merging" },
+    { text: "<strong>Always run CI/tests</strong> yourself before merging — don't just trust Devin's self-report" },
+    { text: "<strong>Parallel sessions</strong> = the multiplier; launch 5 tasks simultaneously, review them all later" },
+    { text: "<strong>Week 1 complete:</strong> you now have the full foundation — identity, sessions, instructions, onboarding, daily tools" }
+  ]
+}
+];
+
+// ─── RENDER ─────────────────────────────────────────────────────
+function renderModule(idx) {
+  const m = modules[idx];
+  const main = document.getElementById('mainContent');
+
+  // Build full text for TTS
+  fullText = m.script.map(b => {
+    if (b.type === 'intro') return b.text;
+    if (b.type === 'p' || b.type === 'section' || b.type === 'exercise') return b.text || b.items?.map(i=>i.text).join('. ');
+    if (b.type === 'callout') return b.text.replace(/<[^>]+>/g,'');
+    if (b.type === 'compare') return b.items.map(i=>i.label + ': ' + i.text).join('. ');
+    return '';
+  }).filter(Boolean).join('\n\n');
+
+  // Build script HTML
+  let scriptHTML = '';
+  m.script.forEach(block => {
+    if (block.type === 'intro') {
+      scriptHTML += `<div class="script-intro">${block.text.replace(/\n/g,'<br>')}</div>`;
+    } else if (block.type === 'p') {
+      scriptHTML += `<p class="script-p ${block.highlight?'highlight':''}">${block.text}</p>`;
+    } else if (block.type === 'section') {
+      scriptHTML += `<div class="section-head">${block.text}</div>`;
+    } else if (block.type === 'callout') {
+      scriptHTML += `<div class="callout ${block.variant||''}">${block.text}</div>`;
+    } else if (block.type === 'compare') {
+      scriptHTML += `<div class="compare-grid">`;
+      block.items.forEach(it => {
+        scriptHTML += `<div class="compare-card ${it.type}"><div class="compare-label">${it.label}</div><div class="compare-text">${it.text}</div></div>`;
+      });
+      scriptHTML += `</div>`;
+    } else if (block.type === 'exercise') {
+      scriptHTML += `<div class="exercise-box"><div class="exercise-label">🎙️ Audio Exercise</div><div class="exercise-text">${block.text}</div></div>`;
+    }
+  });
+
+  // Build key points HTML
+  let kpHTML = m.keyPoints.map((kp,i) => `
+    <div class="key-point">
+      <div class="kp-bullet">${i+1}</div>
+      <div class="kp-text">${kp.text}</div>
+    </div>`).join('');
+
+  main.innerHTML = `
+    <div class="module-header">
+      <div class="module-eyebrow">
+        <span class="module-day">${m.day}</span>
+        <span class="module-duration">${m.duration}</span>
+      </div>
+      <h1 class="module-heading">${m.title}</h1>
+      <p class="module-sub">${m.subtitle}</p>
+    </div>
+
+    <div class="player-bar">
+      <button class="btn-play" id="playBtn" onclick="togglePlay()">
+        <svg class="play-icon" width="18" height="18" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="pause-icon" width="18" height="18" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+      <div class="player-info">
+        <div class="player-track" id="playerTrack">${m.day} — ${m.title.replace(/<[^>]+>/g,'')}</div>
+        <div class="player-progress-bg"><div class="player-progress-fill" id="playerProgress"></div></div>
+      </div>
+      <div class="player-controls-right">
+        <button class="btn-ctrl" onclick="changeSpeed()"><span id="speedLabel">${speechRate}×</span></button>
+        <button class="btn-ctrl" id="markDoneBtn" onclick="markDone(${idx})">Mark Done</button>
+      </div>
+    </div>
+
+    <div class="script-container">
+      <div class="script-tabs">
+        <button class="tab-btn active" onclick="switchTab('script', this)">📜 Audio Script</button>
+        <button class="tab-btn" onclick="switchTab('notes', this)">📌 Key Points</button>
+      </div>
+      <div class="script-body">
+        <div class="tab-content active" id="tab-script">${scriptHTML}</div>
+        <div class="tab-content" id="tab-notes">${kpHTML}</div>
+      </div>
+    </div>
+
+    <div class="module-nav">
+      ${idx > 0 ? `<button class="btn-nav" onclick="loadModule(${idx-1})">← Module ${idx}</button>` : ''}
+      ${idx < modules.length-1 ? `<button class="btn-nav primary" onclick="loadModule(${idx+1})">Module ${idx+2} →</button>` : `<button class="btn-nav primary" onclick="alert('🎉 Week 1 Complete! Head to Week 2.')">Complete Week 1 🎉</button>`}
+    </div>
+  `;
+
+  if (doneModules.has(idx)) {
+    document.getElementById('markDoneBtn').textContent = '✓ Done';
+    document.getElementById('markDoneBtn').classList.add('active');
+  }
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+function loadModule(idx) {
+  stopSpeech();
+  currentModule = idx;
+  document.querySelectorAll('.module-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+  renderModule(idx);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('mainContent').scrollTop = 0;
+}
+
+function markDone(idx) {
+  doneModules.add(idx);
+  document.getElementById('btn'+idx).classList.add('done');
+  document.getElementById('markDoneBtn').textContent = '✓ Done';
+  document.getElementById('markDoneBtn').classList.add('active');
+  const pct = (doneModules.size / modules.length) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = doneModules.size + ' of ' + modules.length + ' completed';
+}
+
+// ─── TTS ────────────────────────────────────────────────────────
+function togglePlay() {
+  if (isPlaying) { pauseSpeech(); } else { startSpeech(); }
+}
+
+function startSpeech() {
+  if (synth.paused && utterance) {
+    synth.resume();
+    isPlaying = true;
+    document.getElementById('playBtn').classList.add('playing');
+    startProgressUpdate();
+    return;
+  }
+  synth.cancel();
+  utterance = new SpeechSynthesisUtterance(fullText);
+  utterance.rate = speechRate;
+  utterance.pitch = 1.0;
+  utterance.lang = 'en-US';
+  isPlaying = true;
+  document.getElementById('playBtn').classList.add('playing');
+  charIndex = 0;
+  utterance.onboundary = (e) => {
+    if (e.name === 'word') {
+      charIndex = e.charIndex;
+      const pct = Math.min(100, (charIndex / fullText.length) * 100);
+      const el = document.getElementById('playerProgress');
+      if (el) el.style.width = pct + '%';
+    }
+  };
+  utterance.onend = () => {
+    isPlaying = false;
+    const btn = document.getElementById('playBtn');
+    if (btn) btn.classList.remove('playing');
+    const prog = document.getElementById('playerProgress');
+    if (prog) prog.style.width = '100%';
+  };
+  synth.speak(utterance);
+}
+
+function pauseSpeech() {
+  synth.pause();
+  isPlaying = false;
+  const btn = document.getElementById('playBtn');
+  if (btn) btn.classList.remove('playing');
+}
+
+function stopSpeech() {
+  synth.cancel();
+  isPlaying = false;
+  utterance = null;
+}
+
+let speeds = [0.8, 1.0, 1.25, 1.5, 1.75, 2.0];
+let speedIdx = 1;
+function changeSpeed() {
+  speedIdx = (speedIdx + 1) % speeds.length;
+  speechRate = speeds[speedIdx];
+  document.getElementById('speedLabel').textContent = speechRate + '×';
+  if (isPlaying) { stopSpeech(); startSpeech(); }
+}
+
+function startProgressUpdate() {
+  clearInterval(progressInterval);
+  progressInterval = setInterval(() => {
+    const el = document.getElementById('playerProgress');
+    if (!el || !isPlaying) { clearInterval(progressInterval); return; }
+  }, 500);
+}
+
+// Init
+loadModule(0);
+</script>
+</body>
+</html>

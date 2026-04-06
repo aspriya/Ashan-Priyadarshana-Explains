@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devin AI — Week 2 Audio Learning</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,400;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0a10;
+    --surface: #13111a;
+    --surface2: #1a1824;
+    --border: #211e2e;
+    --accent: #a78bfa;
+    --accent2: #f472b6;
+    --accent3: #34d399;
+    --text: #eae8f2;
+    --text-dim: #9490aa;
+    --text-muted: #4e4860;
+    --danger: #f87171;
+    --glow: rgba(167,139,250,0.15);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events:none; z-index:0; opacity:0.5;
+  }
+  .layout { display:grid; grid-template-columns:280px 1fr; min-height:100vh; position:relative; z-index:1; }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 28px 0;
+    position: sticky; top:0; height:100vh;
+    overflow-y: auto; display:flex; flex-direction:column;
+  }
+  .sidebar-header { padding:0 24px 24px; border-bottom:1px solid var(--border); margin-bottom:20px; }
+  .sidebar-badge {
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(167,139,250,0.12); border:1px solid rgba(167,139,250,0.25);
+    border-radius:20px; padding:4px 12px; margin-bottom:12px;
+  }
+  .badge-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .badge-text { font-family:'DM Mono',monospace; font-size:10px; color:var(--accent); text-transform:uppercase; letter-spacing:0.12em; }
+  .sidebar-title { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; line-height:1.2; color:var(--text); }
+  .sidebar-sub { font-family:'DM Mono',monospace; font-size:10px; color:var(--text-muted); margin-top:4px; text-transform:uppercase; letter-spacing:0.1em; }
+
+  .module-list { padding:0 12px; flex:1; }
+  .module-btn {
+    width:100%; background:none; border:none; border-radius:10px;
+    padding:12px 14px; cursor:pointer; text-align:left; margin-bottom:4px;
+    transition:background 0.2s; display:flex; align-items:center; gap:12px;
+  }
+  .module-btn:hover { background:var(--surface2); }
+  .module-btn.active { background:rgba(167,139,250,0.1); outline:1px solid rgba(167,139,250,0.3); }
+  .module-btn.active .mod-num { color:var(--accent); }
+  .module-btn.active .mod-name { color:var(--text); }
+  .mod-num { font-family:'DM Mono',monospace; font-size:11px; color:var(--text-muted); min-width:28px; font-weight:500; }
+  .mod-meta { flex:1; min-width:0; }
+  .mod-name { font-family:'Syne',sans-serif; font-size:12.5px; font-weight:600; color:var(--text-dim); line-height:1.3; }
+  .mod-dur { font-family:'DM Mono',monospace; font-size:10px; color:var(--text-muted); margin-top:2px; }
+  .mod-done { width:8px; height:8px; border-radius:50%; background:var(--accent3); flex-shrink:0; opacity:0; transition:opacity 0.3s; }
+  .module-btn.done .mod-done { opacity:1; }
+
+  .sidebar-footer { padding:16px 24px 0; border-top:1px solid var(--border); margin-top:auto; }
+  .progress-label { font-family:'DM Mono',monospace; font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; }
+  .progress-bar-bg { height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .progress-bar-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:2px; width:0%; transition:width 0.5s cubic-bezier(0.4,0,0.2,1); }
+
+  /* MAIN */
+  .main { padding:48px 56px; max-width:900px; }
+  .module-header { margin-bottom:36px; animation:slideIn 0.4s cubic-bezier(0.4,0,0.2,1); }
+  @keyframes slideIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .module-eyebrow { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+  .module-day { font-family:'DM Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.15em; color:var(--accent); background:rgba(167,139,250,0.1); padding:4px 10px; border-radius:4px; }
+  .module-duration { font-family:'DM Mono',monospace; font-size:11px; color:var(--text-muted); }
+  .module-heading { font-family:'Syne',sans-serif; font-size:36px; font-weight:800; line-height:1.1; letter-spacing:-0.02em; color:var(--text); margin-bottom:12px; }
+  .module-heading span { color:var(--accent); }
+  .module-sub { font-size:16px; color:var(--text-dim); font-style:italic; line-height:1.6; }
+
+  /* PLAYER */
+  .player-bar {
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    padding:20px 24px; margin-bottom:32px; display:flex; align-items:center; gap:20px;
+  }
+  .btn-play {
+    width:52px; height:52px; border-radius:50%; background:var(--accent); border:none;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    transition:transform 0.15s,box-shadow 0.2s; box-shadow:0 0 24px rgba(167,139,250,0.35);
+  }
+  .btn-play:hover { transform:scale(1.08); box-shadow:0 0 36px rgba(167,139,250,0.55); }
+  .btn-play svg { fill:#0c0a10; }
+  .btn-play.playing svg.play-icon { display:none; }
+  .btn-play.playing svg.pause-icon { display:block !important; }
+  .player-info { flex:1; min-width:0; }
+  .player-track { font-family:'Syne',sans-serif; font-size:13px; font-weight:600; color:var(--text); margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .player-progress-bg { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .player-progress-fill { height:100%; background:var(--accent); width:0%; transition:width 0.5s linear; border-radius:2px; }
+  .player-controls-right { display:flex; align-items:center; gap:10px; }
+  .btn-ctrl { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:7px 14px; font-family:'DM Mono',monospace; font-size:11px; color:var(--text-dim); cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+  .btn-ctrl:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-ctrl.active { background:rgba(52,211,153,0.1); border-color:var(--accent3); color:var(--accent3); }
+
+  /* SCRIPT */
+  .script-container { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; animation:slideIn 0.4s cubic-bezier(0.4,0,0.2,1); }
+  .script-tabs { display:flex; border-bottom:1px solid var(--border); padding:0 24px; }
+  .tab-btn { background:none; border:none; padding:14px 16px; font-family:'DM Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; margin-bottom:-1px; }
+  .tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
+  .script-body { padding:32px 36px; max-height:65vh; overflow-y:auto; scroll-behavior:smooth; }
+  .script-body::-webkit-scrollbar { width:4px; }
+  .script-body::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+
+  .script-intro { background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(244,114,182,0.08)); border:1px solid rgba(167,139,250,0.2); border-radius:10px; padding:18px 22px; margin-bottom:28px; font-family:'DM Mono',monospace; font-size:12px; color:var(--accent); line-height:1.7; }
+  .script-p { font-size:16px; line-height:1.85; color:var(--text-dim); margin-bottom:20px; }
+  .script-p.highlight { color:var(--text); font-size:17px; }
+  .section-head { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:var(--accent2); margin:32px 0 14px; display:flex; align-items:center; gap:8px; }
+  .section-head::after { content:''; flex:1; height:1px; background:var(--border); }
+  .callout { background:rgba(244,114,182,0.08); border-left:3px solid var(--accent2); padding:14px 20px; border-radius:0 8px 8px 0; margin:20px 0; font-size:15px; color:var(--text-dim); line-height:1.7; font-style:italic; }
+  .callout strong { color:var(--accent2); font-style:normal; }
+  .callout.purple { background:rgba(167,139,250,0.08); border-left-color:var(--accent); }
+  .callout.purple strong { color:var(--accent); }
+  .callout.green { background:rgba(52,211,153,0.08); border-left-color:var(--accent3); }
+  .callout.green strong { color:var(--accent3); }
+  .compare-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:20px 0; }
+  .compare-card { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:16px; }
+  .compare-card.bad { border-color:rgba(248,113,113,0.3); }
+  .compare-card.good { border-color:rgba(52,211,153,0.3); }
+  .compare-label { font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.12em; margin-bottom:8px; }
+  .compare-card.bad .compare-label { color:var(--danger); }
+  .compare-card.good .compare-label { color:var(--accent3); }
+  .compare-text { font-size:13px; line-height:1.6; color:var(--text-dim); }
+  .exercise-box { background:var(--surface2); border:1px dashed rgba(167,139,250,0.4); border-radius:12px; padding:20px 24px; margin-top:32px; }
+  .exercise-label { font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.15em; color:var(--accent); margin-bottom:10px; }
+  .exercise-text { font-size:15px; line-height:1.75; color:var(--text-dim); }
+  .exercise-text strong { color:var(--text); }
+  .code-block { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:14px 18px; font-family:'DM Mono',monospace; font-size:12px; color:var(--accent3); line-height:1.7; margin:16px 0; overflow-x:auto; white-space:pre; }
+
+  /* KEY POINTS */
+  .key-point { display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--border); align-items:flex-start; }
+  .key-point:last-child { border-bottom:none; }
+  .kp-bullet { width:22px; height:22px; border-radius:50%; background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.3); display:flex; align-items:center; justify-content:center; font-family:'DM Mono',monospace; font-size:10px; color:var(--accent); flex-shrink:0; margin-top:1px; }
+  .kp-text { font-size:14px; line-height:1.7; color:var(--text-dim); }
+  .kp-text strong { color:var(--text); }
+
+  .module-nav { display:flex; gap:12px; margin-top:32px; padding-top:24px; border-top:1px solid var(--border); }
+  .btn-nav { padding:12px 24px; border-radius:10px; font-family:'Syne',sans-serif; font-size:13px; font-weight:700; cursor:pointer; border:1px solid var(--border); background:var(--surface); color:var(--text-dim); transition:all 0.2s; display:flex; align-items:center; gap:8px; }
+  .btn-nav:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-nav.primary { background:var(--accent); color:#0c0a10; border-color:var(--accent); margin-left:auto; }
+  .btn-nav.primary:hover { background:#c4b5fd; box-shadow:0 0 28px rgba(167,139,250,0.45); }
+
+  @media(max-width:900px) {
+    .layout{grid-template-columns:1fr} .sidebar{position:static;height:auto} .main{padding:24px 20px}
+    .compare-grid{grid-template-columns:1fr} .module-heading{font-size:26px}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-badge"><div class="badge-dot"></div><span class="badge-text">Week 2 — Advanced</span></div>
+      <div class="sidebar-title">Devin AI<br>Mastery Series</div>
+      <div class="sidebar-sub">🎧 Audio Learning · 5 Modules</div>
+    </div>
+    <div class="module-list" id="moduleList">
+      <button class="module-btn active" onclick="loadModule(0)" id="btn0">
+        <span class="mod-num">D6</span>
+        <div class="mod-meta"><div class="mod-name">Knowledge, Playbooks & Scheduling</div><div class="mod-dur">45 min · Module 6</div></div>
+        <div class="mod-done"></div>
+      </button>
+      <button class="module-btn" onclick="loadModule(1)" id="btn1">
+        <span class="mod-num">D7</span>
+        <div class="mod-meta"><div class="mod-name">Integrations Mastery</div><div class="mod-dur">45 min · Module 7</div></div>
+        <div class="mod-done"></div>
+      </button>
+      <button class="module-btn" onclick="loadModule(2)" id="btn2">
+        <span class="mod-num">D8</span>
+        <div class="mod-meta"><div class="mod-name">MCP, DeepWiki & Special Agents</div><div class="mod-dur">30 min · Module 8</div></div>
+        <div class="mod-done"></div>
+      </button>
+      <button class="module-btn" onclick="loadModule(3)" id="btn3">
+        <span class="mod-num">D9</span>
+        <div class="mod-meta"><div class="mod-name">Security, Secrets & Admin</div><div class="mod-dur">30 min · Module 9</div></div>
+        <div class="mod-done"></div>
+      </button>
+      <button class="module-btn" onclick="loadModule(4)" id="btn4">
+        <span class="mod-num">D10</span>
+        <div class="mod-meta"><div class="mod-name">Enterprise, API & Scale</div><div class="mod-dur">45 min · Module 10</div></div>
+        <div class="mod-done"></div>
+      </button>
+    </div>
+    <div class="sidebar-footer">
+      <div class="progress-label" id="progressLabel">0 of 5 completed</div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar"></div></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" id="mainContent"></main>
+</div>
+
+<script>
+const synth = window.speechSynthesis;
+let utterance = null, isPlaying = false, speechRate = 1.0;
+let currentModule = 0, doneModules = new Set(), fullText = '';
+let speeds = [0.8,1.0,1.25,1.5,1.75,2.0], speedIdx = 1;
+
+// ── MODULE DATA ────────────────────────────────────────────────
+const modules = [
+// ── MODULE 6 ──────────────────────────────────────────────────
+{
+  day:"Day 6 — Module 6",
+  title:"Knowledge, Playbooks <span>&</span> Scheduling",
+  subtitle:"The three pillars of a scalable Devin workflow — persistent memory, reusable task templates, and automated recurring sessions.",
+  duration:"~45 min",
+  script:[
+    {type:'intro',text:"📖 Source: docs.devin.ai → Knowledge, Creating Playbooks, Using Playbooks, Scheduled Sessions, Session Insights, Advanced Mode\nThis module covers the tools that turn Devin from a one-off assistant into a persistent, improving team member."},
+    {type:'p',text:"Welcome to Module 6 — the first module of Week 2. You've built your foundation. Now you go deeper. This module covers the three features that separate casual Devin users from teams who extract maximum value from the platform: Knowledge, Playbooks, and Scheduled Sessions.",highlight:true},
+    {type:'section',text:"Part 1 — Knowledge: Devin's Persistent Memory"},
+    {type:'p',text:"Let's start with Knowledge — the most underutilized and highest-leverage feature in Devin. Here is the official description from the docs: Knowledge is a collection of instructions and advice that Devin can reference in all sessions. Think of it as onboarding a new employee with the relevant organizational context."},
+    {type:'p',text:"Knowledge is the best way to share codebase-level context — as opposed to task-level context. Task-level instructions go in your prompt. Codebase-level understanding goes in Knowledge."},
+    {type:'callout',text:"<strong>What goes in Knowledge?</strong> Code conformance practices. Deployment workflows. PR naming conventions. Testing workflows. How to interact with proprietary internal tools. Architecture decisions. Common bugs and their fixes. Anything a new developer on your team would need to know.",variant:'purple'},
+    {type:'p',text:"There are a few important mechanics to understand. First, Devin will automatically generate repo knowledge based on your existing READMEs, file structure, and repository contents — but only for repositories it has access to. This auto-generation is a starting point; you should always review and enrich it manually."},
+    {type:'p',text:"Second, Knowledge is retrieved based on a Trigger you set. If you want a Knowledge item to always be available, pin it to all repositories. If it's only relevant in one codebase, pin it to that specific repo. If it's not pinned, it will only be used when its trigger description matches the current session context — so make triggers clear and specific."},
+    {type:'callout',text:"<strong>Critical Warning:</strong> A single outdated Knowledge item can degrade session quality across your entire team. Review and update your Knowledge base regularly. Remove or correct anything that's no longer accurate the moment you notice it.",variant:'pink'},
+    {type:'p',text:"The Session Insights tool has a Knowledge Usage tab that shows you exactly which Knowledge items were used in each session and how they contributed. Use this to audit and refine your Knowledge base over time."},
+    {type:'section',text:"Part 2 — Playbooks: Reusable Task Templates"},
+    {type:'p',text:"Now let's talk about Playbooks. The official definition is elegant: a Playbook is like a custom system prompt for a repeated task.",highlight:true},
+    {type:'p',text:"Here's the key distinction: Playbooks are for procedures — step-by-step instructions tied to a specific type of task. Knowledge is for context — general conventions that apply broadly across all sessions. Use Playbooks when you find yourself writing the same instructions over and over. Use Knowledge for the background understanding Devin always needs."},
+    {type:'compare',items:[
+      {type:'bad',label:"Use Knowledge For",text:"'Our codebase uses PostgreSQL. All queries go through our ORM layer. Never write raw SQL.'"},
+      {type:'good',label:"Use Playbooks For",text:"'Step 1: Identify failing tests. Step 2: Check the CI logs. Step 3: Reproduce locally. Step 4: Fix and verify CI passes before opening a PR.'"}
+    ]},
+    {type:'p',text:"Playbooks are shareable across your organization and the broader Devin community. The Playbook Community Gallery lives at app.devin.ai/playbooks and is worth exploring — you may find playbooks for common tasks already written by other teams."},
+    {type:'p',text:"Playbooks support macros — short trigger keywords preceded by an exclamation mark, like exclamation-mark-data-tutorial. When you type a macro in the session prompt, the associated Playbook is automatically attached. This makes invoking complex, multi-step procedures as fast as typing a single word."},
+    {type:'callout',text:"<strong>Playbook Writing Tips from the Docs:</strong> Don't make steps too specific unless necessary — this preserves Devin's ability to problem-solve. Each procedure step should contain an action verb: Write, Navigate to, Check, Verify, Run. Advice in a Playbook functions like comments on pseudocode — it influences Devin's execution without being a rigid command.",variant:'purple'},
+    {type:'p',text:"Playbooks support version history. Every time you save an edit, a new version is created. You can view and revert to previous versions if a recent change broke something. For enterprise customers, Playbooks can be managed at the enterprise level and shared across all organizations in your enterprise — enabling standardization at scale."},
+    {type:'section',text:"Part 3 — Scheduled Sessions: Automating Recurring Work"},
+    {type:'p',text:"Scheduled Sessions are exactly what they sound like. From the official docs: Scheduled Sessions let you create Devin sessions that run automatically — either on a recurring schedule or as a one-time run at a specific date and time.",highlight:true},
+    {type:'p',text:"Use them to automate repetitive tasks like daily reports, periodic code maintenance, routine data analysis, and more. Think of this as giving Devin a recurring job on your engineering team — like a cron job, but one that understands your codebase and can make intelligent decisions."},
+    {type:'p',text:"Here are the most common use cases from the official documentation. Daily standup reports — summarize recent pull requests, issues, or commits every morning. Periodic dependency updates — check for and apply dependency updates on a weekly basis. Recurring data analysis — generate reports or dashboards from your data at regular intervals. Routine code maintenance — run lint fixes, dead code removal, or test coverage checks on a schedule. Monitoring and alerting — periodically check system health or review logs for anomalies."},
+    {type:'callout',text:"<strong>Power Move:</strong> Attach a Playbook to a Scheduled Session. The Playbook will be applied every time the schedule runs, ensuring consistent, well-structured behavior across every execution — fully automatic.",variant:'green'},
+    {type:'p',text:"Schedules support two frequency modes. Visual mode provides preset options — daily, weekly, and so on. Custom mode lets you enter a standard cron expression directly, like zero-nine-star-star-one-through-five for weekdays at 9 AM. Times are displayed in your local timezone but stored as UTC internally."},
+    {type:'p',text:"Schedule statuses you should know: Active means it will run on schedule. Paused means it's disabled and won't run until re-enabled. Error means the schedule encountered consecutive failures. One-time schedules are automatically paused after execution."},
+    {type:'section',text:"Part 4 — Session Insights: Learning From Every Session"},
+    {type:'p',text:"Session Insights is Devin's analytical feedback system. After any completed session, you can trigger an analysis that examines the session to identify patterns, issues, and opportunities for better collaboration."},
+    {type:'p',text:"It provides three things: an improved prompt suggestion — a rewritten version of your original prompt that would have gotten better results; Action Items — concrete steps you can take in your environment or Knowledge setup to prevent recurring issues; and the Knowledge Usage tab showing which items helped, which were unused, and which may have caused problems."},
+    {type:'callout',text:"<strong>Best Practice from the Docs:</strong> Make it a habit to check Session Insights after important or complex sessions. The patterns you identify will help you become more effective over time. Save your best improved prompts as Playbooks for repeatable workflows.",variant:'purple'},
+    {type:'p',text:"Session Insights is available for all completed Devin sessions at no additional cost. Critically, insights are not generated automatically — you must trigger analysis either through the UI button or via the API. Sessions that are too short — fewer than one Devin message — will not generate insights."},
+    {type:'section',text:"Part 5 — Advanced Mode: Devin Managing Devin"},
+    {type:'p',text:"Advanced Mode gives Devin enhanced meta-capabilities. In this mode, Devin can analyze other Devin sessions, create and improve Playbooks, start batch sessions, and manage your organization's Knowledge base.",highlight:true},
+    {type:'p',text:"This is the orchestration layer. You can ask Devin in Advanced Mode to analyze a session and explain why it succeeded or failed. You can ask it to turn a successful session into a Playbook. You can ask it to launch a batch of sessions for repetitive tasks, review the proposed sessions before they start, and approve them in bulk."},
+    {type:'callout',text:"<strong>Example from the Docs:</strong> 'Analyze our codebase for all files using the legacy REST client. Group them into independent work packages that won't conflict, then start a parallel Devin session for each package to migrate to the new GraphQL client.'",variant:'green'},
+    {type:'exercise',text:"🎙️ Audio Exercise: Design a complete recurring workflow for a hypothetical engineering team out loud. Describe: one Knowledge item you'd create, one Playbook with at least 3 procedure steps, and one Scheduled Session that uses that Playbook. Be specific enough that someone could implement it immediately."}
+  ],
+  keyPoints:[
+    {text:"<strong>Knowledge</strong> = persistent codebase-level context, auto-recalled by trigger; pin globally or to specific repos"},
+    {text:"<strong>Outdated Knowledge is dangerous</strong> — audit regularly via the Knowledge Usage tab in Session Insights"},
+    {text:"<strong>Playbooks</strong> = reusable step-by-step task procedures with action verbs; shareable + version-controlled"},
+    {text:"<strong>Playbook macros</strong> = !shortcut in the prompt to instantly attach a Playbook"},
+    {text:"<strong>Scheduled Sessions</strong> = cron-like automation; supports visual presets and raw cron expressions"},
+    {text:"<strong>Combine Playbooks + Schedules</strong> for fully automated, consistent recurring engineering tasks"},
+    {text:"<strong>Session Insights</strong> = on-demand analysis; improved prompt + action items + knowledge usage audit"},
+    {text:"<strong>Advanced Mode</strong> = Devin orchestrates Devins; batch sessions, session analysis, Playbook creation"}
+  ]
+},
+
+// ── MODULE 7 ──────────────────────────────────────────────────
+{
+  day:"Day 7 — Module 7",
+  title:"Integrations <span>Mastery</span>",
+  subtitle:"Slack, Teams, GitHub, GitLab, Jira, Linear — how Devin plugs into every tool your engineering team already uses.",
+  duration:"~45 min",
+  script:[
+    {type:'intro',text:"📖 Source: docs.devin.ai → Integrations Overview, Slack, Microsoft Teams, GitHub, GitLab, Bitbucket, Linear, Jira, PR Templates\nThis module is about making Devin invisible — embedded so naturally in your workflow that delegating to it feels as natural as tagging a teammate."},
+    {type:'p',text:"Welcome to Module 7. Today you learn how Devin integrates with the full engineering toolchain. By the end, you'll be able to explain Devin's complete integration ecosystem and walk through the lifecycle of a task from ticket creation to merged pull request — without touching the Devin web app at all.",highlight:true},
+    {type:'section',text:"Part 1 — The Integration Architecture"},
+    {type:'p',text:"The official docs divide Devin's integrations into three categories. Native integrations — direct connections to platforms like GitHub, Slack, Jira, and others. The Secrets Manager — for storing API keys and credentials securely so Devin can use them in sessions. And MCP — the Model Context Protocol — for connecting to hundreds of additional external tools and data sources. We cover MCP in depth in Module 8."},
+    {type:'callout',text:"<strong>The Philosophy:</strong> Devin is most effective when it's part of your team and your existing workflow — not a separate tool you have to context-switch into. Integrations are what make this possible.",variant:'purple'},
+    {type:'section',text:"Part 2 — Slack Integration"},
+    {type:'p',text:"The Slack integration is arguably the most powerful workflow accelerator in the entire Devin ecosystem. Once installed, you can chat and collaborate with Devin directly in your company Slack by tagging @Devin.",highlight:true},
+    {type:'p',text:"Here's the magic: when your team is discussing a bug in a Slack thread and you tag @Devin, Devin picks up the entire thread context — all the messages, all the code snippets, all the discussion — and uses it as the starting point for the session. You're delegating in the same place where the problem was identified, with zero copy-paste."},
+    {type:'p',text:"You can also send Devin voice messages via Slack. If you think of an issue during a standup call or while walking between meetings, you can voice-message Devin directly and it will transcribe and act on your verbal instructions."},
+    {type:'callout',text:"<strong>Key Slack Features:</strong> Tag @Devin in any thread to start a session. Use Inline Slack Keywords and Functions for special commands. Turn on Slack Notifications to get session updates without leaving Slack. Set up a dedicated Devin channel for your team's AI engineering work. Control whether Devin replies in threads or in the main channel via the Thread Mode Preference setting.",variant:'purple'},
+    {type:'p',text:"The Slack integration follows a strict permission model. Devin only responds to users on an allowlist — preventing unauthorized team members from inadvertently starting sessions. This is configurable through the integration settings."},
+    {type:'section',text:"Part 3 — Microsoft Teams Integration"},
+    {type:'p',text:"For organizations using Microsoft Teams, Devin provides equivalent functionality. You tag @Devin in a Teams conversation and kick off sessions directly from your team chat, just like with Slack. The same context-capture capability applies — Devin reads the thread and uses it as session context."},
+    {type:'section',text:"Part 4 — GitHub Integration"},
+    {type:'p',text:"The GitHub integration is the connective tissue between Devin and your actual code. Connecting your GitHub account allows Devin to access your repositories, create branches, open pull requests, and contribute code directly to your existing repositories.",highlight:true},
+    {type:'p',text:"One recent capability worth highlighting: Devin can now take over and work on existing pull requests that weren't created in the current session. This means if a PR has been stalled or needs additional changes, you can point Devin at it and have it continue the work — cross-session continuation of pull request work."},
+    {type:'p',text:"Devin also integrates with GitHub's commit status checks. When you use Devin Review, the review progress is displayed directly on pull request commits in GitHub — linking back to the full Devin Review analysis. This gives your team visibility into Devin's review quality without leaving GitHub."},
+    {type:'p',text:"GitHub Pull Request Templates are also supported. You can configure templates that Devin will use when writing pull request descriptions — ensuring Devin's PRs follow your team's required format, include the right checklists, and contain the information reviewers need."},
+    {type:'section',text:"Part 5 — GitLab, Bitbucket, and Azure DevOps"},
+    {type:'p',text:"Beyond GitHub, Devin supports GitLab for merge requests and repository access, Bitbucket for pull request creation and repository access, and Azure DevOps for repository management and pipeline integration. The core workflow is the same across all platforms — Devin connects, indexes the repos, and contributes code through the platform's native PR or merge request mechanism."},
+    {type:'p',text:"For organizations with self-hosted source control or artifact registries, Devin supports Self-Hosted SCM and Artifacts — meaning you're not limited to public cloud Git hosting. This is particularly relevant for enterprise teams with on-premises infrastructure."},
+    {type:'section',text:"Part 6 — Jira Integration"},
+    {type:'p',text:"The Jira integration transforms your issue tracker into a direct delegation interface for Devin. The workflow is straightforward. You create a new Jira account specifically for Devin to use — a service account rather than a personal account. You connect Devin to that account. Then, to delegate a task to Devin, you simply add the 'Devin' label to a Jira issue.",highlight:true},
+    {type:'p',text:"What happens next is impressive: Devin knows your codebase and will comment on each labelled ticket within minutes, providing a summary of the relevant code, an implementation plan, and any open questions it has. It also reports its confidence level — shown as green, yellow, or red — so you know before work starts how likely Devin is to complete the task successfully."},
+    {type:'callout',text:"<strong>Bulk Delegation:</strong> You can add the 'Devin' label to multiple Jira issues at once to begin issue scoping in parallel across your entire backlog. Devin will analyze and comment on each one simultaneously.",variant:'green'},
+    {type:'p',text:"Recent enhancements include direct session creation from Jira issues, service account connections, and per-project trigger options for controlling when Devin activates. Enterprise accounts can also configure organization-to-Jira project mappings."},
+    {type:'section',text:"Part 7 — Linear Integration"},
+    {type:'p',text:"The Linear integration works analogously to the Jira integration. Connect Linear to enable Devin to work with your Linear issues and projects. Devin can create and update issues, track work, and integrate with your project management workflow."},
+    {type:'p',text:"An important note from the docs: if you have the Linear native integration connected, you do not need to configure the Linear MCP separately — the native integration already provides all the Linear tools Devin needs. This prevents duplication and simplifies your configuration."},
+    {type:'section',text:"Part 8 — The Full Ticket-to-PR Lifecycle"},
+    {type:'p',text:"Let's synthesize everything into a complete workflow that you should be able to narrate from memory. A Jira ticket is created for a bug fix. An engineer adds the 'Devin' label. Within minutes, Devin comments with a code analysis, implementation plan, and confidence score. The engineer reviews and approves the plan in Devin Spaces. Devin starts a session, writes the fix, runs tests, and opens a pull request on GitHub following the team's PR template. The PR triggers Devin Review, which attaches a commit status check visible in GitHub. An engineer reviews the Devin Review analysis and merges the PR. Session Insights is triggered to capture learnings. The insights are saved as a new Knowledge item so future sessions benefit.",highlight:true},
+    {type:'exercise',text:"🎙️ Audio Exercise: Walk through the complete ticket-to-PR lifecycle out loud, naming every tool involved at each step. Then answer: 'A new developer asks you why Devin needs a separate Jira service account.' Explain it correctly and confidently without notes."}
+  ],
+  keyPoints:[
+    {text:"<strong>3 integration categories:</strong> Native integrations, Secrets Manager, MCP"},
+    {text:"<strong>Slack:</strong> tag @Devin in any thread; context-aware, voice messages, notifications, allowlist control"},
+    {text:"<strong>GitHub:</strong> repo access, PR creation, cross-session PR continuation, commit status checks"},
+    {text:"<strong>PR Templates:</strong> configure Devin's PR format to match your team's required structure"},
+    {text:"<strong>Jira:</strong> add 'Devin' label to delegate; Devin comments with plan + confidence score in minutes"},
+    {text:"<strong>Bulk delegation:</strong> label multiple Jira issues at once for parallel scoping"},
+    {text:"<strong>Linear:</strong> native integration replaces need for Linear MCP — don't configure both"},
+    {text:"<strong>Full lifecycle:</strong> ticket → Devin label → plan comment → session → PR → Devin Review → merge → insights"}
+  ]
+},
+
+// ── MODULE 8 ──────────────────────────────────────────────────
+{
+  day:"Day 8 — Module 8",
+  title:"MCP, DeepWiki <span>&</span> Special Agents",
+  subtitle:"Extending Devin with hundreds of external tools via MCP, understanding DeepWiki for codebase intelligence, and the Data Analyst agent.",
+  duration:"~30 min",
+  script:[
+    {type:'intro',text:"📖 Source: docs.devin.ai → MCP Marketplace, DeepWiki, DeepWiki MCP, Devin MCP, Data Analyst Agent\nThis module covers Devin's extensibility layer — the architecture that lets Devin reach beyond code into databases, design tools, monitoring systems, and more."},
+    {type:'p',text:"Welcome to Module 8. This module is about Devin's extensibility — how it connects to the wider tooling ecosystem and how specialized agents extend what's possible in a single session.",highlight:true},
+    {type:'section',text:"Part 1 — What is MCP?"},
+    {type:'p',text:"MCP stands for Model Context Protocol. Here is the official definition from the Devin docs: MCP is an open standard that enables AI apps to securely connect to MCP-compatible data sources and tools. The docs give an analogy worth memorizing: you can think of MCP like a USB-C port for AI applications — a standardized way to connect AI apps to different services."},
+    {type:'p',text:"Before MCP, every AI tool needed a custom integration for every external service. MCP standardizes this. Any tool that implements the MCP protocol can now connect to any AI that supports MCP — including Devin. This means Devin can connect to Datadog, Sentry, Figma, Notion, Stripe, databases, monitoring systems, and hundreds of other tools through a single, consistent interface.",highlight:true},
+    {type:'section',text:"Part 2 — The MCP Marketplace"},
+    {type:'p',text:"Devin provides a dedicated MCP Marketplace accessible at Settings and then MCP Marketplace. From here, you can browse and enable pre-built integrations with a single click. Official integrations include Datadog, Slack, Supabase, Figma, and many more."},
+    {type:'callout',text:"<strong>What this enables in a single session:</strong> Devin can investigate a Datadog alert, query a Supabase database, read a Figma design file, check Sentry for error context, and commit a fix — all without leaving the session and without you having to manually retrieve any of this data.",variant:'green'},
+    {type:'p',text:"For MCP servers that authenticate with OAuth, Devin will prompt you to connect your account. The docs strongly recommend using a service account rather than your personal account for these connections, since the access will be shared across your organization."},
+    {type:'p',text:"If the MCP you need isn't in the marketplace, you can add any custom MCP server using the 'Add Your Own' option. Devin supports three transport types for custom servers. You can also wrap any command-line tool or script as an MCP server — making it possible to give Devin access to virtually any internal tool your team uses."},
+    {type:'section',text:"Part 3 — DeepWiki: AI-Powered Codebase Documentation"},
+    {type:'p',text:"DeepWiki is Devin's knowledge layer for codebases. The official docs describe it as automatically-generated, up-to-date documentation that you can talk to.",highlight:true},
+    {type:'p',text:"When you connect a repository, Devin automatically indexes it and produces a wiki with architecture diagrams, links to source files, and summaries of your codebase structure. This wiki becomes the knowledge foundation that Ask Devin draws from when answering questions about your code."},
+    {type:'p',text:"For public repositories, DeepWiki is available for free at deepwiki.com — with over 30,000 popular open source repositories already indexed, including React, TensorFlow, and LangChain. You can submit any public GitHub repository URL for indexing."},
+    {type:'p',text:"For private repositories, DeepWiki is available through your Devin account. The key configuration file is .devin/wiki.json in your repository root. This file lets you steer how the wiki is generated — specifying repo notes to guide documentation and explicitly defining which pages should be created. This is especially important for large repositories that may hit built-in limits on automatic page generation."},
+    {type:'callout',text:"<strong>Key Insight:</strong> DeepWiki + Ask Devin together give you the ability to ask natural-language questions about any codebase and get AI-powered, context-grounded answers with source links. This is one of the fastest ways to onboard to an unfamiliar repository.",variant:'purple'},
+    {type:'section',text:"Part 4 — The DeepWiki MCP Server"},
+    {type:'p',text:"The DeepWiki MCP server provides programmatic access to DeepWiki's public repository documentation and search capabilities. It is free, remote, and requires no authentication. The base URL is mcp.deepwiki.com."},
+    {type:'p',text:"It exposes three main tools: read_wiki_structure, which lists the documentation structure of a repository; read_wiki_contents, which reads the full content of wiki pages; and ask_question, which lets you ask any natural language question about a GitHub repository and get an AI-powered, context-grounded response."},
+    {type:'p',text:"The Streamable HTTP endpoint at /mcp is the recommended protocol — SSE at /sse is available but being deprecated. If you want DeepWiki capabilities for private repositories, you use the Devin MCP server instead, which requires a Devin API key."},
+    {type:'section',text:"Part 5 — The Devin MCP Server"},
+    {type:'p',text:"The Devin MCP server is distinct from the DeepWiki MCP. It requires authentication with a Devin API key and provides full programmatic control over your Devin account. Through the Devin MCP, other AI applications can manage your Devin sessions, Knowledge base, Playbooks, scheduled sessions, and integrations.",highlight:true},
+    {type:'p',text:"Think of this as: the DeepWiki MCP gives external tools access to public codebase knowledge. The Devin MCP gives external tools full control over Devin's operational capabilities. The key difference is authentication and scope — DeepWiki is public and free, Devin MCP is authenticated and manages your organization."},
+    {type:'section',text:"Part 6 — Dana: The Data Analyst Agent"},
+    {type:'p',text:"Dana is Devin's specialized agent for data work. When you select Dana as your agent configuration at session start, you get an agent optimized for querying databases, analyzing data, and creating visualizations."},
+    {type:'p',text:"Dana is best used for tasks like: writing and executing SQL queries against connected databases, analyzing datasets and generating statistical summaries, creating charts and visualizations, and building data pipelines or scheduled reports."},
+    {type:'callout',text:"<strong>When to Choose Dana vs. Default Devin:</strong> If the primary output of your task is data insights, SQL queries, or visualizations — use Dana. If the task involves code changes alongside data work — use the default Devin agent, which can also run database queries via MCP.",variant:'green'},
+    {type:'section',text:"Part 7 — Confidence Scores"},
+    {type:'p',text:"A feature worth knowing across all agents: Devin 2.1 introduced Confidence Scores. At multiple points in each session, Devin expresses its confidence with a green, yellow, or red indicator. When Devin doesn't have green confidence, it waits for your approval before proceeding with its plan. When it does have green confidence, it proceeds automatically."},
+    {type:'p',text:"This self-awareness feature is highly correlated with success according to Cognition's data. Sessions where Devin has high confidence throughout tend to produce much better outcomes. If Devin consistently shows yellow or red confidence on a particular type of task, it's a signal to either improve your prompt, add more context, or break the task into smaller pieces."},
+    {type:'exercise',text:"🎙️ Audio Exercise: Explain MCP to a non-technical CTO who has never heard of it. Use the USB-C analogy. Then explain specifically what would be possible in a Devin session with Datadog, Figma, and a Supabase database all connected via MCP — walk through a concrete scenario from problem to fix."}
+  ],
+  keyPoints:[
+    {text:"<strong>MCP = USB-C for AI</strong> — standardized open protocol connecting Devin to any compatible tool"},
+    {text:"<strong>MCP Marketplace</strong> — browse and enable Datadog, Figma, Slack, Sentry, Supabase, and hundreds more"},
+    {text:"<strong>Use service accounts</strong> for OAuth MCP connections — access is shared across your organization"},
+    {text:"<strong>DeepWiki</strong> = auto-generated, AI-queryable codebase wiki; architecture diagrams, source links, natural-language Q&A"},
+    {text:"<strong>.devin/wiki.json</strong> — steer DeepWiki generation for large repos by specifying pages and repo notes"},
+    {text:"<strong>DeepWiki MCP</strong> = free, public, no-auth; tools: read_wiki_structure, read_wiki_contents, ask_question"},
+    {text:"<strong>Devin MCP</strong> = authenticated, manages your org's sessions, Knowledge, Playbooks, schedules"},
+    {text:"<strong>Dana</strong> = data analyst agent; use for SQL, data analysis, visualizations, reports"},
+    {text:"<strong>Confidence Scores</strong> = green/yellow/red; Devin waits for approval if not green — use as a quality signal"}
+  ]
+},
+
+// ── MODULE 9 ──────────────────────────────────────────────────
+{
+  day:"Day 9 — Module 9",
+  title:"Security, Secrets <span>&</span> Admin",
+  subtitle:"Secrets Manager, Cognition's security model, billing and ACUs, common issues, and team management.",
+  duration:"~30 min",
+  script:[
+    {type:'intro',text:"📖 Source: docs.devin.ai → Secrets & Site Cookies, Security at Cognition, Billing, Common Issues, Invite your Team\nThis module is what separates a developer who uses Devin from one who can responsibly deploy and manage it for an engineering organization."},
+    {type:'p',text:"Welcome to Module 9. This module covers the operational and trust layer — security, credentials, billing, and administration. This is the content that matters most in enterprise conversations and in interviews where they want to know if you understand Devin as a production tool, not just a demo.",highlight:true},
+    {type:'section',text:"Part 1 — The Secrets Manager"},
+    {type:'p',text:"The Secrets Manager is how you safely give Devin access to credentials it needs to do its job. The official docs are direct: if Devin requires credentials — API keys, passwords, cookies — use Cognition's Secrets Manager under the Settings page to securely share and store sensitive information."},
+    {type:'callout',text:"<strong>The Golden Rule:</strong> Never paste API keys, passwords, or tokens directly into a Devin prompt. Always use the Secrets Manager. Prompts are session data; Secrets Manager is a secure credential vault with proper access controls.",variant:'pink'},
+    {type:'p',text:"Secrets stored in the Secrets Manager can be referenced in your MCP server configurations using the dollar-sign-SECRETNAME syntax. This means you configure a secret once, and reference it by name wherever needed — avoiding any hardcoded credentials in your configuration files."},
+    {type:'p',text:"Site Cookies are a related credential type. If you log in to a website for Devin during onboarding using Devin's browser, the session cookie is saved for future sessions. If the cookie expires, you'll need to provide credentials again via Secrets. This is how Devin handles tasks involving authenticated web applications — like testing a staging environment that requires login."},
+    {type:'p',text:"For enterprise accounts, Secrets can be managed at the enterprise level and automatically shared across all organizations. Enterprise admins can also enforce an MCP server allowlist — preventing team members from connecting unauthorized external tools."},
+    {type:'section',text:"Part 2 — Cognition's Security Model"},
+    {type:'p',text:"Understanding Cognition's security architecture is important for enterprise conversations. Here are the key points from the official security documentation.",highlight:true},
+    {type:'p',text:"Data processing depends on how customers interact with Devin. Through the web application, Cognition only processes data actively provided by the authorized user. For integrations, the administrator installing the integration can review and manage all permissions granted to Devin. For enterprise customers with dedicated SaaS deployments, all customer data is stored within the customer's tenant — not in a shared environment."},
+    {type:'p',text:"Cognition retains data processed through Devin for the duration of the customer relationship unless specified otherwise. All inputs and outputs — regardless of plan — are considered the customer's intellectual property."},
+    {type:'callout',text:"<strong>Enterprise Security Controls:</strong> Role-based access control via RBAC. SSO integration (including Okta). Secure Mode — when enabled, Devin loses native internet deployment capabilities for maximum isolation. Enterprise ACU visibility controls. Enterprise build pinning and rollback. Audit logs for compliance.",variant:'purple'},
+    {type:'p',text:"To report security incidents, the official contact is security@cognition.ai. For feature requests and general support, it's support@cognition.ai. Enterprise customers receive direct Cognition engineering team support and notification of any security incidents that may impact their environments."},
+    {type:'section',text:"Part 3 — Understanding ACUs and Billing"},
+    {type:'p',text:"ACU stands for Agent Compute Unit. It is Devin's normalized measure of the resources consumed by a session. The ACU model is important to understand because it directly affects how you think about task sizing and cost management.",highlight:true},
+    {type:'p',text:"There are currently three plan levels. The Core plan is pay-as-you-go, starting at twenty dollars which provides approximately nine ACUs at two dollars and twenty-five cents per ACU. This is the entry point for solo developers or experimentation. The Teams plan is five hundred dollars per month and includes two hundred and fifty ACUs, with additional ACUs available at two dollars each. This plan includes API access, Slack integration, and is designed for engineering teams. Enterprise provides custom pricing with VPC deployment options for complete data isolation."},
+    {type:'callout',text:"<strong>Important ACU Tip from the Docs:</strong> Keep sessions under 10 ACUs. Devin's performance degrades in very long sessions. If a task is consuming many ACUs, it's usually a signal to break it into smaller focused sessions — which also produce better results.",variant:'green'},
+    {type:'p',text:"Subscriptions include a monthly ACU capacity. Once exhausted, you can pay as you go up to an additional usage budget you configure. You will be billed at the end of your billing cycle or whenever your usage exceeds two thousand dollars — whichever comes first."},
+    {type:'p',text:"The Devin API is included with Teams and Enterprise plans. There are no additional costs to using the API beyond the ACUs consumed by sessions you start programmatically."},
+    {type:'section',text:"Part 4 — Common Issues and How to Resolve Them"},
+    {type:'p',text:"Knowing the common failure modes makes you a better Devin operator. Here are the patterns most frequently identified in Session Insights action items."},
+    {type:'p',text:"Devin going off-track: Almost always caused by an under-specified prompt or missing context. Solutions: improve the initial prompt, use Ask Devin to plan first, add relevant Knowledge items, or provide direct file references via @ mentions."},
+    {type:'p',text:"Environment or tooling failures: Devin may fail because dependencies aren't installed or environment variables aren't configured in its machine setup. Session Insights Action Items will flag this — address environment issues proactively rather than waiting for them to recur."},
+    {type:'p',text:"Outdated Knowledge causing bad decisions: A Knowledge item that was accurate three months ago may now be wrong. Regular Knowledge audits using the Knowledge Usage tab prevent this class of failures."},
+    {type:'p',text:"ACU budget exhaustion mid-session: Configure a per-session ACU limit in Settings and Usage to prevent sessions from running indefinitely. You'll receive a notification when Devin is about to sleep due to low ACUs."},
+    {type:'section',text:"Part 5 — Team Management"},
+    {type:'p',text:"For Teams and Enterprise plans, you can invite your team through the Devin settings. The Teams plan offers unlimited seats — Devin is designed for entire engineering organizations, not individuals. User roles control what team members can access: org_member and org_admin are the default roles, with the UseDevinExpert permission included in both by default."},
+    {type:'p',text:"Custom roles allow you to restrict specific capabilities — for example, preventing certain users from accessing Advanced Mode or from using specific MCP integrations. Enterprise accounts support SSO and IdP group-based role assignments, enabling automated provisioning as team members join or leave."},
+    {type:'exercise',text:"🎙️ Audio Exercise: A CTO asks you: 'Our security team is concerned about giving Devin access to our production GitHub repository. What controls does Cognition provide?' Answer confidently and completely — cover Secrets Manager, data isolation, role controls, audit logs, and how the Secrets Manager prevents credentials from appearing in session data. No notes."}
+  ],
+  keyPoints:[
+    {text:"<strong>Secrets Manager</strong> — always use it for credentials; never paste tokens in prompts; reference via $SECRETNAME"},
+    {text:"<strong>Site Cookies</strong> — login once in Devin's browser during onboarding; cookie saved for future sessions"},
+    {text:"<strong>Data isolation</strong> — enterprise tenants get dedicated SaaS or VPC deployment; your data stays in your tenant"},
+    {text:"<strong>All I/O is your IP</strong> — inputs and outputs are customer intellectual property regardless of plan"},
+    {text:"<strong>ACU = Agent Compute Unit</strong> — Core: $2.25/ACU; Teams: 250 ACUs/$500/month at $2/ACU additional"},
+    {text:"<strong>Keep sessions under 10 ACUs</strong> — performance degrades in very long sessions; break them up"},
+    {text:"<strong>Security contacts:</strong> security@cognition.ai for incidents, support@cognition.ai for features"},
+    {text:"<strong>Teams plan = unlimited seats</strong> — designed for entire engineering organizations, includes API access"}
+  ]
+},
+
+// ── MODULE 10 ─────────────────────────────────────────────────
+{
+  day:"Day 10 — Module 10",
+  title:"Enterprise, API <span>&</span> Scale",
+  subtitle:"The Devin v3 API, enterprise features, batch orchestration, RBAC, and how to operate Devin at organization scale.",
+  duration:"~45 min",
+  script:[
+    {type:'intro',text:"📖 Source: docs.devin.ai → API Reference Overview, Enterprise Getting Started, Advanced Mode (Batch Sessions), Devin MCP\nThis is the final module of Week 2. Master this and you can speak confidently about Devin in any engineering leadership conversation."},
+    {type:'p',text:"Welcome to Module 10 — the final module of your Week 2 journey. This module is about scale. How do you operate Devin not as an individual tool, but as infrastructure for an engineering organization? The answer lives in the API, enterprise features, and the orchestration model.",highlight:true},
+    {type:'section',text:"Part 1 — The Devin API: What It Is and Why It Exists"},
+    {type:'p',text:"The official description: The Devin API enables you to integrate Devin into your applications, automate workflows, and build powerful tools. The current API version is v3, which officially came out of beta and is now the primary API for all Devin functionality. The legacy v1 and v2 APIs will eventually be deprecated."},
+    {type:'p',text:"Why would you use the API instead of the web interface? Three scenarios. First: programmatic automation — you want sessions to be created automatically based on external triggers, like a CI failure or a monitoring alert. Second: integration into existing tools — you want Devin to be a step in your existing deployment pipeline or issue resolution workflow. Third: batch processing — you need to launch many sessions simultaneously with structured, programmatic control over each one.",highlight:true},
+    {type:'section',text:"Part 2 — API Architecture: Organization vs. Enterprise"},
+    {type:'p',text:"The v3 API has two base URLs, each serving a different scope. The Organization API at api.devin.ai/v3/organizations manages resources within a single organization — sessions, knowledge, playbooks, secrets, and more. This is where most integrations start. The Enterprise API at api.devin.ai/v3/enterprise handles cross-organization management — analytics, audit logs, user management, billing, and infrastructure. This is for enterprise customers managing multiple organizations."},
+    {type:'callout',text:"<strong>Which path to choose:</strong> Most customers start with the Teams quick start using the Organization API. Choose the Enterprise path if you manage multiple organizations, use SSO, or need custom roles and RBAC.",variant:'purple'},
+    {type:'section',text:"Part 3 — Authentication: Service Users and RBAC"},
+    {type:'p',text:"The v3 API introduces a significant improvement over previous versions: service users with role-based access control. Instead of using personal API keys — which are tied to individuals and disappear when someone leaves — you create service users specifically for programmatic access.",highlight:true},
+    {type:'p',text:"RBAC means you can assign each service user only the permissions it needs. A CI/CD integration that creates sessions doesn't need permission to manage Knowledge or delete Playbooks. Scoped permissions reduce your attack surface and make audit logs more meaningful. The official docs recommend always using service users rather than personal API keys for production integrations."},
+    {type:'section',text:"Part 4 — Core API Operations"},
+    {type:'p',text:"The Organization API exposes full CRUD — create, read, update, delete — across all major Devin resources. You can create and manage sessions programmatically, setting prompts, attaching playbooks, specifying tags, and setting ACU limits. You can manage your Knowledge base — creating, reading, updating, and deleting knowledge notes, browsing folder structure, and reviewing pending knowledge suggestions. You can manage Playbooks — creating from scratch, iterating on existing ones, and attaching macros. You can manage Schedules — creating recurring or one-time automated sessions with agent selection and notification preferences. And you can manage Secrets — creating and revoking credentials for use in sessions."},
+    {type:'callout',text:"<strong>Practical Example — CI/CD Integration:</strong> When a test suite fails in your CI pipeline, your CI system calls the Devin API to create a session with the failure logs as context and the 'Fix failing tests' Playbook attached. Devin diagnoses and fixes the issue, opens a PR, and your CI pipeline automatically tags it for review. Zero human intervention until the fix is ready.",variant:'green'},
+    {type:'section',text:"Part 5 — Session Insights via API"},
+    {type:'p',text:"Session Insights can also be triggered programmatically via the API. You can generate insights for any completed session and retrieve the results — improved prompt suggestions, action items, and knowledge usage data — all through API calls. This enables you to build automated post-session analysis pipelines that feed learnings back into your Knowledge base without manual intervention."},
+    {type:'section',text:"Part 6 — Batch Sessions and Parallel Orchestration"},
+    {type:'p',text:"The most powerful API capability is batch session creation. Using Advanced Mode or the API directly, you can launch hundreds of Devin sessions simultaneously, each with its own prompt, playbook, ACU limit, and tag. This is how Devin scales from a productivity tool to engineering infrastructure.",highlight:true},
+    {type:'p',text:"The official docs give a compelling example: you want to migrate fifty files from a legacy REST client to a new GraphQL client. You ask Devin to analyze your codebase, group files into independent work packages that won't conflict, then start a parallel Devin session for each package — all running simultaneously."},
+    {type:'p',text:"The coordinator session handles the decomposition, monitors progress across child sessions, resolves conflicts, and compiles results. Each child session runs in its own isolated virtual machine. The coordinator can message child sessions with follow-up instructions, monitor their ACU consumption, put them to sleep, or terminate them if they go off track."},
+    {type:'callout',text:"<strong>The Scale Arithmetic:</strong> If each developer on a 10-person team runs 5 parallel Devin sessions per day, that's 50 concurrent AI engineers working on your codebase every day. The API is what makes this programmable and systematic rather than manual.",variant:'green'},
+    {type:'section',text:"Part 7 — Enterprise-Exclusive Features"},
+    {type:'p',text:"The Enterprise plan unlocks several capabilities beyond Teams. VPC deployment for complete data isolation — your Devin environment runs in your own Virtual Private Cloud with no shared infrastructure. Enterprise-scoped Secrets that are automatically shared across all organizations in your enterprise. Enterprise ACU visibility control — enterprise admins can control whether users see ACU usage information. Enterprise MCP registry enforcement — admins can enforce an approved MCP server allowlist across the entire organization. Enterprise build pinning — admins can pin specific Devin versions and roll back to previous builds if a new release causes issues."},
+    {type:'p',text:"These enterprise controls are what make Devin a viable tool for regulated industries, large organizations with strict compliance requirements, and companies with sensitive IP that requires maximum isolation."},
+    {type:'section',text:"Part 8 — The Complete Picture"},
+    {type:'p',text:"Let's close with the complete picture of what you now know across both weeks of this course.",highlight:true},
+    {type:'p',text:"You understand Devin's identity: an autonomous AI software engineer with a Shell, IDE, and Browser workspace, designed to work like a junior engineer with excellent execution and a need for clear direction. You know how sessions work from Ask mode planning through Agent mode execution. You can write expert-level prompts with the right specificity, context, success criteria, and feedback loops."},
+    {type:'p',text:"You know how to onboard Devin to any codebase: repositories, indexing, VPN, Knowledge, and AGENTS.md. You can operate Devin's daily tools: slash commands, session tools, Devin Review, and parallel sessions. You understand the advanced features: Playbooks for reusable templates, Scheduled Sessions for automation, Session Insights for continuous improvement, and Advanced Mode for meta-orchestration."},
+    {type:'p',text:"You can navigate the full integration ecosystem: Slack and Teams for team communication, GitHub and GitLab for code, Jira and Linear for project management, MCP for external tool connectivity, and DeepWiki for codebase intelligence. And you understand the security, billing, API, and enterprise architecture for production deployment."},
+    {type:'callout',text:"<strong>You are now ready.</strong> This is not surface-level knowledge — you have worked through the complete Devin documentation systematically. Go demonstrate that depth with confidence.",variant:'green'},
+    {type:'exercise',text:"🎙️ Final Audio Exercise: Without any notes, record a 5-minute audio pitch called 'Why Our Team Should Use Devin and How We'd Implement It.' Cover: what Devin is, 3 specific use cases for your team, the onboarding steps, the integrations you'd enable, how you'd secure it, and what ROI metrics you'd track. This is your interview closer."}
+  ],
+  keyPoints:[
+    {text:"<strong>Devin API v3</strong> is current; v1/v2 will be deprecated — always use v3 for new integrations"},
+    {text:"<strong>Two API scopes:</strong> Organization API (sessions, knowledge, playbooks) + Enterprise API (cross-org, billing, audit)"},
+    {text:"<strong>Use service users</strong> with RBAC for production API integrations — not personal API keys"},
+    {text:"<strong>Full CRUD via API:</strong> sessions, knowledge, playbooks, schedules, secrets, and insights"},
+    {text:"<strong>Batch sessions</strong> = launch hundreds of parallel Devin sessions programmatically; each in isolated VMs"},
+    {text:"<strong>Coordinator + child session model</strong> — coordinator manages decomposition, monitoring, and result compilation"},
+    {text:"<strong>Enterprise exclusives:</strong> VPC deployment, enterprise secrets, MCP allowlist enforcement, build pinning, RBAC"},
+    {text:"<strong>Week 2 complete:</strong> you now have full mastery — from daily ops to API to enterprise architecture"}
+  ]
+}
+];
+
+// ── RENDER ─────────────────────────────────────────────────────
+function renderModule(idx) {
+  const m = modules[idx];
+  fullText = m.script.map(b=>{
+    if(b.type==='intro'||b.type==='p'||b.type==='section'||b.type==='exercise') return b.text||'';
+    if(b.type==='callout') return b.text.replace(/<[^>]+>/g,'');
+    if(b.type==='compare') return b.items.map(i=>i.label+': '+i.text).join('. ');
+    return '';
+  }).filter(Boolean).join('\n\n');
+
+  let scriptHTML='';
+  m.script.forEach(block=>{
+    if(block.type==='intro') scriptHTML+=`<div class="script-intro">${block.text.replace(/\n/g,'<br>')}</div>`;
+    else if(block.type==='p') scriptHTML+=`<p class="script-p ${block.highlight?'highlight':''}">${block.text}</p>`;
+    else if(block.type==='section') scriptHTML+=`<div class="section-head">${block.text}</div>`;
+    else if(block.type==='callout') scriptHTML+=`<div class="callout ${block.variant||''}">${block.text}</div>`;
+    else if(block.type==='compare') {
+      scriptHTML+=`<div class="compare-grid">`;
+      block.items.forEach(it=>scriptHTML+=`<div class="compare-card ${it.type}"><div class="compare-label">${it.label}</div><div class="compare-text">${it.text}</div></div>`);
+      scriptHTML+=`</div>`;
+    } else if(block.type==='exercise') scriptHTML+=`<div class="exercise-box"><div class="exercise-label">🎙️ Audio Exercise</div><div class="exercise-text">${block.text}</div></div>`;
+  });
+
+  let kpHTML = m.keyPoints.map((kp,i)=>`
+    <div class="key-point">
+      <div class="kp-bullet">${i+1}</div>
+      <div class="kp-text">${kp.text}</div>
+    </div>`).join('');
+
+  document.getElementById('mainContent').innerHTML=`
+    <div class="module-header">
+      <div class="module-eyebrow">
+        <span class="module-day">${m.day}</span>
+        <span class="module-duration">${m.duration}</span>
+      </div>
+      <h1 class="module-heading">${m.title}</h1>
+      <p class="module-sub">${m.subtitle}</p>
+    </div>
+
+    <div class="player-bar">
+      <button class="btn-play" id="playBtn" onclick="togglePlay()">
+        <svg class="play-icon" width="18" height="18" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg class="pause-icon" width="18" height="18" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+      <div class="player-info">
+        <div class="player-track">${m.day} — ${m.title.replace(/<[^>]+>/g,'')}</div>
+        <div class="player-progress-bg"><div class="player-progress-fill" id="playerProgress"></div></div>
+      </div>
+      <div class="player-controls-right">
+        <button class="btn-ctrl" onclick="changeSpeed()"><span id="speedLabel">${speechRate}×</span></button>
+        <button class="btn-ctrl ${doneModules.has(idx)?'active':''}" id="markDoneBtn" onclick="markDone(${idx})">${doneModules.has(idx)?'✓ Done':'Mark Done'}</button>
+      </div>
+    </div>
+
+    <div class="script-container">
+      <div class="script-tabs">
+        <button class="tab-btn active" onclick="switchTab('script',this)">📜 Audio Script</button>
+        <button class="tab-btn" onclick="switchTab('notes',this)">📌 Key Points</button>
+      </div>
+      <div class="script-body">
+        <div class="tab-content active" id="tab-script">${scriptHTML}</div>
+        <div class="tab-content" id="tab-notes">${kpHTML}</div>
+      </div>
+    </div>
+
+    <div class="module-nav">
+      ${idx>0?`<button class="btn-nav" onclick="loadModule(${idx-1})">← Module ${idx+5}</button>`:''}
+      ${idx<modules.length-1?`<button class="btn-nav primary" onclick="loadModule(${idx+1})">Module ${idx+7} →</button>`:`<button class="btn-nav primary" onclick="alert('🎉 Week 2 Complete! You are now a Devin expert. Go get that job!')">Complete Course 🎉</button>`}
+    </div>`;
+}
+
+function switchTab(name,el){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+function loadModule(idx){
+  stopSpeech(); currentModule=idx;
+  document.querySelectorAll('.module-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  renderModule(idx);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function markDone(idx){
+  doneModules.add(idx);
+  document.getElementById('btn'+idx).classList.add('done');
+  document.getElementById('markDoneBtn').textContent='✓ Done';
+  document.getElementById('markDoneBtn').classList.add('active');
+  const pct=(doneModules.size/modules.length)*100;
+  document.getElementById('progressBar').style.width=pct+'%';
+  document.getElementById('progressLabel').textContent=doneModules.size+' of '+modules.length+' completed';
+}
+
+function togglePlay(){ isPlaying?pauseSpeech():startSpeech(); }
+function startSpeech(){
+  if(synth.paused&&utterance){synth.resume();isPlaying=true;document.getElementById('playBtn').classList.add('playing');return;}
+  synth.cancel();
+  utterance=new SpeechSynthesisUtterance(fullText);
+  utterance.rate=speechRate; utterance.lang='en-US'; isPlaying=true;
+  document.getElementById('playBtn').classList.add('playing');
+  utterance.onboundary=e=>{
+    if(e.name==='word'){
+      const pct=Math.min(100,(e.charIndex/fullText.length)*100);
+      const el=document.getElementById('playerProgress');
+      if(el) el.style.width=pct+'%';
+    }
+  };
+  utterance.onend=()=>{
+    isPlaying=false;
+    const btn=document.getElementById('playBtn');
+    if(btn) btn.classList.remove('playing');
+    const p=document.getElementById('playerProgress');
+    if(p) p.style.width='100%';
+  };
+  synth.speak(utterance);
+}
+function pauseSpeech(){ synth.pause(); isPlaying=false; document.getElementById('playBtn')?.classList.remove('playing'); }
+function stopSpeech(){ synth.cancel(); isPlaying=false; utterance=null; }
+function changeSpeed(){
+  speedIdx=(speedIdx+1)%speeds.length; speechRate=speeds[speedIdx];
+  document.getElementById('speedLabel').textContent=speechRate+'×';
+  if(isPlaying){stopSpeech();startSpeech();}
+}
+
+loadModule(0);
+</script>
+</body>
+</html>

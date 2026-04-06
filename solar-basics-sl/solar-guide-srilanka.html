@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solar Power Guide – Giriulla, Sri Lanka</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+:root{--sun:#F5A623;--sunbg:#FFF8EC;--sky:#1B6CA8;--skybg:#EBF4FC;--leaf:#2A7A4B;--leafbg:#EBF5EE;--hot:#D94F2B;--hotbg:#FEF0EB;--pur:#6246C8;--purbg:#F0ECFF;--dark:#0F1923;--text:#1C2B3A;--muted:#5A6B7A;--border:#DDE4EA;--bg:#F4F6F9;--white:#FFFFFF}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+.hero{background:linear-gradient(150deg,#0a1628 0%,#0e2d52 45%,#1B5E8E 100%);color:#fff;padding:52px 24px 72px;text-align:center;position:relative;overflow:hidden}
+.glow{position:absolute;top:-40px;right:-40px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(245,166,35,.35) 0%,transparent 70%);animation:glowpulse 4s ease-in-out infinite}
+@keyframes glowpulse{0%,100%{transform:scale(1);opacity:.35}50%{transform:scale(1.15);opacity:.5}}
+.hero-sun{font-size:60px;display:block;margin-bottom:14px;animation:float 3.5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(26px,5.5vw,46px);font-weight:800;line-height:1.15;margin-bottom:10px}
+.hero p{font-size:15px;opacity:.8;max-width:460px;margin:0 auto 20px}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:36px;background:var(--bg);clip-path:ellipse(55% 100% at 50% 100%)}
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:4px}
+.badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:5px 14px;font-size:12px;backdrop-filter:blur(8px)}
+.snav{position:sticky;top:0;z-index:100;background:rgba(244,246,249,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:10px 16px;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.snav::-webkit-scrollbar{display:none}
+.snav-inner{display:inline-flex;gap:6px}
+.nb{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:18px;border:1.5px solid var(--border);background:var(--white);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .2s}
+.nb:hover{border-color:var(--sky);color:var(--sky)}
+.nb.active{background:var(--sky);border-color:var(--sky);color:#fff}
+.wrap{max-width:800px;margin:0 auto;padding:32px 20px 80px}
+.sec{margin-bottom:56px;opacity:0;transform:translateY(18px);transition:all .5s ease}
+.sec.vis{opacity:1;transform:translateY(0)}
+.sec-head{display:flex;align-items:flex-start;gap:15px;margin-bottom:22px}
+.sec-ico{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.sec-title h2{font-family:'Syne',sans-serif;font-size:21px;font-weight:700;margin-bottom:3px}
+.sec-sub{font-size:13px;color:var(--muted)}
+.card{background:var(--white);border-radius:16px;padding:20px;border:1px solid var(--border);margin-bottom:14px;transition:box-shadow .2s}
+.card:hover{box-shadow:0 4px 22px rgba(0,0,0,.06)}
+.card h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.callout{border-radius:0 12px 12px 0;padding:14px 18px;margin:14px 0}
+.callout .clabel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;margin-bottom:5px}
+.callout p{font-size:13.5px}
+.ca{background:var(--sunbg);border-left:4px solid var(--sun)}.ca .clabel{color:var(--sun)}.ca p{color:#5C4100}
+.ct{background:var(--leafbg);border-left:4px solid var(--leaf)}.ct .clabel{color:var(--leaf)}.ct p{color:#1A3D28}
+.cw{background:var(--hotbg);border-left:4px solid var(--hot)}.cw .clabel{color:var(--hot)}.cw p{color:#6B2210}
+.ci{background:var(--skybg);border-left:4px solid var(--sky)}.ci .clabel{color:var(--sky)}.ci p{color:#0D2D52}
+.ccard{background:var(--white);border-radius:16px;border:1px solid var(--border);overflow:hidden;margin-bottom:16px}
+.ccard-head{padding:15px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.ccard-ico{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.ccard-info h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:2px}
+.ccard-sub{font-size:11px;color:var(--muted)}
+.ccard-body{padding:15px 20px;font-size:13.5px}
+.ccard-body p{margin-bottom:8px}.ccard-body p:last-child{margin-bottom:0}
+.diagram{background:var(--white);border-radius:16px;border:1px solid var(--border);padding:22px 18px;margin-bottom:14px;text-align:center}
+.diag-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:3px}
+.diag-sub{font-size:11px;color:var(--muted);margin-bottom:14px}
+.flow{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:7px;margin:8px 0}
+.fn{border:2px solid var(--border);border-radius:11px;padding:9px 14px;font-size:12px;font-weight:500;text-align:center;min-width:76px;line-height:1.4}
+.fn small{font-size:10px;opacity:.7;display:block}
+.fa{font-size:17px;color:var(--muted)}
+.fn-sol{background:var(--sunbg);border-color:var(--sun)}
+.fn-inv{background:var(--purbg);border-color:var(--pur)}
+.fn-bat{background:var(--leafbg);border-color:var(--leaf)}
+.fn-hom{background:var(--hotbg);border-color:var(--hot)}
+.fn-grid{background:var(--skybg);border-color:var(--sky)}
+.ctbl{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden;border:1px solid var(--border);font-size:13px}
+.ctbl th{background:var(--dark);color:#fff;padding:11px 15px;text-align:left;font-family:'Syne',sans-serif;font-weight:600}
+.ctbl td{padding:10px 15px;border-bottom:1px solid var(--border);vertical-align:top}
+.ctbl tr:last-child td{border-bottom:none}
+.ctbl tr:nth-child(even) td{background:var(--bg)}
+.yes{color:var(--leaf);font-weight:600}.no{color:var(--hot);font-weight:600}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:430px){.stat-grid{grid-template-columns:1fr 1fr}}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center}
+.stat .big{font-family:'Syne',sans-serif;font-size:30px;font-weight:800}
+.stat .lbl{font-size:11px;color:var(--muted);margin-top:3px}
+.app-grid{display:grid;grid-template-columns:1.5fr 75px 70px 36px;gap:7px;align-items:center;margin-bottom:7px}
+.app-header{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted)}
+.app-input{border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);width:100%;transition:border .2s}
+.app-input:focus{outline:none;border-color:var(--sky)}
+.app-input[type=number]{text-align:center}
+.del-btn{background:none;border:none;cursor:pointer;font-size:18px;color:#ccc;line-height:1;transition:color .2s;padding:0}
+.del-btn:hover{color:var(--hot)}
+.add-btn{width:100%;margin-top:4px;padding:9px;background:var(--white);border:1.5px dashed var(--border);border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--muted);cursor:pointer;transition:all .2s}
+.add-btn:hover{border-color:var(--sky);color:var(--sky)}
+.calcbox{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:14px}
+.calcbox h3{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--sky);margin-bottom:6px}
+.calcbox .ch-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.cal-row{display:flex;align-items:center;gap:10px;margin-bottom:11px;flex-wrap:wrap}
+.cal-row label{font-size:13px;color:var(--muted);min-width:160px}
+.cal-row input,.cal-row select{border:1.5px solid var(--border);border-radius:8px;padding:7px 11px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);width:140px;transition:border .2s}
+.cal-row input:focus,.cal-row select:focus{outline:none;border-color:var(--sky)}
+.cbtn{background:var(--sky);color:#fff;border:none;border-radius:10px;padding:11px 26px;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;margin-top:6px}
+.cbtn:hover{background:#144F80}
+.cres{margin-top:16px;padding:20px;background:var(--dark);border-radius:12px;color:#fff;display:none}
+.cres.show{display:block}
+.rrow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:13px}
+.rrow:last-of-type{border-bottom:none}
+.rval{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--sun)}
+.rnote{font-size:11px;opacity:.6;margin-top:10px;line-height:1.5}
+.steps{display:flex;flex-direction:column}
+.step{display:flex;gap:14px;padding-bottom:18px;position:relative}
+.step:not(:last-child)::before{content:'';position:absolute;left:17px;top:38px;bottom:0;width:2px;background:var(--border)}
+.stepnum{width:36px;height:36px;border-radius:50%;background:var(--sky);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1}
+.stepcont h4{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px}
+.stepcont p{font-size:13px;color:var(--muted)}
+.qcard{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px}
+.qq{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:13px}
+.qopts{display:flex;flex-direction:column;gap:7px}
+.qopt{padding:9px 15px;border-radius:9px;border:1.5px solid var(--border);cursor:pointer;font-size:13px;transition:all .2s;background:var(--white);text-align:left;font-family:'DM Sans',sans-serif}
+.qopt:hover{border-color:var(--sky);background:var(--skybg)}
+.qopt.correct{background:var(--leafbg);border-color:var(--leaf);color:#1A3D28}
+.qopt.wrong{background:var(--hotbg);border-color:var(--hot);color:#6B2210}
+.qres{font-size:12.5px;margin-top:9px;padding:9px 13px;border-radius:8px;display:none}
+.qres.show{display:block}
+.qres.pass{background:var(--leafbg);color:#1A3D28}
+.qres.fail{background:var(--hotbg);color:#6B2210}
+.cklist{list-style:none}
+.cklist li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13.5px}
+.cklist li:last-child{border-bottom:none}
+.cklist input[type=checkbox]{margin-top:2px;width:15px;height:15px;accent-color:var(--leaf);cursor:pointer;flex-shrink:0}
+.cklist li.chk label{text-decoration:line-through;color:var(--muted)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:10px 0}
+@media(max-width:480px){.g2{grid-template-columns:1fr}}
+.div{display:flex;align-items:center;gap:11px;margin:40px 0 28px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px}
+.div::before,.div::after{content:'';flex:1;height:1px;background:var(--border)}
+.banner{background:var(--dark);color:#fff;border-radius:14px;padding:18px 20px;margin-bottom:14px;display:flex;gap:12px;align-items:flex-start}
+.banner .bico{font-size:22px;flex-shrink:0;margin-top:1px}
+.banner p{font-size:13.5px;opacity:.9}
+.banner strong{color:var(--sun)}
+footer{background:var(--dark);color:rgba(255,255,255,.6);text-align:center;padding:22px 20px;font-size:12px}
+footer a{color:var(--sun);text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="glow"></div>
+  <span class="hero-sun">☀️</span>
+  <h1>Solar Power for Your<br>Large Home — Giriulla</h1>
+  <p>A complete personalized guide: hybrid grid-tied system with battery backup, sized for AC, water pump, and a full household load.</p>
+  <div class="badge-row">
+    <span class="badge">📍 Giriulla, Western Province</span>
+    <span class="badge">⚡ Hybrid System</span>
+    <span class="badge">🏠 Large Home · AC · Water Pump</span>
+  </div>
+</div>
+
+<nav class="snav">
+  <div class="snav-inner">
+    <button class="nb active" onclick="goTo('s1',this)">1 · How Solar Works</button>
+    <button class="nb" onclick="goTo('s2',this)">2 · Electricity Basics</button>
+    <button class="nb" onclick="goTo('s3',this)">3 · Components</button>
+    <button class="nb" onclick="goTo('s4',this)">4 · Your System</button>
+    <button class="nb" onclick="goTo('s5',this)">5 · AC &amp; Pump</button>
+    <button class="nb" onclick="goTo('s6',this)">6 · Calculator</button>
+    <button class="nb" onclick="goTo('s7',this)">7 · Sri Lanka Rules</button>
+    <button class="nb" onclick="goTo('s8',this)">8 · Installation</button>
+    <button class="nb" onclick="goTo('s9',this)">9 · Quiz</button>
+    <button class="nb" onclick="goTo('s10',this)">10 · Checklist</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- CH 1 -->
+<div class="sec vis" id="s1">
+  <div class="sec-head">
+    <div class="sec-ico" style="background:var(--sunbg)">☀️</div>
+    <div class="sec-title"><h2>Chapter 1 — How Solar Actually Works</h2><div class="sec-sub">Zero knowledge needed. Start here.</div></div>
+  </div>
+  <div class="card">
+    <h3>🌞 The Core Idea</h3>
+    <p>Solar panels are made from silicon — a material found in sand. When sunlight strikes silicon, it knocks electrons loose and those moving electrons <em>are</em> electricity. No fuel, no moving parts, no burning anything. Just light hitting a surface and producing power.</p>
+    <p style="margin-top:8px">Multiple panels are wired together to form an <strong>"array."</strong> A 10kW system on your home could easily offset your entire CEB bill and more — and earn you money on top.</p>
+  </div>
+  <div class="callout ca">
+    <div class="clabel">💡 Real-World Analogy</div>
+    <p>Think of rain falling onto a sloped roof into gutters. Rain = sunlight. Roof = solar panels. Gutters = wires. The bigger the roof, the more rain you collect. The stronger the rain, the faster the buckets fill. Replace "rain" with sunlight and "water" with electricity — that's solar.</p>
+  </div>
+  <div class="stat-grid">
+    <div class="stat"><div class="big" style="color:var(--sun)">5–6</div><div class="lbl">Peak sun hours/day — Giriulla</div></div>
+    <div class="stat"><div class="big" style="color:var(--leaf)">25+</div><div class="lbl">Years quality panels last</div></div>
+    <div class="stat"><div class="big" style="color:var(--sky)">4–6</div><div class="lbl">Year payback period in SL</div></div>
+  </div>
+  <div class="card">
+    <h3>🏠 What Makes a Large Home Different</h3>
+    <p>A large home with AC units and a water pump has two challenges smaller homes don't:</p>
+    <div class="g2" style="margin-top:10px">
+      <div style="background:var(--bg);border-radius:10px;padding:12px;font-size:13px"><strong>⚡ High surge current at startup</strong><br><br>ACs and pumps need 2–3× their running power for the first 2–3 seconds when starting. Your inverter must handle this "surge" or it will trip.</div>
+      <div style="background:var(--bg);border-radius:10px;padding:12px;font-size:13px"><strong>📊 High total daily consumption</strong><br><br>A 1-ton AC running 8 hrs = ~8 kWh/day alone. A water pump adds 1–3 kWh. Your system must be sized generously — typically 8–15kWp.</div>
+    </div>
+  </div>
+  <div class="callout ct">
+    <div class="clabel">🌴 Giriulla Advantage</div>
+    <p>Giriulla sits at roughly 7°N in the Western Province — one of Sri Lanka's best solar zones. You get strong sun nearly year-round, with only slight reduction during the south-west monsoon (May–September). Even on cloudy days, panels still produce 50–70% of peak output.</p>
+  </div>
+</div>
+
+<div class="div" id="s2">Chapter 2</div>
+
+<!-- CH 2 -->
+<div class="sec" id="elec">
+  <div class="sec-head">
+    <div class="sec-ico" style="background:var(--skybg)">⚡</div>
+    <div class="sec-title"><h2>Electricity Basics — 5 Words That Explain Everything</h2><div class="sec-sub">Master these and no solar salesman can confuse you.</div></div>
+  </div>
+
+  <div class="ccard">
+    <div class="ccard-head"><div class="ccard-ico" style="background:var(--sunbg)">🔴</div><div class="ccard-info"><h3>Volt (V) — The Pressure</h3><div class="ccard-sub">Forces electricity through a wire</div></div></div>
+    <div class="ccard-body">
+      <p><strong>Imagine water in a pipe.</strong> Voltage = the water pressure. More pressure = the water travels further and pushes harder. More voltage = electricity can power demanding devices across long cable runs.</p>
+      <p>Your panels produce <strong>DC at 12V, 24V, or 48V</strong>. Sri Lanka's grid and home appliances use <strong>230V AC</strong>. The inverter bridges this gap.</p>
+    </div>
+  </div>
+
+  <div class="ccard">
+    <div class="ccard-head"><div class="ccard-ico" style="background:var(--skybg)">💧</div><div class="ccard-info"><h3>Ampere (A) — The Flow Rate</h3><div class="ccard-sub">How much electricity is moving at once</div></div></div>
+    <div class="ccard-body">
+      <p>If Volts = pressure, Amps = how wide the pipe is. A thick pipe flows more water; a thicker wire carries more current. Solar DC wires are thick (4–10mm²) because they carry high amperage.</p>
+      <p><strong>Why it matters for you:</strong> Your 1-ton AC draws about 6–8A running, but spikes to 18–24A for 2–3 seconds on startup. Your inverter's <strong>surge rating</strong> must handle this, or it trips every time the AC starts.</p>
+    </div>
+  </div>
+
+  <div class="ccard">
+    <div class="ccard-head"><div class="ccard-ico" style="background:var(--hotbg)">⚡</div><div class="ccard-info"><h3>Watt (W) — The Power Right Now</h3><div class="ccard-sub">Volts × Amps = Watts</div></div></div>
+    <div class="ccard-body">
+      <p>Watts = how much power is being consumed <em>this moment</em>. All appliances are rated in watts — it's how "hungry" they are.</p>
+      <div class="g2">
+        <div style="background:var(--bg);border-radius:10px;padding:11px;font-size:12.5px">💡 LED bulb — 9W<br>🌀 Fan — 60–75W<br>📺 TV — 80–120W<br>🧊 Fridge — 100–200W</div>
+        <div style="background:var(--bg);border-radius:10px;padding:11px;font-size:12.5px">❄️ 1-ton AC — 900–1100W<br>❄️ 1.5-ton AC — 1300–1600W<br>💧 Water pump (1HP) — 750–900W<br>🍳 Microwave — 800–1200W</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ccard">
+    <div class="ccard-head"><div class="ccard-ico" style="background:var(--leafbg)">🕐</div><div class="ccard-info"><h3>Kilowatt-Hour (kWh) — Energy Used Over Time</h3><div class="ccard-sub">This is the "unit" on your CEB bill</div></div></div>
+    <div class="ccard-body">
+      <p>1 kWh = 1,000 watts running for 1 hour. <strong>Formula: kWh = Watts × Hours ÷ 1000</strong></p>
+      <div class="callout ca" style="margin:10px 0">
+        <div class="clabel">📖 Worked Example</div>
+        <p>Your 1,000W AC runs 8 hours/day: <strong>1000 × 8 ÷ 1000 = 8 kWh/day = 8 units.</strong> At CEB's upper tariff (~Rs.75/unit), that's Rs.600/day just for one AC unit.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ccard">
+    <div class="ccard-head"><div class="ccard-ico" style="background:var(--purbg)">🔄</div><div class="ccard-info"><h3>AC vs DC — Two Different Types of Electricity</h3><div class="ccard-sub">Solar makes DC. Your home uses AC. The inverter translates.</div></div></div>
+    <div class="ccard-body">
+      <p><strong>DC (Direct Current)</strong> — electrons flow in one direction, like a river. Batteries and solar panels produce DC.</p>
+      <p><strong>AC (Alternating Current)</strong> — electrons flip direction 50 times per second. Sri Lanka grid and home appliances: 230V AC.</p>
+      <div class="callout cw" style="margin-top:10px">
+        <div class="clabel">⚠️ Critical for AC units and pumps</div>
+        <p>ACs and water pumps contain electric motors — "inductive loads." They require a <strong>pure sine wave</strong> inverter, not a cheap modified sine wave type. Cheap inverters cause motors to run hot, vibrate, and fail early. All quality hybrid inverters output pure sine wave — always confirm this spec.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="div" id="s3">Chapter 3</div>
+
+<!-- CH 3 -->
+<div class="sec" id="comps">
+  <div class="sec-head">
+    <div class="sec-ico" style="background:var(--sunbg)">🔧</div>
+    <div class="sec-title"><h2>Every Component — What It Does &amp; What to Buy</h2><div class="sec-sub">6 components, explained simply with real Sri Lanka buying advice.</div></div>
+  </div>
+
+  <div class="ccard">
+    <div class="ccard-head"><div class="ccard-ico" style="background:var(--sunbg)">🟦</div><div class="ccard-info"><h3>1. Solar Panels (PV Modules)</h3><div class="ccard-sub">Convert sunlight → DC electricity</div></div></div>
+    <div class="ccard-body">
+      <p>Each panel is silicon cells in an aluminium frame. For your large home: expect <strong>16–28 panels</strong> depending on wattage.</p>
+      <p><strong>Key specs:</strong> <em>Watt-peak (Wp)</em> — output under ideal conditions. Modern panels: 500–620Wp each. <em>Efficiency</em> — % of sunlight converted. Aim for 21%+. <em>Temperature coefficient</em> — Sri Lanka is hot. Better panels lose less output in heat; look for -0.35%/°C or better.</p>
+      <div class="callout ct">
+        <div class="clabel">🛒 Buy in Sri Lanka</div>
+        <p>Tier 1 brands available locally: <strong>Jinko Solar, LONGi, Canadian Solar, AE Solar, Risen</strong>. Insist on <strong>10-year product warranty</strong> + <strong>25-year performance warranty</strong> (80% output guaranteed at year 25). Buy from SLSEA-registered dealers only.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ccard">
+    <div class="ccard-head"><div class="ccard-ico" style="background:var(--purbg)">🧠</div><div class="ccard-info"><h3>2. Hybrid Inverter — The Brain</h3><div class="ccard-sub">Manages panels + batteries + grid simultaneously</div></div></div>
+    <div class="ccard-body">
+      <p>For your setup, this is the most critical (and expensive after panels) component. A hybrid inverter does 4 jobs at once:</p>
+      <div style="display:flex;flex-direction:column;gap:7px;margin:10px 0">
+        <div style="background:var(--bg);border-radius:9px;padding:11px;font-size:13px">⚡ Converts panel DC → 230V AC for your home</div>
+        <div style="background:var(--bg);border-radius:9px;padding:11px;font-size:13px">🔋 Charges batteries from panels (and from grid if needed)</div>
+        <div style="background:var(--bg);border-radius:9px;padding:11px;font-size:13px">🔌 Exports excess power to CEB grid and earns you money</div>
+        <div style="background:var(--bg);border-radius:9px;padding:11px;font-size:13px">🔦 During power cut: instantly switches to battery in milliseconds</div>
+      </div>
+      <div class="callout cw">
+        <div class="clabel">⚠️ Critical — Surge Rating for your AC + Pump</div>
+        <p>A 1-ton AC (1,000W running) may surge to 3,000W at startup. A 1HP pump (750W) may surge to 2,200W. If both start close together plus household loads, your inverter must handle 8–10kW surge. Most 5kW hybrid inverters handle 10kW surge — <strong>always confirm the surge rating spec before buying</strong>.</p>
+      </div>
+      <p><strong>Recommended brands (Sri Lanka, 2025):</strong> Deye, Growatt, Goodwe, Solis — all have local dealers, spare parts, and SLSEA approval. Must output pure sine wave.</p>
+    </div>
+  </div>
+
+  <div class="ccard">
+    <div class="ccard-head"><div class="ccard-ico" style="background:var(--leafbg)">🔋</div><div class="ccard-info"><h3>3. Battery Bank — Night &amp; Backup Power</h3><div class="ccard-sub">Stores energy for when panels can't generate</div></div></div>
+    <div class="ccard-body">
+      <div class="g2">
+        <div style="background:var(--bg);border-radius:10px;padding:12px;font-size:13px">
+          <strong style="color:var(--hot)">Lead Acid (Tubular)</strong><br><br>
+          Cost: Rs.15,000–30,000 / 100Ah 12V<br>
+          Life: 3–5 years<br>
+          Usable depth: 50% only<br>
+          Weight: Very heavy<br>
+          Needs monthly water top-up<br>
+          Emits gas — needs ventilation
+        </div>
+        <div style="background:var(--bg);border-radius:10px;padding:12px;font-size:13px">
+          <strong style="color:var(--leaf)">Lithium LiFePO4 ★</strong><br><br>
+          Cost: Rs.800K–1.5M / 10kWh<br>
+          Life: 10–15 years<br>
+          Usable depth: 80–90%<br>
+          Weight: 40% lighter<br>
+          Zero maintenance<br>
+          No ventilation needed
+        </div>
+      </div>
+      <div class="callout ct" style="margin-top:10px">
+        <div class="clabel">💡 Recommendation for your case</div>
+        <p>For a large home with AC, <strong>Lithium LiFePO4</strong> is strongly recommended. You'll likely need 10–20kWh capacity to cover critical loads (lights, fans, fridge — not AC) for 8–12 hours. Lead acid at that scale becomes extremely heavy, inefficient, and needs replacing in 4 years anyway.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ccard">
+    <div class="ccard-head"><div class="ccard-ico" style="background:#FFFBE8">🎯</div><div class="ccard-info"><h3>4. MPPT Charge Controller (Built into your inverter)</h3><div class="ccard-sub">Extracts maximum power from panels at all times</div></div></div>
+    <div class="ccard-body">
+      <p>MPPT (Maximum Power Point Tracking) constantly adjusts to pull the maximum available power from your panels — like always driving in the optimal gear. In Sri Lanka's heat, panels can lose 10–15% without MPPT. It recovers most of this automatically.</p>
+      <p>Good news: <strong>all quality hybrid inverters have 1–2 built-in MPPT inputs</strong>. You don't need a separate unit. Confirm the inverter's MPPT voltage range covers your panel array's voltage.</p>
+    </div>
+  </div>
+
+  <div class="ccard">
+    <div class="ccard-head"><div class="ccard-ico" style="background:var(--hotbg)">🛡️</div><div class="ccard-info"><h3>5. Wiring, Protection &amp; Safety Devices</h3><div class="ccard-sub">Never cut corners here — this keeps you safe</div></div></div>
+    <div class="ccard-body">
+      <p><strong>Solar DC Cable:</strong> UV-resistant, double-insulated, outdoor-rated. 4mm² or 6mm² copper. Never use regular household wire on the roof.</p>
+      <p><strong>MC4 Connectors:</strong> Weatherproof click-lock connectors for panel cables. If ever joined by tape or twisting, reject the installation immediately.</p>
+      <p><strong>DC Combiner + Fuses:</strong> Each panel string needs a fuse. Protects everything if a wire shorts.</p>
+      <p><strong>AC MCB / Isolator:</strong> Between inverter and distribution board. Required by CEB for safe system isolation.</p>
+      <p><strong>Surge Protection Device (SPD):</strong> Both DC side (panels) and AC side (inverter). Absorbs lightning-induced voltage spikes.</p>
+      <p><strong>Lightning Arrestor:</strong> Critically important in Sri Lanka. Directs a strike safely to ground, away from your expensive inverter and panels.</p>
+      <p><strong>Earth Bonding:</strong> All metal frames, inverter chassis, battery cabinet connected to an earth rod buried in the ground.</p>
+      <div class="banner" style="margin-top:12px">
+        <span class="bico">⚡</span>
+        <p><strong>Safety rule you must never forget:</strong> Solar panels produce voltage whenever light hits them — even on a cloudy day, even at dawn. You cannot switch them off. Before anyone touches wiring, panels must be covered with a thick dark tarpaulin or cardboard.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ccard">
+    <div class="ccard-head"><div class="ccard-ico" style="background:var(--skybg)">📊</div><div class="ccard-info"><h3>6. Bidirectional / Net Meter</h3><div class="ccard-sub">CEB installs this — you don't buy it</div></div></div>
+    <div class="ccard-body">
+      <p>CEB replaces your current meter with one that tracks both directions: units you take from the grid (you pay) and units you send to the grid (you earn). This is installed free by CEB after your system is approved and the agreement is signed.</p>
+    </div>
+  </div>
+</div>
+
+<div class="div" id="s4">Chapter 4</div>
+
+<!-- CH 4 -->
+<div class="sec" id="systype">
+  <div class="sec-head">
+    <div class="sec-ico" style="background:var(--purbg)">🏗️</div>
+    <div class="sec-title"><h2>Your System — Hybrid Grid-Tied + Battery</h2><div class="sec-sub">How energy flows through your home, minute by minute.</div></div>
+  </div>
+
+  <div class="diagram">
+    <div class="diag-title" style="color:var(--sky)">Your Hybrid System — Energy Flow</div>
+    <div class="diag-sub">The hybrid inverter intelligently manages all sources simultaneously</div>
+    <div class="flow">
+      <div class="fn fn-sol">☀️ Roof Panels<br><small>DC electricity</small></div>
+      <div class="fa">→</div>
+      <div class="fn fn-inv" style="padding:12px 16px">🧠 Hybrid Inverter<br><small>+ MPPT built-in</small></div>
+      <div class="fa">↔</div>
+      <div class="fn fn-bat">🔋 Battery<br><small>Lithium bank</small></div>
+    </div>
+    <div class="flow" style="margin-top:6px">
+      <div class="fn fn-hom">🏠 Your Home<br><small>AC, pump, loads</small></div>
+      <div class="fa">↔</div>
+      <div class="fn fn-grid">⚡ CEB Grid<br><small>Backup + Export</small></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>⏱️ What Happens at Each Part of the Day</h3>
+    <div style="display:flex;flex-direction:column;gap:9px;font-size:13.5px;margin-top:8px">
+      <div style="display:flex;gap:10px;align-items:flex-start"><div style="background:var(--sunbg);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:#A06200;white-space:nowrap;flex-shrink:0;margin-top:3px">6–8am</div><div>Panels start generating. Output is low. Home may draw partly from grid. Battery begins charging from panels.</div></div>
+      <div style="display:flex;gap:10px;align-items:flex-start"><div style="background:var(--leafbg);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:var(--leaf);white-space:nowrap;flex-shrink:0;margin-top:3px">8am–4pm</div><div>Peak solar. Panels power the <em>entire home</em> — including AC, pump, fridge, everything. Batteries charge fully. Excess exported to CEB → you earn Rs.22/unit.</div></div>
+      <div style="display:flex;gap:10px;align-items:flex-start"><div style="background:var(--sunbg);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:#A06200;white-space:nowrap;flex-shrink:0;margin-top:3px">4–7pm</div><div>Panels winding down. Home draws from full batteries first. AC can still run on battery power.</div></div>
+      <div style="display:flex;gap:10px;align-items:flex-start"><div style="background:var(--skybg);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:var(--sky);white-space:nowrap;flex-shrink:0;margin-top:3px">7pm–6am</div><div>No solar. Home draws from batteries. When batteries reach set minimum (e.g. 20%), system smoothly draws from grid to supplement — no interruption.</div></div>
+      <div style="display:flex;gap:10px;align-items:flex-start"><div style="background:var(--hotbg);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:var(--hot);white-space:nowrap;flex-shrink:0;margin-top:3px">Power Cut!</div><div>Inverter detects grid loss in milliseconds. Instantly switches to battery + solar (if daytime). Your home continues running. AC keeps cooling. You don't notice the cut.</div></div>
+    </div>
+  </div>
+
+  <table class="ctbl" style="margin-top:16px">
+    <tr><th>Feature</th><th>On-Grid Only</th><th>✅ Your Hybrid</th><th>Off-Grid</th></tr>
+    <tr><td>Works during power cut</td><td class="no">❌ Shuts off</td><td class="yes">✅ Battery kicks in</td><td class="yes">✅ Yes</td></tr>
+    <tr><td>Earns from CEB exports</td><td class="yes">✅ Yes</td><td class="yes">✅ Yes</td><td class="no">❌ No</td></tr>
+    <tr><td>Runs AC + pump</td><td class="yes">✅ Daytime only</td><td class="yes">✅ Day &amp; night</td><td class="yes">✅ Yes</td></tr>
+    <tr><td>Estimated cost (10kWp)</td><td>Rs. 900K–1.2M</td><td>Rs. 1.5M–2.5M</td><td>Rs. 2M–3.5M</td></tr>
+    <tr><td>Payback period</td><td>3–4 years</td><td>4–6 years</td><td>6–8 years</td></tr>
+  </table>
+</div>
+
+<div class="div" id="s5">Chapter 5</div>
+
+<!-- CH 5 -->
+<div class="sec" id="acpump">
+  <div class="sec-head">
+    <div class="sec-ico" style="background:var(--hotbg)">❄️</div>
+    <div class="sec-title"><h2>AC Units &amp; Water Pumps — Special Considerations</h2><div class="sec-sub">The trickiest loads in any solar system. Here's exactly what you must know.</div></div>
+  </div>
+
+  <div class="ccard">
+    <div class="ccard-head"><div class="ccard-ico" style="background:var(--hotbg)">❄️</div><div class="ccard-info"><h3>Air Conditioners on Solar</h3><div class="ccard-sub">Your biggest single load — manageable with correct sizing</div></div></div>
+    <div class="ccard-body">
+      <p><strong>Can solar run an AC? Absolutely yes</strong> — millions of homes do it. The keys are correct inverter sizing and understanding when to run the AC.</p>
+      <table class="ctbl" style="margin:10px 0">
+        <tr><th>AC Size</th><th>Running Watts</th><th>Startup Surge</th><th>Panels needed (daytime)</th></tr>
+        <tr><td>0.75 ton (9,000 BTU)</td><td>600–750W</td><td>1,500–2,000W</td><td>2–3 panels (600Wp)</td></tr>
+        <tr><td>1.0 ton (12,000 BTU)</td><td>900–1,100W</td><td>2,500–3,000W</td><td>3–4 panels</td></tr>
+        <tr><td>1.5 ton (18,000 BTU)</td><td>1,300–1,600W</td><td>3,500–4,500W</td><td>4–6 panels</td></tr>
+        <tr><td>2.0 ton (24,000 BTU)</td><td>1,800–2,200W</td><td>5,000–6,000W</td><td>6–8 panels</td></tr>
+      </table>
+      <div class="callout cw">
+        <div class="clabel">⚠️ Inverter surge rating is critical</div>
+        <p>The startup surge lasts only 2–3 seconds but it must not exceed your inverter's surge rating. If you have 2 ACs, confirm they can't both start simultaneously (staggered AC start timers are built into some hybrid inverters).</p>
+      </div>
+      <div class="callout ct">
+        <div class="clabel">💡 Pro Tip — Buy an Inverter-Type AC</div>
+        <p>If buying a new AC, choose an <strong>inverter-type (variable speed) AC</strong> — Panasonic, Mitsubishi, LG Dual Inverter etc. These have far lower startup surges (sometimes just 1.3× running) and are 30–40% more energy efficient. Perfect pairing with solar.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ccard">
+    <div class="ccard-head"><div class="ccard-ico" style="background:var(--skybg)">💧</div><div class="ccard-info"><h3>Water Pumps on Solar</h3><div class="ccard-sub">High surge, short runtime — very manageable</div></div></div>
+    <div class="ccard-body">
+      <p>Pumps are motor loads with large startup surges. But they typically only run for 30 mins–2 hrs/day, making their <em>daily energy use</em> quite manageable.</p>
+      <table class="ctbl" style="margin:10px 0">
+        <tr><th>Pump Size</th><th>Running Watts</th><th>Startup Surge</th><th>Daily kWh (2hrs)</th></tr>
+        <tr><td>0.5 HP</td><td>375W</td><td>900–1,100W</td><td>0.75 kWh</td></tr>
+        <tr><td>1.0 HP</td><td>750W</td><td>1,800–2,200W</td><td>1.5 kWh</td></tr>
+        <tr><td>1.5 HP</td><td>1,100W</td><td>2,500–3,000W</td><td>2.2 kWh</td></tr>
+        <tr><td>2.0 HP</td><td>1,500W</td><td>3,500–4,000W</td><td>3.0 kWh</td></tr>
+      </table>
+      <div class="callout ca">
+        <div class="clabel">💡 Smart Strategy — Schedule Your Pump</div>
+        <p>Programme the pump to run between 10am–2pm when panels are at peak output. It runs directly off solar with no battery use, keeping batteries fully charged for night backup. Most hybrid inverter apps let you set smart load schedules.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="banner">
+    <span class="bico">🧠</span>
+    <p><strong>The "Total Simultaneous Load" Rule:</strong> Your inverter continuous rating must exceed everything running at the same time. Example: 1-ton AC (1kW) + water pump (0.75kW) + fridge (0.15kW) + lights/fans (0.5kW) = <strong>2.4kW simultaneous</strong>. A 5kW inverter handles this comfortably. But the surge when AC + pump both start within seconds of each other could hit 6kW — so the inverter's surge rating matters just as much as continuous rating.</p>
+  </div>
+</div>
+
+<div class="div" id="s6">Chapter 6</div>
+
+<!-- CH 6 - CALCULATOR -->
+<div class="sec" id="calc">
+  <div class="sec-head">
+    <div class="sec-ico" style="background:var(--leafbg)">🧮</div>
+    <div class="sec-title"><h2>Size Your System — Interactive Calculator</h2><div class="sec-sub">Pre-loaded with a typical large Sri Lanka home. Edit to match yours.</div></div>
+  </div>
+
+  <div class="calcbox">
+    <h3>Step 1 — Your Appliances &amp; Daily Usage</h3>
+    <div class="ch-sub">Edit these to match your home exactly. Find wattage on each appliance's label or manual.</div>
+    <div class="app-grid">
+      <div class="app-header">Appliance</div>
+      <div class="app-header" style="text-align:center">Watts</div>
+      <div class="app-header" style="text-align:center">Hrs/day</div>
+      <div></div>
+    </div>
+    <div id="applist"></div>
+    <button class="add-btn" onclick="addRow()">+ Add another appliance</button>
+    <button class="cbtn" onclick="calcAll()" style="margin-top:14px">Calculate My System Size</button>
+    <div class="cres" id="res1">
+      <div class="rrow"><span>Total daily energy need</span><span class="rval" id="r-daily">—</span></div>
+      <div class="rrow"><span>Monthly consumption (units)</span><span class="rval" id="r-monthly">—</span></div>
+      <div class="rrow"><span>Recommended solar capacity</span><span class="rval" id="r-kwp">—</span></div>
+      <div class="rrow"><span>Number of 600Wp panels</span><span class="rval" id="r-panels">—</span></div>
+      <div class="rrow"><span>Peak simultaneous load</span><span class="rval" id="r-peak">—</span></div>
+      <div class="rrow"><span>Minimum inverter continuous rating</span><span class="rval" id="r-inv">—</span></div>
+      <p class="rnote">Based on 5.5 peak sun hours/day (Giriulla avg.) and 80% system efficiency. Add 20% margin when choosing final panel count.</p>
+    </div>
+  </div>
+
+  <div class="calcbox">
+    <h3>Step 2 — Battery Backup Sizing</h3>
+    <div class="ch-sub">Size for critical loads during a power cut. Note: running large ACs on battery needs very large (and expensive) battery banks — most people backup lights, fans, fridge only.</div>
+    <div class="cal-row"><label>Critical load (Wh/day)</label><input type="number" id="b-wh" placeholder="e.g. 4000"></div>
+    <div class="cal-row"><label>Backup hours needed</label><select id="b-hrs"><option value="4">4 hours</option><option value="6">6 hours</option><option value="8" selected>8 hours</option><option value="12">12 hours</option></select></div>
+    <div class="cal-row"><label>Battery chemistry</label><select id="b-chem"><option value="0.5">Lead Acid (50% DoD)</option><option value="0.8" selected>Lithium LiFePO4 (80% DoD)</option></select></div>
+    <div class="cal-row"><label>System voltage</label><select id="b-v"><option value="24">24V</option><option value="48" selected>48V</option></select></div>
+    <button class="cbtn" onclick="calcBattery()">Calculate Battery Size</button>
+    <div class="cres" id="res2">
+      <div class="rrow"><span>Energy needed from battery</span><span class="rval" id="rb-e">—</span></div>
+      <div class="rrow"><span>Required battery capacity</span><span class="rval" id="rb-kwh">—</span></div>
+      <div class="rrow"><span>In Ah at selected voltage</span><span class="rval" id="rb-ah">—</span></div>
+      <p class="rnote">Add 20% buffer to final figure. For running even one AC on battery for a night, multiply by 2–3×.</p>
+    </div>
+  </div>
+
+  <div class="calcbox">
+    <h3>Step 3 — Cost &amp; Savings Estimate (Sri Lanka 2025)</h3>
+    <div class="ch-sub">Based on 2025 market data from local Sri Lanka installers. Always get 3 quotes to verify.</div>
+    <div class="cal-row"><label>Solar panel capacity (kWp)</label><input type="number" id="c-kwp" placeholder="e.g. 10"></div>
+    <div class="cal-row"><label>Battery size</label><select id="c-bat"><option value="0">No battery (on-grid only)</option><option value="5">5 kWh Lithium</option><option value="10" selected>10 kWh Lithium</option><option value="15">15 kWh Lithium</option><option value="20">20 kWh Lithium</option></select></div>
+    <div class="cal-row"><label>Your CEB tariff (Rs./unit)</label><input type="number" id="c-tariff" value="75" placeholder="75"></div>
+    <button class="cbtn" onclick="calcCost()">Estimate Cost &amp; Savings</button>
+    <div class="cres" id="res3">
+      <div class="rrow"><span>Panels + Hybrid Inverter (est.)</span><span class="rval" id="rc-panels">—</span></div>
+      <div class="rrow"><span>Battery cost (est.)</span><span class="rval" id="rc-bat">—</span></div>
+      <div class="rrow"><span>Installation + CEB charges (est.)</span><span class="rval" id="rc-inst">—</span></div>
+      <div class="rrow"><span>Total estimated investment</span><span class="rval" id="rc-total">—</span></div>
+      <div class="rrow"><span>Est. monthly savings on CEB bill</span><span class="rval" id="rc-save">—</span></div>
+      <div class="rrow"><span>Est. payback period</span><span class="rval" id="rc-pay">—</span></div>
+      <p class="rnote">Sources: IMEX Solar LK, StartGreen LK, Huijue 2025 market data. A 10kWh lithium battery alone costs Rs.800K–1.5M depending on brand. Prices vary — treat these as indicative ranges only.</p>
+    </div>
+  </div>
+</div>
+
+<div class="div" id="s7">Chapter 7</div>
+
+<!-- CH 7 -->
+<div class="sec" id="rules">
+  <div class="sec-head">
+    <div class="sec-ico" style="background:var(--skybg)">🇱🇰</div>
+    <div class="sec-title"><h2>Sri Lanka Grid Connection &amp; Earning Money</h2><div class="sec-sub">SLSEA, CEB, Net Metering, and the Soorya Bala Sangramaya program.</div></div>
+  </div>
+
+  <div class="card">
+    <h3>🏛️ The 3 Authorities You'll Deal With</h3>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;font-size:13.5px">
+      <div style="background:var(--bg);border-radius:10px;padding:13px"><strong style="color:var(--sky)">SLSEA — Sri Lanka Sustainable Energy Authority</strong><br>Registers and certifies solar installers. Sets technical standards. You must use an SLSEA-registered company or CEB will not approve your grid connection. Verify at <strong>energy.gov.lk</strong>.</div>
+      <div style="background:var(--bg);border-radius:10px;padding:13px"><strong style="color:var(--sky)">CEB — Ceylon Electricity Board</strong><br>Your distributor in Giriulla. Approves your system, inspects installation, installs the net meter, and pays you for exported energy. PUCSL mandates they must respond within 2 weeks of application.</div>
+      <div style="background:var(--bg);border-radius:10px;padding:13px"><strong style="color:var(--sky)">PUCSL — Public Utilities Commission</strong><br>Consumer regulator. They've granted all domestic consumers the legal right to install solar and earn from it — no generation license needed for home systems.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>💰 3 Earning Schemes — Compared</h3>
+    <table class="ctbl" style="margin-top:10px">
+      <tr><th>Scheme</th><th>How It Works</th><th>Best For</th></tr>
+      <tr><td><strong>Net Metering</strong></td><td>Meter spins forward importing, backward exporting. Pay only the net difference each month.</td><td>Homes using most power during daytime</td></tr>
+      <tr><td><strong>Net Accounting</strong></td><td>Import and export tracked separately. Export credited at a set rate lower than import.</td><td>Clear visibility of generation vs consumption</td></tr>
+      <tr><td><strong style="color:var(--sun)">Net Plus ★ (Soorya Bala Sangramaya)</strong></td><td>Two separate meters. CEB pays Rs.22/unit for ALL generated units (yrs 1–7), then Rs.15.50/unit. You pay normal tariff for consumption separately.</td><td>Large systems — maximizes income</td></tr>
+    </table>
+    <div class="callout ct" style="margin-top:12px">
+      <div class="clabel">🏠 Best for your large home</div>
+      <p>With a large system (8–12kWp), the <strong>Net Plus scheme</strong> will likely earn the most. At 10kWp generating ~1,650 units/month, you'd earn roughly <strong>Rs.36,300/month</strong> from CEB in years 1–7 — while separately managing your consumption bill.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📋 Grid Connection — Step by Step</h3>
+    <div class="steps" style="margin-top:14px">
+      <div class="step"><div class="stepnum">1</div><div class="stepcont"><h4>Collect last 6 CEB bills</h4><p>Your consumption pattern. The installer uses this to correctly size your system.</p></div></div>
+      <div class="step"><div class="stepnum">2</div><div class="stepcont"><h4>Get site survey from SLSEA-registered installer</h4><p>They check roof area, shading, structural strength, and distance to your main distribution board. Free with reputable companies.</p></div></div>
+      <div class="step"><div class="stepnum">3</div><div class="stepcont"><h4>Review &amp; sign proposal</h4><p>Must itemize panel brand+model, inverter brand+model+surge rating, battery spec, warranty details, and CEB scheme they'll apply for.</p></div></div>
+      <div class="step"><div class="stepnum">4</div><div class="stepcont"><h4>Installer submits CEB application</h4><p>Includes single-line diagram, equipment data sheets, application fee. CEB must provide meter installation estimate within 1 week (PUCSL rule).</p></div></div>
+      <div class="step"><div class="stepnum">5</div><div class="stepcont"><h4>Installation (1–2 days for large home)</h4><p>Panels mounted, inverter + batteries installed, wiring run, protection devices fitted, earthing done.</p></div></div>
+      <div class="step"><div class="stepnum">6</div><div class="stepcont"><h4>CEB inspection</h4><p>CEB engineer inspects against approved design. Must complete within 2 weeks of application.</p></div></div>
+      <div class="step"><div class="stepnum">7</div><div class="stepcont"><h4>Net meter + agreement signed</h4><p>CEB installs new bidirectional meter. You sign the Net Plus agreement. System commissioned.</p></div></div>
+      <div class="step"><div class="stepnum">8</div><div class="stepcont"><h4>🎉 Live! Start saving and earning</h4><p>Monitor daily via your inverter app (Deye, Growatt, Goodwe all have smartphone apps). See live generation, consumption, and exports.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="div" id="s8">Chapter 8</div>
+
+<!-- CH 8 -->
+<div class="sec" id="install">
+  <div class="sec-head">
+    <div class="sec-ico" style="background:var(--hotbg)">🏗️</div>
+    <div class="sec-title"><h2>Installation — What to Prepare &amp; Watch For</h2><div class="sec-sub">Be an informed homeowner, not just a bystander.</div></div>
+  </div>
+
+  <div class="card">
+    <h3>🏠 Roof Checklist for a Large System</h3>
+    <div style="font-size:13.5px;display:flex;flex-direction:column;gap:8px;margin-top:6px">
+      <div>✅ <strong>Unshaded area:</strong> For 8–12kWp you need 40–60m² (each 600Wp panel ≈ 2.5m²). Consider trimming trees that shade between 9am–3pm.</div>
+      <div>✅ <strong>Orientation:</strong> South-facing = maximum. An East+West split gives a flatter generation curve through the day — good if you have panels on both sides.</div>
+      <div>✅ <strong>Roof pitch:</strong> 10–15° is ideal. Flat concrete roofs need tilt frames (add Rs.5,000–10,000 per panel).</div>
+      <div>✅ <strong>Structural load:</strong> 20 panels × 25kg = ~500kg extra. Ask a civil engineer or trusted builder to confirm your roof can handle this.</div>
+      <div>✅ <strong>Roof material:</strong> Clay tiles, concrete, GI sheets, asbestos — each has specific mounting methods. Asbestos is fragile — inform the installer in advance.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔌 Equipment Placement</h3>
+    <div style="font-size:13.5px;display:flex;flex-direction:column;gap:9px;margin-top:6px">
+      <div><strong>Hybrid Inverter:</strong> Wall-mounted indoors, shaded, well-ventilated. Within 5m of main distribution board. Open garage wall or equipment room is ideal. Never in a sealed room — inverters generate heat.</div>
+      <div><strong>Battery bank:</strong> Ground level (batteries are heavy). Lithium needs minimal ventilation. Lead acid needs its own ventilated room. Keep away from heat sources and direct sun.</div>
+      <div><strong>DC combiner/fuse box:</strong> Near the roof cable entry point — keeps DC cable runs short and safe.</div>
+      <div><strong>Main AC disconnect:</strong> Between inverter and distribution board. Must be accessible at all times.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧹 Ongoing Maintenance (Minimal)</h3>
+    <div style="font-size:13.5px;display:flex;flex-direction:column;gap:8px;margin-top:6px">
+      <div>🌧️ <strong>Panel cleaning every 4–8 weeks.</strong> Dust, bird droppings, and coconut pollen reduce output by 10–20%. Soft cloth + water in early morning. No abrasive cleaners.</div>
+      <div>🔍 <strong>Visual check every 6 months</strong> — cracked panels, loose MC4 connectors, any wire discoloration.</div>
+      <div>📱 <strong>Monitor your inverter app daily.</strong> If generation is significantly lower than expected on a sunny day, something needs checking. Modern inverters send automatic alerts.</div>
+      <div>🔋 <strong>Lead acid only:</strong> Check electrolyte level monthly, top up with distilled water.</div>
+    </div>
+  </div>
+</div>
+
+<div class="div" id="s9">Chapter 9</div>
+
+<!-- CH 9 - QUIZ -->
+<div class="sec" id="quiz">
+  <div class="sec-head">
+    <div class="sec-ico" style="background:var(--purbg)">🧠</div>
+    <div class="sec-title"><h2>Test Your Knowledge — 8 Questions</h2><div class="sec-sub">Tailored to your exact setup: hybrid system, large home, AC and pump loads.</div></div>
+  </div>
+
+  <div class="qcard">
+    <div class="qq">1. Your 1.5-ton AC (1,400W running) starts up. The startup surge is approximately:</div>
+    <div class="qopts">
+      <button class="qopt" onclick="ans(this,false,'q1')">1,400W — same as running power</button>
+      <button class="qopt" onclick="ans(this,true,'q1')">3,500–4,200W for about 2–3 seconds</button>
+      <button class="qopt" onclick="ans(this,false,'q1')">700W — half the running power</button>
+    </div>
+    <div class="qres" id="q1">Motor loads surge to 2.5–3× running watts at startup. Your hybrid inverter's <strong>surge rating</strong> must handle this — not just the continuous rating.</div>
+  </div>
+
+  <div class="qcard">
+    <div class="qq">2. Your 1HP water pump (750W) runs 2 hours daily. Monthly energy consumption is:</div>
+    <div class="qopts">
+      <button class="qopt" onclick="ans(this,false,'q2')">22.5 kWh</button>
+      <button class="qopt" onclick="ans(this,true,'q2')">45 kWh</button>
+      <button class="qopt" onclick="ans(this,false,'q2')">750 kWh</button>
+      <button class="qopt" onclick="ans(this,false,'q2')">1.5 kWh</button>
+    </div>
+    <div class="qres" id="q2">750W × 2hrs = 1,500Wh = 1.5 kWh/day. × 30 days = <strong>45 kWh/month</strong>. Schedule it during peak solar (10am–2pm) and it costs you nothing from the grid.</div>
+  </div>
+
+  <div class="qcard">
+    <div class="qq">3. During a CEB power cut at 9pm, your hybrid inverter with a charged battery will:</div>
+    <div class="qopts">
+      <button class="qopt" onclick="ans(this,false,'q3')">Shut off like an on-grid system</button>
+      <button class="qopt" onclick="ans(this,true,'q3')">Switch to battery in milliseconds — home keeps running uninterrupted</button>
+      <button class="qopt" onclick="ans(this,false,'q3')">Wait until morning when panels generate again</button>
+    </div>
+    <div class="qres" id="q3">This is the hybrid system's biggest advantage over on-grid. The switchover is essentially instantaneous. Your lights, fridge, fans stay on. Even ACs keep running if the battery is large enough.</div>
+  </div>
+
+  <div class="qcard">
+    <div class="qq">4. Why must you use an SLSEA-registered solar installer?</div>
+    <div class="qopts">
+      <button class="qopt" onclick="ans(this,false,'q4')">Only for safety — the work is the same regardless</button>
+      <button class="qopt" onclick="ans(this,true,'q4')">Without it, CEB will not approve your grid connection or net metering agreement</button>
+      <button class="qopt" onclick="ans(this,false,'q4')">Only required if your system is above 10kWp</button>
+    </div>
+    <div class="qres" id="q4">Using an unregistered company means CEB cannot legally connect your system to the grid. You lose the ability to earn from exports and could face disconnection. Check energy.gov.lk for the registered list.</div>
+  </div>
+
+  <div class="qcard">
+    <div class="qq">5. Under the Soorya Bala Sangramaya Net Plus scheme, how much does CEB pay per unit generated in years 1–7?</div>
+    <div class="qopts">
+      <button class="qopt" onclick="ans(this,false,'q5')">Rs. 15.50</button>
+      <button class="qopt" onclick="ans(this,true,'q5')">Rs. 22.00</button>
+      <button class="qopt" onclick="ans(this,false,'q5')">Rs. 8.00</button>
+    </div>
+    <div class="qres" id="q5">Rs.22/unit for years 1–7, then Rs.15.50/unit from year 8. For a 10kWp system generating ~1,650 units/month, that's Rs.36,300/month income in the first 7 years from exports alone.</div>
+  </div>
+
+  <div class="qcard">
+    <div class="qq">6. Why is Lithium LiFePO4 better long-term value than lead acid despite higher upfront cost?</div>
+    <div class="qopts">
+      <button class="qopt" onclick="ans(this,false,'q6')">It's lighter but otherwise the same</button>
+      <button class="qopt" onclick="ans(this,true,'q6')">10–15yr lifespan vs 3–5yr, 80% usable depth vs 50%, zero maintenance, higher efficiency</button>
+      <button class="qopt" onclick="ans(this,false,'q6')">It makes your panels generate more electricity</button>
+    </div>
+    <div class="qres" id="q6">Over 15 years you'd replace lead acid 3 times at similar total cost. Lithium's deeper usable depth means you need less installed capacity too. For a large home, lithium almost always wins on total cost of ownership.</div>
+  </div>
+
+  <div class="qcard">
+    <div class="qq">7. Why must your hybrid inverter output "pure sine wave" for your AC and water pump?</div>
+    <div class="qopts">
+      <button class="qopt" onclick="ans(this,false,'q7')">Pure sine wave is more efficient for lighting only</button>
+      <button class="qopt" onclick="ans(this,false,'q7')">It's only required for connecting to the CEB grid</button>
+      <button class="qopt" onclick="ans(this,true,'q7')">ACs and pumps contain motors — modified sine wave causes overheating, vibration, and early failure of motors</button>
+    </div>
+    <div class="qres" id="q7">Electric motors (in ACs, pumps, washing machines) require clean AC power. Modified sine wave inverters cause motors to run hotter, vibrate more, and can damage compressors over time. All reputable hybrid inverters output pure sine wave.</div>
+  </div>
+
+  <div class="qcard">
+    <div class="qq">8. The smartest time to run your water pump to save battery backup is:</div>
+    <div class="qopts">
+      <button class="qopt" onclick="ans(this,false,'q8')">6am–8am when the day is cool</button>
+      <button class="qopt" onclick="ans(this,true,'q8')">10am–2pm when panels are at peak output</button>
+      <button class="qopt" onclick="ans(this,false,'q8')">At night to avoid daytime heat affecting the pump</button>
+    </div>
+    <div class="qres" id="q8">Running high-wattage loads during peak solar means they draw directly from panel output — not from batteries. This preserves your full battery charge for nighttime backup and extends battery lifespan significantly.</div>
+  </div>
+</div>
+
+<div class="div" id="s10">Final Checklist</div>
+
+<!-- CH 10 - CHECKLIST -->
+<div class="sec" id="checklist">
+  <div class="sec-head">
+    <div class="sec-ico" style="background:var(--leafbg)">✅</div>
+    <div class="sec-title"><h2>Your Complete Installation Checklist</h2><div class="sec-sub">Tick each item as you complete it. Your full action plan, start to finish.</div></div>
+  </div>
+
+  <div class="card">
+    <h3>📊 Before Getting Quotes</h3>
+    <ul class="cklist">
+      <li><input type="checkbox" onchange="chk(this)"><label>Gather last 6 months of CEB bills</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>List all ACs (tonnage each) and water pump (HP)</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Use the calculator above to estimate daily kWh and panel count</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Check roof orientation — ideally south-facing</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Identify shade sources between 9am–3pm (trees, tanks, antennas)</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Estimate usable unshaded roof area (length × width)</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Confirm roof structure can handle 400–600kg extra load</label></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>🤝 Selecting Your Installer &amp; Quote</h3>
+    <ul class="cklist">
+      <li><input type="checkbox" onchange="chk(this)"><label>Verify installer on SLSEA registered list at energy.gov.lk</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Get quotes from at least 3 different SLSEA companies</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Each quote lists panel brand + model (verify it's Tier 1)</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Each quote lists hybrid inverter brand + model + surge rating</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Inverter surge rating exceeds your largest AC + pump startup combined</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Confirm inverter outputs pure sine wave (essential for AC and pump)</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Battery type, brand, kWh capacity, warranty years in writing</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Price includes CEB net metering application and all CEB charges</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Ask about ADB / government low-interest solar loan options</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Ask to enroll in Net Plus (Soorya Bala Sangramaya) scheme</label></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>🔧 During Installation — Watch For These</h3>
+    <ul class="cklist">
+      <li><input type="checkbox" onchange="chk(this)"><label>Roof cables are UV-rated solar DC cable (not ordinary household wire)</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>MC4 connectors are click-locked — not taped or tied</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>DC combiner box + fuses installed at roof cable entry point</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>AC MCB / isolator installed between inverter and distribution board</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Surge Protection Devices (SPDs) on both DC and AC sides</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Lightning arrestor installed and connected to earth</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Earth rod driven into ground, all metal parts bonded to it</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Inverter in cool, ventilated, accessible location</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Battery bank at ground level in appropriate location</label></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>📋 Before Paying Final Invoice</h3>
+    <ul class="cklist">
+      <li><input type="checkbox" onchange="chk(this)"><label>Inverter display shows live generation (watts from panels)</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Monitoring app on your phone with live data confirmed working</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Test battery backup: switch off main CEB breaker — home stays powered</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Start AC unit — inverter does NOT trip</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Start water pump — inverter does NOT trip</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>All warranty cards and documentation received</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Single-line diagram of the full system in your hands</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>CEB inspection completed and approved</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Net meter installed and Net Plus agreement signed with CEB</label></li>
+      <li><input type="checkbox" onchange="chk(this)"><label>Monthly generation target from installer noted (e.g. "expect 1,200 kWh/month")</label></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+
+<footer>
+  <p>Solar Power Guide · Giriulla, Sri Lanka · Hybrid System · Large Home Edition · 2025</p>
+  <p style="margin-top:6px">Verify current regulations: <a href="https://www.energy.gov.lk" target="_blank">energy.gov.lk</a> · <a href="https://www.ceb.lk" target="_blank">ceb.lk</a> · <a href="https://www.pucsl.gov.lk" target="_blank">pucsl.gov.lk</a></p>
+</footer>
+
+<script>
+const rows=[
+  {n:'LED Lights (×10)',w:90,h:6},
+  {n:'Ceiling Fans (×4)',w:280,h:10},
+  {n:'1-ton AC (bedroom)',w:1000,h:8},
+  {n:'1.5-ton AC (living room)',w:1400,h:6},
+  {n:'Refrigerator (large)',w:180,h:24},
+  {n:'Water pump (1HP)',w:750,h:2},
+  {n:'TV (×2)',w:200,h:5},
+  {n:'Washing machine',w:500,h:1},
+  {n:'Phone / laptop charging',w:150,h:4},
+  {n:'Microwave / Rice cooker',w:800,h:0.5},
+];
+
+function renderRows(){
+  const el=document.getElementById('applist');
+  el.innerHTML='';
+  rows.forEach((r,i)=>{
+    const d=document.createElement('div');
+    d.className='app-grid';
+    d.innerHTML=`<input class="app-input" type="text" value="${r.n}" oninput="rows[${i}].n=this.value" placeholder="Appliance"><input class="app-input" type="number" value="${r.w}" oninput="rows[${i}].w=+this.value||0"><input class="app-input" type="number" value="${r.h}" oninput="rows[${i}].h=+this.value||0"><button class="del-btn" onclick="rows.splice(${i},1);renderRows()">×</button>`;
+    el.appendChild(d);
+  });
+}
+
+function addRow(){rows.push({n:'',w:0,h:0});renderRows();}
+
+function calcAll(){
+  let totalWh=0,peakW=0;
+  rows.forEach(r=>{totalWh+=r.w*r.h;peakW+=r.w;});
+  const kwp=(totalWh/1000/5.5/0.8).toFixed(2);
+  const numP=Math.ceil(+kwp*1000/600);
+  set('r-daily',(totalWh/1000).toFixed(1)+' kWh/day');
+  set('r-monthly',Math.round(totalWh/1000*30)+' kWh/month');
+  set('r-kwp',kwp+' kWp');
+  set('r-panels',numP+' panels (600Wp each)');
+  set('r-peak',(peakW/1000).toFixed(1)+' kW simultaneous');
+  set('r-inv',Math.ceil(peakW/1000*1.25)+' kW minimum');
+  show('res1');
+  document.getElementById('b-wh').value=Math.round(totalWh*0.35);
+}
+
+function calcBattery(){
+  const wh=+document.getElementById('b-wh').value||0;
+  const hrs=+document.getElementById('b-hrs').value;
+  const dod=+document.getElementById('b-chem').value;
+  const v=+document.getElementById('b-v').value;
+  const need=Math.round(wh/24*hrs);
+  const kwh=(need/1000/dod).toFixed(2);
+  set('rb-e',need+' Wh');
+  set('rb-kwh',kwh+' kWh');
+  set('rb-ah',Math.round(+kwh*1000/v)+' Ah at '+v+'V');
+  show('res2');
+}
+
+function calcCost(){
+  const kwp=+document.getElementById('c-kwp').value||0;
+  const batKwh=+document.getElementById('c-bat').value;
+  const tariff=+document.getElementById('c-tariff').value||75;
+  const panelCost=kwp*110000; // Rs/kWp installed hybrid
+  const batCost=batKwh*100000; // Rs/kWh lithium installed
+  const instCost=Math.round((panelCost+batCost)*0.12);
+  const total=panelCost+batCost+instCost;
+  const monthlyKwh=kwp*5.5*30*0.8;
+  const savingsMonth=Math.round(monthlyKwh*0.65*tariff+monthlyKwh*0.35*22);
+  set('rc-panels','Rs. '+fmt(panelCost));
+  set('rc-bat',batKwh>0?'Rs. '+fmt(batCost):'Not included');
+  set('rc-inst','Rs. '+fmt(instCost));
+  set('rc-total','Rs. '+fmt(total));
+  set('rc-save','Rs. '+fmt(savingsMonth)+'/month');
+  set('rc-pay',(total/(savingsMonth*12)).toFixed(1)+' years');
+  show('res3');
+}
+
+function ans(btn,correct,qid){
+  btn.closest('.qopts').querySelectorAll('.qopt').forEach(b=>b.disabled=true);
+  btn.classList.add(correct?'correct':'wrong');
+  const r=document.getElementById(qid);
+  r.classList.add('show',correct?'pass':'fail');
+  r.innerHTML=(correct?'✅ Correct! ':'❌ Not quite. ')+r.textContent;
+}
+
+function chk(el){el.closest('li').classList.toggle('chk',el.checked);}
+
+function goTo(id,btn){
+  document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function set(id,v){document.getElementById(id).textContent=v;}
+function show(id){document.getElementById(id).classList.add('show');}
+function fmt(n){return n.toLocaleString();}
+
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');}),{threshold:.08});
+document.querySelectorAll('.sec').forEach(s=>obs.observe(s));
+
+renderRows();
+</script>
+</body>
+</html>

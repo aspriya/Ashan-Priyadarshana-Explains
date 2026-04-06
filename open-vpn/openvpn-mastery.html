@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenVPN Mastery — From Zero to Titan</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c14;
+    --surface: #0f1724;
+    --surface2: #162035;
+    --border: #1e2d4a;
+    --text: #c8d8f0;
+    --muted: #6a82a8;
+    --cyan: #00e5ff;
+    --amber: #ffa726;
+    --green: #00e676;
+    --red: #ff5252;
+    --purple: #ce93d8;
+    --blue: #448aff;
+    --accent-glow: rgba(0,229,255,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.85;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: rgba(8,12,20,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 32px;
+    display: flex; align-items: center; gap: 24px;
+    z-index: 100;
+    flex-wrap: wrap;
+  }
+  nav .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 14px;
+    color: var(--cyan); letter-spacing: 2px;
+    text-transform: uppercase; margin-right: auto;
+    white-space: nowrap;
+  }
+  nav a {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-decoration: none;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  nav a:hover { color: var(--cyan); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 50% at 50% 40%, rgba(0,100,180,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 20% 70%, rgba(0,229,255,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 80% 20%, rgba(206,147,216,0.07) 0%, transparent 60%);
+  }
+  .grid-lines {
+    position: absolute; inset: 0; opacity: 0.035;
+    background-image: linear-gradient(var(--cyan) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--cyan) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--cyan);
+    letter-spacing: 3px; text-transform: uppercase;
+    border: 1px solid rgba(0,229,255,0.3);
+    padding: 6px 18px; border-radius: 2px;
+    margin-bottom: 32px;
+    background: rgba(0,229,255,0.05);
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 6vw, 80px);
+    font-weight: 800; line-height: 1.1;
+    color: #fff;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .hero h1 span { color: var(--cyan); }
+  .hero-sub {
+    font-size: 18px; color: var(--muted);
+    max-width: 640px; line-height: 1.7;
+    margin-bottom: 48px;
+    font-style: italic;
+  }
+  .hero-stats {
+    display: flex; gap: 48px; flex-wrap: wrap; justify-content: center;
+  }
+  .stat { text-align: center; }
+  .stat .num {
+    font-family: 'Syne', sans-serif;
+    font-size: 32px; font-weight: 800;
+    color: var(--cyan);
+  }
+  .stat .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--muted);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  /* ── MAIN CONTENT ── */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 120px;
+  }
+
+  /* ── SECTION ── */
+  .chapter {
+    margin-top: 100px;
+    scroll-margin-top: 80px;
+  }
+  .chapter-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--cyan);
+    letter-spacing: 3px; text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.7;
+  }
+  .chapter h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 800; color: #fff;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .chapter-desc {
+    color: var(--muted); font-style: italic;
+    margin-bottom: 40px; font-size: 16px;
+  }
+  .chapter p { margin-bottom: 20px; }
+
+  h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px; font-weight: 700;
+    color: var(--amber); margin: 40px 0 16px;
+  }
+  h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px; font-weight: 700;
+    color: var(--purple); margin: 28px 0 10px;
+  }
+
+  /* ── AHA BOX ── */
+  .aha {
+    background: linear-gradient(135deg, rgba(0,229,255,0.07) 0%, rgba(0,100,180,0.05) 100%);
+    border: 1px solid rgba(0,229,255,0.25);
+    border-left: 3px solid var(--cyan);
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin: 32px 0;
+    position: relative;
+  }
+  .aha::before {
+    content: "⚡ AHA MOMENT";
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    color: var(--cyan); letter-spacing: 2px;
+    display: block; margin-bottom: 10px;
+    opacity: 0.8;
+  }
+  .aha p { margin: 0; color: #d8eaff; font-style: italic; }
+
+  /* ── WARNING / INSIGHT / POWER BOX ── */
+  .callout {
+    padding: 18px 22px;
+    border-radius: 4px;
+    margin: 28px 0;
+    border-left: 3px solid;
+  }
+  .callout::before {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 2px; display: block; margin-bottom: 8px;
+  }
+  .callout p { margin: 0; }
+  .callout.insight {
+    background: rgba(255,167,38,0.07);
+    border-color: var(--amber);
+    color: #ffe0b2;
+  }
+  .callout.insight::before { content: "💡 DEEP INSIGHT"; color: var(--amber); }
+  .callout.power {
+    background: rgba(0,230,118,0.07);
+    border-color: var(--green);
+    color: #ccffe8;
+  }
+  .callout.power::before { content: "🔥 TITAN KNOWLEDGE"; color: var(--green); }
+  .callout.warn {
+    background: rgba(255,82,82,0.07);
+    border-color: var(--red);
+    color: #ffd0d0;
+  }
+  .callout.warn::before { content: "⚠️ MOST ENGINEERS MISS THIS"; color: var(--red); }
+
+  /* ── CODE BLOCK ── */
+  pre {
+    background: #040810;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 24px;
+    overflow-x: auto;
+    margin: 24px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; line-height: 1.7;
+    color: #a8c8f0;
+  }
+  pre .c { color: var(--muted); font-style: italic; }
+  pre .k { color: var(--cyan); }
+  pre .s { color: var(--green); }
+  pre .n { color: var(--amber); }
+  pre .h { color: var(--purple); }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: rgba(0,229,255,0.08);
+    border: 1px solid rgba(0,229,255,0.15);
+    padding: 1px 7px; border-radius: 3px;
+    color: var(--cyan);
+  }
+
+  /* ── DIAGRAM ── */
+  .diagram {
+    background: #040810;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 28px 24px;
+    margin: 28px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; line-height: 1.6;
+    color: #a8c8f0;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .diagram .cyan { color: var(--cyan); }
+  .diagram .amber { color: var(--amber); }
+  .diagram .green { color: var(--green); }
+  .diagram .purple { color: var(--purple); }
+  .diagram .red { color: var(--red); }
+  .diagram .muted { color: var(--muted); }
+
+  /* ── LAYERS TABLE ── */
+  .layer-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  .layer-table th {
+    background: var(--surface2);
+    color: var(--cyan); font-weight: 700;
+    padding: 10px 16px; text-align: left;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 1px;
+    text-transform: uppercase; font-size: 11px;
+  }
+  .layer-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(30,45,74,0.5);
+    color: var(--text);
+  }
+  .layer-table tr:hover td { background: rgba(0,229,255,0.03); }
+  .layer-table .tag {
+    display: inline-block;
+    padding: 2px 8px; border-radius: 2px;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  }
+  .tag-cyan { background: rgba(0,229,255,0.12); color: var(--cyan); }
+  .tag-amber { background: rgba(255,167,38,0.12); color: var(--amber); }
+  .tag-green { background: rgba(0,230,118,0.12); color: var(--green); }
+  .tag-purple { background: rgba(206,147,216,0.12); color: var(--purple); }
+
+  /* ── DIVIDER ── */
+  .div {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 60px 0;
+  }
+
+  /* ── CHECKLIST ── */
+  .checklist { list-style: none; margin: 16px 0 24px; }
+  .checklist li {
+    padding: 8px 0 8px 32px;
+    position: relative;
+    border-bottom: 1px solid rgba(30,45,74,0.4);
+  }
+  .checklist li::before {
+    content: "▸";
+    position: absolute; left: 0;
+    color: var(--cyan); font-size: 14px;
+  }
+
+  /* ── NUMBERED STEPS ── */
+  .steps { counter-reset: step; list-style: none; margin: 16px 0 24px; }
+  .steps li {
+    counter-increment: step;
+    padding: 14px 14px 14px 56px;
+    position: relative;
+    margin-bottom: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute; left: 14px; top: 14px;
+    width: 28px; height: 28px;
+    background: rgba(0,229,255,0.1);
+    border: 1px solid rgba(0,229,255,0.3);
+    color: var(--cyan);
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 2px;
+  }
+
+  /* ── HIGHLIGHT INLINE ── */
+  .hi-cyan { color: var(--cyan); font-weight: 600; }
+  .hi-amber { color: var(--amber); font-weight: 600; }
+  .hi-green { color: var(--green); font-weight: 600; }
+  .hi-purple { color: var(--purple); font-weight: 600; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    text-align: center; padding: 40px 24px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: 1px;
+  }
+
+  /* ── SCROLL REVEAL ANIMATION ── */
+  .chapter { opacity: 0; transform: translateY(24px); transition: opacity 0.6s, transform 0.6s; }
+  .chapter.visible { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">OpenVPN Mastery</span>
+  <a href="#problem">The Problem</a>
+  <a href="#fundamentals">Fundamentals</a>
+  <a href="#crypto">Cryptography</a>
+  <a href="#tuntap">TUN/TAP</a>
+  <a href="#pki">PKI</a>
+  <a href="#routing">Routing</a>
+  <a href="#openvpn">OpenVPN</a>
+  <a href="#advanced">Advanced</a>
+  <a href="#architect">Architect</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="grid-lines"></div>
+  <div style="position:relative;">
+    <div class="hero-tag">Complete Field Mastery</div>
+    <h1>Become a <span>Titan</span><br>in OpenVPN &amp; Secure Networking</h1>
+    <p class="hero-sub">
+      From "why does the internet even work" to designing enterprise-grade VPN infrastructure —
+      every aha moment, every mental model, every piece of knowledge that separates masters from the rest.
+    </p>
+    <div class="hero-stats">
+      <div class="stat"><div class="num">9</div><div class="label">Core Chapters</div></div>
+      <div class="stat"><div class="num">30+</div><div class="label">Aha Moments</div></div>
+      <div class="stat"><div class="num">∞</div><div class="label">Depth</div></div>
+    </div>
+  </div>
+</section>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 0: THE PROBLEM -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="chapter" id="problem">
+  <div class="chapter-num">Chapter 00</div>
+  <h2>The Problem the Internet Never Solved</h2>
+  <p class="chapter-desc">Before you understand the solution, you must feel the pain of the problem.</p>
+
+  <p>
+    The internet was designed in the 1970s for one purpose: <span class="hi-cyan">resilient communication between trusted academic institutions</span>. Security was an afterthought. The original architects never imagined billions of strangers, hostile governments, corporations mining data, or remote workers connecting to sensitive systems from coffee shops.
+  </p>
+
+  <p>
+    Every packet you send across the public internet is, by default, <span class="hi-amber">naked</span>. It travels through routers, ISPs, and infrastructure you do not own or trust. Anyone with access to those hops — your ISP, a government, an attacker on the same café Wi-Fi — can read it, modify it, or silently record it.
+  </p>
+
+  <div class="diagram"><span class="red">[ Your Laptop ]</span> ──→ <span class="muted">[ ISP Router ]</span> ──→ <span class="muted">[ Backbone Router ]</span> ──→ <span class="muted">[ Remote ISP ]</span> ──→ <span class="cyan">[ Server ]</span>
+
+         <span class="amber">↑                  ↑                    ↑</span>
+    <span class="amber">Anyone here can intercept your packets in plain sight</span>
+  </div>
+
+  <div class="aha">
+    <p>The internet is not a private telephone line between you and the server. It is closer to shouting across a crowded room. Everyone in between can hear you. SSL/TLS protects the content, but your IP, your destination, your traffic patterns — all visible.</p>
+  </div>
+
+  <h3>The Three Core Problems VPNs Solve</h3>
+
+  <h4>1. Privacy: "Who's watching me?"</h4>
+  <p>Your ISP sees every domain you visit, every connection you make. They sell this data. Governments demand it. Advertisers exploit it. A VPN wraps all your traffic in an encrypted tunnel so your ISP only sees: <em>"This person is connected to a VPN server."</em> Nothing more.</p>
+
+  <h4>2. Security on Untrusted Networks</h4>
+  <p>When you connect to a café Wi-Fi, you share the same local network with strangers. An attacker can perform <span class="hi-amber">ARP spoofing</span> to pretend they're the router, intercepting all your traffic. A VPN creates an encrypted tunnel that bypasses this entirely — the attacker sees encrypted noise.</p>
+
+  <h4>3. Remote Access: "The Network Extension Problem"</h4>
+  <p>A company has servers on a private internal network (192.168.1.0/24). A remote employee needs to access those servers from home. Without a VPN, those servers are not reachable from the public internet at all — nor should they be. A VPN makes the employee's machine <span class="hi-green">virtually join the private network</span>, even from thousands of miles away.</p>
+
+  <div class="callout insight">
+    <p>This third use case — remote network access — is the primary reason enterprises run OpenVPN. Privacy is a bonus. The core engineering problem is: <strong>how do you make a machine that is physically somewhere else appear to be inside your private network?</strong></p>
+  </div>
+
+  <h3>What Makes OpenVPN Different from "Just Using HTTPS"?</h3>
+  <p>HTTPS encrypts the <em>content</em> of your communication with one specific server. OpenVPN encrypts <em>all your network traffic</em> at the IP layer and routes it through a trusted tunnel endpoint. They solve different problems at different layers of the stack.</p>
+
+  <table class="layer-table">
+    <tr><th>Protection</th><th>HTTPS</th><th>OpenVPN</th></tr>
+    <tr><td>Content encryption</td><td><span class="tag tag-green">Yes</span></td><td><span class="tag tag-green">Yes</span></td></tr>
+    <tr><td>Hides destination IP</td><td><span class="tag tag-amber">No</span></td><td><span class="tag tag-green">Yes</span></td></tr>
+    <tr><td>Protects all apps</td><td><span class="tag tag-amber">No</span></td><td><span class="tag tag-green">Yes</span></td></tr>
+    <tr><td>Joins private networks</td><td><span class="tag tag-amber">No</span></td><td><span class="tag tag-green">Yes</span></td></tr>
+    <tr><td>Works at layer</td><td><span class="tag tag-cyan">L7 App</span></td><td><span class="tag tag-cyan">L3 Network</span></td></tr>
+  </table>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 1: NETWORKING FUNDAMENTALS -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="chapter" id="fundamentals">
+  <div class="chapter-num">Chapter 01</div>
+  <h2>The OSI Stack — Read It Like a Pro</h2>
+  <p class="chapter-desc">Most engineers can recite the 7 layers. Almost none can tell you where the magic happens.</p>
+
+  <p>
+    You know the OSI model. Let's read it differently — not as a list to memorize, but as a <span class="hi-cyan">packaging system for data</span>. Every layer wraps the data from the layer above it with its own header, creating a nesting doll of information called an <strong>encapsulation stack</strong>.
+  </p>
+
+  <div class="diagram">
+    <span class="cyan">  ┌──────────────────────────────────────────────────────┐</span>
+    <span class="cyan">  │  L7  APPLICATION   HTTP, DNS, SMTP — your actual data  │</span>
+    <span class="cyan">  │  L6  PRESENTATION  Encoding, encryption (TLS lives here)│</span>
+    <span class="cyan">  │  L5  SESSION       Connection lifecycle management      │</span>
+    <span class="amber">  │  L4  TRANSPORT     TCP/UDP — port numbers, reliability   │</span>
+    <span class="amber">  │  L3  NETWORK  ◄──  IP addresses, routing — VPN IS HERE   │</span>
+    <span class="green">  │  L2  DATA LINK     MAC addresses, Ethernet frames        │</span>
+    <span class="green">  │  L1  PHYSICAL      Actual bits on wire/wifi              │</span>
+    <span class="cyan">  └──────────────────────────────────────────────────────┘</span>
+  </div>
+
+  <div class="aha">
+    <p>OpenVPN intercepts at Layer 3 (IP). It takes raw IP packets destined for the outside world, encrypts them, and re-wraps them as UDP/TCP packets to send to the VPN server. Your packet gets a new IP header — like putting a sealed letter inside another envelope addressed to a PO Box. The postman only sees the outer envelope.</p>
+  </div>
+
+  <h3>IP Addresses — The Two Worlds</h3>
+  <p>
+    There are two classes of IP addresses you must deeply understand:
+  </p>
+
+  <h4>Public IPs — The Internet World</h4>
+  <p>Globally unique. Routable across the internet. Assigned by ISPs. Every packet on the public internet has a real, unique source and destination public IP. There are about 4.3 billion IPv4 addresses, and we ran out.</p>
+
+  <h4>Private IPs — The Intranet World</h4>
+  <p>
+    Three ranges are reserved for private networks only. They are <span class="hi-amber">not routable on the public internet</span> — no router on the backbone will forward a packet with a private destination IP.
+  </p>
+
+  <pre><span class="c"># Private IP ranges (RFC 1918)</span>
+<span class="n">10.0.0.0/8</span>       <span class="c"># 10.x.x.x — large enterprises, usually</span>
+<span class="n">172.16.0.0/12</span>    <span class="c"># 172.16.x.x to 172.31.x.x</span>
+<span class="n">192.168.0.0/16</span>   <span class="c"># 192.168.x.x — your home router</span></pre>
+
+  <div class="callout warn">
+    <p>OpenVPN typically assigns clients a private IP in a dedicated subnet (like 10.8.0.0/24). When you see that 10.x.x.x address on your VPN client — that IS your virtual network identity inside the tunnel. This is the IP that private servers on the other end see when you connect.</p>
+  </div>
+
+  <h3>CIDR Notation — Stop Guessing, Start Calculating</h3>
+  <p>
+    The slash notation (like <code>/24</code>) tells you how many bits of the address are the <em>network</em> portion. The remaining bits are for <em>hosts</em>.
+  </p>
+
+  <pre><span class="c"># 10.8.0.0/24</span>
+<span class="c"># 24 bits = network, 8 bits = hosts</span>
+<span class="c"># 2^8 = 256 addresses, minus 2 (network + broadcast) = 254 usable</span>
+
+<span class="k">Network:</span>   <span class="n">10.8.0.0</span>      <span class="c"># the network itself</span>
+<span class="k">Gateway:</span>   <span class="n">10.8.0.1</span>      <span class="c"># typically the VPN server</span>
+<span class="k">Clients:</span>   <span class="n">10.8.0.2</span> - <span class="n">10.8.0.254</span>
+<span class="k">Broadcast:</span> <span class="n">10.8.0.255</span>    <span class="c"># can't assign to any host</span></pre>
+
+  <h3>NAT — The Great Address Translator</h3>
+  <p>Network Address Translation is why your home network can have 50 devices all sharing one public IP. Your router rewrites the source IP of every outgoing packet from the private 192.168.x.x address to the public IP, and keeps a translation table to route replies back.</p>
+
+  <div class="diagram">
+  <span class="cyan">Your PC: 192.168.1.10:54321</span>
+         │
+         ▼ <span class="amber">NAT ROUTER: rewrites source to public IP</span>
+  <span class="green">Internet packet: 203.0.113.5:54321 ──→ destination</span>
+         │
+  <span class="amber">Reply comes back to 203.0.113.5:54321</span>
+  <span class="amber">Router looks up table: 54321 → forward to 192.168.1.10</span>
+  </div>
+
+  <div class="aha">
+    <p>This is why "port forwarding" exists. When a connection originates from the internet toward your public IP, the NAT router has no translation table entry — it doesn't know where to send it. You have to explicitly tell it: "port 1194 incoming → forward to 192.168.1.50". This is exactly what you do when exposing an OpenVPN server behind a home router.</p>
+  </div>
+
+  <h3>TCP vs UDP — Choose Wisely</h3>
+  <p>OpenVPN can run over either TCP or UDP. Understanding why this matters changes how you architect VPN setups.</p>
+
+  <table class="layer-table">
+    <tr><th>Property</th><th>TCP</th><th>UDP</th></tr>
+    <tr><td>Guarantees delivery</td><td><span class="tag tag-green">Yes — retransmits</span></td><td><span class="tag tag-amber">No — fire and forget</span></td></tr>
+    <tr><td>Ordering</td><td><span class="tag tag-green">Guaranteed</span></td><td><span class="tag tag-amber">Out of order possible</span></td></tr>
+    <tr><td>Speed</td><td><span class="tag tag-amber">Slower — more overhead</span></td><td><span class="tag tag-green">Faster</span></td></tr>
+    <tr><td>VPN recommendation</td><td>Fallback only</td><td><span class="tag tag-cyan">Preferred (port 1194)</span></td></tr>
+  </table>
+
+  <div class="callout warn">
+    <p><strong>TCP over TCP Problem</strong>: If you tunnel TCP traffic inside OpenVPN running over TCP, you get <em>double retransmission</em>. When the outer TCP layer retransmits, the inner TCP doesn't know — it also retransmits. This creates catastrophic performance degradation. This is why OpenVPN's default is UDP. If you must use TCP (to bypass firewalls on port 443), you pay a real performance price.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 2: CRYPTOGRAPHY -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="chapter" id="crypto">
+  <div class="chapter-num">Chapter 02</div>
+  <h2>Cryptography — The Engine Under the Hood</h2>
+  <p class="chapter-desc">You don't need to implement it. You need to understand it deeply enough to configure it correctly and know when it fails.</p>
+
+  <p>
+    OpenVPN is powered by <span class="hi-cyan">OpenSSL</span> — the same library that powers HTTPS. Understanding the crypto stack is what separates engineers who configure VPNs by copying examples from those who can audit, troubleshoot, and architect secure systems.
+  </p>
+
+  <h3>Symmetric Encryption — The Fast Lock</h3>
+  <p>
+    You have one key. It encrypts and decrypts. It's extremely fast — hardware-accelerated on modern CPUs (AES-NI instruction set). This is what encrypts your <em>data stream</em> inside the VPN tunnel.
+  </p>
+
+  <pre><span class="c"># AES (Advanced Encryption Standard)</span>
+<span class="c"># Block size: 128 bits</span>
+<span class="c"># Key sizes: 128, 192, or 256 bits</span>
+
+<span class="c"># OpenVPN recommendation:</span>
+<span class="k">cipher AES-256-GCM</span>   <span class="c"># Gold standard as of OpenVPN 2.4+</span>
+
+<span class="c"># GCM = Galois/Counter Mode</span>
+<span class="c"># It's an AEAD cipher — provides BOTH encryption AND authentication</span>
+<span class="c"># in one operation. Replaces the need for a separate HMAC.</span></pre>
+
+  <div class="aha">
+    <p>AES-256-GCM is called an AEAD (Authenticated Encryption with Associated Data) cipher. It doesn't just encrypt your data — it also mathematically proves that the data hasn't been tampered with in transit. One algorithm doing two jobs that used to require two separate steps. This is why older configs had both a <code>cipher</code> and an <code>auth</code> directive — GCM made the <code>auth</code> redundant.</p>
+  </div>
+
+  <h3>Asymmetric Encryption — The Key Exchange</h3>
+  <p>
+    You have two keys: a <span class="hi-cyan">public key</span> (share with everyone) and a <span class="hi-amber">private key</span> (never share). Data encrypted with one can only be decrypted with the other. Critically, knowing the public key does not let you reverse-engineer the private key (mathematically infeasible with RSA-2048+).
+  </p>
+  <p>
+    The problem: this is <em>thousands of times slower</em> than symmetric encryption. You can't use it for bulk data.
+  </p>
+  <p>
+    The solution: <span class="hi-green">use asymmetric crypto to securely exchange a symmetric key</span>, then use symmetric crypto for everything else. This hybrid approach is exactly how TLS works — and exactly how OpenVPN's handshake works.
+  </p>
+
+  <div class="diagram">
+  <span class="cyan">CLIENT                               SERVER</span>
+  <span class="cyan">  │</span>                                       <span class="cyan">│</span>
+  <span class="cyan">  │──── "Hello, here's my public key" ──→│</span>
+  <span class="cyan">  │</span>                         <span class="amber">Server verifies│ cert against CA</span>
+  <span class="cyan">  │←── "Here's mine, it's signed by CA" ─│</span>
+  <span class="cyan">  │</span>                                       <span class="cyan">│</span>
+  <span class="green">  │═══ Negotiate shared session key ═════│</span>  ← asymmetric math
+  <span class="green">  │                                       │</span>
+  <span class="green">  │═══ All data now encrypted with ══════│</span>  ← symmetric AES
+  <span class="green">  │        that session key               │</span>
+  </div>
+
+  <h3>Hashing — The Fingerprint System</h3>
+  <p>
+    A hash function takes any input and produces a fixed-size output (e.g., 256 bits for SHA-256). It's a one-way function — you can't reverse it. The same input always produces the same output, but changing even one bit changes the entire output unpredictably.
+  </p>
+
+  <ul class="checklist">
+    <li><strong>Integrity</strong> — Proves data wasn't tampered with in transit (HMAC)</li>
+    <li><strong>Certificate fingerprints</strong> — Verify a certificate is authentic</li>
+    <li><strong>Password storage</strong> — Store hash, never the password itself</li>
+    <li><strong>Key derivation</strong> — Generate encryption keys from passwords (PBKDF2)</li>
+  </ul>
+
+  <div class="callout power">
+    <p>OpenVPN's <code>tls-auth</code> directive adds an HMAC layer to ALL TLS handshake packets. This means an attacker who sends a packet to your VPN port without the correct HMAC key gets <em>zero response</em>. Your server doesn't even begin the TLS handshake. This hides your VPN from scanners and blocks entire classes of DoS attacks before they reach the crypto layer. Most admins skip this. Titans don't.</p>
+  </div>
+
+  <h3>Diffie-Hellman — The Genius of Public Key Exchange</h3>
+  <p>
+    Here's the beautiful problem: if Alice and Bob have never met and want to share a secret key, how do they do it over a channel that an eavesdropper can see?
+  </p>
+  <p>
+    Diffie-Hellman solves this with a mathematical magic trick. Both parties exchange public numbers. Through modular exponentiation, they each independently arrive at the <em>same secret number</em> without ever transmitting that secret — and an eavesdropper who saw all the exchanged numbers still cannot compute it.
+  </p>
+
+  <div class="aha">
+    <p>The "key exchange" in the name is slightly misleading. No key is actually transmitted. Both sides <em>compute</em> the same key independently from public information. It's like mixing paint: I send you yellow, you send me blue, we both mix them with our private color (red), and we both get brown — but the person watching saw yellow and blue and can't figure out our private red or the final brown. This is the foundation of all secure internet communication.</p>
+  </div>
+
+  <p>Modern OpenVPN uses <span class="hi-cyan">ECDH (Elliptic Curve Diffie-Hellman)</span> — same mathematical idea but using elliptic curves, which achieve the same security with much smaller key sizes and faster computation. This is why modern configs show <code>dh none</code> and use <code>ecdh-curve prime256v1</code> instead of large DH parameter files.</p>
+
+  <h3>Perfect Forward Secrecy (PFS)</h3>
+  <p>
+    This is one of the most important concepts in modern security that most engineers cannot explain.
+  </p>
+  <p>
+    Without PFS: if an attacker records all your encrypted traffic today, and steals your server's private key in the future, they can <em>decrypt all past traffic retroactively</em>.
+  </p>
+  <p>
+    With PFS: each session generates a <em>temporary, ephemeral key</em>. Even with the server's long-term private key, past sessions cannot be decrypted because those ephemeral keys were never stored anywhere.
+  </p>
+
+  <div class="callout power">
+    <p>OpenVPN with TLS mode automatically gets PFS because TLS 1.2+ uses ephemeral Diffie-Hellman (DHE/ECDHE) ciphersuites. Each connection negotiates its own throwaway key. Past sessions become cryptographically sealed even from the server itself. This is why the NSA's BULLRUN program focused on attacking key exchange implementations rather than AES — the encryption itself is solid.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 3: TUN/TAP INTERFACES -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="chapter" id="tuntap">
+  <div class="chapter-num">Chapter 03</div>
+  <h2>TUN / TAP — The Kernel's Virtual Interface</h2>
+  <p class="chapter-desc">This is the piece almost no tutorial explains. It is the heart of how VPNs physically work at the OS level.</p>
+
+  <p>
+    When you run OpenVPN, the OS creates a new virtual network interface — you'll see it with <code>ip addr</code> or <code>ifconfig</code>. It looks exactly like a physical NIC, but it has no hardware. It's a <span class="hi-cyan">software-defined network interface</span> implemented in the kernel.
+  </p>
+
+  <h3>How a Normal Network Interface Works</h3>
+
+  <div class="diagram">
+  <span class="cyan">Application writes to socket</span>
+       ↓
+  <span class="amber">Kernel network stack processes it (IP/TCP headers)</span>
+       ↓
+  <span class="green">Physical NIC driver sends bits over wire</span>
+  </div>
+
+  <h3>How a TUN Interface Works</h3>
+
+  <div class="diagram">
+  <span class="cyan">Application writes to socket (e.g., curl)</span>
+       ↓
+  <span class="amber">Kernel network stack builds IP packet</span>
+       ↓
+  <span class="green">Packet goes to TUN device (tun0) — no hardware</span>
+       ↓
+  <span class="purple">OpenVPN process reads from /dev/tun0 — like reading a file!</span>
+       ↓
+  <span class="cyan">OpenVPN encrypts the IP packet</span>
+       ↓
+  <span class="amber">Sends encrypted packet as UDP to VPN server</span>
+  </div>
+
+  <div class="aha">
+    <p>The TUN device is a <em>pipe between the kernel's network stack and a userspace process</em>. When the kernel wants to send a packet out through tun0, OpenVPN reads it. When OpenVPN writes to tun0, the kernel processes it as if it arrived from a network. This is the virtual machine trick applied to networking — the kernel is "tricked" into thinking tun0 is a real network card.</p>
+  </div>
+
+  <h3>TUN vs TAP — Layer 3 vs Layer 2</h3>
+
+  <table class="layer-table">
+    <tr><th>Feature</th><th>TUN</th><th>TAP</th></tr>
+    <tr><td>OSI Layer</td><td><span class="tag tag-cyan">Layer 3 — IP packets</span></td><td><span class="tag tag-purple">Layer 2 — Ethernet frames</span></td></tr>
+    <tr><td>Carries</td><td>IP packets only</td><td>Full Ethernet frames (IP, ARP, etc.)</td></tr>
+    <tr><td>Use case</td><td>Route-based VPN (most common)</td><td>Bridge-based VPN (network extension)</td></tr>
+    <tr><td>Performance</td><td>Higher</td><td>Lower (more overhead)</td></tr>
+    <tr><td>OpenVPN default</td><td><span class="tag tag-green">Yes — dev tun</span></td><td>Specific use cases only</td></tr>
+  </table>
+
+  <div class="callout insight">
+    <p>Use <code>dev tap</code> when you need to extend a Layer 2 network — for example, to join a remote machine to the same broadcast domain as your office LAN so it can receive DHCP from the office DHCP server, or run protocols that rely on broadcast/ARP. Use <code>dev tun</code> (routing mode) for everything else. TAP mode is more complex and has a real performance cost.</p>
+  </div>
+
+  <h3>The Packet's Full Journey Through OpenVPN</h3>
+
+  <div class="diagram">
+  <span class="muted">  CLIENT (10.8.0.6)                          SERVER (10.8.0.1)</span>
+
+  <span class="cyan">  curl http://192.168.1.50/api</span>
+       ↓
+  <span class="cyan">  Kernel: build IP packet</span>
+       <span class="cyan">  src: 10.8.0.6  dst: 192.168.1.50</span>
+       ↓
+  <span class="cyan">  Route table: 192.168.1.0/24 → tun0</span>
+       ↓
+  <span class="amber">  OpenVPN reads from tun0</span>
+  <span class="amber">  Encrypts: AES-256-GCM</span>
+  <span class="amber">  Adds HMAC</span>
+       ↓
+  <span class="amber">  New outer packet:</span>
+  <span class="amber">  src: client-public-IP  dst: server-public-IP:1194</span>
+  <span class="amber">  payload: [ENCRYPTED ORIGINAL PACKET]</span>
+       ↓
+  <span class="green">  ════════ Public Internet ════════</span>
+       ↓
+  <span class="green">  Server OpenVPN receives UDP packet</span>
+  <span class="green">  Decrypts payload</span>
+  <span class="green">  Gets original: src 10.8.0.6 → dst 192.168.1.50</span>
+       ↓
+  <span class="green">  Writes to tun0 on server</span>
+  <span class="green">  Kernel routes to 192.168.1.0/24 via eth0</span>
+       ↓
+  <span class="green">  Reaches the target server!</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 4: PKI -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="chapter" id="pki">
+  <div class="chapter-num">Chapter 04</div>
+  <h2>PKI — The Trust Hierarchy</h2>
+  <p class="chapter-desc">This is where most VPN setups get broken. Understand this, and you become the person everyone asks when certificates go wrong.</p>
+
+  <p>
+    Public Key Infrastructure (PKI) is the system of certificates, signing authorities, and trust chains that answers one fundamental question: <span class="hi-cyan">"How do I know I'm talking to who I think I'm talking to?"</span>
+  </p>
+
+  <p>
+    A certificate is a digital document that binds a public key to an identity (a domain name, an IP, an organization name). But anyone can create a certificate. The trick is getting it <em>signed</em> by someone the other party trusts.
+  </p>
+
+  <h3>The Certificate Trust Chain</h3>
+
+  <div class="diagram">
+  <span class="cyan">  ┌─────────────────────────────┐</span>
+  <span class="cyan">  │  ROOT CA (Certificate Auth) │  ← Self-signed. The "god" of the chain.</span>
+  <span class="cyan">  │  ca.crt / ca.key            │    Everyone must trust this explicitly.</span>
+  <span class="cyan">  └──────────┬──────────────────┘</span>
+             <span class="cyan">│ signs</span>
+             <span class="amber">▼</span>
+  <span class="amber">  ┌─────────────────────────────┐</span>
+  <span class="amber">  │  SERVER CERTIFICATE         │  ← Signed by CA. Proves "I am the VPN server."</span>
+  <span class="amber">  │  server.crt / server.key    │</span>
+  <span class="amber">  └─────────────────────────────┘</span>
+
+  <span class="amber">  ┌─────────────────────────────┐</span>
+  <span class="amber">  │  CLIENT CERTIFICATES        │  ← Signed by same CA. Proves "I am a trusted client."</span>
+  <span class="amber">  │  client1.crt / client1.key  │    Every user gets their own cert.</span>
+  <span class="amber">  └─────────────────────────────┘</span>
+  </div>
+
+  <div class="aha">
+    <p>With OpenVPN's mutual TLS, BOTH sides present certificates signed by the same CA. The client verifies the server's cert (prevents connecting to a rogue server). The server verifies the client's cert (replaces or supplements username/password auth). If a client's cert is compromised, you revoke just that cert — you don't need to change anything else. This is elegance in security design.</p>
+  </div>
+
+  <h3>EasyRSA — The PKI Toolchain</h3>
+  <p>
+    OpenVPN's companion tool EasyRSA creates and manages your private CA. Key files you'll work with:
+  </p>
+
+  <pre><span class="c"># Your CA infrastructure</span>
+<span class="n">ca.crt</span>         <span class="c"># CA public certificate — distribute to ALL clients and server</span>
+<span class="n">ca.key</span>         <span class="c"># CA private key — KEEP THIS LOCKED DOWN. Never on server.</span>
+
+<span class="c"># Server files</span>
+<span class="n">server.crt</span>     <span class="c"># Server certificate (signed by CA)</span>
+<span class="n">server.key</span>     <span class="c"># Server private key</span>
+<span class="n">dh.pem</span>        <span class="c"># (Legacy) Diffie-Hellman params — use 'dh none' in modern configs</span>
+
+<span class="c"># Per-client files</span>
+<span class="n">client1.crt</span>    <span class="c"># Client certificate</span>
+<span class="n">client1.key</span>    <span class="c"># Client private key</span>
+<span class="n">ta.key</span>         <span class="c"># TLS Authentication key — shared secret, extra HMAC layer</span></pre>
+
+  <div class="callout power">
+    <p>The <code>ca.key</code> (your root CA private key) should NEVER live on the VPN server. Generate it on an air-gapped machine, sign certificates as needed, then destroy or vault the key. If your VPN server is compromised and the attacker gets <code>ca.key</code>, they can issue trusted certificates to impersonate any client. Keep the CA key offline — this is the practice used by major CAs like Let's Encrypt.</p>
+  </div>
+
+  <h3>Certificate Revocation List (CRL)</h3>
+  <p>
+    When an employee leaves, or a client device is stolen, you need to invalidate their certificate without touching anything else. The CRL is a signed list of revoked certificate serial numbers. OpenVPN checks this list on every new connection.
+  </p>
+
+  <pre><span class="c"># Generate a CRL</span>
+<span class="k">./easyrsa</span> gen-crl
+
+<span class="c"># In server.conf</span>
+<span class="k">crl-verify</span> <span class="s">/etc/openvpn/crl.pem</span>
+
+<span class="c"># Revoke a specific client</span>
+<span class="k">./easyrsa</span> revoke client1
+<span class="k">./easyrsa</span> gen-crl
+<span class="c"># Copy new crl.pem to server — takes effect immediately</span></pre>
+
+  <h3>Certificate Attributes That Matter</h3>
+  <p>
+    OpenVPN uses X.509 certificate extensions to enforce roles. The key one: <code>nsCertType</code> and <code>extendedKeyUsage</code>. These prevent a client certificate from being used as a server certificate (and vice versa) — this blocks a class of attack called certificate spoofing.
+  </p>
+
+  <pre><span class="c"># In server.conf, add these checks:</span>
+<span class="k">remote-cert-tls</span> client    <span class="c"># Server verifies connecting cert is a CLIENT cert</span>
+
+<span class="c"># In client.conf, add:</span>
+<span class="k">remote-cert-tls</span> server    <span class="c"># Client verifies server cert is a SERVER cert</span></pre>
+
+  <div class="callout warn">
+    <p>Without <code>remote-cert-tls</code>, a stolen client certificate could theoretically be used to set up a rogue server that clients trust. Always add this directive. It costs nothing and prevents a real attack vector that most tutorials never mention.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 5: ROUTING -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="chapter" id="routing">
+  <div class="chapter-num">Chapter 05</div>
+  <h2>Routing — The Brain of the Network</h2>
+  <p class="chapter-desc">Understanding routing is understanding how the internet makes decisions. This is where most VPN configurations break.</p>
+
+  <p>
+    A routing table is the map the kernel uses to decide: <em>"For a packet destined to IP address X — which interface do I send it out through, and what's the next hop?"</em>
+  </p>
+
+  <pre><span class="c"># View your routing table</span>
+<span class="k">ip route show</span>
+
+<span class="c"># Typical output on a VPN client:</span>
+<span class="n">default</span>       via 192.168.1.1 dev eth0      <span class="c"># → Everything else → home router</span>
+<span class="n">10.8.0.0/24</span>   via 10.8.0.1   dev tun0      <span class="c"># → VPN subnet → through tunnel</span>
+<span class="n">192.168.1.0/24</span>               dev eth0      <span class="c"># → Local LAN → direct on eth0</span></pre>
+
+  <h3>Full Tunnel vs Split Tunnel — The Architectural Choice</h3>
+
+  <h4>Full Tunnel Mode (redirect-gateway)</h4>
+  <p>
+    ALL traffic — including internet browsing — goes through the VPN server. Your ISP sees only encrypted traffic to the VPN server. The VPN server's IP is what websites see.
+  </p>
+  <pre><span class="c"># In server.conf</span>
+<span class="k">push "redirect-gateway def1 bypass-dhcp"</span>
+<span class="k">push "dhcp-option DNS 1.1.1.1"</span></pre>
+
+  <h4>Split Tunnel Mode</h4>
+  <p>
+    Only specific subnets go through the VPN tunnel. Internet traffic goes directly through the local connection. Faster, but the VPN server doesn't see your general browsing.
+  </p>
+  <pre><span class="c"># In server.conf — push only specific routes</span>
+<span class="k">push "route 192.168.10.0 255.255.255.0"</span>   <span class="c"># Only internal office subnet</span>
+<span class="k">push "route 10.0.0.0 255.0.0.0"</span>           <span class="c"># Only private 10.x range</span></pre>
+
+  <div class="aha">
+    <p>The <code>def1</code> flag in redirect-gateway is elegant engineering. Instead of replacing the default route (which would break the VPN connection itself — the VPN server would suddenly be unreachable!), it adds two more specific routes: <code>0.0.0.0/1</code> and <code>128.0.0.0/1</code>. These two cover the entire IP space but are more specific than <code>0.0.0.0/0</code>. The routing table always prefers more specific routes — so these "win" without touching the original default route. The original route still handles the VPN server's own IP.</p>
+  </div>
+
+  <h3>IP Forwarding — The Gate That Must Be Opened</h3>
+  <p>
+    By default, a Linux machine drops packets that aren't destined for itself. To act as a router (which your VPN server must), you need IP forwarding enabled.
+  </p>
+
+  <pre><span class="c"># Temporary (lost on reboot)</span>
+<span class="k">echo 1 > /proc/sys/net/ipv4/ip_forward</span>
+
+<span class="c"># Permanent — edit /etc/sysctl.conf</span>
+<span class="n">net.ipv4.ip_forward = 1</span>
+<span class="k">sysctl -p</span></pre>
+
+  <div class="callout warn">
+    <p>Forgetting to enable IP forwarding is the single most common reason a "working" OpenVPN connection can't reach anything beyond the VPN server's own IP. The tunnel is established, pings reach 10.8.0.1, but nothing further responds. Check <code>ip_forward</code> first.</p>
+  </div>
+
+  <h3>NAT on the VPN Server — Masquerading</h3>
+  <p>
+    When VPN clients (10.8.0.0/24) want to reach internet resources through the server, you need NAT on the server's outgoing interface — otherwise replies would be sent back to a 10.8.x.x address, which is private and unreachable from the internet.
+  </p>
+
+  <pre><span class="c"># Using iptables — the VPN server NATs client traffic onto its public interface</span>
+<span class="k">iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE</span>
+
+<span class="c"># Using nftables (modern systems)</span>
+<span class="k">nft add rule ip nat postrouting</span> <span class="n">ip saddr 10.8.0.0/24</span> <span class="k">oif eth0 masquerade</span></pre>
+
+  <h3>Client-Specific Routing (CCD)</h3>
+  <p>
+    OpenVPN's Client Config Directory (CCD) lets you assign a fixed IP to a specific client, or push routes to specific clients only. This is powerful for enterprise setups.
+  </p>
+
+  <pre><span class="c"># In server.conf</span>
+<span class="k">client-config-dir</span> /etc/openvpn/ccd
+<span class="k">route 192.168.100.0 255.255.255.0</span>   <span class="c"># Tell server about this subnet</span>
+
+<span class="c"># /etc/openvpn/ccd/client1  (filename = CN of client's certificate)</span>
+<span class="k">ifconfig-push</span> <span class="n">10.8.0.10 10.8.0.9</span>   <span class="c"># Assign fixed IP to this client</span>
+<span class="k">iroute 192.168.100.0 255.255.255.0</span>  <span class="c"># Client sits in front of this subnet</span></pre>
+
+  <div class="aha">
+    <p>The <code>iroute</code> directive is internal routing inside OpenVPN's own routing logic. The <code>route</code> in server.conf is for the kernel's routing table. You need BOTH to route traffic to a subnet that exists behind a VPN client. This "iroute vs route" distinction breaks almost every site-to-site VPN setup attempt until you understand it.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 6: OPENVPN DEEP DIVE -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="chapter" id="openvpn">
+  <div class="chapter-num">Chapter 06</div>
+  <h2>OpenVPN — Architecture Deep Dive</h2>
+  <p class="chapter-desc">Now that you have the foundations, OpenVPN clicks into place perfectly.</p>
+
+  <p>
+    OpenVPN was created by James Yonan in 2001. It's open-source, runs in userspace (no kernel module required), and uses SSL/TLS for its security layer. It is not IPsec, not WireGuard, not PPTP. It is its own VPN protocol built on top of OpenSSL.
+  </p>
+
+  <h3>The Two Operating Modes</h3>
+
+  <h4>Point-to-Point (Legacy)</h4>
+  <p>One server, one client. Pre-shared key authentication. Simple but doesn't scale. Used for linking two routers.</p>
+
+  <h4>TLS Mode (Standard)</h4>
+  <p>Full PKI infrastructure. One server, many clients. Each client has a certificate. This is what all modern deployments use.</p>
+
+  <h3>The Connection Handshake — Step by Step</h3>
+
+  <ol class="steps">
+    <li>Client connects to server on UDP port 1194. If <code>tls-auth</code> is set, the packet has an HMAC. Server verifies it immediately — if invalid, silently drops.</li>
+    <li>TLS handshake begins. Client and server exchange certificates. Both verify against the CA.</li>
+    <li>DH/ECDH key exchange occurs. A shared master secret is derived. Per-session symmetric keys are generated from it.</li>
+    <li>Control channel is now encrypted. Further messages over the control channel are protected with these session keys.</li>
+    <li>Server pushes configuration to client: IP address, routes, DNS servers via <code>push</code> directives.</li>
+    <li>TUN/TAP interface is brought up on the client. Routes are added to the kernel routing table.</li>
+    <li>Data channel is active. All subsequent VPN traffic uses a separate, high-performance encrypted data channel.</li>
+  </ol>
+
+  <div class="aha">
+    <p>OpenVPN uses <em>two separate channels</em>: a control channel (for handshake, renegotiation, keepalives) and a data channel (for actual traffic). They can use different cipher suites optimized for their respective purposes. The data channel uses the fast AEAD cipher. The control channel can use more careful TLS. This separation is a key design insight.</p>
+  </div>
+
+  <h3>Annotated Server Configuration</h3>
+
+  <pre><span class="c"># /etc/openvpn/server.conf — Annotated Modern Config</span>
+
+<span class="k">port</span> <span class="n">1194</span>
+<span class="k">proto</span> udp        <span class="c"># Use UDP for performance</span>
+<span class="k">dev</span> tun          <span class="c"># Layer 3 routing mode</span>
+
+<span class="c"># Certificates</span>
+<span class="k">ca</span>   <span class="s">/etc/openvpn/ca.crt</span>
+<span class="k">cert</span> <span class="s">/etc/openvpn/server.crt</span>
+<span class="k">key</span>  <span class="s">/etc/openvpn/server.key</span>
+<span class="k">dh</span>   none         <span class="c"># Use ECDH instead of DH params file</span>
+
+<span class="c"># VPN subnet — clients get IPs from here</span>
+<span class="k">server 10.8.0.0 255.255.255.0</span>
+
+<span class="c"># Persist client IP assignments between restarts</span>
+<span class="k">ifconfig-pool-persist</span> <span class="s">/var/log/openvpn/ipp.txt</span>
+
+<span class="c"># Push routes to clients</span>
+<span class="k">push "route 192.168.1.0 255.255.255.0"</span>  <span class="c"># Internal office subnet</span>
+<span class="k">push "dhcp-option DNS 10.8.0.1"</span>          <span class="c"># Use VPN server for DNS</span>
+
+<span class="c"># Security hardening</span>
+<span class="k">tls-auth</span> <span class="s">/etc/openvpn/ta.key</span> 0         <span class="c"># 0=server, 1=client</span>
+<span class="k">cipher AES-256-GCM</span>
+<span class="k">tls-version-min 1.2</span>
+<span class="k">tls-cipher TLS-ECDHE-RSA-WITH-AES-256-GCM-SHA384</span>
+<span class="k">remote-cert-tls client</span>                   <span class="c"># Require proper client cert type</span>
+
+<span class="c"># Privilege dropping — run as nobody after startup</span>
+<span class="k">user nobody</span>
+<span class="k">group nogroup</span>
+
+<span class="c"># Persist TUN device and keys across restarts</span>
+<span class="k">persist-key</span>
+<span class="k">persist-tun</span>
+
+<span class="c"># Keepalive: ping every 10s, restart if no ping for 120s</span>
+<span class="k">keepalive 10 120</span>
+
+<span class="c"># Revocation list</span>
+<span class="k">crl-verify</span> <span class="s">/etc/openvpn/crl.pem</span>
+
+<span class="c"># Log verbosity (0-9, 3 is good for production)</span>
+<span class="k">verb 3</span>
+
+<span class="c"># Allow multiple clients to share one certificate (for testing only!)</span>
+<span class="c"># duplicate-cn</span>
+
+<span class="c"># Run a script when client connects/disconnects</span>
+<span class="k">client-connect</span>    <span class="s">/etc/openvpn/scripts/on-connect.sh</span>
+<span class="k">client-disconnect</span> <span class="s">/etc/openvpn/scripts/on-disconnect.sh</span>
+
+<span class="k">status</span> <span class="s">/var/log/openvpn/status.log</span>
+<span class="k">log-append</span> <span class="s">/var/log/openvpn/openvpn.log</span></pre>
+
+  <div class="callout power">
+    <p>The <code>user nobody / group nogroup</code> directives are critical. OpenVPN needs root to create the TUN device and modify routing tables. After that's done at startup, it drops privileges to a non-privileged user. This is defense-in-depth: even if OpenVPN is exploited, the attacker doesn't get root. Most tutorial configs never include this.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 7: ADVANCED TOPICS -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="chapter" id="advanced">
+  <div class="chapter-num">Chapter 07</div>
+  <h2>Advanced Patterns — Level Up</h2>
+  <p class="chapter-desc">These are the topics that separate the engineers who set up VPNs from those who design them.</p>
+
+  <h3>Multi-Factor Authentication (MFA) with OpenVPN</h3>
+  <p>
+    OpenVPN supports a two-factor approach: certificate + password via PAM (Pluggable Authentication Module). Or certificate + TOTP (Google Authenticator). The client presents the TOTP code as the password field.
+  </p>
+
+  <pre><span class="c"># server.conf</span>
+<span class="k">plugin</span> /usr/lib/openvpn/openvpn-plugin-auth-pam.so openvpn
+<span class="k">client-cert-not-required</span>  <span class="c"># Optional: cert OR password, not both</span>
+<span class="c"># Or require BOTH cert AND password:</span>
+<span class="k">username-as-common-name</span></pre>
+
+  <h3>Split DNS — The Overlooked Must-Have</h3>
+  <p>
+    In split tunnel mode, you typically want internal hostnames (db.internal, app.corp) to resolve via the corporate DNS server, while public domains use the local DNS. Split DNS sends only internal queries through the VPN DNS.
+  </p>
+
+  <pre><span class="c"># Push DNS server AND domain</span>
+<span class="k">push "dhcp-option DNS 10.8.0.1"</span>
+<span class="k">push "dhcp-option DOMAIN corp.internal"</span>
+<span class="c"># Client will use VPN DNS for *.corp.internal queries</span></pre>
+
+  <h3>High Availability — Active-Passive Failover</h3>
+  <p>
+    Production VPN cannot have a single point of failure. Standard pattern:
+  </p>
+
+  <ol class="steps">
+    <li>Two OpenVPN servers share the same CA and configuration</li>
+    <li>Both are behind a load balancer (HAProxy, AWS NLB) on the same VIP (Virtual IP)</li>
+    <li>Health checks monitor each server; traffic fails over in &lt;30 seconds</li>
+    <li>Client configs list multiple <code>remote</code> directives — tries each in order</li>
+  </ol>
+
+  <pre><span class="c"># client.conf — multiple server entries</span>
+<span class="k">remote vpn1.company.com 1194 udp</span>
+<span class="k">remote vpn2.company.com 1194 udp</span>
+<span class="k">remote-random</span>          <span class="c"># Randomize order for load distribution</span>
+<span class="k">resolv-retry infinite</span>
+<span class="k">connect-retry 5 60</span></pre>
+
+  <h3>OpenVPN Over TCP Port 443 — Firewall Bypass</h3>
+  <p>
+    Some corporate or hotel firewalls block all UDP and all non-standard TCP ports. By running OpenVPN over TCP port 443 (HTTPS port), it becomes nearly impossible to block without breaking HTTPS entirely.
+  </p>
+
+  <pre><span class="c"># server.conf</span>
+<span class="k">proto</span> tcp
+<span class="k">port</span> 443
+
+<span class="c"># client.conf</span>
+<span class="k">remote vpn.company.com 443 tcp</span></pre>
+
+  <div class="callout insight">
+    <p>A more elegant approach: run <strong>sslh</strong> (a port multiplexer) on port 443 that distinguishes real HTTPS traffic from OpenVPN TCP traffic and forwards each to the right service. Your HTTPS web server and OpenVPN both share port 443. This is the approach used when the server must also serve a website on port 443.</p>
+  </div>
+
+  <h3>OpenVPN + Docker / Kubernetes</h3>
+  <p>
+    OpenVPN runs excellently in Docker. The key challenge: the container needs <code>NET_ADMIN</code> capability to create TUN devices and modify routes.
+  </p>
+
+  <pre><span class="c"># docker-compose.yml</span>
+<span class="k">services:</span>
+  <span class="n">openvpn:</span>
+    <span class="n">image: kylemanna/openvpn</span>
+    <span class="k">cap_add:</span>
+      <span class="k">- NET_ADMIN</span>
+    <span class="k">devices:</span>
+      <span class="k">- /dev/net/tun</span>
+    <span class="k">ports:</span>
+      <span class="k">- "1194:1194/udp"</span>
+    <span class="k">volumes:</span>
+      <span class="k">- ./openvpn-data:/etc/openvpn</span></pre>
+
+  <h3>Monitoring and Observability</h3>
+  <p>
+    A VPN you can't observe is a VPN you can't trust.
+  </p>
+
+  <pre><span class="c"># Enable the management interface</span>
+<span class="k">management</span> 127.0.0.1 7505
+
+<span class="c"># Connect to it:</span>
+<span class="k">nc 127.0.0.1 7505</span>
+<span class="c"># Commands: status, kill &lt;client&gt;, bytecount 5, log 20</span>
+
+<span class="c"># Or use the status file</span>
+<span class="k">status /var/log/openvpn/status.log 10</span>  <span class="c"># Refresh every 10 seconds</span></pre>
+
+  <div class="callout power">
+    <p>Integrate OpenVPN status with Prometheus + Grafana using <strong>openvpn_exporter</strong>. Track: connected clients count, bytes in/out per client, connection duration, failed auth attempts. Set alerts on sudden drops in connections (server crash?) or spikes in failed auths (brute force?). This is production-grade VPN ops.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CHAPTER 8: THE LANDSCAPE -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="chapter" id="architect">
+  <div class="chapter-num">Chapter 08</div>
+  <h2>The Architect's View — Where OpenVPN Sits</h2>
+  <p class="chapter-desc">Titans know not just their tool, but where it fits in the universe of tools.</p>
+
+  <h3>OpenVPN vs WireGuard vs IPsec</h3>
+
+  <table class="layer-table">
+    <tr><th>Property</th><th>OpenVPN</th><th>WireGuard</th><th>IPsec (IKEv2)</th></tr>
+    <tr><td>Protocol</td><td>Custom TLS-based</td><td>Custom UDP-based</td><td>IETF Standard</td></tr>
+    <tr><td>Code size</td><td>~150K lines</td><td>~4K lines</td><td>Complex</td></tr>
+    <tr><td>Speed</td><td>Good</td><td><span class="tag tag-green">Fastest</span></td><td>Good</td></tr>
+    <tr><td>Firewall bypass</td><td><span class="tag tag-green">Excellent</span></td><td>Harder</td><td>Often blocked</td></tr>
+    <tr><td>PKI flexibility</td><td><span class="tag tag-green">Excellent</span></td><td>Basic</td><td>Good</td></tr>
+    <tr><td>Maturity / audit trail</td><td><span class="tag tag-green">22+ years</span></td><td>Newer</td><td>Decades</td></tr>
+    <tr><td>Best for</td><td>Enterprise, complex setups</td><td>Performance, simplicity</td><td>Mobile clients, hardware routers</td></tr>
+  </table>
+
+  <div class="callout insight">
+    <p>WireGuard is faster and simpler, but it has no native certificate-based auth, no built-in user management, and its kernel integration makes it less flexible to deploy in containers. OpenVPN's age and complexity is also its strength: every edge case has been solved, every bug found. For enterprise deployments with certificate management, user revocation, and complex routing needs, OpenVPN remains the gold standard.</p>
+  </div>
+
+  <h3>Zero Trust vs VPN — The Future</h3>
+  <p>
+    The industry is moving toward <span class="hi-cyan">Zero Trust Network Access (ZTNA)</span>. Traditional VPNs grant network access — once inside, you can reach many resources. Zero Trust grants <em>application-level access</em> — you get access to exactly one app, not the network it sits in.
+  </p>
+  <p>
+    OpenVPN's commercial product (OpenVPN Access Server) has moved toward this model. But understanding OpenVPN gives you the foundations to understand ZTNA — it's the same crypto, the same certificate model, the same routing concepts, applied at a finer-grained level.
+  </p>
+
+  <h3>The Knowledge Map — What You Now Own</h3>
+
+  <div class="diagram">
+  <span class="cyan">   OSI Model &amp; TCP/IP</span>
+         │
+  <span class="amber">   Private Networks, CIDR, NAT, Routing Tables</span>
+         │
+  <span class="green">   Symmetric / Asymmetric Crypto, TLS Handshake, PFS</span>
+         │
+  <span class="purple">   PKI — CA, Certificates, Revocation, Trust Chains</span>
+         │
+  <span class="cyan">   TUN/TAP Devices — Kernel Virtual Interfaces</span>
+         │
+  <span class="amber">   OpenVPN Architecture — Control + Data Channels</span>
+         │
+  <span class="green">   Routing — Full/Split Tunnel, iroute, CCD, IP Forwarding</span>
+         │
+  <span class="purple">   Hardening — tls-auth, privilege drop, cert type enforcement</span>
+         │
+  <span class="cyan">   Production Ops — HA, MFA, Monitoring, Docker, Firewall bypass</span>
+         │
+  <span class="amber">   Landscape — OpenVPN vs WireGuard vs IPsec vs ZTNA</span>
+  </div>
+
+  <h3>The 10 Things Titans Know That Others Don't</h3>
+
+  <ol class="steps">
+    <li><strong>tls-auth drops packets at the HMAC layer</strong> before TLS even starts — completely invisible to attackers.</li>
+    <li><strong>The "def1" trick</strong> — why redirect-gateway doesn't break the VPN connection to the server itself.</li>
+    <li><strong>iroute vs route</strong> — you need both to route traffic to subnets behind a client in site-to-site setups.</li>
+    <li><strong>TCP over TCP performance</strong> — why UDP is mandatory for tunnel transports carrying TCP traffic.</li>
+    <li><strong>ca.key must never be on the server</strong> — air-gap your CA, sign certs offline.</li>
+    <li><strong>AES-256-GCM is AEAD</strong> — it replaces both the cipher and the auth HMAC in legacy configs.</li>
+    <li><strong>Perfect Forward Secrecy</strong> — historical traffic remains secure even after private key compromise.</li>
+    <li><strong>user nobody / group nogroup</strong> — privilege dropping after startup. Defense in depth.</li>
+    <li><strong>remote-cert-tls</strong> — prevents certificate type spoofing (client cert used as server, vice versa).</li>
+    <li><strong>Split DNS</strong> — internal DNS only for internal domains; avoid routing all DNS queries through VPN.</li>
+  </ol>
+
+</section>
+
+<div class="div"></div>
+
+<!-- FINAL CALL TO POWER -->
+<section style="text-align:center; padding: 60px 0;">
+  <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--cyan); letter-spacing:3px; text-transform:uppercase; margin-bottom:20px;">You made it.</div>
+  <h2 style="font-family:'Syne',sans-serif; font-size:clamp(28px,4vw,48px); font-weight:800; color:#fff; margin-bottom:20px; line-height:1.2;">
+    You now think at the<br><span style="color:var(--cyan)">Architect's Level.</span>
+  </h2>
+  <p style="max-width:560px; margin:0 auto; color:var(--muted); font-size:16px; line-height:1.8; font-style:italic;">
+    Most engineers copy configs. You now understand why every line exists, what breaks when you remove it, and what it protects against. That is the difference between a user and a titan. The knowledge you have now took most networking engineers years to accumulate — and most of them still have gaps in it.
+  </p>
+</section>
+
+</main>
+
+<footer>
+  <p>OpenVPN Mastery Guide &nbsp;·&nbsp; Built for Ashan Priyadarshana &nbsp;·&nbsp; From Zero to Titan</p>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.chapter').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
