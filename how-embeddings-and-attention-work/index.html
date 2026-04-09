@@ -777,30 +777,32 @@
 
   <script>
     // ===== SLIDE SYSTEM =====
-    let cur = 0, total = 18, inited = new Set();
+    let cur = 0, total = 19, inited = new Set();
     const slideData = [
       { tag: 'WEEK 04', title: 'The Language of Vectors' },
       { tag: 'SLIDE 01 · ENCODING', title: 'What is Encoding?', sub: 'Before we teach machines language, we need to understand how information becomes numbers.' },
       { tag: 'SLIDE 02 · ENCODING METHODS', title: 'Why Language is Hard for Machines', sub: 'Three encoding approaches — and only one captures meaning.' },
       { tag: 'SLIDE 03 · TOKENIZATION', title: 'What the Model Actually Sees', sub: 'Words are an illusion. The model sees subword tokens.' },
       { tag: 'SLIDE 04 · EMBEDDINGS', title: 'What is an Embedding?', sub: 'A learned, dense vector where position = meaning.' },
-      { tag: 'SLIDE 05 · VECTOR MATH', title: 'Vector Arithmetic & King–Queen', sub: 'Meaning has structure. You can do math on it.' },
-      { tag: 'SLIDE 06 · CONTEXT', title: 'The Context Problem', sub: 'Why word-by-word encoding fails — and what fixes it.' },
-      { tag: 'SLIDE 07 · ATTENTION', title: 'The Attention Mechanism — Intuition', sub: 'The model "looks at" different parts of the sentence for each word.' },
-      { tag: 'SLIDE 08 · Q, K, V', title: 'Attention: The Math', sub: 'softmax(QK^T / √d_k) · V — step by step.' },
-      { tag: 'SLIDE 09 · MULTI-HEAD', title: 'Multi-Head Attention', sub: 'Each head asks a different question about the sentence.' },
-      { tag: 'SLIDE 10 · DEPTH', title: 'Layer Stacking & Why Depth Matters', sub: 'Each layer builds on the representations below it.' },
-      { tag: 'SLIDE 11 · POSITION', title: 'Positional Encoding', sub: 'Making attention care about word order.' },
-      { tag: 'SLIDE 12 · ARCHITECTURE', title: 'The Transformer (Big Picture)', sub: 'Every component in one clickable diagram.' },
-      { tag: 'SLIDE 13 · KV CACHE', title: 'KV Cache: Why Inference is Fast', sub: 'Cache Keys and Values. Only compute the new token.' },
-      { tag: 'SLIDE 14 · CONTEXT WINDOW', title: 'Context Window: The Memory Limit', sub: 'The finite buffer of tokens the model can see.' },
-      { tag: 'SLIDE 15 · TRAINING', title: 'From Transformer to LLM', sub: 'The training objective: predict the next token.' },
-      { tag: 'SLIDE 16 · FOUNDATION', title: 'You Just Understood the Foundation of Every LLM', sub: 'These aren\'t abstract concepts. They are real engineering.' },
-      { tag: 'SLIDE 17 · RECAP', title: 'Week 4 Recap + Week 5 Preview', sub: 'Key takeaways and what\'s coming next.' }
+      { tag: 'SLIDE 05 · HOW IT LEARNS', title: 'Training Embeddings', sub: 'Discovering latent structures through context prediction.' },
+      { tag: 'SLIDE 06 · VECTOR MATH', title: 'Vector Arithmetic & King–Queen', sub: 'Meaning has structure. You can do math on it.' },
+      { tag: 'SLIDE 07 · CONTEXT', title: 'The Context Problem', sub: 'Why word-by-word encoding fails — and what fixes it.' },
+      { tag: 'SLIDE 08 · ATTENTION', title: 'The Attention Mechanism — Intuition', sub: 'The model "looks at" different parts of the sentence for each word.' },
+      { tag: 'SLIDE 09 · Q, K, V', title: 'Attention: The Math', sub: 'softmax(QK^T / √d_k) · V — step by step.' },
+      { tag: 'SLIDE 10 · MULTI-HEAD', title: 'Multi-Head Attention', sub: 'Each head asks a different question about the sentence.' },
+      { tag: 'SLIDE 11 · DEPTH', title: 'Layer Stacking & Why Depth Matters', sub: 'Each layer builds on the representations below it.' },
+      { tag: 'SLIDE 12 · POSITION', title: 'Positional Encoding', sub: 'Making attention care about word order.' },
+      { tag: 'SLIDE 13 · ARCHITECTURE', title: 'The Transformer (Big Picture)', sub: 'Every component in one clickable diagram.' },
+      { tag: 'SLIDE 14 · KV CACHE', title: 'KV Cache: Why Inference is Fast', sub: 'Cache Keys and Values. Only compute the new token.' },
+      { tag: 'SLIDE 15 · CONTEXT WINDOW', title: 'Context Window: The Memory Limit', sub: 'The finite buffer of tokens the model can see.' },
+      { tag: 'SLIDE 16 · TRAINING', title: 'From Transformer to LLM', sub: 'The training objective: predict the next token.' },
+      { tag: 'SLIDE 17 · FOUNDATION', title: 'You Just Understood the Foundation of Every LLM', sub: 'These aren\'t abstract concepts. They are real engineering.' },
+      { tag: 'SLIDE 18 · RECAP', title: 'Week 4 Recap + Week 5 Preview', sub: 'Key takeaways and what\'s coming next.' }
     ];
 
     function buildDeck() {
       const deck = document.getElementById('deck'), dots = document.getElementById('dots');
+      const idMap = [0, 1, 2, 3, 4, 'training', 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
       for (let i = 0; i < total; i++) {
         const s = document.createElement('div');
         s.className = 'slide' + (i === 0 ? ' active' : '');
@@ -809,7 +811,7 @@
           `<div class="slide-tag">${slideData[i].tag}</div>
     <div class="slide-title">${slideData[i].title}</div>
     <div class="slide-subtitle">${slideData[i].sub || ''}</div>
-    <div class="slide-content" id="sc-${i}"></div>`;
+    <div class="slide-content" id="sc-${idMap[i]}"></div>`;
         deck.appendChild(s);
         const d = document.createElement('div');
         d.className = 'dot' + (i === 0 ? ' active' : '');
@@ -861,7 +863,7 @@
     // ===== SLIDE INITS =====
     function onSlideEnter(idx) {
       if (inited.has(idx)) return; inited.add(idx);
-      const fn = [initS0, initS1, initS2, initS3, initS4, initS5, initS6, initS7, initS8, initS9, initS10, initS11, initS12, initS13, initS14, initS15, initS16, initS17];
+      const fn = [initS0, initS1, initS2, initS3, initS4, initTraining, initS5, initS6, initS7, initS8, initS9, initS10, initS11, initS12, initS13, initS14, initS15, initS16, initS17];
       if (fn[idx]) fn[idx]();
     }
 
@@ -1289,6 +1291,147 @@
       document.getElementById('s3-random').onclick = () => { trained = false; document.getElementById('s3-random').classList.add('active'); document.getElementById('s3-trained').classList.remove('active'); buildChart(); if (selected) showInfo() };
       document.getElementById('s3-trained').onclick = () => { trained = true; document.getElementById('s3-trained').classList.add('active'); document.getElementById('s3-random').classList.remove('active'); buildChart(); if (selected) showInfo() };
       buildChart();
+    }
+
+    // S_TRAINING: How Embeddings Learn
+    function initTraining() {
+      const el = document.getElementById('sc-training');
+      const corpus = [
+        "The wise king ruled the ancient kingdom.",
+        "The brave queen ruled the ancient kingdom.",
+        "A golden crown sits on the king.",
+        "A golden crown sits on the queen.",
+        "I ate a sweet apple for lunch.",
+        "I ate a sweet orange for lunch.",
+        "The apple is a delicious red fruit.",
+        "The orange is a delicious round fruit."
+      ];
+      
+      const initialVecs = {
+        king:   [ 0.12,  0.84, -0.23, -0.65,  0.41, -0.19,  0.33, -0.77,  0.10,  0.55],
+        queen:  [-0.45, -0.11,  0.66,  0.32,  0.88,  0.14, -0.55,  0.27, -0.31, -0.62],
+        apple:  [ 0.77, -0.34,  0.11,  0.92, -0.56,  0.23,  0.65, -0.12, -0.88,  0.43],
+        orange: [-0.63,  0.52, -0.81, -0.15,  0.37,  0.78,  0.19,  0.45,  0.62, -0.29]
+      };
+      
+      let vecs = JSON.parse(JSON.stringify(initialVecs));
+      
+      const targetVecs = {
+        king:   [ 0.70,  0.65, -0.40, -0.55,  0.80, -0.20,  0.50, -0.60,  0.20,  0.45],
+        queen:  [ 0.65,  0.60, -0.35, -0.50,  0.85, -0.15,  0.55, -0.55,  0.15,  0.50],
+        apple:  [-0.60, -0.55,  0.75,  0.60, -0.40,  0.80, -0.65,  0.30, -0.70, -0.85],
+        orange: [-0.55, -0.50,  0.70,  0.65, -0.35,  0.75, -0.60,  0.35, -0.65, -0.80]
+      };
+
+      let epoch = 0;
+      
+      el.innerHTML = `<div class="two-col">
+        <div class="card" style="flex:1; display:flex; flex-direction:column;">
+         <div class="card-header">1. Read the Corpus</div>
+         <p style="font-size:12px;color:var(--muted);margin-bottom:12px">The model scans billions of sentences. We'll use 8. Context windows (3-4 words) slide across each sentence to predict the center word.</p>
+         <div id="tr-corpus" style="flex:1; overflow-y:auto; background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:6px; padding:12px; font-family:var(--font-mono); font-size:11px; line-height:2.0; color:var(--muted);"></div>
+         <div style="margin-top:16px;">
+          <button class="step-btn" id="tr-btn" style="width:100%">Train One Epoch</button>
+         </div>
+        </div>
+        <div class="card" style="flex:1.2; display:flex; flex-direction:column;">
+         <div class="card-header">2. Update 10D Vectors</div>
+         <p style="font-size:12px;color:var(--muted);margin-bottom:8px; line-height:1.4">Coordinates adjust dynamically. Words answering the same context get pulled to the same mathematical area.</p>
+         <div id="tr-matrix" style="flex:1; display:flex; flex-direction:column; gap:4px; margin-top:8px"></div>
+         <div class="insight-card" style="margin-top:auto">
+          <span id="tr-insight"><strong>Initialization:</strong> Notice how random the vectors are. "king" and "queen" are completely dissimilar.</span>
+         </div>
+        </div>
+       </div>`;
+
+      const corpusEl = document.getElementById('tr-corpus');
+      const matrixEl = document.getElementById('tr-matrix');
+      const btn = document.getElementById('tr-btn');
+      const insight = document.getElementById('tr-insight');
+
+      function drawCorpus(highlightKeywords = false) {
+        corpusEl.innerHTML = corpus.map((s, i) => {
+          let html = s;
+          if (highlightKeywords) {
+            html = html.replace('king', '<span style="color:var(--teal);background:rgba(0,212,170,0.15);padding:0 4px;border-radius:4px;font-weight:700">king</span>');
+            html = html.replace('queen', '<span style="color:var(--teal);background:rgba(0,212,170,0.15);padding:0 4px;border-radius:4px;font-weight:700">queen</span>');
+            html = html.replace('apple', '<span style="color:var(--amber);background:rgba(245,158,11,0.15);padding:0 4px;border-radius:4px;font-weight:700">apple</span>');
+            html = html.replace('orange', '<span style="color:var(--amber);background:rgba(245,158,11,0.15);padding:0 4px;border-radius:4px;font-weight:700">orange</span>');
+          }
+          return `<div style="margin-bottom:6px; transition:opacity 0.4s ease" id="tr-c-${i}">${html}</div>`;
+        }).join('');
+      }
+
+      function initMatrixDOM() {
+        let h = `<div style="display:flex; font-size:9px; color:var(--muted); padding-left:60px; margin-bottom:4px">
+          ${[0,1,2,3,4,5,6,7,8,9].map(i => `<div style="flex:1;text-align:center;font-family:var(--font-mono)">\${i}</div>`).join('')}
+        </div>`;
+        
+        ['king', 'queen', 'apple', 'orange'].forEach(w => {
+          h += `<div style="display:flex; align-items:center; margin-bottom:12px">
+            <div style="width:60px; font-weight:600; font-size:12px; color:var(--white)">${w}</div>
+            ${[0,1,2,3,4,5,6,7,8,9].map(i => {
+              return `<div id="tr-m-${w}-${i}" style="flex:1; aspect-ratio:1; max-height:28px; border-radius:4px; margin:0 2px; border:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.9); font-size:9px; font-family:var(--font-mono); transition:all 0.6s cubic-bezier(0.4, 0, 0.2, 1)"></div>`;
+            }).join('')}
+          </div>`;
+        });
+        matrixEl.innerHTML = h;
+      }
+      
+      function updateMatrix() {
+        ['king', 'queen', 'apple', 'orange'].forEach(w => {
+          for(let i=0; i<10; i++) {
+            const el = document.getElementById(`tr-m-${w}-${i}`);
+            const v = vecs[w][i];
+            const bg = v > 0 ? `rgba(0, 212, 170, ${Math.min(v + 0.1, 1)})` : `rgba(239, 68, 68, ${Math.min(Math.abs(v) + 0.1, 1)})`;
+            el.style.background = bg;
+            el.textContent = v.toFixed(1);
+          }
+        });
+      }
+
+      drawCorpus(false);
+      initMatrixDOM();
+      updateMatrix();
+
+      btn.onclick = () => {
+        if (epoch >= 5) {
+          epoch = 0;
+          vecs = JSON.parse(JSON.stringify(initialVecs));
+          btn.textContent = "Train One Epoch";
+          insight.innerHTML = '<strong>Initialization:</strong> Notice how random the vectors are. "king" and "queen" are completely dissimilar.';
+          drawCorpus(false); 
+          for(let i=0; i<8; i++) document.getElementById('tr-c-'+i).style.opacity = '1';
+          updateMatrix();
+          return;
+        }
+
+        epoch++;
+        
+        if (epoch === 1) drawCorpus(true);
+        for(let i=0; i<8; i++) document.getElementById('tr-c-'+i).style.opacity = '0.2';
+        const hl = [0, 4, 2, 6][(epoch - 1) % 4];
+        document.getElementById('tr-c-'+hl).style.opacity = '1';
+        document.getElementById('tr-c-'+(hl+1)).style.opacity = '1';
+
+        ['king', 'queen', 'apple', 'orange'].forEach(w => {
+          for(let i=0; i<10; i++) {
+            vecs[w][i] += (targetVecs[w][i] - vecs[w][i]) * 0.40; 
+          }
+        });
+
+        updateMatrix();
+
+        if (epoch === 1) {
+          insight.innerHTML = '<strong>Epoch 1:</strong> The model reads "ruled the ancient kingdom" for both <em>king</em> and <em>queen</em>. Math pulls their dimensions closer.';
+        } else if (epoch === 3) {
+          insight.innerHTML = '<strong>Epoch 3:</strong> <em>apple</em> and <em>orange</em> share "sweet fruit" contexts. Their dimensions sync up into a separate cluster.';
+        } else if (epoch === 5) {
+          insight.innerHTML = '<strong>Converged!</strong> <em>king/queen</em> are mathematically grouped. <em>apple/orange</em> form their own conceptual cluster. The space is learned!';
+          btn.textContent = "Reset Training";
+          for(let i=0; i<8; i++) document.getElementById('tr-c-'+i).style.opacity = '1';
+        }
+      };
     }
 
     // S5: Vector Arithmetic
