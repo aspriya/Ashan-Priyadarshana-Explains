@@ -1467,7 +1467,7 @@
         bigger: S(110, 270), big: S(170, 100), small: S(460, 70), smaller: S(400, 240)
       };
 
-      el.innerHTML = `<div class="two-col">
+      el.innerHTML = `<div class="two-col" style="margin-bottom:16px">
   <div class="card" style="flex:1.5;position:relative;display:flex;flex-direction:column;">
    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap" id="s4-presets"></div>
    <canvas id="s4-canvas" width="800" height="400" style="width:100%; height:auto; background:rgba(0,0,0,0.1); border-radius:8px; border:1px solid var(--border)"></canvas>
@@ -1487,6 +1487,10 @@
     <strong>The Aha! Moment:</strong> Embeddings encode relationships as spatial <em>directions</em>. The physical distance mapped as "royalty" applies uniformly across genders.
    </div>
   </div>
+ </div>
+ <div class="card" style="background:var(--navy3); border:1px solid rgba(139, 92, 246, 0.3); border-left:4px solid #8B5CF6;">
+   <strong style="color:var(--purple); display:block; margin-bottom:8px; font-size:14px;">Philosophical Insight: Lexical Gaps & Latent Creativity</strong>
+   <p style="font-size:13px; color:var(--muted); line-height:1.6; margin:0">Because the embedding space is continuous, we can pick <em>any</em> coordinate by adding vectors. The model mathematically maps that resulting concept perfectly—but usually, <strong>there is no word in human language for that idea</strong>. This is called a <span style="color:var(--white)">Lexical Gap</span>. In a sense, models are intrinsically creative: they have a concrete "understanding" of an infinite spectrum of concepts (like a flavor between nostalgia and speed) that humans haven't yet invented words to document.</p>
  </div>`;
 
       const presetEl = document.getElementById('s4-presets');
