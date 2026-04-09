@@ -1333,11 +1333,22 @@
          <div style="margin-top:16px;">
           <button class="step-btn" id="tr-btn" style="width:100%">Train One Epoch</button>
          </div>
+         <div style="margin-top:18px;font-size:11px;color:var(--muted);line-height:1.5">
+          <strong style="color:var(--teal)">The Training Pipeline:</strong><br>
+          1. Break the massive corpus into tokens (vocabulary size).<br>
+          2. Define embedding dimensions (e.g., this is a 10D space).<br>
+          3. Slide a "context window" across the text.<br>
+          4. Process the corpus in <strong>mini-batches</strong> to update dimensions incrementally via gradient descent (not all at once!).
+         </div>
         </div>
         <div class="card" style="flex:1.2; display:flex; flex-direction:column;">
          <div class="card-header">2. Update 10D Vectors</div>
          <p style="font-size:12px;color:var(--muted);margin-bottom:8px; line-height:1.4">Coordinates adjust dynamically. Words answering the same context get pulled to the same mathematical area.</p>
          <div id="tr-matrix" style="flex:1; display:flex; flex-direction:column; gap:4px; margin-top:8px"></div>
+         <div style="margin-top:16px;margin-bottom:12px;font-size:11px;color:var(--muted);line-height:1.5">
+          <strong style="color:var(--teal)">Why call it "Latent" structure?</strong><br>
+          "Latent" means hidden. We <em>never</em> manually configure the dimensions to track specific rules. The model automatically discovers these hidden structures (like semantic groupings) purely through contextual math. The final structure is called a <strong>Latent Space</strong>.
+         </div>
          <div class="insight-card" style="margin-top:auto">
           <span id="tr-insight"><strong>Initialization:</strong> Notice how random the vectors are. "king" and "queen" are completely dissimilar.</span>
          </div>
