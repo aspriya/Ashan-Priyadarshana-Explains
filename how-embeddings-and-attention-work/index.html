@@ -1197,11 +1197,29 @@
    <div class="card-header">Selected Word</div>
    <div id="s3-info" style="font-size:13px;color:var(--muted)">Click a point on the chart</div>
    
-   <div style="margin-top:20px;font-size:12px;color:var(--muted);line-height:1.5">
+   <div style="margin-top:16px;font-size:12px;color:var(--muted);line-height:1.5">
     <strong style="color:var(--teal)">How do they learn?</strong><br>
-    The model plays a "fill-in-the-blank" game across millions of books. To guess words correctly, it <em>must</em> cluster similar concepts closer together and push unrelated ones apart. The resulting coordinates become the embedding.<br><br>
-    <strong style="color:var(--teal)">Why are they called "dense"?</strong><br>
-    Unlike sparse one-hot vectors that are 99% zeros, a dense vector packs continuous, real-number values into <em>every single dimension</em>. Every decimal relates to a tiny, abstract fragment of meaning.
+    The model plays a "guess the missing word" game:
+    <div style="background:rgba(0,0,0,0.2);padding:8px 10px;border-radius:6px;margin:6px 0;border:1px solid var(--border)">
+     <div style="margin-bottom:6px">"The majestic <span style="color:var(--teal);border-bottom:1px dashed var(--teal)">____</span> rules the jungle."</div>
+     <div style="display:flex;justify-content:space-between;align-items:center;font-family:var(--font-mono);font-size:11px">
+      <div>
+       <div>lion: <span style="color:var(--red)">[0.1, 0.9]</span></div>
+       <div>tiger: <span style="color:var(--red)">[0.8, 0.2]</span></div>
+      </div>
+      <div style="color:var(--teal);font-size:16px">→</div>
+      <div>
+       <div>lion: <span style="color:var(--green)">[0.6, 0.8]</span></div>
+       <div>tiger: <span style="color:var(--green)">[0.5, 0.7]</span></div>
+      </div>
+     </div>
+     <div style="margin-top:6px;font-size:11px;color:var(--muted);font-family:var(--font-body)">
+      Because they fit the same context, the network physically <em>pulls their coordinates closer together</em>. Doing this billions of times builds the semantic map!
+     </div>
+    </div>
+
+    <strong style="color:var(--teal);display:block;margin-top:10px">Why are they called "dense"?</strong>
+    Unlike sparse one-hot vectors that are 99% zeros, a dense vector packs meaning into <em>every dimension</em>. Every decimal relates to an abstract fragment of meaning.
    </div>
 
    <div class="insight-card" style="margin-top:auto">
