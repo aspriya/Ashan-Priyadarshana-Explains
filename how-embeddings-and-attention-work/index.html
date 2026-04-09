@@ -1198,14 +1198,14 @@
    <div id="s3-info" style="font-size:13px;color:var(--muted)">Click a point on the chart</div>
    
    <div style="margin-top:16px;font-size:12px;color:var(--muted);line-height:1.5">
-    <strong style="color:var(--teal)">How do they learn?</strong><br>
-    The model plays a "guess the missing word" game:
+    <strong style="color:var(--teal)">How do they learn? (The Magic!)</strong><br>
+    We <em>never</em> tell the model what words mean, and we <em>never</em> assign rules to the dimensions (e.g., "dimension 1 = animal"). Instead, it plays a massive "guess the missing word" game:
     <div style="background:rgba(0,0,0,0.2);padding:8px 10px;border-radius:6px;margin:6px 0;border:1px solid var(--border)">
      <div style="margin-bottom:6px">"The majestic <span style="color:var(--teal);border-bottom:1px dashed var(--teal)">____</span> rules the jungle."</div>
      <div style="display:flex;justify-content:space-between;align-items:center;font-family:var(--font-mono);font-size:11px">
       <div>
        <div>lion: <span style="color:var(--red)">[0.1, 0.9]</span></div>
-       <div>tiger: <span style="color:var(--red)">[0.8, 0.2]</span></div>
+       <div>tiger: <span style="color:var(--red)">[-0.8, 0.2]</span></div>
       </div>
       <div style="color:var(--teal);font-size:16px">→</div>
       <div>
@@ -1214,12 +1214,12 @@
       </div>
      </div>
      <div style="margin-top:6px;font-size:11px;color:var(--muted);font-family:var(--font-body)">
-      Because they fit the same context, the network physically <em>pulls their coordinates closer together</em>. Doing this billions of times builds the semantic map!
+      Because both words fit the exact same contexts, the math physically <em>forces their abstract coordinates closer together</em>. Do this billions of times, and human language maps itself automatically!
      </div>
     </div>
 
-    <strong style="color:var(--teal);display:block;margin-top:10px">Why are they called "dense"?</strong>
-    Unlike sparse one-hot vectors that are 99% zeros, a dense vector packs meaning into <em>every dimension</em>. Every decimal relates to an abstract fragment of meaning.
+    <strong style="color:var(--teal);display:block;margin-top:10px">What does a dimension actually record?</strong>
+    In a dense vector, every decimal relates to a <em>latent</em> concept discovered purely by the model. Dimension 408 might loosely track "fluffiness", while 1024 tracks "danger" — all learned entirely from context, without human rules.
    </div>
 
    <div class="insight-card" style="margin-top:auto">
