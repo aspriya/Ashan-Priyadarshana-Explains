@@ -1752,7 +1752,10 @@
    <div style="font-family:var(--font-mono);font-size:13px;line-height:2;color:var(--muted)">
     Attention(Q,K,V) =<br><span style="color:var(--teal)">softmax</span>(<span style="color:var(--blue)">QK<sup>T</sup></span> / <span style="color:var(--purple)">√d<sub>k</sub></span>) · <span style="color:var(--amber)">V</span>
    </div>
-   <div id="s7-explain" style="font-size:12px;color:var(--muted);line-height:1.6;margin-top:12px"></div>
+   <div style="background:var(--navy3); border-radius:6px; padding:12px; border-left:3px solid var(--teal); margin-top:16px;">
+    <strong style="color:var(--white); font-size:12px; display:block; margin-bottom:6px" id="s8-explain-title">Step 1 Details</strong>
+    <div id="s7-explain" style="font-size:12.5px;color:rgba(255,255,255,0.85);line-height:1.6"></div>
+   </div>
   </div>
  </div>`;
 
@@ -1768,8 +1771,9 @@
 
       function render() {
         const cEl = document.getElementById('s7-content');
-        document.querySelectorAll('#sc-7 .toggle-btn').forEach(b => b.classList.toggle('active', +b.dataset.s === curStep + 1));
+        document.querySelectorAll('#sc-8 .toggle-btn').forEach(b => b.classList.toggle('active', +b.dataset.s === curStep + 1));
         document.getElementById('s7-step-num').textContent = curStep + 1;
+        const eTitle = document.getElementById('s8-explain-title');
 
         if (curStep === 0) {
           cEl.innerHTML = `<p style="font-size:13px;color:var(--muted);margin-bottom:10px">Input embeddings × weight matrices = Q, K, V</p>
@@ -1779,7 +1783,9 @@
      ${renderMatrix(K, 'K = X·W_k', 'var(--blue)')}
      ${renderMatrix(V, 'V = X·W_v', 'var(--amber)')}
     </div>`;
-          document.getElementById('s7-explain').innerHTML = 'Each input token gets projected into three separate spaces: <strong style="color:var(--teal)">Query</strong> (what am I looking for?), <strong style="color:var(--blue)">Key</strong> (what do I contain?), <strong style="color:var(--amber)">Value</strong> (what information do I carry?).';
+          eTitle.textContent = "Step 1: Generating Queries, Keys, and Values";
+          eTitle.style.color = "var(--teal)";
+          document.getElementById('s7-explain').innerHTML = 'The static embedding of each input token gets projected into three distinct mathematical spaces through weight matrices. <br><br>• <strong style="color:var(--teal)">Query (Q)</strong>: What am I looking for? <br>• <strong style="color:var(--blue)">Key (K)</strong>: What do I contain? <br>• <strong style="color:var(--amber)">Value (V)</strong>: What information do I carry into the output?';
         } else if (curStep === 1) {
           cEl.innerHTML = `<p style="font-size:13px;color:var(--muted);margin-bottom:10px">QK<sup>T</sup> → "How much does token i attend to token j?"</p>
     <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
@@ -1788,14 +1794,18 @@
      ${renderMatrix(QKt, 'Scores', 'var(--purple)')}
     </div>
     <div style="margin-top:8px;font-size:11px;color:var(--muted)">Rows: ${tokens.join(', ')} | Cols: ${tokens.join(', ')}</div>`;
-          document.getElementById('s7-explain').innerHTML = 'Each cell [i,j] is the dot product of Q[i] and K[j]. Higher value = token i should pay more attention to token j.';
+          eTitle.textContent = "Step 2: Calculating Attention Scores";
+          eTitle.style.color = "var(--purple)";
+          document.getElementById('s7-explain').innerHTML = 'We mathematically compare every Query with every Key using a <strong>Dot Product</strong> matrix multiplication.<br><br>Each cell [i,j] tells us how strongly the Query of word <em>i</em> aligns with the Key of word <em>j</em>. A higher value means word <em>i</em> will absorb a lot of meaning from word <em>j</em>!';
         } else if (curStep === 2) {
           cEl.innerHTML = `<p style="font-size:13px;color:var(--muted);margin-bottom:10px">Scale by √d<sub>k</sub> = √${d / 2} = ${dk.toFixed(1)}, then softmax</p>
     <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
      ${renderMatrix(scaled, 'Scaled Scores', 'var(--purple)')} <span style="font-size:16px;color:var(--muted);align-self:center">→ softmax →</span>
      ${renderMatrix(attn, 'Attention Weights', 'var(--teal)')}
     </div>`;
-          document.getElementById('s7-explain').innerHTML = '<strong style="color:var(--purple)">Why scale?</strong> Without √d_k, large dimensions cause extreme dot products → softmax saturates → vanishing gradients. Scaling keeps values in a stable range. Softmax turns scores into probabilities (each row sums to 1).';
+          eTitle.textContent = "Step 3: Scaling and Softmax (Probabilities)";
+          eTitle.style.color = "var(--yellow)";
+          document.getElementById('s7-explain').innerHTML = '<strong style="color:#F59E0B">Why scale?</strong> Without dividing by √d_k, deep networks create extremely large dot products which break the softmax function via vanishing gradients.<br><br><strong>Softmax</strong> normalizes those raw scores into perfect percentages (probabilities) so every row cleanly sums to 1.0 (100%).';
         } else {
           cEl.innerHTML = `<p style="font-size:13px;color:var(--muted);margin-bottom:10px">Attention weights × V = contextual output</p>
     <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
@@ -1804,11 +1814,13 @@
      ${renderMatrix(output, 'Output', 'var(--green)')}
     </div>
     <div style="margin-top:10px;font-family:var(--font-mono);font-size:12px;color:var(--muted)">Output for "cat" = ${attn[0].map((w, i) => `${(w * 100).toFixed(0)}% of V[${tokens[i]}]`).join(' + ')}</div>`;
-          document.getElementById('s7-explain').innerHTML = 'Each output token is now a <strong style="color:var(--green)">weighted combination</strong> of all Value vectors. The weights are determined by how relevant each key is to the query. This is the complete attention computation.';
+          eTitle.textContent = "Step 4: Creating the Context-Aware Vector";
+          eTitle.style.color = "var(--green)";
+          document.getElementById('s7-explain').innerHTML = 'Finally, every output token becomes a <strong style="color:var(--green)">weighted mixture</strong> of all the original Value (V) vectors. <br><br>Words that scored high in Step 2 contribute heavily. This is the ultimate "Aha" moment: the final numbers are pure context-aware representations!';
         }
       }
 
-      document.querySelectorAll('#sc-7 .toggle-btn').forEach(b => b.onclick = () => { curStep = +b.dataset.s - 1; render() });
+      document.querySelectorAll('#sc-8 .toggle-btn').forEach(b => b.onclick = () => { curStep = +b.dataset.s - 1; render() });
       render();
     }
 
