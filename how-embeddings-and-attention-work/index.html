@@ -1447,7 +1447,7 @@
 
     // S5: Vector Arithmetic
     function initS5() {
-      const el = document.getElementById('sc-5');
+      const el = document.getElementById('sc-6');
       const analogies = [
         { a: 'king', b: 'man', c: 'woman', r: 'queen', pct: 94 },
         { a: 'Paris', b: 'France', c: 'Italy', r: 'Rome', pct: 91 },
@@ -1456,29 +1456,35 @@
       ];
       let curA = 0, step = 0;
 
-      // Precomputed 2D positions
+      // Coordinate helper
+      const O = { x: 120, y: 320 }; // Origin at bottom-left
+      function S(px, py) { return { x: O.x + px, y: O.y - py }; }
+      
       const positions = {
-        king: { x: 300, y: 100 }, man: { x: 150, y: 250 }, woman: { x: 450, y: 250 }, queen: { x: 500, y: 100 },
-        Paris: { x: 350, y: 80 }, France: { x: 150, y: 200 }, Italy: { x: 450, y: 200 }, Rome: { x: 550, y: 80 },
-        walked: { x: 320, y: 90 }, walk: { x: 130, y: 220 }, run: { x: 470, y: 220 }, ran: { x: 530, y: 90 },
-        bigger: { x: 310, y: 100 }, big: { x: 140, y: 240 }, small: { x: 460, y: 240 }, smaller: { x: 520, y: 100 }
+        king: S(80, 240), man: S(150, 70), woman: S(480, 50), queen: S(410, 220),
+        Paris: S(90, 260), France: S(120, 90), Italy: S(450, 110), Rome: S(420, 280),
+        walked: S(60, 210), walk: S(140, 80), run: S(440, 60), ran: S(360, 190),
+        bigger: S(110, 270), big: S(170, 100), small: S(460, 70), smaller: S(400, 240)
       };
 
       el.innerHTML = `<div class="two-col">
-  <div class="card" style="flex:2;position:relative">
-   <div style="display:flex;gap:6px;margin-bottom:10px" id="s4-presets"></div>
-   <canvas id="s4-canvas" width="650" height="350" style="width:100%;max-height:350px"></canvas>
-   <div style="margin-top:8px;text-align:center">
-    <button class="step-btn" id="s4-step">Animate →</button>
-    <button class="step-btn" id="s4-reset" style="background:var(--navy3);color:var(--white);margin-left:8px">Reset</button>
+  <div class="card" style="flex:1.5;position:relative;display:flex;flex-direction:column;">
+   <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap" id="s4-presets"></div>
+   <canvas id="s4-canvas" width="800" height="400" style="width:100%; height:auto; background:rgba(0,0,0,0.1); border-radius:8px; border:1px solid var(--border)"></canvas>
+   <div style="margin-top:16px;display:flex;gap:8px">
+    <button class="step-btn" id="s4-step" style="flex:1">Step Forward →</button>
+    <button class="step-btn" id="s4-reset" style="background:var(--navy3);color:var(--white);padding:8px 16px">Reset</button>
    </div>
   </div>
-  <div class="card" style="flex:1">
-   <div class="card-header">Formula</div>
-   <div id="s4-formula" style="font-family:var(--font-mono);font-size:14px;line-height:2;margin-bottom:12px"></div>
+  <div class="card" style="flex:1; display:flex; flex-direction:column;">
+   <div class="card-header">Semantic Math</div>
+   <div id="s4-formula" style="font-family:var(--font-mono);font-size:14px;line-height:2;margin-bottom:16px"></div>
+   
+   <div id="s4-explanation" style="font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:16px; min-height:80px"></div>
+   
    <div id="s4-match" style="font-family:var(--font-mono);font-size:13px;color:var(--teal)"></div>
    <div class="insight-card" style="margin-top:auto">
-    <strong>Vector arithmetic works</strong> because embeddings encode semantic relationships as directions in space. The "royalty" direction is the same as the "gender" direction offset.
+    <strong>The Aha! Moment:</strong> Embeddings encode relationships as spatial <em>directions</em>. The physical distance mapped as "royalty" applies uniformly across genders.
    </div>
   </div>
  </div>`;
@@ -1499,37 +1505,77 @@
         const W = c.width, H = c.height; ctx.clearRect(0, 0, W, H);
         const an = analogies[curA];
         const pa = positions[an.a], pb = positions[an.b], pc = positions[an.c], pr = positions[an.r];
+        const expl = document.getElementById('s4-explanation');
+
+        // Draw grid & axes
+        ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1; ctx.beginPath();
+        for (let x = 0; x <= W; x += 40) { ctx.moveTo(x, 0); ctx.lineTo(x, H); }
+        for (let y = 0; y <= H; y += 40) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 2; ctx.beginPath();
+        ctx.moveTo(O.x, 0); ctx.lineTo(O.x, H+50); // Y axis
+        ctx.moveTo(0, O.y); ctx.lineTo(W+50, O.y); // X axis
+        ctx.stroke();
 
         // Draw labels
         function drawLabel(pos, label, color) {
-          ctx.fillStyle = color; ctx.font = 'bold 14px "Space Grotesk"';
-          ctx.fillText(label, pos.x - ctx.measureText(label).width / 2, pos.y - 12);
-          ctx.beginPath(); ctx.arc(pos.x, pos.y, 5, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = color; ctx.font = 'bold 15px "Space Grotesk"';
+          ctx.fillText(label, pos.x - ctx.measureText(label).width / 2, pos.y - 14);
+          ctx.beginPath(); ctx.arc(pos.x, pos.y, 6, 0, Math.PI * 2); ctx.fill();
         }
-        function drawArrow(from, to, color, lw = 2) {
+        function drawArrow(from, to, color, lw = 2, dash = []) {
+          ctx.setLineDash(dash);
           ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(to.x, to.y); ctx.stroke();
+          ctx.setLineDash([]);
           const angle = Math.atan2(to.y - from.y, to.x - from.x);
-          ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(to.x, to.y); ctx.lineTo(to.x - 10 * Math.cos(angle - 0.3), to.y - 10 * Math.sin(angle - 0.3)); ctx.lineTo(to.x - 10 * Math.cos(angle + 0.3), to.y - 10 * Math.sin(angle + 0.3)); ctx.fill();
+          ctx.fillStyle = color; ctx.beginPath(); 
+          ctx.moveTo(to.x, to.y); 
+          ctx.lineTo(to.x - 12 * Math.cos(angle - 0.4), to.y - 12 * Math.sin(angle - 0.4)); 
+          ctx.lineTo(to.x - 12 * Math.cos(angle + 0.4), to.y - 12 * Math.sin(angle + 0.4)); 
+          ctx.fill();
         }
 
-        // Always show all points
-        drawLabel(pa, an.a, '#00D4AA'); drawLabel(pb, an.b, '#4C9BE8'); drawLabel(pc, an.c, '#8B5CF6');
-        if (step >= 3) drawLabel(pr, an.r, '#F59E0B');
+        // Base points
+        drawLabel(pa, an.a, '#00D4AA'); 
+        drawLabel(pb, an.b, '#4C9BE8'); 
+        drawLabel(pc, an.c, '#8B5CF6');
+        
+        let targetPos = pr;
+        let vX = pa.x - pb.x; // Vector distance X
+        let vY = pa.y - pb.y; // Vector distance Y
 
-        if (step >= 1) drawArrow({ x: 50, y: H / 2 }, pa, '#00D4AA');
-        if (step >= 2) drawArrow(pa, { x: pa.x - (pa.x - pb.x), y: pa.y - (pa.y - pb.y) }, '#EF4444');
-        // Simplified: show result arrow
-        if (step >= 3) {
-          const mid = { x: pa.x + (pc.x - pb.x), y: pa.y + (pc.y - pb.y) };
-          drawArrow(pa, mid, '#8B5CF6');
-          // Show approximate match
-          ctx.setLineDash([5, 5]); ctx.strokeStyle = '#F59E0B'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(mid.x, mid.y); ctx.lineTo(pr.x, pr.y); ctx.stroke(); ctx.setLineDash([]);
+        // Formulate explanation logic
+        if (step === 0) {
+          expl.innerHTML = `We have four related words plotted on a simplified 2D grid. We want to test if relationships are mathematically consistent.`;
+        } else if (step === 1) {
+           drawArrow(pb, pa, '#EF4444', 3);
+          expl.innerHTML = `<strong>1: Extract Concept Vector.</strong> We calculate the visual distance algebraically from <em>${an.b}</em> to <em>${an.a}</em>. This vector isolates the concept of "status" or "change"!`;
+        } else if (step === 2) {
+          drawArrow(pb, pa, 'rgba(239,68,68,0.3)', 2);
+          drawLabel(pc, an.c, '#8B5CF6'); // Redraw over arrow
+          expl.innerHTML = `<strong>2: Mathematical Transfer.</strong> We take that exact extracted concept-vector and add it to the coordinate of <em>${an.c}</em>.`;
+        } else if (step >= 3) {
+          drawArrow(pb, pa, 'rgba(239,68,68,0.3)', 2);
+          drawArrow(pc, { x: pc.x + vX, y: pc.y + vY }, '#EF4444', 3);
+          drawLabel(pr, an.r, '#F59E0B');
+          expl.innerHTML = `<strong>3: The Arrival.</strong> Moving along that vector from <em>${an.c}</em> lands us perfectly at our target destination: <em>${an.r}</em>!`;
+        }
+
+        // Show proximity dashed line at end
+        if (step === 4) {
+          drawArrow(pb, pa, 'rgba(239,68,68,0.3)', 2);
+          drawArrow(pc, { x: pc.x + vX, y: pc.y + vY }, '#EF4444', 3);
+          drawLabel(pr, an.r, '#F59E0B');
+          ctx.setLineDash([5, 5]); ctx.strokeStyle = '#F59E0B'; ctx.lineWidth = 1; ctx.beginPath(); 
+          ctx.moveTo(pc.x + vX, pc.y + vY); ctx.lineTo(pr.x, pr.y); ctx.stroke(); ctx.setLineDash([]);
+          expl.innerHTML += `<br><br><span style="color:var(--amber)">This validates the latent structure! The math intrinsically captured analogical properties.</span>`;
         }
 
         // Formula
         const fEl = document.getElementById('s4-formula');
         fEl.innerHTML = `<span style="color:var(--teal)">${an.a}</span> − <span style="color:var(--blue)">${an.b}</span> + <span style="color:var(--purple)">${an.c}</span> ≈ <span style="color:var(--amber)">${an.r}</span>`;
-        document.getElementById('s4-match').textContent = step >= 3 ? `Approximate match: ${an.pct}%` : '';
+        document.getElementById('s4-match').textContent = step >= 4 ? `Cosine Similarity Match: ${an.pct}%` : '';
       }
       drawCanvas();
     }
