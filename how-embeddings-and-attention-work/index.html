@@ -1665,12 +1665,18 @@
    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px" id="s6-words"></div>
    <div id="s6-heatmap" style="overflow-x:auto"></div>
   </div>
-  <div class="card" style="flex:1">
+  <div class="card" style="flex:1; display:flex; flex-direction:column; overflow-y:auto; padding-right:12px;">
    <div class="card-header">Temperature: <span id="s6-temp-val">1.0</span></div>
    <input type="range" min="0.1" max="5" step="0.1" value="1" id="s6-temp" style="margin-bottom:12px">
    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:14px"><span>Sharp (0.1)</span><span>Diffuse (5.0)</span></div>
-   <div id="s6-explain" style="font-size:13px;color:var(--muted);line-height:1.6"></div>
-   <div class="insight-card" style="margin-top:auto"><strong>The model "looks at" different parts of the sentence differently for each word.</strong> This is the core intuition of attention.</div>
+   <div id="s6-explain" style="font-size:13px;color:var(--muted);line-height:1.6; margin-bottom:16px;"></div>
+   
+   <div class="insight-card" style="margin-top:auto; margin-bottom:16px;"><strong>The model "looks at" different parts of the sentence differently for each word.</strong> This is the core intuition of attention.</div>
+
+   <div style="background:rgba(0, 212, 170, 0.05); border:1px solid rgba(0, 212, 170, 0.2); border-left:4px solid var(--teal); border-radius:6px; padding:12px;">
+    <strong style="color:var(--teal); display:block; margin-bottom:8px; font-size:13px;">The Lexical Shift (Aha! Moment)</strong>
+    <p style="font-size:12px; color:rgba(255,255,255,0.85); line-height:1.6; margin:0">Standard embeddings give a word a <em>static</em> mathematical meaning like a dictionary. But language is fluid—meaning shifts drastically based on surrounding words!<br><br>We need a mechanism that updates those static initial vectors based on the specific neighborhood of words they currently appear in. This is called <strong>Self-Attention</strong> because the sentence mathematicaly "looks at itself" to shift every static word vector into a purely <em>context-aware</em> vector!</p>
+   </div>
   </div>
  </div>`;
 
