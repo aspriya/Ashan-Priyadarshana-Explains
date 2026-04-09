@@ -369,7 +369,8 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      flex: 1
+      flex: 1;
+      padding-top: 100px;
     }
 
     .title-center h1 {
@@ -893,15 +894,15 @@
     function initS0() {
       const c = document.getElementById('c0'), ctx = c.getContext('2d');
       let W, H; const pts = [];
-      function resize() { 
-        W = c.width = c.clientWidth || window.innerWidth; 
-        H = c.height = c.clientHeight || (window.innerHeight * 0.45); 
+      function resize() {
+        W = c.width = c.clientWidth || window.innerWidth;
+        H = c.height = c.clientHeight || (window.innerHeight * 0.45);
       }
       resize(); window.addEventListener('resize', resize);
       // Ensure canvas spans properly right away
-      setTimeout(resize, 50); 
+      setTimeout(resize, 50);
 
-      for (let i = 0; i < 180; i++) pts.push({ x: Math.random() * (window.innerWidth), y: Math.random() * (window.innerHeight*0.45), vx: (Math.random() - .5) * .6, vy: (Math.random() - .5) * .6, r: Math.random() * 2 + 1 });
+      for (let i = 0; i < 180; i++) pts.push({ x: Math.random() * (window.innerWidth), y: Math.random() * (window.innerHeight * 0.45), vx: (Math.random() - .5) * .6, vy: (Math.random() - .5) * .6, r: Math.random() * 2 + 1 });
       function draw() {
         ctx.clearRect(0, 0, W, H);
         pts.forEach(p => {
@@ -1105,7 +1106,7 @@
         simEl.textContent = sim.toFixed(4);
         simEl.style.color = sim > .5 ? 'var(--teal)' : sim > .2 ? 'var(--amber)' : 'var(--red)';
         pairEl.textContent = `"${a}" vs "${b}"`;
-        
+
         calcEl.innerHTML = calcHtml;
         calcEl.style.display = 'block';
       }
@@ -1334,25 +1335,25 @@
         "The apple is a delicious red fruit.",
         "The orange is a delicious round fruit."
       ];
-      
+
       const initialVecs = {
-        king:   [ 0.12,  0.84, -0.23, -0.65,  0.41, -0.19,  0.33, -0.77,  0.10,  0.55],
-        queen:  [-0.45, -0.11,  0.66,  0.32,  0.88,  0.14, -0.55,  0.27, -0.31, -0.62],
-        apple:  [ 0.77, -0.34,  0.11,  0.92, -0.56,  0.23,  0.65, -0.12, -0.88,  0.43],
-        orange: [-0.63,  0.52, -0.81, -0.15,  0.37,  0.78,  0.19,  0.45,  0.62, -0.29]
+        king: [0.12, 0.84, -0.23, -0.65, 0.41, -0.19, 0.33, -0.77, 0.10, 0.55],
+        queen: [-0.45, -0.11, 0.66, 0.32, 0.88, 0.14, -0.55, 0.27, -0.31, -0.62],
+        apple: [0.77, -0.34, 0.11, 0.92, -0.56, 0.23, 0.65, -0.12, -0.88, 0.43],
+        orange: [-0.63, 0.52, -0.81, -0.15, 0.37, 0.78, 0.19, 0.45, 0.62, -0.29]
       };
-      
+
       let vecs = JSON.parse(JSON.stringify(initialVecs));
-      
+
       const targetVecs = {
-        king:   [ 0.70,  0.65, -0.40, -0.55,  0.80, -0.20,  0.50, -0.60,  0.20,  0.45],
-        queen:  [ 0.65,  0.60, -0.35, -0.50,  0.85, -0.15,  0.55, -0.55,  0.15,  0.50],
-        apple:  [-0.60, -0.55,  0.75,  0.60, -0.40,  0.80, -0.65,  0.30, -0.70, -0.85],
-        orange: [-0.55, -0.50,  0.70,  0.65, -0.35,  0.75, -0.60,  0.35, -0.65, -0.80]
+        king: [0.70, 0.65, -0.40, -0.55, 0.80, -0.20, 0.50, -0.60, 0.20, 0.45],
+        queen: [0.65, 0.60, -0.35, -0.50, 0.85, -0.15, 0.55, -0.55, 0.15, 0.50],
+        apple: [-0.60, -0.55, 0.75, 0.60, -0.40, 0.80, -0.65, 0.30, -0.70, -0.85],
+        orange: [-0.55, -0.50, 0.70, 0.65, -0.35, 0.75, -0.60, 0.35, -0.65, -0.80]
       };
 
       let epoch = 0;
-      
+
       el.innerHTML = `<div class="two-col">
         <div class="card" style="flex:1; display:flex; flex-direction:column;">
          <div class="card-header">1. Read the Corpus</div>
@@ -1403,23 +1404,23 @@
 
       function initMatrixDOM() {
         let h = `<div style="display:flex; font-size:9px; color:var(--muted); padding-left:60px; margin-bottom:4px">
-          ${[0,1,2,3,4,5,6,7,8,9].map(i => `<div style="flex:1;text-align:center;font-family:var(--font-mono)">\${i}</div>`).join('')}
+          ${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => `<div style="flex:1;text-align:center;font-family:var(--font-mono)">\${i}</div>`).join('')}
         </div>`;
-        
+
         ['king', 'queen', 'apple', 'orange'].forEach(w => {
           h += `<div style="display:flex; align-items:center; margin-bottom:12px">
             <div style="width:60px; font-weight:600; font-size:12px; color:var(--white)">${w}</div>
-            ${[0,1,2,3,4,5,6,7,8,9].map(i => {
-              return `<div id="tr-m-${w}-${i}" style="flex:1; aspect-ratio:1; max-height:28px; border-radius:4px; margin:0 2px; border:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.9); font-size:9px; font-family:var(--font-mono); transition:all 0.6s cubic-bezier(0.4, 0, 0.2, 1)"></div>`;
-            }).join('')}
+            ${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => {
+            return `<div id="tr-m-${w}-${i}" style="flex:1; aspect-ratio:1; max-height:28px; border-radius:4px; margin:0 2px; border:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.9); font-size:9px; font-family:var(--font-mono); transition:all 0.6s cubic-bezier(0.4, 0, 0.2, 1)"></div>`;
+          }).join('')}
           </div>`;
         });
         matrixEl.innerHTML = h;
       }
-      
+
       function updateMatrix() {
         ['king', 'queen', 'apple', 'orange'].forEach(w => {
-          for(let i=0; i<10; i++) {
+          for (let i = 0; i < 10; i++) {
             const el = document.getElementById(`tr-m-${w}-${i}`);
             const v = vecs[w][i];
             const bg = v > 0 ? `rgba(0, 212, 170, ${Math.min(v + 0.1, 1)})` : `rgba(239, 68, 68, ${Math.min(Math.abs(v) + 0.1, 1)})`;
@@ -1439,23 +1440,23 @@
           vecs = JSON.parse(JSON.stringify(initialVecs));
           btn.textContent = "Train One Epoch";
           insight.innerHTML = '<strong>Initialization:</strong> Notice how random the vectors are. "king" and "queen" are completely dissimilar.';
-          drawCorpus(false); 
-          for(let i=0; i<8; i++) document.getElementById('tr-c-'+i).style.opacity = '1';
+          drawCorpus(false);
+          for (let i = 0; i < 8; i++) document.getElementById('tr-c-' + i).style.opacity = '1';
           updateMatrix();
           return;
         }
 
         epoch++;
-        
+
         if (epoch === 1) drawCorpus(true);
-        for(let i=0; i<8; i++) document.getElementById('tr-c-'+i).style.opacity = '0.2';
+        for (let i = 0; i < 8; i++) document.getElementById('tr-c-' + i).style.opacity = '0.2';
         const hl = [0, 4, 2, 6][(epoch - 1) % 4];
-        document.getElementById('tr-c-'+hl).style.opacity = '1';
-        document.getElementById('tr-c-'+(hl+1)).style.opacity = '1';
+        document.getElementById('tr-c-' + hl).style.opacity = '1';
+        document.getElementById('tr-c-' + (hl + 1)).style.opacity = '1';
 
         ['king', 'queen', 'apple', 'orange'].forEach(w => {
-          for(let i=0; i<10; i++) {
-            vecs[w][i] += (targetVecs[w][i] - vecs[w][i]) * 0.40; 
+          for (let i = 0; i < 10; i++) {
+            vecs[w][i] += (targetVecs[w][i] - vecs[w][i]) * 0.40;
           }
         });
 
@@ -1468,7 +1469,7 @@
         } else if (epoch === 5) {
           insight.innerHTML = '<strong>Converged!</strong> <em>king/queen</em> are mathematically grouped. <em>apple/orange</em> form their own conceptual cluster. The space is learned!';
           btn.textContent = "Reset Training";
-          for(let i=0; i<8; i++) document.getElementById('tr-c-'+i).style.opacity = '1';
+          for (let i = 0; i < 8; i++) document.getElementById('tr-c-' + i).style.opacity = '1';
         }
       };
     }
@@ -1487,7 +1488,7 @@
       // Coordinate helper
       const O = { x: 120, y: 320 }; // Origin at bottom-left
       function S(px, py) { return { x: O.x + px, y: O.y - py }; }
-      
+
       const positions = {
         king: S(80, 240), man: S(150, 70), woman: S(480, 50), queen: S(410, 220),
         Paris: S(90, 260), France: S(120, 90), Italy: S(450, 110), Rome: S(420, 280),
@@ -1546,8 +1547,8 @@
         ctx.stroke();
 
         ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 2; ctx.beginPath();
-        ctx.moveTo(O.x, 0); ctx.lineTo(O.x, H+50); // Y axis
-        ctx.moveTo(0, O.y); ctx.lineTo(W+50, O.y); // X axis
+        ctx.moveTo(O.x, 0); ctx.lineTo(O.x, H + 50); // Y axis
+        ctx.moveTo(0, O.y); ctx.lineTo(W + 50, O.y); // X axis
         ctx.stroke();
 
         // Axis Labels
@@ -1555,7 +1556,7 @@
         ctx.fillText('Latent Dimension X (e.g. Masculine → Feminine, Present → Past)', O.x + 20, O.y + 20);
         ctx.save();
         ctx.translate(O.x - 20, 20);
-        ctx.rotate(-Math.PI/2);
+        ctx.rotate(-Math.PI / 2);
         ctx.fillText('Latent Dimension Y (e.g. Human → Royalty, Normal → Extreme)', -250, 0);
         ctx.restore();
 
@@ -1570,18 +1571,18 @@
           ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(to.x, to.y); ctx.stroke();
           ctx.setLineDash([]);
           const angle = Math.atan2(to.y - from.y, to.x - from.x);
-          ctx.fillStyle = color; ctx.beginPath(); 
-          ctx.moveTo(to.x, to.y); 
-          ctx.lineTo(to.x - 12 * Math.cos(angle - 0.4), to.y - 12 * Math.sin(angle - 0.4)); 
-          ctx.lineTo(to.x - 12 * Math.cos(angle + 0.4), to.y - 12 * Math.sin(angle + 0.4)); 
+          ctx.fillStyle = color; ctx.beginPath();
+          ctx.moveTo(to.x, to.y);
+          ctx.lineTo(to.x - 12 * Math.cos(angle - 0.4), to.y - 12 * Math.sin(angle - 0.4));
+          ctx.lineTo(to.x - 12 * Math.cos(angle + 0.4), to.y - 12 * Math.sin(angle + 0.4));
           ctx.fill();
         }
 
         // Base points
-        drawLabel(pa, an.a, '#00D4AA'); 
-        drawLabel(pb, an.b, '#4C9BE8'); 
+        drawLabel(pa, an.a, '#00D4AA');
+        drawLabel(pb, an.b, '#4C9BE8');
         drawLabel(pc, an.c, '#8B5CF6');
-        
+
         let vX = pa.x - pb.x; // Vector distance X
         let vY = pa.y - pb.y; // Vector distance Y
         let originVectorNode = { x: O.x + vX, y: O.y + vY }; // The physical "Concept" vector relative to the origin
@@ -1590,7 +1591,7 @@
         if (step === 0) {
           expl.innerHTML = `We have four related words plotted on a simplified 2D grid. We want to test if relationships are mathematically consistent. Note: Real embeddings have 1024+ dimensions; we only show 2 latent dimensions here.`;
         } else if (step === 1) {
-           drawArrow(pb, pa, '#EF4444', 3);
+          drawArrow(pb, pa, '#EF4444', 3);
           expl.innerHTML = `<strong>1: Extract Vector.</strong> We calculate the visual distance algebraically from <em>${an.b}</em> to <em>${an.a}</em>.`;
         } else if (step === 2) {
           drawArrow(pb, pa, 'rgba(239,68,68,0.3)', 2);
@@ -1610,7 +1611,7 @@
           drawArrow(pb, pa, 'rgba(239,68,68,0.3)', 2);
           drawArrow(pc, { x: pc.x + vX, y: pc.y + vY }, '#EF4444', 3);
           drawLabel(pr, an.r, '#F59E0B');
-          ctx.setLineDash([5, 5]); ctx.strokeStyle = '#F59E0B'; ctx.lineWidth = 1; ctx.beginPath(); 
+          ctx.setLineDash([5, 5]); ctx.strokeStyle = '#F59E0B'; ctx.lineWidth = 1; ctx.beginPath();
           ctx.moveTo(pc.x + vX, pc.y + vY); ctx.lineTo(pr.x, pr.y); ctx.stroke(); ctx.setLineDash([]);
           expl.innerHTML = `<strong>4: The Arrival.</strong> Moving along the concept vector from <em>${an.c}</em> lands us perfectly at our target destination: <em>${an.r}</em>!`;
           expl.innerHTML += `<br><br><span style="color:var(--amber)">This validates the latent structure! The math intrinsically captured analogical properties across dimensions.</span>`;
