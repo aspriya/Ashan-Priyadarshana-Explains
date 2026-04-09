@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Week 04 — The Language of Vectors</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--navy:#0D1B2A;--navy2:#1A2B3C;--navy3:#243447;
+--teal:#00D4AA;--teal2:#00A882;--blue:#4C9BE8;--purple:#8B5CF6;
+--amber:#F59E0B;--red:#EF4444;--orange:#F97316;--green:#10B981;
+--white:#F0F4F8;--muted:#64748B;
+--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);
+--font-display:'Fraunces',serif;--font-body:'Space Grotesk',sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);color:var(--white);font-family:var(--font-body)}
+/* Progress bar */
+#progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--blue));z-index:1000;transition:width .4s ease}
+/* Slide container */
+#deck{position:relative;width:100%;height:100%}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:48px 48px 80px;opacity:0;transform:translateX(60px);transition:opacity .5s cubic-bezier(.4,0,.2,1),transform .5s cubic-bezier(.4,0,.2,1);pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}
+.slide.prev{opacity:0;transform:translateX(-60px)}
+.slide-tag{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--teal);margin-bottom:6px}
+.slide-title{font-family:var(--font-display);font-size:clamp(24px,3.5vw,42px);font-weight:700;line-height:1.15;margin-bottom:6px}
+.slide-subtitle{color:var(--muted);font-size:clamp(13px,1.4vw,16px);margin-bottom:20px;max-width:700px}
+.slide-content{flex:1;display:flex;gap:20px;min-height:0;overflow:hidden}
+/* Nav bar */
+#nav{position:fixed;bottom:0;left:0;right:0;height:64px;background:rgba(13,27,42,.95);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:999;backdrop-filter:blur(12px)}
+#nav .dots{display:flex;gap:6px;flex:1;justify-content:center;overflow-x:auto}
+#nav .dot{width:8px;height:8px;border-radius:50%;background:var(--navy3);cursor:pointer;transition:all .3s;flex-shrink:0}
+#nav .dot.active{background:var(--teal);transform:scale(1.3)}
+#nav .dot:hover{background:var(--teal2)}
+.nav-btn{font-family:var(--font-body);font-size:13px;font-weight:600;padding:8px 20px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--white);cursor:pointer;transition:all .2s;white-space:nowrap}
+.nav-btn:hover{background:var(--teal);color:var(--navy);border-color:var(--teal)}
+#slide-label{font-family:var(--font-mono);font-size:11px;color:var(--muted);position:fixed;bottom:68px;left:50%;transform:translateX(-50%);z-index:999}
+/* Shared UI */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.card-header{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--teal);margin-bottom:10px}
+.toggle-group{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.toggle-btn{font-family:var(--font-mono);font-size:12px;padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .2s}
+.toggle-btn.active{background:var(--teal);color:var(--navy);border-color:var(--teal)}
+.toggle-btn:hover{border-color:var(--teal)}
+.step-btn{font-family:var(--font-body);font-size:13px;font-weight:600;padding:8px 20px;border-radius:8px;border:none;background:var(--teal);color:var(--navy);cursor:pointer;transition:all .2s}
+.step-btn:hover{background:var(--teal2)}
+.insight-card{background:linear-gradient(135deg,rgba(0,212,170,.08),rgba(76,155,232,.08));border:1px solid rgba(0,212,170,.2);border-radius:10px;padding:14px;margin-top:12px;font-size:13px;line-height:1.6}
+.insight-card strong{color:var(--teal)}
+.pill{display:inline-block;font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);color:var(--muted);margin:3px}
+.two-col{display:flex;gap:20px;flex:1;min-height:0}
+.two-col>*{flex:1;min-width:0}
+.mini-table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:12px;margin-top:8px}
+.mini-table th,.mini-table td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--border)}
+.mini-table th{color:var(--teal);font-weight:600}
+.check-item{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;font-size:13px;line-height:1.5}
+.check-item::before{content:'✓';color:var(--teal);font-weight:700;flex-shrink:0}
+canvas.bg-canvas{position:absolute;inset:0;z-index:0}
+.z1{position:relative;z-index:1}
+/* Title slide */
+.title-center{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;flex:1}
+.title-center h1{font-family:var(--font-display);font-size:clamp(32px,5vw,64px);font-weight:800;background:linear-gradient(135deg,var(--white),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
+.title-center .week-badge{font-family:var(--font-mono);font-size:13px;letter-spacing:3px;color:var(--teal);margin-bottom:20px;text-transform:uppercase}
+.title-pills{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:16px}
+/* Flip cards */
+.flip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;flex:1;overflow-y:auto}
+.flip-card{perspective:600px;height:140px;cursor:pointer}
+.flip-inner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;border-radius:12px;padding:16px;display:flex;flex-direction:column;justify-content:center;backface-visibility:hidden}
+.flip-front{border:1px solid var(--border);background:var(--card)}
+.flip-back{transform:rotateY(180deg);border:1px solid rgba(0,212,170,.2);background:rgba(0,212,170,.06);font-size:13px;line-height:1.5}
+.flip-front .fc-label{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+.flip-front .fc-title{font-family:var(--font-display);font-size:18px;font-weight:700}
+/* Heatmap */
+.heatmap-grid{display:grid;gap:2px;font-family:var(--font-mono);font-size:10px}
+.heatmap-cell{display:flex;align-items:center;justify-content:center;border-radius:3px;aspect-ratio:1;min-width:24px;cursor:pointer;transition:all .2s}
+.heatmap-label{color:var(--muted);font-size:10px;display:flex;align-items:center;justify-content:center}
+/* Token chips */
+.token-chip{display:inline-block;padding:4px 8px;border-radius:6px;font-family:var(--font-mono);font-size:13px;margin:3px;color:var(--navy);font-weight:600}
+.token-id{display:inline-block;font-family:var(--font-mono);font-size:10px;color:var(--muted);margin:1px 3px}
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--navy3);border-radius:4px}
+/* Responsive */
+@media(max-width:768px){
+ .slide{padding:24px 16px 80px}
+ .slide-content,.two-col{flex-direction:column}
+ .flip-grid{grid-template-columns:1fr}
+ .toggle-btn,.step-btn,.nav-btn{min-height:44px}
+ #nav .dots{gap:4px}
+ #nav .dot{width:6px;height:6px}
+}
+/* Preset buttons */
+.preset-btn{font-family:var(--font-mono);font-size:11px;padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s}
+.preset-btn:hover,.preset-btn.active{border-color:var(--teal);color:var(--teal)}
+/* Matrix display */
+.matrix{display:inline-grid;gap:2px;font-family:var(--font-mono);font-size:11px;background:var(--card);border-radius:8px;padding:8px}
+.matrix-cell{padding:3px 6px;border-radius:3px;text-align:center;min-width:36px}
+/* Architecture blocks */
+.arch-block{padding:10px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card);cursor:pointer;text-align:center;font-family:var(--font-mono);font-size:12px;transition:all .2s;margin:4px 0}
+.arch-block:hover,.arch-block.selected{border-color:var(--teal);background:rgba(0,212,170,.08)}
+.arch-arrow{text-align:center;color:var(--muted);font-size:18px;line-height:1}
+/* Word click */
+.word-btn{font-family:var(--font-mono);font-size:13px;padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--white);cursor:pointer;transition:all .2s;margin:3px}
+.word-btn:hover{border-color:var(--teal)}
+.word-btn.active{background:var(--teal);color:var(--navy);border-color:var(--teal)}
+/* Slider */
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:var(--navy3);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--teal);cursor:pointer}
+/* Input */
+.text-input{font-family:var(--font-mono);font-size:14px;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--navy2);color:var(--white);width:100%;outline:none}
+.text-input:focus{border-color:var(--teal)}
+select.styled-select{font-family:var(--font-mono);font-size:12px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--navy2);color:var(--white);outline:none;cursor:pointer}
+/* Layer stack */
+.layer-block{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card);cursor:pointer;font-family:var(--font-mono);font-size:12px;margin:3px 0;transition:all .3s;text-align:center}
+.layer-block:hover,.layer-block.active{border-color:var(--teal);background:rgba(0,212,170,.08)}
+/* KV anim */
+.kv-token{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:8px;font-family:var(--font-mono);font-size:11px;margin:3px;border:2px solid var(--border);transition:all .3s}
+.kv-token.cached{border-color:var(--green);background:rgba(16,185,129,.1)}
+.kv-token.computing{border-color:var(--amber);background:rgba(245,158,11,.15);animation:pulse .8s ease infinite}
+.kv-token.new{border-color:var(--teal);background:rgba(0,212,170,.1)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+/* Context buffer */
+.ctx-token{display:inline-block;width:24px;height:32px;border-radius:4px;margin:1px;font-family:var(--font-mono);font-size:8px;line-height:32px;text-align:center;transition:all .3s}
+.ctx-token.visible{background:var(--teal);color:var(--navy)}
+.ctx-token.fallen{background:var(--red);opacity:.3}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="deck"></div>
+<div id="slide-label"></div>
+<nav id="nav">
+ <button class="nav-btn" onclick="go(-1)">← Prev</button>
+ <div class="dots" id="dots"></div>
+ <button class="nav-btn" onclick="go(1)">Next →</button>
+</nav>
+
+<script>
+// ===== SLIDE SYSTEM =====
+let cur=0,total=18,inited=new Set();
+const slideData=[
+ {tag:'WEEK 04',title:'The Language of Vectors'},
+ {tag:'SLIDE 01 · ENCODING',title:'What is Encoding?',sub:'Before we teach machines language, we need to understand how information becomes numbers.'},
+ {tag:'SLIDE 02 · ENCODING METHODS',title:'Why Language is Hard for Machines',sub:'Three encoding approaches — and only one captures meaning.'},
+ {tag:'SLIDE 03 · TOKENIZATION',title:'What the Model Actually Sees',sub:'Words are an illusion. The model sees subword tokens.'},
+ {tag:'SLIDE 04 · EMBEDDINGS',title:'What is an Embedding?',sub:'A learned, dense vector where position = meaning.'},
+ {tag:'SLIDE 05 · VECTOR MATH',title:'Vector Arithmetic & King–Queen',sub:'Meaning has structure. You can do math on it.'},
+ {tag:'SLIDE 06 · CONTEXT',title:'The Context Problem',sub:'Why word-by-word encoding fails — and what fixes it.'},
+ {tag:'SLIDE 07 · ATTENTION',title:'The Attention Mechanism — Intuition',sub:'The model "looks at" different parts of the sentence for each word.'},
+ {tag:'SLIDE 08 · Q, K, V',title:'Attention: The Math',sub:'softmax(QK^T / √d_k) · V — step by step.'},
+ {tag:'SLIDE 09 · MULTI-HEAD',title:'Multi-Head Attention',sub:'Each head asks a different question about the sentence.'},
+ {tag:'SLIDE 10 · DEPTH',title:'Layer Stacking & Why Depth Matters',sub:'Each layer builds on the representations below it.'},
+ {tag:'SLIDE 11 · POSITION',title:'Positional Encoding',sub:'Making attention care about word order.'},
+ {tag:'SLIDE 12 · ARCHITECTURE',title:'The Transformer (Big Picture)',sub:'Every component in one clickable diagram.'},
+ {tag:'SLIDE 13 · KV CACHE',title:'KV Cache: Why Inference is Fast',sub:'Cache Keys and Values. Only compute the new token.'},
+ {tag:'SLIDE 14 · CONTEXT WINDOW',title:'Context Window: The Memory Limit',sub:'The finite buffer of tokens the model can see.'},
+ {tag:'SLIDE 15 · TRAINING',title:'From Transformer to LLM',sub:'The training objective: predict the next token.'},
+ {tag:'SLIDE 16 · FOUNDATION',title:'You Just Understood the Foundation of Every LLM',sub:'These aren\'t abstract concepts. They are real engineering.'},
+ {tag:'SLIDE 17 · RECAP',title:'Week 4 Recap + Week 5 Preview',sub:'Key takeaways and what\'s coming next.'}
+];
+
+function buildDeck(){
+ const deck=document.getElementById('deck'),dots=document.getElementById('dots');
+ for(let i=0;i<total;i++){
+  const s=document.createElement('div');
+  s.className='slide'+(i===0?' active':'');
+  s.id='slide-'+i;
+  s.innerHTML=i===0?buildSlide0():
+   `<div class="slide-tag">${slideData[i].tag}</div>
+    <div class="slide-title">${slideData[i].title}</div>
+    <div class="slide-subtitle">${slideData[i].sub||''}</div>
+    <div class="slide-content" id="sc-${i}"></div>`;
+  deck.appendChild(s);
+  const d=document.createElement('div');
+  d.className='dot'+(i===0?' active':'');
+  d.onclick=()=>goTo(i);
+  dots.appendChild(d);
+ }
+ updateUI();
+}
+
+function buildSlide0(){
+ return `<canvas class="bg-canvas" id="c0"></canvas>
+ <div class="title-center z1">
+  <div class="week-badge">Week 04 · Core AI Principles</div>
+  <h1>The Language of Vectors</h1>
+  <p style="color:var(--muted);max-width:520px;margin:0 auto 16px;font-size:15px">How Embeddings and Attention translate human language into mathematical space where meaning is preserved.</p>
+  <div class="title-pills">
+   <span class="pill">Tokenization</span><span class="pill">Embeddings</span><span class="pill">Attention</span>
+   <span class="pill">Transformers</span><span class="pill">KV Cache</span><span class="pill">Context Window</span>
+  </div>
+ </div>`;
+}
+
+function goTo(i){
+ if(i<0||i>=total||i===cur)return;
+ const prev=document.getElementById('slide-'+cur);
+ const next=document.getElementById('slide-'+i);
+ prev.className=i>cur?'slide prev':'slide';
+ next.className='slide active';
+ cur=i;updateUI();onSlideEnter(i);
+}
+function go(d){goTo(cur+d)}
+function updateUI(){
+ document.querySelectorAll('.dot').forEach((d,i)=>d.className=i===cur?'dot active':'dot');
+ document.getElementById('progress').style.width=(cur/(total-1)*100)+'%';
+ document.getElementById('slide-label').textContent=slideData[cur].tag;
+}
+document.addEventListener('keydown',e=>{
+ if(e.key==='ArrowRight')go(1);
+ if(e.key==='ArrowLeft')go(-1);
+});
+
+// ===== HELPERS =====
+function cosSim(a,b){let d=0,ma=0,mb=0;for(let i=0;i<a.length;i++){d+=a[i]*b[i];ma+=a[i]*a[i];mb+=b[i]*b[i]}return d/(Math.sqrt(ma)*Math.sqrt(mb))}
+function softmax(arr){const m=Math.max(...arr);const e=arr.map(x=>Math.exp(x-m));const s=e.reduce((a,b)=>a+b,0);return e.map(x=>x/s)}
+function randN(){return(Math.random()-.5)*2}
+function lerp(a,b,t){return a+(b-a)*t}
+const TC=['#00D4AA','#4C9BE8','#8B5CF6','#F59E0B','#EF4444','#F97316','#10B981','#EC4899','#06B6D4','#A78BFA'];
+
+// ===== SLIDE INITS =====
+function onSlideEnter(idx){
+ if(inited.has(idx))return;inited.add(idx);
+ const fn=[initS0,initS1,initS2,initS3,initS4,initS5,initS6,initS7,initS8,initS9,initS10,initS11,initS12,initS13,initS14,initS15,initS16,initS17];
+ if(fn[idx])fn[idx]();
+}
+
+// S0: Title particles
+function initS0(){
+ const c=document.getElementById('c0'),ctx=c.getContext('2d');
+ let W,H;const pts=[];
+ function resize(){W=c.width=c.offsetWidth;H=c.height=c.offsetHeight}
+ resize();window.addEventListener('resize',resize);
+ for(let i=0;i<80;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*2+1});
+ function draw(){
+  ctx.clearRect(0,0,W,H);
+  pts.forEach(p=>{
+   p.x+=p.vx;p.y+=p.vy;
+   if(p.x<0||p.x>W)p.vx*=-1;
+   if(p.y<0||p.y>H)p.vy*=-1;
+   ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(0,212,170,.4)';ctx.fill();
+  });
+  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+   const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,dist=Math.sqrt(dx*dx+dy*dy);
+   if(dist<120){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(0,212,170,${.15*(1-dist/120)})`;ctx.stroke()}
+  }
+  requestAnimationFrame(draw);
+ }
+ draw();
+}
+
+// S1: What is Encoding — Introduction
+function initS1(){
+ const el=document.getElementById('sc-1');
+
+ el.innerHTML=`<div class="two-col">
+  <div class="card" style="flex:2;overflow-y:auto">
+   <div class="card-header">The Big Question</div>
+   <p style="font-size:17px;color:var(--white);line-height:1.8;margin-bottom:16px;font-family:var(--font-display);font-weight:600">Computers only understand numbers. Language is made of words. How do we bridge that gap?</p>
+   <p style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:18px"><strong style="color:var(--teal)">Encoding</strong> is the process of converting information from one form into another — specifically, into a form that a system can process. It's not unique to AI — encoding is everywhere.</p>
+   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:18px" id="s1-examples">
+    <div style="padding:14px;border-radius:10px;border:1px solid rgba(0,212,170,.2);background:rgba(0,212,170,.05);cursor:pointer;transition:all .3s" class="enc-ex" data-idx="0">
+     <div style="font-size:22px;margin-bottom:6px">🔤</div>
+     <div style="font-family:var(--font-mono);font-size:11px;color:var(--teal);margin-bottom:4px">Text → Numbers</div>
+     <div style="font-size:12px;color:var(--muted);line-height:1.5">'A' = 65, 'B' = 66 (ASCII)</div>
+    </div>
+    <div style="padding:14px;border-radius:10px;border:1px solid rgba(76,155,232,.2);background:rgba(76,155,232,.05);cursor:pointer;transition:all .3s" class="enc-ex" data-idx="1">
+     <div style="font-size:22px;margin-bottom:6px">🎨</div>
+     <div style="font-family:var(--font-mono);font-size:11px;color:var(--blue);margin-bottom:4px">Color → Numbers</div>
+     <div style="font-size:12px;color:var(--muted);line-height:1.5">Red = (255, 0, 0) in RGB</div>
+    </div>
+    <div style="padding:14px;border-radius:10px;border:1px solid rgba(139,92,246,.2);background:rgba(139,92,246,.05);cursor:pointer;transition:all .3s" class="enc-ex" data-idx="2">
+     <div style="font-size:22px;margin-bottom:6px">🎵</div>
+     <div style="font-family:var(--font-mono);font-size:11px;color:var(--purple);margin-bottom:4px">Sound → Numbers</div>
+     <div style="font-size:12px;color:var(--muted);line-height:1.5">Audio waveform → sample values 44,100 times/sec</div>
+    </div>
+    <div style="padding:14px;border-radius:10px;border:1px solid rgba(245,158,11,.2);background:rgba(245,158,11,.05);cursor:pointer;transition:all .3s" class="enc-ex" data-idx="3">
+     <div style="font-size:22px;margin-bottom:6px">📍</div>
+     <div style="font-family:var(--font-mono);font-size:11px;color:var(--amber);margin-bottom:4px">Location → Numbers</div>
+     <div style="font-size:12px;color:var(--muted);line-height:1.5">Colombo = (6.927, 79.861) in GPS</div>
+    </div>
+   </div>
+   <div id="s1-detail" style="min-height:80px;padding:16px;border-radius:10px;background:var(--card);border:1px solid var(--border);transition:all .3s">
+    <div style="font-size:13px;color:var(--muted);line-height:1.7">👆 Click any example above to explore how it's encoded into numbers.</div>
+   </div>
+  </div>
+  <div class="card" style="flex:1">
+   <div class="card-header">The 3-Step Pipeline</div>
+   <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+    <div style="padding:12px;border-radius:8px;border-left:3px solid var(--teal);background:rgba(0,212,170,.05)">
+     <div style="font-family:var(--font-mono);font-size:11px;color:var(--teal);margin-bottom:4px">STEP 1 — TOKENIZE</div>
+     <div style="font-size:12px;color:var(--muted);line-height:1.5">Break text into pieces (tokens)</div>
+    </div>
+    <div style="text-align:center;color:var(--muted);font-size:16px">↓</div>
+    <div style="padding:12px;border-radius:8px;border-left:3px solid var(--blue);background:rgba(76,155,232,.05)">
+     <div style="font-family:var(--font-mono);font-size:11px;color:var(--blue);margin-bottom:4px">STEP 2 — ENCODE</div>
+     <div style="font-size:12px;color:var(--muted);line-height:1.5">Convert each token into a number or vector</div>
+    </div>
+    <div style="text-align:center;color:var(--muted);font-size:16px">↓</div>
+    <div style="padding:12px;border-radius:8px;border-left:3px solid var(--purple);background:rgba(139,92,246,.05)">
+     <div style="font-family:var(--font-mono);font-size:11px;color:var(--purple);margin-bottom:4px">STEP 3 — PROCESS</div>
+     <div style="font-size:12px;color:var(--muted);line-height:1.5">Feed numbers into the neural network</div>
+    </div>
+   </div>
+   <div class="insight-card" style="margin-top:auto">
+    <strong>The core challenge:</strong> Not all encodings are equal. The <em>way</em> you encode language determines how much meaning the model can understand. That's what the next slide explores.
+   </div>
+  </div>
+ </div>`;
+
+ const details=[
+  {title:'Text Encoding (ASCII / Unicode)',color:'var(--teal)',body:'Every character you type is stored as a number. <strong style="color:var(--teal)">A = 65</strong>, <strong style="color:var(--teal)">B = 66</strong>, space = 32. This is how your keyboard talks to your computer.<br><br>But ASCII only maps characters — it says nothing about <em>meaning</em>. The letter sequence C-A-T is three numbers (67, 65, 84) with no concept of a furry animal.'},
+  {title:'Color Encoding (RGB)',color:'var(--blue)',body:'Every pixel on your screen is encoded as three numbers: <strong style="color:var(--blue)">Red, Green, Blue</strong> — each from 0 to 255.<br><br>Pure red = (255, 0, 0). White = (255, 255, 255). This encoding is <em>meaningful</em> — similar colors have similar numbers. That\'s a useful property.'},
+  {title:'Audio Encoding (PCM)',color:'var(--purple)',body:'Sound is a continuous wave. To digitize it, we <strong style="color:var(--purple)">sample</strong> the waveform 44,100 times per second (CD quality), recording the amplitude as a number each time.<br><br>A 3-minute song ≈ 7.9 million numbers. The encoding preserves the wave shape — and therefore the sound.'},
+  {title:'Location Encoding (GPS Coordinates)',color:'var(--amber)',body:'Any place on Earth = two numbers: <strong style="color:var(--amber)">latitude and longitude</strong>. Colombo = (6.927, 79.861).<br><br>Nearby places have nearby coordinates. This means distance in the number space ≈ distance in the real world. That\'s a <em>semantically meaningful</em> encoding.'}
+ ];
+
+ el.querySelectorAll('.enc-ex').forEach(card=>{
+  card.onmouseenter=()=>card.style.transform='translateY(-3px)';
+  card.onmouseleave=()=>card.style.transform='';
+  card.onclick=()=>{
+   const d=details[+card.dataset.idx];
+   document.getElementById('s1-detail').innerHTML=`<div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:${d.color};margin-bottom:8px">${d.title}</div><div style="font-size:13px;color:var(--muted);line-height:1.7">${d.body}</div>`;
+  };
+ });
+}
+
+// S2: Encoding comparison
+function initS2(){
+ const el=document.getElementById('sc-2');
+ const vocab=['cat','kitten','dog','puppy','fish','bird','airplane','car','laptop','love','hate','happy'];
+ const embeddings={cat:[.8,.6,.1],kitten:[.75,.65,.12],dog:[.7,.5,.15],puppy:[.68,.55,.14],fish:[.3,.9,.2],bird:[.35,.85,.3],airplane:[.1,.1,.95],car:[.15,.15,.85],laptop:[.2,.05,.9],love:[.5,.3,.05],hate:[.45,.25,.08],happy:[.55,.35,.03]};
+ let mode='onehot',selWords=[];
+
+ el.innerHTML=`<div class="two-col">
+  <div class="card" style="flex:2">
+   <div class="toggle-group" id="s2-toggles">
+    <button class="toggle-btn active" data-m="onehot">One-Hot</button>
+    <button class="toggle-btn" data-m="integer">Integer</button>
+    <button class="toggle-btn" data-m="embedding">Embeddings</button>
+   </div>
+   <div id="s2-display" style="overflow-y:auto;max-height:calc(100% - 50px)"></div>
+  </div>
+  <div class="card" style="flex:1">
+   <div class="card-header">Cosine Similarity</div>
+   <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Click two words to compare</p>
+   <div id="s2-sim" style="font-family:var(--font-mono);font-size:24px;color:var(--teal)">—</div>
+   <div id="s2-simpair" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
+   <div class="insight-card" style="margin-top:16px">
+    <strong>Key insight:</strong> One-hot and integer encodings lose all semantic meaning. Only embeddings capture that "cat" and "kitten" are similar.
+   </div>
+  </div>
+ </div>`;
+
+ document.querySelectorAll('#s2-toggles .toggle-btn').forEach(b=>{
+  b.onclick=()=>{
+   document.querySelectorAll('#s2-toggles .toggle-btn').forEach(x=>x.classList.remove('active'));
+   b.classList.add('active');mode=b.dataset.m;selWords=[];render();
+  }
+ });
+
+ function render(){
+  const d=document.getElementById('s2-display');
+  if(mode==='onehot'){
+   let h='<div style="display:flex;flex-wrap:wrap;gap:6px">';
+   vocab.forEach((w,i)=>{
+    const sel=selWords.includes(w);
+    h+=`<div class="word-btn${sel?' active':''}" data-w="${w}" style="cursor:pointer">${w}</div>`;
+   });
+   h+='</div><div style="margin-top:12px;overflow-x:auto"><table class="mini-table"><tr><th></th>';
+   vocab.forEach((_,i)=>h+=`<th style="font-size:10px">${i}</th>`);h+='</tr>';
+   selWords.forEach(w=>{
+    const idx=vocab.indexOf(w);
+    h+=`<tr><td style="color:var(--teal)">${w}</td>`;
+    vocab.forEach((_,j)=>h+=`<td style="color:${j===idx?'var(--teal)':'#3A4A5C'}">${j===idx?'1':'0'}</td>`);
+    h+='</tr>';
+   });
+   h+='</table></div>';d.innerHTML=h;
+  } else if(mode==='integer'){
+   let h='<div style="display:flex;flex-wrap:wrap;gap:6px">';
+   vocab.forEach((w,i)=>{
+    const sel=selWords.includes(w);
+    h+=`<div class="word-btn${sel?' active':''}" data-w="${w}">${w} <span style="color:var(--amber)">=&nbsp;${i}</span></div>`;
+   });
+   h+='</div><div class="insight-card" style="margin-top:14px"><strong>Problem:</strong> "cat"=0, "kitten"=1 → distance=1. "cat"=0, "feline"=? (not in vocab!) Integer distance is meaningless.</div>';
+   d.innerHTML=h;
+  } else {
+   let h='<div style="display:flex;flex-wrap:wrap;gap:6px">';
+   vocab.forEach(w=>{
+    const sel=selWords.includes(w);
+    const v=embeddings[w];
+    h+=`<div class="word-btn${sel?' active':''}" data-w="${w}">${w} <span style="color:var(--purple);font-size:10px">[${v.map(x=>x.toFixed(2)).join(', ')}]</span></div>`;
+   });
+   h+='</div>';d.innerHTML=h;
+  }
+  d.querySelectorAll('.word-btn').forEach(b=>{
+   b.onclick=()=>{
+    const w=b.dataset.w;
+    if(selWords.includes(w))selWords=selWords.filter(x=>x!==w);
+    else{if(selWords.length>=2)selWords.shift();selWords.push(w)}
+    render();updateSim();
+   }
+  });
+ }
+
+ function updateSim(){
+  const simEl=document.getElementById('s2-sim'),pairEl=document.getElementById('s2-simpair');
+  if(selWords.length<2){simEl.textContent='—';pairEl.textContent='';return}
+  const[a,b]=selWords;
+  let sim=0;
+  if(mode==='onehot'){
+   const va=vocab.map((_,i)=>i===vocab.indexOf(a)?1:0);
+   const vb=vocab.map((_,i)=>i===vocab.indexOf(b)?1:0);
+   sim=cosSim(va,vb);
+  } else if(mode==='integer'){
+   sim=1-Math.abs(vocab.indexOf(a)-vocab.indexOf(b))/vocab.length;
+  } else {
+   sim=cosSim(embeddings[a],embeddings[b]);
+  }
+  simEl.textContent=sim.toFixed(4);
+  simEl.style.color=sim>.5?'var(--teal)':sim>.2?'var(--amber)':'var(--red)';
+  pairEl.textContent=`"${a}" vs "${b}"`;
+ }
+ render();
+}
+
+// S3: Tokenizer
+function initS3(){
+ const el=document.getElementById('sc-3');
+ const presets=[
+  {text:'Hello world',tokens:['Hello',' world'],ids:[9906,1917]},
+  {text:'unbelievable',tokens:['un','believ','able'],ids:[359,25714,481]},
+  {text:'GPT-4',tokens:['G','PT','-','4'],ids:[38,2898,12,19]},
+  {text:'👍',tokens:['\\xf0\\x9f','\\x91','\\x8d'],ids:[9468,8541,235]},
+  {text:'aaaaaaaaaa',tokens:['aaaa','aaaa','aa'],ids:[6584,6584,564]},
+  {text:'The quick brown fox',tokens:['The',' quick',' brown',' fox'],ids:[464,2159,7586,21831]}
+ ];
+ let curP=0;
+
+ el.innerHTML=`<div class="two-col">
+  <div class="card" style="flex:2">
+   <div class="card-header">Live Tokenizer</div>
+   <input class="text-input" id="s2-input" placeholder="Type any text..." value="Hello world">
+   <div style="display:flex;flex-wrap:wrap;gap:4px;margin:10px 0" id="s2-presets"></div>
+   <div style="margin-top:12px">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Tokens:</div>
+    <div id="s2-tokens" style="min-height:40px"></div>
+    <div id="s2-ids" style="min-height:20px;margin-top:4px"></div>
+   </div>
+   <div style="margin-top:12px;display:flex;gap:16px;font-family:var(--font-mono);font-size:12px">
+    <span>Tokens: <span id="s2-tcount" style="color:var(--teal)">0</span></span>
+    <span>Characters: <span id="s2-ccount" style="color:var(--blue)">0</span></span>
+   </div>
+   <div style="margin-top:10px">
+    <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Token budget: <span id="s2-budget">0</span> / 4096</div>
+    <div style="height:6px;background:var(--navy3);border-radius:3px;overflow:hidden"><div id="s2-bar" style="height:100%;background:linear-gradient(90deg,var(--teal),var(--blue));transition:width .3s;width:0"></div></div>
+   </div>
+  </div>
+  <div class="card" style="flex:1">
+   <div class="card-header">BPE Explained</div>
+   <p style="font-size:13px;line-height:1.7;color:var(--muted)">
+    <strong style="color:var(--teal)">Byte Pair Encoding</strong> learns token boundaries from a large corpus. Frequent character sequences get merged into single tokens. Rare words get split into known subword pieces.<br><br>
+    This is why "hello" is one token (common) but "unbelievable" becomes three (un·believ·able).
+   </p>
+  </div>
+ </div>`;
+
+ const presetEl=document.getElementById('s2-presets');
+ presets.forEach((p,i)=>{
+  const b=document.createElement('button');b.className='preset-btn'+(i===0?' active':'');
+  b.textContent=p.text;b.onclick=()=>{
+   document.getElementById('s2-input').value=p.text;curP=i;
+   presetEl.querySelectorAll('.preset-btn').forEach(x=>x.classList.remove('active'));
+   b.classList.add('active');renderTokens(p);
+  };presetEl.appendChild(b);
+ });
+
+ function renderTokens(p){
+  const tokEl=document.getElementById('s2-tokens'),idEl=document.getElementById('s2-ids');
+  let th='',ih='';
+  p.tokens.forEach((t,i)=>{
+   const c=TC[i%TC.length];
+   th+=`<span class="token-chip" style="background:${c}">${t.replace(/</g,'&lt;')}</span>`;
+   ih+=`<span class="token-id">${p.ids[i]}</span>`;
+  });
+  tokEl.innerHTML=th;idEl.innerHTML=ih;
+  document.getElementById('s2-tcount').textContent=p.tokens.length;
+  document.getElementById('s2-ccount').textContent=p.text.length;
+  document.getElementById('s2-budget').textContent=p.tokens.length;
+  document.getElementById('s2-bar').style.width=(p.tokens.length/4096*100)+'%';
+ }
+
+ document.getElementById('s2-input').addEventListener('input',e=>{
+  const txt=e.target.value;
+  // Simple approximate tokenization
+  const toks=[];const ids=[];
+  let i=0;
+  while(i<txt.length){
+   let len=Math.min(txt.length-i, Math.random()>0.6?5:Math.random()>0.5?4:3);
+   if(txt.length-i<=2)len=txt.length-i;
+   toks.push(txt.substr(i,len));ids.push(Math.floor(Math.random()*50000));i+=len;
+  }
+  if(toks.length===0){toks.push('');ids.push(0);}
+  renderTokens({text:txt,tokens:toks,ids});
+ });
+
+ renderTokens(presets[0]);
+}
+
+// S4: Embedding Space
+function initS4(){
+ const el=document.getElementById('sc-4');
+ const words=[
+  {w:'cat',c:'Animals',x:2.1,y:3.2,tx:7.2,ty:6.8},{w:'dog',c:'Animals',x:5.1,y:1.2,tx:7.8,ty:6.2},
+  {w:'fish',c:'Animals',x:8.2,y:4.1,tx:6.5,ty:7.5},{w:'bird',c:'Animals',x:1.3,y:7.2,tx:7.0,ty:7.8},
+  {w:'wolf',c:'Animals',x:3.5,y:8.1,tx:8.2,ty:6.5},
+  {w:'king',c:'Royalty',x:6.2,y:2.3,tx:2.5,ty:2.8},{w:'queen',c:'Royalty',x:2.8,y:5.5,tx:2.0,ty:3.5},
+  {w:'prince',c:'Royalty',x:7.8,y:6.3,tx:3.0,ty:2.2},{w:'princess',c:'Royalty',x:4.2,y:3.8,tx:2.3,ty:3.0},
+  {w:'crown',c:'Royalty',x:9.1,y:1.5,tx:3.5,ty:2.5},
+  {w:'computer',c:'Tech',x:1.5,y:4.5,tx:5.5,ty:1.5},{w:'laptop',c:'Tech',x:6.8,y:8.2,tx:5.0,ty:2.0},
+  {w:'software',c:'Tech',x:3.2,y:6.8,tx:5.8,ty:1.0},{w:'data',c:'Tech',x:8.5,y:3.5,tx:4.8,ty:1.8},
+  {w:'network',c:'Tech',x:4.8,y:9.0,tx:5.2,ty:2.5},
+  {w:'pizza',c:'Food',x:5.5,y:5.2,tx:1.5,ty:7.5},{w:'sushi',c:'Food',x:9.5,y:7.8,tx:1.0,ty:8.2},
+  {w:'bread',c:'Food',x:2.5,y:2.0,tx:2.0,ty:7.8},{w:'rice',c:'Food',x:7.0,y:4.8,tx:1.8,ty:8.5},
+  {w:'soup',c:'Food',x:0.8,y:8.5,tx:1.2,ty:7.0}
+ ];
+ const catColors={Animals:'#10B981',Royalty:'#4C9BE8',Tech:'#8B5CF6',Food:'#F59E0B'};
+ let trained=false,selected=null,chart=null;
+
+ el.innerHTML=`<div class="two-col">
+  <div class="card" style="flex:2;position:relative">
+   <div class="toggle-group">
+    <button class="toggle-btn active" id="s3-random">Random (Untrained)</button>
+    <button class="toggle-btn" id="s3-trained">Trained</button>
+   </div>
+   <canvas id="s3-chart" style="width:100%;max-height:380px"></canvas>
+  </div>
+  <div class="card" style="flex:1">
+   <div class="card-header">Selected Word</div>
+   <div id="s3-info" style="font-size:13px;color:var(--muted)">Click a point on the chart</div>
+   <div class="insight-card" style="margin-top:auto">
+    <strong>An embedding</strong> is a learned, dense, real-valued vector. Position in this space = meaning. Distance = semantic similarity.
+   </div>
+  </div>
+ </div>`;
+
+ function buildChart(){
+  const canvas=document.getElementById('s3-chart');
+  if(chart)chart.destroy();
+  const datasets={};
+  words.forEach(w=>{
+   if(!datasets[w.c])datasets[w.c]={label:w.c,data:[],backgroundColor:catColors[w.c],pointRadius:6,pointHoverRadius:9};
+   datasets[w.c].data.push({x:trained?w.tx:w.x,y:trained?w.ty:w.y,label:w.w});
+  });
+  chart=new Chart(canvas,{
+   type:'scatter',
+   data:{datasets:Object.values(datasets)},
+   options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#64748B',font:{family:'Space Grotesk',size:11}}},
+     tooltip:{callbacks:{label:ctx=>ctx.raw.label+` (${ctx.raw.x.toFixed(1)}, ${ctx.raw.y.toFixed(1)})`}}
+    },
+    scales:{x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#64748B'}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#64748B'}}},
+    onClick:(e,els)=>{
+     if(els.length){
+      const di=els[0].datasetIndex,pi=els[0].index;
+      const pt=chart.data.datasets[di].data[pi];
+      selected=pt.label;showInfo();}
+    }
+   },
+   plugins:[{afterDraw:ch=>{
+    const ctx2=ch.ctx;ctx2.font='11px "JetBrains Mono"';ctx2.fillStyle='#F0F4F8';
+    ch.data.datasets.forEach(ds=>{ds.data.forEach(pt=>{
+     const meta=ch.getDatasetMeta(ch.data.datasets.indexOf(ds));
+     const idx=ds.data.indexOf(pt);
+     if(meta.data[idx]){const{x,y}=meta.data[idx];ctx2.fillText(pt.label,x+8,y-6)}
+    })});
+   }}]
+  });
+ }
+
+ function showInfo(){
+  if(!selected)return;
+  const w=words.find(x=>x.w===selected);
+  const pos=trained?{x:w.tx,y:w.ty}:{x:w.x,y:w.y};
+  // Find nearest
+  const dists=words.filter(x=>x.w!==selected).map(x=>{
+   const ox=trained?x.tx:x.x,oy=trained?x.ty:x.y;
+   const d=Math.sqrt((pos.x-ox)**2+(pos.y-oy)**2);
+   return{w:x.w,d,sim:Math.max(0,1-d/12).toFixed(2)};
+  }).sort((a,b)=>a.d-b.d).slice(0,3);
+  document.getElementById('s3-info').innerHTML=`
+   <div style="font-size:18px;color:var(--teal);font-family:var(--font-display);margin-bottom:8px">${selected}</div>
+   <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:12px">Category: ${w.c}<br>Vector: [${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}]</div>
+   <div style="font-size:12px;font-weight:600;margin-bottom:6px">Nearest Neighbors:</div>
+   ${dists.map(d=>`<div style="font-family:var(--font-mono);font-size:12px;margin-bottom:4px">${d.w} <span style="color:var(--teal)">(sim: ${d.sim})</span></div>`).join('')}`;
+ }
+
+ document.getElementById('s3-random').onclick=()=>{trained=false;document.getElementById('s3-random').classList.add('active');document.getElementById('s3-trained').classList.remove('active');buildChart();if(selected)showInfo()};
+ document.getElementById('s3-trained').onclick=()=>{trained=true;document.getElementById('s3-trained').classList.add('active');document.getElementById('s3-random').classList.remove('active');buildChart();if(selected)showInfo()};
+ buildChart();
+}
+
+// S5: Vector Arithmetic
+function initS5(){
+ const el=document.getElementById('sc-5');
+ const analogies=[
+  {a:'king',b:'man',c:'woman',r:'queen',pct:94},
+  {a:'Paris',b:'France',c:'Italy',r:'Rome',pct:91},
+  {a:'walked',b:'walk',c:'run',r:'ran',pct:88},
+  {a:'bigger',b:'big',c:'small',r:'smaller',pct:92}
+ ];
+ let curA=0,step=0;
+
+ // Precomputed 2D positions
+ const positions={king:{x:300,y:100},man:{x:150,y:250},woman:{x:450,y:250},queen:{x:500,y:100},
+  Paris:{x:350,y:80},France:{x:150,y:200},Italy:{x:450,y:200},Rome:{x:550,y:80},
+  walked:{x:320,y:90},walk:{x:130,y:220},run:{x:470,y:220},ran:{x:530,y:90},
+  bigger:{x:310,y:100},big:{x:140,y:240},small:{x:460,y:240},smaller:{x:520,y:100}};
+
+ el.innerHTML=`<div class="two-col">
+  <div class="card" style="flex:2;position:relative">
+   <div style="display:flex;gap:6px;margin-bottom:10px" id="s4-presets"></div>
+   <canvas id="s4-canvas" width="650" height="350" style="width:100%;max-height:350px"></canvas>
+   <div style="margin-top:8px;text-align:center">
+    <button class="step-btn" id="s4-step">Animate →</button>
+    <button class="step-btn" id="s4-reset" style="background:var(--navy3);color:var(--white);margin-left:8px">Reset</button>
+   </div>
+  </div>
+  <div class="card" style="flex:1">
+   <div class="card-header">Formula</div>
+   <div id="s4-formula" style="font-family:var(--font-mono);font-size:14px;line-height:2;margin-bottom:12px"></div>
+   <div id="s4-match" style="font-family:var(--font-mono);font-size:13px;color:var(--teal)"></div>
+   <div class="insight-card" style="margin-top:auto">
+    <strong>Vector arithmetic works</strong> because embeddings encode semantic relationships as directions in space. The "royalty" direction is the same as the "gender" direction offset.
+   </div>
+  </div>
+ </div>`;
+
+ const presetEl=document.getElementById('s4-presets');
+ analogies.forEach((an,i)=>{
+  const b=document.createElement('button');b.className='preset-btn'+(i===0?' active':'');
+  b.textContent=`${an.a} − ${an.b} + ${an.c}`;
+  b.onclick=()=>{curA=i;step=0;presetEl.querySelectorAll('.preset-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');drawCanvas()};
+  presetEl.appendChild(b);
+ });
+
+ document.getElementById('s4-step').onclick=()=>{if(step<4)step++;drawCanvas()};
+ document.getElementById('s4-reset').onclick=()=>{step=0;drawCanvas()};
+
+ function drawCanvas(){
+  const c=document.getElementById('s4-canvas'),ctx=c.getContext('2d');
+  const W=c.width,H=c.height;ctx.clearRect(0,0,W,H);
+  const an=analogies[curA];
+  const pa=positions[an.a],pb=positions[an.b],pc=positions[an.c],pr=positions[an.r];
+
+  // Draw labels
+  function drawLabel(pos,label,color){
+   ctx.fillStyle=color;ctx.font='bold 14px "Space Grotesk"';
+   ctx.fillText(label,pos.x-ctx.measureText(label).width/2,pos.y-12);
+   ctx.beginPath();ctx.arc(pos.x,pos.y,5,0,Math.PI*2);ctx.fill();
+  }
+  function drawArrow(from,to,color,lw=2){
+   ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.beginPath();ctx.moveTo(from.x,from.y);ctx.lineTo(to.x,to.y);ctx.stroke();
+   const angle=Math.atan2(to.y-from.y,to.x-from.x);
+   ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(to.x,to.y);ctx.lineTo(to.x-10*Math.cos(angle-0.3),to.y-10*Math.sin(angle-0.3));ctx.lineTo(to.x-10*Math.cos(angle+0.3),to.y-10*Math.sin(angle+0.3));ctx.fill();
+  }
+
+  // Always show all points
+  drawLabel(pa,an.a,'#00D4AA');drawLabel(pb,an.b,'#4C9BE8');drawLabel(pc,an.c,'#8B5CF6');
+  if(step>=3)drawLabel(pr,an.r,'#F59E0B');
+
+  if(step>=1)drawArrow({x:50,y:H/2},pa,'#00D4AA');
+  if(step>=2)drawArrow(pa,{x:pa.x-(pa.x-pb.x),y:pa.y-(pa.y-pb.y)},'#EF4444');
+  // Simplified: show result arrow
+  if(step>=3){
+   const mid={x:pa.x+(pc.x-pb.x),y:pa.y+(pc.y-pb.y)};
+   drawArrow(pa,mid,'#8B5CF6');
+   // Show approximate match
+   ctx.setLineDash([5,5]);ctx.strokeStyle='#F59E0B';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(mid.x,mid.y);ctx.lineTo(pr.x,pr.y);ctx.stroke();ctx.setLineDash([]);
+  }
+
+  // Formula
+  const fEl=document.getElementById('s4-formula');
+  fEl.innerHTML=`<span style="color:var(--teal)">${an.a}</span> − <span style="color:var(--blue)">${an.b}</span> + <span style="color:var(--purple)">${an.c}</span> ≈ <span style="color:var(--amber)">${an.r}</span>`;
+  document.getElementById('s4-match').textContent=step>=3?`Approximate match: ${an.pct}%`:'';
+ }
+ drawCanvas();
+}
+
+// S6: Context Problem
+function initS6(){
+ const el=document.getElementById('sc-6');
+ const sentences=[
+  {text:'I deposited money at the bank',word:'bank',ctx:'finance',neighbors:['money','deposit','loan','savings'],color:'var(--teal)'},
+  {text:'The fish swam near the river bank',word:'bank',ctx:'geography',neighbors:['river','shore','water','land'],color:'var(--blue)'}
+ ];
+ let selS=0;
+
+ el.innerHTML=`<div class="two-col">
+  <div class="card" style="flex:2">
+   <div class="card-header">The word "bank" in two contexts</div>
+   <div id="s5-sentences" style="margin-bottom:16px"></div>
+   <div id="s5-result" style="min-height:100px"></div>
+   <div style="margin-top:16px;padding:14px;background:var(--card);border-radius:10px;border:1px solid var(--border)">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px"><strong style="color:var(--amber)">"The animal didn't cross the street because it was too tired"</strong></div>
+    <div style="font-size:12px;color:var(--muted)">What does <strong style="color:var(--teal)">"it"</strong> refer to? Without attention, the model can't tell. With attention: <strong>"it" → "animal"</strong> gets high attention weight (0.72).</div>
+   </div>
+  </div>
+  <div class="card" style="flex:1">
+   <div class="card-header">The Problem</div>
+   <p style="font-size:13px;color:var(--muted);line-height:1.7">Without context, both sentences give "bank" the <strong style="color:var(--red)">same embedding</strong>.</p>
+   <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-top:10px">With attention, the model reads the <strong style="color:var(--teal)">entire sentence</strong> before deciding what each word means.</p>
+   <div class="insight-card" style="margin-top:auto"><strong>We need a mechanism that reads the entire sentence before deciding what each word means. That mechanism is Attention.</strong></div>
+  </div>
+ </div>`;
+
+ function render(){
+  const sEl=document.getElementById('s5-sentences');
+  let h='';
+  sentences.forEach((s,i)=>{
+   h+=`<div class="word-btn${i===selS?' active':''}" data-i="${i}" style="display:block;width:100%;text-align:left;margin-bottom:6px;padding:10px 14px;font-size:14px;font-family:var(--font-body)">
+    "${s.text}"</div>`;
+  });
+  sEl.innerHTML=h;
+  sEl.querySelectorAll('.word-btn').forEach(b=>b.onclick=()=>{selS=+b.dataset.i;render()});
+
+  const s=sentences[selS];
+  document.getElementById('s5-result').innerHTML=`
+   <div style="font-size:13px;margin-bottom:8px"><strong style="color:${s.color}">"${s.word}"</strong> → <span style="color:var(--muted)">${s.ctx} context</span></div>
+   <div style="display:flex;flex-wrap:wrap;gap:6px">${s.neighbors.map(n=>`<span class="pill" style="border-color:${s.color};color:${s.color}">${n}</span>`).join('')}</div>`;
+ }
+ render();
+}
+
+// S7: Attention Heatmap
+function initS7(){
+ const el=document.getElementById('sc-7');
+ const words='The animal didn\'t cross the street because it was too tired'.split(' ');
+ // Attention weights (simplified, for "it" → "animal" is high)
+ const baseWeights=[];
+ for(let i=0;i<words.length;i++){
+  const row=[];
+  for(let j=0;j<words.length;j++){
+   if(i===8&&j===1)row.push(0.72);// "it" → "animal"
+   else if(i===8&&j===8)row.push(0.08);
+   else if(Math.abs(i-j)<=1)row.push(0.15+Math.random()*0.15);
+   else row.push(0.02+Math.random()*0.06);
+  }
+  const s=row.reduce((a,b)=>a+b,0);baseWeights.push(row.map(x=>x/s));
+ }
+ let temp=1.0,selWord=8;
+
+ el.innerHTML=`<div class="two-col">
+  <div class="card" style="flex:2;overflow:auto">
+   <div class="card-header">Attention Heatmap</div>
+   <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px" id="s6-words"></div>
+   <div id="s6-heatmap" style="overflow-x:auto"></div>
+  </div>
+  <div class="card" style="flex:1">
+   <div class="card-header">Temperature: <span id="s6-temp-val">1.0</span></div>
+   <input type="range" min="0.1" max="5" step="0.1" value="1" id="s6-temp" style="margin-bottom:12px">
+   <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:14px"><span>Sharp (0.1)</span><span>Diffuse (5.0)</span></div>
+   <div id="s6-explain" style="font-size:13px;color:var(--muted);line-height:1.6"></div>
+   <div class="insight-card" style="margin-top:auto"><strong>The model "looks at" different parts of the sentence differently for each word.</strong> This is the core intuition of attention.</div>
+  </div>
+ </div>`;
+
+ const tempSlider=document.getElementById('s6-temp');
+ tempSlider.oninput=()=>{temp=+tempSlider.value;document.getElementById('s6-temp-val').textContent=temp.toFixed(1);renderHeatmap()};
+
+ function renderWords(){
+  const wEl=document.getElementById('s6-words');
+  wEl.innerHTML=words.map((w,i)=>`<button class="word-btn${i===selWord?' active':''}" data-i="${i}">${w}</button>`).join('');
+  wEl.querySelectorAll('.word-btn').forEach(b=>b.onclick=()=>{selWord=+b.dataset.i;renderWords();renderHeatmap()});
+ }
+
+ function renderHeatmap(){
+  const row=baseWeights[selWord];
+  // Apply temperature
+  const logits=row.map(x=>Math.log(x+1e-10)/temp);
+  const probs=softmax(logits);
+
+  const hEl=document.getElementById('s6-heatmap');
+  const N=words.length;
+  let h=`<div class="heatmap-grid" style="grid-template-columns:80px repeat(${N},1fr)">`;
+  // Header
+  h+='<div></div>';words.forEach(w=>h+=`<div class="heatmap-label" style="font-size:9px;transform:rotate(-45deg);white-space:nowrap">${w}</div>`);
+  // Row for selected word
+  h+=`<div class="heatmap-label" style="color:var(--teal);font-weight:600">${words[selWord]}</div>`;
+  probs.forEach((p,j)=>{
+   const alpha=Math.min(1,p*3);
+   h+=`<div class="heatmap-cell" style="background:rgba(0,212,170,${alpha});color:${alpha>.4?'var(--navy)':'var(--muted)'}">${p.toFixed(2)}</div>`;
+  });
+  h+='</div>';hEl.innerHTML=h;
+
+  // Explanation
+  const topIdx=probs.indexOf(Math.max(...probs));
+  document.getElementById('s6-explain').innerHTML=`<strong style="color:var(--teal)">"${words[selWord]}"</strong> attends most strongly to <strong style="color:var(--amber)">"${words[topIdx]}"</strong> (${probs[topIdx].toFixed(2)})<br><br>${selWord===8?'This is how the model resolves the pronoun "it" → "animal"':'The attention pattern shows which words contribute most to this token\'s representation.'}`;
+ }
+ renderWords();renderHeatmap();
+}
+
+// S8: Q, K, V Math
+function initS8(){
+ const el=document.getElementById('sc-8');
+ const tokens=['cat','sat','mat'];
+ const d=4;
+ // Toy values
+ const X=[[0.5,0.3,0.8,0.1],[0.2,0.9,0.1,0.7],[0.6,0.1,0.5,0.4]];
+ const Wq=[[0.1,0.3],[0.5,0.2],[0.2,0.8],[0.9,0.1]];
+ const Wk=[[0.3,0.1],[0.2,0.6],[0.8,0.3],[0.1,0.5]];
+ const Wv=[[0.4,0.2],[0.1,0.7],[0.6,0.1],[0.3,0.8]];
+ let curStep=0;
+
+ function matMul(A,B){
+  const R=A.length,C=B[0].length,K=B.length;
+  const out=[];for(let i=0;i<R;i++){out[i]=[];for(let j=0;j<C;j++){let s=0;for(let k=0;k<K;k++)s+=A[i][k]*B[k][j];out[i][j]=+s.toFixed(3)}}return out;
+ }
+
+ const Q=matMul(X,Wq),K=matMul(X,Wk),V=matMul(X,Wv);
+ const QKt=matMul(Q,K[0].map((_,i)=>K.map(r=>r[i])));// transpose K
+ const dk=Math.sqrt(2);
+ const scaled=QKt.map(r=>r.map(v=>+(v/dk).toFixed(3)));
+ const attn=scaled.map(r=>softmax(r).map(v=>+v.toFixed(3)));
+ const output=matMul(attn,V);
+
+ el.innerHTML=`<div class="two-col">
+  <div class="card" style="flex:2;overflow-y:auto">
+   <div class="card-header">Step <span id="s7-step-num">1</span> of 4</div>
+   <div style="display:flex;gap:6px;margin-bottom:12px">
+    ${[1,2,3,4].map(i=>`<button class="toggle-btn${i===1?' active':''}" data-s="${i}" id="s7-s${i}">Step ${i}</button>`).join('')}
+   </div>
+   <div id="s7-content" style="overflow-x:auto"></div>
+  </div>
+  <div class="card" style="flex:1">
+   <div class="card-header">Formula</div>
+   <div style="font-family:var(--font-mono);font-size:13px;line-height:2;color:var(--muted)">
+    Attention(Q,K,V) =<br><span style="color:var(--teal)">softmax</span>(<span style="color:var(--blue)">QK<sup>T</sup></span> / <span style="color:var(--purple)">√d<sub>k</sub></span>) · <span style="color:var(--amber)">V</span>
+   </div>
+   <div id="s7-explain" style="font-size:12px;color:var(--muted);line-height:1.6;margin-top:12px"></div>
+  </div>
+ </div>`;
+
+ function renderMatrix(m,label,color){
+  let h=`<div style="margin-bottom:8px"><span style="font-family:var(--font-mono);font-size:11px;color:${color||'var(--muted)'}">${label}</span></div>`;
+  h+='<div class="matrix" style="grid-template-columns:repeat('+m[0].length+',1fr)">';
+  m.forEach(r=>r.forEach(v=>{
+   const alpha=Math.abs(v)*0.8;
+   h+=`<div class="matrix-cell" style="background:rgba(0,212,170,${alpha})">${v.toFixed?v.toFixed(2):v}</div>`;
+  }));
+  h+='</div>';return h;
+ }
+
+ function render(){
+  const cEl=document.getElementById('s7-content');
+  document.querySelectorAll('#sc-7 .toggle-btn').forEach(b=>b.classList.toggle('active',+b.dataset.s===curStep+1));
+  document.getElementById('s7-step-num').textContent=curStep+1;
+
+  if(curStep===0){
+   cEl.innerHTML=`<p style="font-size:13px;color:var(--muted);margin-bottom:10px">Input embeddings × weight matrices = Q, K, V</p>
+    <div style="display:flex;flex-wrap:wrap;gap:16px">
+     ${renderMatrix(X,'Input X','var(--white)')}
+     ${renderMatrix(Q,'Q = X·W_q','var(--teal)')}
+     ${renderMatrix(K,'K = X·W_k','var(--blue)')}
+     ${renderMatrix(V,'V = X·W_v','var(--amber)')}
+    </div>`;
+   document.getElementById('s7-explain').innerHTML='Each input token gets projected into three separate spaces: <strong style="color:var(--teal)">Query</strong> (what am I looking for?), <strong style="color:var(--blue)">Key</strong> (what do I contain?), <strong style="color:var(--amber)">Value</strong> (what information do I carry?).';
+  } else if(curStep===1){
+   cEl.innerHTML=`<p style="font-size:13px;color:var(--muted);margin-bottom:10px">QK<sup>T</sup> → "How much does token i attend to token j?"</p>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
+     ${renderMatrix(Q,'Q','var(--teal)')} <span style="font-size:24px;color:var(--muted);align-self:center">×</span>
+     ${renderMatrix(K[0].map((_,i)=>K.map(r=>r[i])),'K^T','var(--blue)')} <span style="font-size:24px;color:var(--muted);align-self:center">=</span>
+     ${renderMatrix(QKt,'Scores','var(--purple)')}
+    </div>
+    <div style="margin-top:8px;font-size:11px;color:var(--muted)">Rows: ${tokens.join(', ')} | Cols: ${tokens.join(', ')}</div>`;
+   document.getElementById('s7-explain').innerHTML='Each cell [i,j] is the dot product of Q[i] and K[j]. Higher value = token i should pay more attention to token j.';
+  } else if(curStep===2){
+   cEl.innerHTML=`<p style="font-size:13px;color:var(--muted);margin-bottom:10px">Scale by √d<sub>k</sub> = √${d/2} = ${dk.toFixed(1)}, then softmax</p>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
+     ${renderMatrix(scaled,'Scaled Scores','var(--purple)')} <span style="font-size:16px;color:var(--muted);align-self:center">→ softmax →</span>
+     ${renderMatrix(attn,'Attention Weights','var(--teal)')}
+    </div>`;
+   document.getElementById('s7-explain').innerHTML='<strong style="color:var(--purple)">Why scale?</strong> Without √d_k, large dimensions cause extreme dot products → softmax saturates → vanishing gradients. Scaling keeps values in a stable range. Softmax turns scores into probabilities (each row sums to 1).';
+  } else {
+   cEl.innerHTML=`<p style="font-size:13px;color:var(--muted);margin-bottom:10px">Attention weights × V = contextual output</p>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
+     ${renderMatrix(attn,'Weights','var(--teal)')} <span style="font-size:24px;color:var(--muted);align-self:center">×</span>
+     ${renderMatrix(V,'V','var(--amber)')} <span style="font-size:24px;color:var(--muted);align-self:center">=</span>
+     ${renderMatrix(output,'Output','var(--green)')}
+    </div>
+    <div style="margin-top:10px;font-family:var(--font-mono);font-size:12px;color:var(--muted)">Output for "cat" = ${attn[0].map((w,i)=>`${(w*100).toFixed(0)}% of V[${tokens[i]}]`).join(' + ')}</div>`;
+   document.getElementById('s7-explain').innerHTML='Each output token is now a <strong style="color:var(--green)">weighted combination</strong> of all Value vectors. The weights are determined by how relevant each key is to the query. This is the complete attention computation.';
+  }
+ }
+
+ document.querySelectorAll('#sc-7 .toggle-btn').forEach(b=>b.onclick=()=>{curStep=+b.dataset.s-1;render()});
+ render();
+}
+
+// S9: Multi-Head Attention
+function initS9(){
+ const el=document.getElementById('sc-9');
+ const words='The cat sat on the mat'.split(' ');
+ const heads=[
+  {name:'Head 1: Syntactic',desc:'Subject-verb-object relationships',weights:[[.1,.1,.4,.1,.1,.2],[.1,.1,.1,.1,.1,.5],[.3,.4,.1,.1,.05,.05],[.1,.05,.1,.2,.5,.05],[.4,.1,.1,.1,.1,.2],[.1,.1,.5,.1,.1,.1]]},
+  {name:'Head 2: Coreference',desc:'Pronouns → antecedents',weights:[[.2,.15,.15,.15,.2,.15],[.15,.2,.15,.15,.15,.2],[.15,.15,.2,.15,.15,.2],[.15,.2,.15,.2,.15,.15],[.2,.15,.15,.15,.2,.15],[.15,.2,.2,.15,.15,.15]]},
+  {name:'Head 3: Positional',desc:'Attend to immediate neighbors',weights:[[.5,.35,.1,.03,.01,.01],[.35,.3,.3,.03,.01,.01],[.05,.3,.3,.3,.03,.02],[.02,.05,.3,.3,.3,.03],[.01,.02,.05,.3,.3,.32],[.01,.01,.03,.1,.35,.5]]},
+  {name:'Head 4: Semantic',desc:'Semantically related words',weights:[[.1,.1,.1,.1,.5,.1],[.1,.2,.3,.05,.05,.3],[.1,.3,.2,.15,.1,.15],[.2,.1,.1,.2,.2,.2],[.5,.1,.1,.1,.1,.1],[.1,.3,.2,.1,.1,.2]]}
+ ];
+ let curH=0;
+
+ el.innerHTML=`<div class="two-col">
+  <div class="card" style="flex:2;overflow:auto">
+   <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap" id="s8-heads"></div>
+   <div id="s8-heatmap"></div>
+  </div>
+  <div class="card" style="flex:1">
+   <div id="s8-info"></div>
+   <div style="margin-top:14px;padding:10px;border-radius:8px;background:var(--card);border:1px solid var(--border)">
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:6px">Architecture:</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.6">4 heads → <span style="color:var(--teal)">concat</span> → <span style="color:var(--blue)">linear projection</span> → output<br><br>d_model = num_heads × d_k<br>(dimensions split, not duplicated)</div>
+   </div>
+   <div class="insight-card" style="margin-top:12px"><strong>Each head asks a different question.</strong> Together they capture a richer understanding than any single pattern could.</div>
+  </div>
+ </div>`;
+
+ const hEl=document.getElementById('s8-heads');
+ heads.forEach((h,i)=>{
+  const b=document.createElement('button');b.className='toggle-btn'+(i===0?' active':'');
+  b.textContent=h.name.split(':')[0];b.onclick=()=>{curH=i;hEl.querySelectorAll('.toggle-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');render()};
+  hEl.appendChild(b);
+ });
+
+ function render(){
+  const head=heads[curH];const N=words.length;
+  let h=`<div class="heatmap-grid" style="grid-template-columns:60px repeat(${N},1fr)">`;
+  h+='<div></div>';words.forEach(w=>h+=`<div class="heatmap-label">${w}</div>`);
+  for(let i=0;i<N;i++){
+   h+=`<div class="heatmap-label" style="color:var(--teal)">${words[i]}</div>`;
+   head.weights[i].forEach(v=>{
+    const alpha=v*2.5;
+    h+=`<div class="heatmap-cell" style="background:rgba(0,212,170,${Math.min(1,alpha)});color:${alpha>.3?'var(--navy)':'var(--muted)'}">${v.toFixed(2)}</div>`;
+   });
+  }
+  h+='</div>';
+  document.getElementById('s8-heatmap').innerHTML=h;
+  document.getElementById('s8-info').innerHTML=`<div style="font-family:var(--font-display);font-size:18px;font-weight:700;margin-bottom:6px;color:var(--teal)">${head.name}</div><div style="font-size:13px;color:var(--muted);line-height:1.6">${head.desc}</div>`;
+ }
+ render();
+}
+
+// S10: Layer Stacking
+function initS10(){
+ const el=document.getElementById('sc-10');
+ const layers=[
+  {range:'1–2',label:'Surface Features',desc:'Parts of speech, basic word boundaries, morphology. The model begins to understand syntax at the most basic level.',color:'var(--teal)'},
+  {range:'3–4',label:'Syntactic Features',desc:'Phrase structure, dependency parsing, subject-verb agreement. The model understands grammar.',color:'var(--blue)'},
+  {range:'5–6',label:'Semantic Features',desc:'Coreference resolution, semantic roles, factual knowledge. The model understands meaning.',color:'var(--purple)'},
+  {range:'7+',label:'Complex Reasoning',desc:'Long-range dependencies, abstract reasoning, world knowledge integration. The deepest abstraction.',color:'var(--amber)'}
+ ];
+ let selL=0;
+
+ el.innerHTML=`<div class="two-col">
+  <div class="card" style="flex:1">
+   <div class="card-header">Transformer Layers</div>
+   <div id="s9-layers" style="display:flex;flex-direction:column-reverse;gap:3px"></div>
+  </div>
+  <div class="card" style="flex:1">
+   <div id="s9-info"></div>
+   <div style="margin-top:14px">
+    <div class="card-header">Depth Comparison</div>
+    <table class="mini-table">
+     <tr><th>Model</th><th>Layers</th><th>Params</th></tr>
+     <tr><td>GPT-2 Small</td><td>12</td><td>117M</td></tr>
+     <tr><td>GPT-2 XL</td><td>48</td><td>1.5B</td></tr>
+     <tr><td>GPT-3</td><td>96</td><td>175B</td></tr>
+     <tr><td>GPT-4 (est.)</td><td>~120</td><td>~1T+</td></tr>
+    </table>
+   </div>
+   <div class="insight-card" style="margin-top:12px"><strong>Depth = abstraction.</strong> Each layer builds on the layer below. Early layers see syntax. Deep layers see meaning.</div>
+  </div>
+ </div>`;
+
+ const lEl=document.getElementById('s9-layers');
+ layers.forEach((l,i)=>{
+  const b=document.createElement('div');
+  b.className='layer-block'+(i===0?' active':'');
+  b.innerHTML=`<span style="color:${l.color}">Layer ${l.range}</span> — ${l.label}`;
+  b.onclick=()=>{selL=i;lEl.querySelectorAll('.layer-block').forEach(x=>x.classList.remove('active'));b.classList.add('active');showInfo()};
+  lEl.appendChild(b);
+ });
+
+ function showInfo(){
+  const l=layers[selL];
+  document.getElementById('s9-info').innerHTML=`
+   <div style="font-family:var(--font-display);font-size:20px;font-weight:700;color:${l.color};margin-bottom:6px">Layer ${l.range}: ${l.label}</div>
+   <p style="font-size:13px;color:var(--muted);line-height:1.7">${l.desc}</p>`;
+ }
+ showInfo();
+}
+
+// S11: Positional Encoding
+function initS11(){
+ const el=document.getElementById('sc-11');
+ let showPE=true,selPos=0;
+
+ el.innerHTML=`<div class="two-col">
+  <div class="card" style="flex:2;overflow:auto">
+   <div class="toggle-group">
+    <button class="toggle-btn" id="s10-without">Without PE</button>
+    <button class="toggle-btn active" id="s10-with">With PE</button>
+   </div>
+   <div id="s10-demo" style="margin-bottom:12px"></div>
+   <div class="card-header">PE Heatmap (positions × dimensions)</div>
+   <canvas id="s10-canvas" width="520" height="200" style="width:100%;max-height:200px;border-radius:8px"></canvas>
+   <div style="margin-top:8px">
+    <label style="font-size:11px;color:var(--muted)">Sequence Position: <span id="s10-pos-val">0</span></label>
+    <input type="range" min="0" max="15" value="0" id="s10-pos" style="margin-top:4px">
+   </div>
+  </div>
+  <div class="card" style="flex:1">
+   <div class="card-header">Hover Info</div>
+   <div id="s10-info" style="font-family:var(--font-mono);font-size:12px;color:var(--muted);line-height:1.8">Hover over the heatmap to see PE values</div>
+   <div class="insight-card" style="margin-top:auto"><strong>Each position gets a unique "fingerprint"</strong> across all dimensions. Nearby positions have similar encodings — the model can generalize to unseen positions.</div>
+  </div>
+ </div>`;
+
+ document.getElementById('s10-without').onclick=()=>{showPE=false;document.getElementById('s10-without').classList.add('active');document.getElementById('s10-with').classList.remove('active');renderDemo();drawHeatmap()};
+ document.getElementById('s10-with').onclick=()=>{showPE=true;document.getElementById('s10-with').classList.add('active');document.getElementById('s10-without').classList.remove('active');renderDemo();drawHeatmap()};
+ document.getElementById('s10-pos').oninput=e=>{selPos=+e.target.value;document.getElementById('s10-pos-val').textContent=selPos;drawHeatmap()};
+
+ function renderDemo(){
+  const d=document.getElementById('s10-demo');
+  if(!showPE){
+   d.innerHTML='<div style="font-size:13px;color:var(--red);line-height:1.6"><strong>"dog bites man"</strong> and <strong>"man bites dog"</strong> produce <strong>identical</strong> attention patterns. Order is invisible.</div>';
+  } else {
+   d.innerHTML='<div style="font-size:13px;color:var(--teal);line-height:1.6">Position 0, 1, 2 each carry <strong>unique signals</strong>. "dog bites man" ≠ "man bites dog" — order is meaningful.</div>';
+  }
+ }
+
+ function PE(pos,dim,dModel=32){
+  if(dim%2===0)return Math.sin(pos/Math.pow(10000,dim/dModel));
+  return Math.cos(pos/Math.pow(10000,(dim-1)/dModel));
+ }
+
+ function drawHeatmap(){
+  const c=document.getElementById('s10-canvas'),ctx=c.getContext('2d');
+  const W=c.width,H=c.height;ctx.clearRect(0,0,W,H);
+  const rows=16,cols=32;
+  const cw=W/cols,ch=H/rows;
+  for(let p=0;p<rows;p++){
+   for(let d=0;d<cols;d++){
+    const v=PE(p,d);
+    const r=v>0?0:Math.abs(v)*200,g=v>0?v*180:0,b2=v>0?v*170:Math.abs(v)*100;
+    ctx.fillStyle=p===selPos?`rgba(0,212,170,${Math.abs(v)*0.8+0.2})`:`rgb(${r},${g+30},${b2+60})`;
+    ctx.fillRect(d*cw,p*ch,cw-1,ch-1);
+   }
+  }
+  // Highlight selected position
+  ctx.strokeStyle='var(--teal)';ctx.lineWidth=2;ctx.strokeRect(0,selPos*ch,W,ch);
+ }
+
+ const canvas=document.getElementById('s10-canvas');
+ canvas.addEventListener('mousemove',e=>{
+  const rect=canvas.getBoundingClientRect();
+  const x=e.clientX-rect.left,y=e.clientY-rect.top;
+  const col=Math.floor(x/canvas.width*32),row=Math.floor(y/canvas.height*16);
+  if(row>=0&&row<16&&col>=0&&col<32){
+   const v=PE(row,col);
+   const fn=col%2===0?'sin':'cos';
+   document.getElementById('s10-info').innerHTML=`PE(pos=${row}, dim=${col})<br><br>${fn}(${row} / 10000^(${col%2===0?col:col-1}/32))<br><br>= <span style="color:var(--teal);font-size:16px">${v.toFixed(4)}</span>`;
+  }
+ });
+
+ renderDemo();drawHeatmap();
+}
+
+// S12: Transformer Architecture
+function initS12(){
+ const el=document.getElementById('sc-12');
+ const components=[
+  {id:'tok-embed',label:'Token Embedding',desc:'Converts token IDs to dense vectors',shape:'(seq_len) → (seq_len, d_model)',why:'Raw token IDs are integers with no semantic meaning. Embeddings project them into a continuous space.'},
+  {id:'pos-enc',label:'Positional Encoding',desc:'Injects position information into each token',shape:'(seq_len, d_model) → (seq_len, d_model)',why:'Self-attention is permutation-invariant. Without PE, the model can\'t distinguish word order.'},
+  {id:'mha',label:'Multi-Head Attention',desc:'Computes context-aware representations',shape:'(seq_len, d_model) → (seq_len, d_model)',why:'Each token needs information from other tokens to understand context. Multiple heads capture different relationship types.'},
+  {id:'add-norm1',label:'Add & Norm (Residual)',desc:'Residual connection + layer normalization',shape:'(seq_len, d_model) → (seq_len, d_model)',why:'Residual connections prevent vanishing gradients in deep networks. Layer norm stabilizes training.'},
+  {id:'ffn',label:'Feed-Forward Network',desc:'Two linear layers with ReLU activation, applied per token',shape:'(seq_len, d_model) → (seq_len, d_ff) → (seq_len, d_model)',why:'Adds non-linearity and expands model capacity. Processes each token independently.'},
+  {id:'add-norm2',label:'Add & Norm (Residual)',desc:'Second residual connection + normalization',shape:'(seq_len, d_model) → (seq_len, d_model)',why:'Same purpose as above — ensures stable gradient flow through the layer stack.'}
+ ];
+ let selC=null;
+
+ el.innerHTML=`<div class="two-col">
+  <div class="card" style="flex:1;overflow-y:auto">
+   <div class="card-header">Architecture Stack</div>
+   <div class="arch-block" data-c="0" style="border-color:var(--teal)">Token Embedding</div>
+   <div class="arch-arrow">↓ +</div>
+   <div class="arch-block" data-c="1" style="border-color:var(--green)">Positional Encoding</div>
+   <div class="arch-arrow">↓</div>
+   <div style="border:1px dashed var(--border);border-radius:10px;padding:10px;margin:4px 0">
+    <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);text-align:center;margin-bottom:6px">× N layers</div>
+    <div class="arch-block" data-c="2" style="border-color:var(--blue)">Multi-Head Attention</div>
+    <div class="arch-arrow">↓</div>
+    <div class="arch-block" data-c="3" style="border-color:var(--purple)">Add & Norm</div>
+    <div class="arch-arrow">↓</div>
+    <div class="arch-block" data-c="4" style="border-color:var(--amber)">Feed-Forward Network</div>
+    <div class="arch-arrow">↓</div>
+    <div class="arch-block" data-c="5" style="border-color:var(--purple)">Add & Norm</div>
+   </div>
+   <div class="arch-arrow">↓</div>
+   <div style="text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--teal);padding:8px">Output Representation</div>
+  </div>
+  <div class="card" style="flex:1">
+   <div class="card-header">Component Detail</div>
+   <div id="s11-detail" style="font-size:13px;color:var(--muted);line-height:1.7">Click any component block to see details</div>
+  </div>
+ </div>`;
+
+ el.querySelectorAll('.arch-block').forEach(b=>{
+  b.onclick=()=>{
+   el.querySelectorAll('.arch-block').forEach(x=>x.classList.remove('selected'));
+   b.classList.add('selected');
+   const c=components[+b.dataset.c];
+   document.getElementById('s11-detail').innerHTML=`
+    <div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--teal);margin-bottom:10px">${c.label}</div>
+    <p><strong>What:</strong> ${c.desc}</p>
+    <p style="margin-top:8px"><strong>Shape:</strong> <span style="font-family:var(--font-mono);font-size:11px">${c.shape}</span></p>
+    <p style="margin-top:8px"><strong>Why:</strong> ${c.why}</p>`;
+  };
+ });
+}
+
+// S13: KV Cache
+function initS13(){
+ const el=document.getElementById('sc-13');
+ const tokens=['The','cat','sat','on','the','mat','and','it'];
+ let stepIdx=0,useCache=true;
+
+ el.innerHTML=`<div class="two-col">
+  <div class="card" style="flex:2">
+   <div class="toggle-group">
+    <button class="toggle-btn active" id="s12-cache">With KV Cache</button>
+    <button class="toggle-btn" id="s12-nocache">Without Cache</button>
+   </div>
+   <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Step: generating token <span id="s12-step" style="color:var(--teal)">1</span> / ${tokens.length}</div>
+   <div id="s12-tokens" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px"></div>
+   <div style="display:flex;gap:16px;font-family:var(--font-mono);font-size:12px;margin-bottom:12px">
+    <span>Compute cost: <span id="s12-cost" style="color:var(--amber)">0</span> ops</span>
+    <span>Cached: <span id="s12-cached" style="color:var(--green)">0</span></span>
+   </div>
+   <div style="display:flex;gap:8px">
+    <button class="step-btn" id="s12-next">Next Token →</button>
+    <button class="step-btn" id="s12-reset" style="background:var(--navy3);color:var(--white)">Reset</button>
+   </div>
+   <div style="margin-top:16px">
+    <div class="card-header">Memory Calculator</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:4px">KV size = 2 × layers × heads × d_k × seq_len × bytes</div>
+    <label style="font-size:11px;color:var(--muted)">Sequence length: <span id="s12-seqval">1024</span></label>
+    <input type="range" min="128" max="131072" step="128" value="1024" id="s12-seq">
+    <div id="s12-mem" style="font-family:var(--font-mono);font-size:16px;color:var(--teal);margin-top:6px"></div>
+   </div>
+  </div>
+  <div class="card" style="flex:1">
+   <div class="card-header">Key Concepts</div>
+   <div style="font-size:12px;color:var(--muted);line-height:1.7">
+    <p><strong style="color:var(--teal)">Why K and V but not Q?</strong><br>Q only belongs to the current token — there's nothing to cache.</p>
+    <p style="margin-top:10px"><strong style="color:var(--blue)">Why it matters:</strong><br>KV Cache is the reason ChatGPT responds in seconds, not minutes.</p>
+    <p style="margin-top:10px"><strong style="color:var(--amber)">The tradeoff:</strong><br>KV cache grows with context length — why 128K context needs massive GPU memory.</p>
+   </div>
+  </div>
+ </div>`;
+
+ document.getElementById('s12-cache').onclick=()=>{useCache=true;document.getElementById('s12-cache').classList.add('active');document.getElementById('s12-nocache').classList.remove('active');render()};
+ document.getElementById('s12-nocache').onclick=()=>{useCache=false;document.getElementById('s12-nocache').classList.add('active');document.getElementById('s12-cache').classList.remove('active');render()};
+ document.getElementById('s12-next').onclick=()=>{if(stepIdx<tokens.length-1)stepIdx++;render()};
+ document.getElementById('s12-reset').onclick=()=>{stepIdx=0;render()};
+ document.getElementById('s12-seq').oninput=e=>{
+  const v=+e.target.value;document.getElementById('s12-seqval').textContent=v.toLocaleString();
+  const mem=2*96*96*128*v*2/(1024*1024);
+  document.getElementById('s12-mem').textContent=mem<1024?mem.toFixed(0)+' MB':(mem/1024).toFixed(1)+' GB';
+ };
+
+ function render(){
+  const tEl=document.getElementById('s12-tokens');
+  let h='';let cost=0,cached=0;
+  for(let i=0;i<=stepIdx;i++){
+   let cls='kv-token';
+   if(i===stepIdx){cls+=' new computing';cost+=1}
+   else if(useCache){cls+=' cached';cached++}
+   else{cls+=' computing';cost++}
+   h+=`<div class="${cls}">${tokens[i]}</div>`;
+  }
+  tEl.innerHTML=h;
+  document.getElementById('s12-step').textContent=stepIdx+1;
+  document.getElementById('s12-cost').textContent=useCache?(stepIdx+1):((stepIdx+1)*(stepIdx+2)/2);
+  document.getElementById('s12-cached').textContent=cached;
+ }
+ // Init mem calc
+ document.getElementById('s12-seq').dispatchEvent(new Event('input'));
+ render();
+}
+
+// S14: Context Window
+function initS14(){
+ const el=document.getElementById('sc-14');
+ const sizes={GPT2:1024,'GPT-3.5':4096,'GPT-4':131072,'Claude 3':200000};
+ let ctxSize=4096,fillCount=0;
+
+ el.innerHTML=`<div class="two-col">
+  <div class="card" style="flex:2">
+   <div class="card-header">Context Buffer Visualizer</div>
+   <div style="margin-bottom:10px">
+    <select class="styled-select" id="s13-select">
+     <option value="1024">GPT-2 (1,024)</option>
+     <option value="4096" selected>GPT-3.5 (4,096)</option>
+     <option value="131072">GPT-4 (128K)</option>
+     <option value="200000">Claude 3 (200K)</option>
+    </select>
+   </div>
+   <div id="s13-buffer" style="display:flex;flex-wrap:wrap;gap:1px;max-height:160px;overflow:hidden;margin-bottom:12px"></div>
+   <div style="margin-bottom:10px">
+    <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Remaining tokens: <span id="s13-remaining">4096</span> / <span id="s13-total">4096</span></div>
+    <div style="height:6px;background:var(--navy3);border-radius:3px;overflow:hidden"><div id="s13-bar" style="height:100%;background:linear-gradient(90deg,var(--teal),var(--blue));transition:width .3s;width:0"></div></div>
+   </div>
+   <div style="display:flex;gap:8px">
+    <button class="step-btn" id="s13-fill">Add 100 tokens</button>
+    <button class="step-btn" id="s13-reset" style="background:var(--navy3);color:var(--white)">Reset</button>
+   </div>
+  </div>
+  <div class="card" style="flex:1">
+   <div class="card-header">Real-World Token Counts</div>
+   <table class="mini-table">
+    <tr><th>Content</th><th>~Tokens</th></tr>
+    <tr><td>A tweet</td><td>~40</td></tr>
+    <tr><td>This slide deck</td><td>~3K</td></tr>
+    <tr><td>A 200-page novel</td><td>~100K</td></tr>
+    <tr><td>2 novels</td><td>~200K</td></tr>
+   </table>
+   <div class="insight-card" style="margin-top:14px">
+    <strong>Context window ≠ memory.</strong> When a token leaves the window, the model has zero access to it. Longer windows need proportionally more KV cache memory.
+   </div>
+  </div>
+ </div>`;
+
+ document.getElementById('s13-select').onchange=e=>{ctxSize=+e.target.value;fillCount=0;render()};
+ document.getElementById('s13-fill').onclick=()=>{fillCount=Math.min(fillCount+100,ctxSize+200);render()};
+ document.getElementById('s13-reset').onclick=()=>{fillCount=0;render()};
+
+ function render(){
+  const buf=document.getElementById('s13-buffer');
+  const displayMax=Math.min(ctxSize,300);// Show max 300 cells for perf
+  const ratio=displayMax/ctxSize;
+  const filled=Math.round(Math.min(fillCount,ctxSize)*ratio);
+  const fallen=Math.round(Math.max(0,fillCount-ctxSize)*ratio);
+  let h='';
+  for(let i=0;i<Math.min(displayMax,filled+fallen);i++){
+   if(i<fallen)h+=`<div class="ctx-token fallen"></div>`;
+   else h+=`<div class="ctx-token visible"></div>`;
+  }
+  for(let i=filled+fallen;i<displayMax;i++)h+=`<div class="ctx-token" style="background:var(--navy3)"></div>`;
+  buf.innerHTML=h;
+  const remaining=Math.max(0,ctxSize-fillCount);
+  document.getElementById('s13-remaining').textContent=remaining.toLocaleString();
+  document.getElementById('s13-total').textContent=ctxSize.toLocaleString();
+  document.getElementById('s13-bar').style.width=((fillCount/ctxSize)*100)+'%';
+ }
+ render();
+}
+
+// S15: Next-token prediction
+function initS15(){
+ const el=document.getElementById('sc-15');
+ const presets=[
+  {prompt:'The capital of France is ___',top:[{t:'Paris',p:.94},{t:'the',p:.02},{t:'a',p:.01},{t:'Lyon',p:.008},{t:'located',p:.005}]},
+  {prompt:'To be or not to ___',top:[{t:'be',p:.89},{t:'do',p:.03},{t:'have',p:.02},{t:'say',p:.01},{t:'know',p:.008}]},
+  {prompt:'The neural network learned to ___',top:[{t:'generalize',p:.28},{t:'predict',p:.24},{t:'classify',p:.18},{t:'recognize',p:.12},{t:'generate',p:.08}]},
+  {prompt:'"Attention is All You ___"',top:[{t:'Need',p:.97},{t:'Want',p:.01},{t:'Have',p:.005},{t:'Require',p:.003},{t:'Get',p:.002}]},
+  {prompt:'The quick brown fox jumps over the lazy ___',top:[{t:'dog',p:.91},{t:'cat',p:.03},{t:'fox',p:.02},{t:'man',p:.01},{t:'boy',p:.005}]}
+ ];
+ let curP=0,chart14=null;
+
+ el.innerHTML=`<div class="two-col">
+  <div class="card" style="flex:2">
+   <div class="card-header">Next Token Prediction</div>
+   <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px" id="s14-presets"></div>
+   <div id="s14-prompt" style="font-family:var(--font-display);font-size:20px;font-weight:600;margin-bottom:16px;color:var(--white)"></div>
+   <div style="position:relative;height:200px"><canvas id="s14-chart"></canvas></div>
+  </div>
+  <div class="card" style="flex:1">
+   <div class="card-header">Key Concept</div>
+   <p style="font-size:13px;color:var(--muted);line-height:1.7">The model outputs a <strong style="color:var(--teal)">probability distribution</strong> over its entire vocabulary (~50,000 tokens). The decoding strategy decides which token to pick.</p>
+   <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-top:10px"><strong style="color:var(--amber)">That's Week 5.</strong></p>
+   <div style="margin-top:14px;padding:10px;border-radius:8px;background:var(--card);border:1px solid var(--border);font-size:12px;color:var(--muted);line-height:1.6">
+    <strong style="color:var(--teal)">Training loop:</strong><br>Input → predict next token → cross-entropy loss → backprop → update weights → repeat on trillions of tokens
+   </div>
+  </div>
+ </div>`;
+
+ const pEl=document.getElementById('s14-presets');
+ presets.forEach((p,i)=>{
+  const b=document.createElement('button');b.className='preset-btn'+(i===0?' active':'');
+  b.textContent=`Example ${i+1}`;b.onclick=()=>{curP=i;pEl.querySelectorAll('.preset-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderChart()};
+  pEl.appendChild(b);
+ });
+
+ function renderChart(){
+  const p=presets[curP];
+  document.getElementById('s14-prompt').textContent=p.prompt;
+  if(chart14)chart14.destroy();
+  chart14=new Chart(document.getElementById('s14-chart'),{
+   type:'bar',
+   data:{labels:p.top.map(t=>t.t),datasets:[{data:p.top.map(t=>t.p),backgroundColor:['#00D4AA','#4C9BE8','#8B5CF6','#F59E0B','#F97316'],borderRadius:6}]},
+   options:{
+    indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.raw*100).toFixed(1)+'%'}}},
+    scales:{
+     x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#64748B',callback:v=>(v*100)+'%'},max:1},
+     y:{grid:{display:false},ticks:{color:'#F0F4F8',font:{family:'JetBrains Mono',size:13}}}
+    }
+   }
+  });
+ }
+ renderChart();
+}
+
+// S16: Foundation
+function initS16(){
+ const el=document.getElementById('sc-16');
+ const cards=[
+  {label:'Tokenization',color:'var(--teal)',back:'Before Claude reads your message, it converts it to token IDs using BPE. "unbelievable" is 3 tokens.'},
+  {label:'Embeddings',color:'var(--blue)',back:'Every token becomes a 4096-dimensional dense vector. That vector encodes meaning, context, and relationships.'},
+  {label:'Attention',color:'var(--purple)',back:'The reason GPT-4 resolves "it" correctly in complex sentences — attention reads the whole context at once.'},
+  {label:'Multi-Head Attention',color:'var(--amber)',back:'GPT-4 has 96 attention heads per layer. Each one looks at a different linguistic relationship simultaneously.'},
+  {label:'KV Cache',color:'var(--orange)',back:'The reason Claude responds in seconds to a 50,000-token context — K and V are cached, not recomputed.'},
+  {label:'Positional Encoding',color:'var(--green)',back:'The reason "dog bites man" and "man bites dog" produce different responses — positions are encoded in every token.'}
+ ];
+
+ el.innerHTML=`<div style="text-align:center;margin-bottom:12px">
+  <div style="font-family:var(--font-display);font-size:clamp(18px,2.5vw,28px);font-weight:700;font-style:italic;color:var(--white);max-width:600px;margin:0 auto">These aren't abstract concepts. They are the literal engineering inside GPT-4, Claude, and Gemini.</div>
+ </div>
+ <div class="flip-grid" id="s15-grid"></div>
+ <div style="text-align:center;margin-top:14px;font-family:var(--font-display);font-style:italic;color:var(--muted);font-size:14px">"Attention Is All You Need" — Vaswani et al., 2017</div>`;
+
+ const grid=document.getElementById('s15-grid');
+ cards.forEach(c=>{
+  const card=document.createElement('div');card.className='flip-card';
+  card.innerHTML=`<div class="flip-inner">
+   <div class="flip-front"><div class="fc-label" style="color:${c.color}">${c.label}</div><div class="fc-title" style="color:var(--white)">Click to reveal →</div></div>
+   <div class="flip-back" style="border-color:${c.color}"><span style="color:${c.color};font-weight:600">${c.label}:</span> ${c.back}</div>
+  </div>`;
+  card.onclick=()=>card.classList.toggle('flipped');
+  grid.appendChild(card);
+ });
+}
+
+// S17: Recap
+function initS17(){
+ const el=document.getElementById('sc-17');
+ const takeaways=[
+  'Machines can\'t process raw text — tokens and embeddings are needed',
+  'Tokenization uses BPE — words become subword token sequences',
+  'Embeddings are learned dense vectors — position = meaning',
+  'Vector arithmetic works — king − man + woman ≈ queen',
+  'Context determines meaning — attention solves ambiguity',
+  'Attention uses Q, K, V — softmax(QK^T/√d_k)·V',
+  'Multi-head attention captures multiple relationship types',
+  'Positional encoding makes attention order-aware',
+  'KV Cache makes inference fast by avoiding redundant computation',
+  'Context window = the finite token buffer the model can "see"'
+ ];
+
+ el.innerHTML=`<div class="two-col">
+  <div class="card" style="overflow-y:auto">
+   <div class="card-header" style="color:var(--teal)">Week 4 — Key Takeaways</div>
+   ${takeaways.map(t=>`<div class="check-item">${t}</div>`).join('')}
+  </div>
+  <div class="card" style="overflow-y:auto">
+   <div class="card-header" style="color:var(--blue)">Week 5 Preview — "The Final Choice"</div>
+   <div style="font-family:var(--font-display);font-size:20px;font-weight:700;margin-bottom:12px">Decoding Strategies</div>
+   <div style="font-size:13px;color:var(--muted);line-height:1.8">
+    <div class="check-item">Temperature — controlling creativity vs determinism</div>
+    <div class="check-item">Top-P (nucleus) sampling</div>
+    <div class="check-item">Beam Search</div>
+    <div class="check-item">Why the same model gives different outputs each time</div>
+   </div>
+   <div class="insight-card" style="margin-top:auto">
+    <strong>The transformer produces probabilities.</strong> Week 5 explores how the final token is chosen — and why that choice changes everything about model behavior.
+   </div>
+  </div>
+ </div>`;
+}
+
+// ===== INIT =====
+buildDeck();
+onSlideEnter(0);
+</script>
+</body>
+</html>
