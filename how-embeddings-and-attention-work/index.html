@@ -1945,10 +1945,25 @@
     <input type="range" min="0" max="15" value="0" id="s10-pos" style="margin-top:4px">
    </div>
   </div>
-  <div class="card" style="flex:1">
-   <div class="card-header">Hover Info</div>
-   <div id="s10-info" style="font-family:var(--font-mono);font-size:12px;color:var(--muted);line-height:1.8">Hover over the heatmap to see PE values</div>
-   <div class="insight-card" style="margin-top:auto"><strong>Each position gets a unique "fingerprint"</strong> across all dimensions. Nearby positions have similar encodings — the model can generalize to unseen positions.</div>
+  <div class="card" style="flex:1; display:flex; flex-direction:column; overflow-y:auto; padding-right:12px;">
+   <div class="card-header">Reading the Heatmap</div>
+   
+   <p style="font-size:12px; color:rgba(255,255,255,0.85); line-height:1.6; margin-top:8px;">
+     <strong>What is this matrix?</strong><br>
+     Each row represents a specific word slot in a sentence (Word 0, Word 1, Word 2...). Each column is a mathematical dimension. 
+   </p>
+
+   <p style="font-size:12px; color:rgba(255,255,255,0.85); line-height:1.6;">
+     <strong>The "Sequence Position" Slider:</strong><br>
+     As you drag the slider, you select a specific word's slot in the sentence. Notice the highlighted horizontal row! This strip of colors is the exact <em>Position Blueprint</em> added to your word's embedding.
+   </p>
+
+   <div style="background:var(--navy3); border-radius:6px; padding:12px; border-left:3px solid var(--teal); margin-top:auto; margin-bottom:12px;">
+    <strong style="color:var(--teal); font-size:12.5px; display:block; margin-bottom:6px">The Aha Moment</strong>
+    <p style="font-size:12px; color:var(--muted); line-height:1.5; margin:0">Look vertically down the columns. You'll notice a rippling wave pattern (created by Sine/Cosine math). Thanks to these waves, every single position index gets a <strong>unique mathematical barcode</strong>.<br><br>When the model processes "dog bites man", the vector for "dog" is injected with barcode #0. In "man bites dog", it gets barcode #2. This injection allows the model to instantly detect grammar and order!</p>
+   </div>
+
+   <div id="s10-info" style="font-family:var(--font-mono);font-size:11px;color:var(--amber);line-height:1.8;">Hover over cells to see exact wave values</div>
   </div>
  </div>`;
 
