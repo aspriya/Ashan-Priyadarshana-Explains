@@ -1467,7 +1467,7 @@
         bigger: S(110, 270), big: S(170, 100), small: S(460, 70), smaller: S(400, 240)
       };
 
-      el.innerHTML = `<div class="two-col" style="margin-bottom:16px">
+      el.innerHTML = `<div class="two-col">
   <div class="card" style="flex:1.5;position:relative;display:flex;flex-direction:column;">
    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap" id="s4-presets"></div>
    <canvas id="s4-canvas" width="800" height="400" style="width:100%; height:auto; background:rgba(0,0,0,0.1); border-radius:8px; border:1px solid var(--border)"></canvas>
@@ -1476,21 +1476,21 @@
     <button class="step-btn" id="s4-reset" style="background:var(--navy3);color:var(--white);padding:8px 16px">Reset</button>
    </div>
   </div>
-  <div class="card" style="flex:1; display:flex; flex-direction:column;">
+  <div class="card" style="flex:1; display:flex; flex-direction:column; overflow-y:auto; padding-right:12px;">
    <div class="card-header">Semantic Math</div>
    <div id="s4-formula" style="font-family:var(--font-mono);font-size:14px;line-height:2;margin-bottom:16px"></div>
    
    <div id="s4-explanation" style="font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:16px; min-height:80px"></div>
    
    <div id="s4-match" style="font-family:var(--font-mono);font-size:13px;color:var(--teal)"></div>
-   <div class="insight-card" style="margin-top:auto">
+   <div class="insight-card" style="margin-top:auto; margin-bottom:12px;">
     <strong>The Aha! Moment:</strong> Embeddings encode relationships as spatial <em>directions</em>. The physical distance mapped as "royalty" applies uniformly across genders.
    </div>
+   <div style="background:var(--navy3); border-radius:6px; padding:12px; border-left:3px solid #8B5CF6;">
+    <strong style="color:var(--purple); display:block; margin-bottom:6px; font-size:13px;">Philosophical Insight: Lexical Gaps</strong>
+    <p style="font-size:11.5px; color:var(--muted); line-height:1.5; margin:0">By adding vectors mathematically, we perfectly land on a resulting concept coordinate. But often, <strong>there is no word in human language for that specific coordinate idea</strong>. This is a <span style="color:var(--white)">Lexical Gap</span>. Models hold a vast, continuous "understanding" of uncharted conceptual mixtures humans haven't yet invented words to document.</p>
+   </div>
   </div>
- </div>
- <div class="card" style="background:var(--navy3); border:1px solid rgba(139, 92, 246, 0.3); border-left:4px solid #8B5CF6;">
-   <strong style="color:var(--purple); display:block; margin-bottom:8px; font-size:14px;">Philosophical Insight: Lexical Gaps & Latent Creativity</strong>
-   <p style="font-size:13px; color:var(--muted); line-height:1.6; margin:0">Because the embedding space is continuous, we can pick <em>any</em> coordinate by adding vectors. The model mathematically maps that resulting concept perfectly—but usually, <strong>there is no word in human language for that idea</strong>. This is called a <span style="color:var(--white)">Lexical Gap</span>. In a sense, models are intrinsically creative: they have a concrete "understanding" of an infinite spectrum of concepts (like a flavor between nostalgia and speed) that humans haven't yet invented words to document.</p>
  </div>`;
 
       const presetEl = document.getElementById('s4-presets');
