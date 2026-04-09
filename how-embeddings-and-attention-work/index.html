@@ -1513,10 +1513,19 @@
         for (let y = 0; y <= H; y += 40) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
         ctx.stroke();
 
-        ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 2; ctx.beginPath();
+        ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 2; ctx.beginPath();
         ctx.moveTo(O.x, 0); ctx.lineTo(O.x, H+50); // Y axis
         ctx.moveTo(0, O.y); ctx.lineTo(W+50, O.y); // X axis
         ctx.stroke();
+
+        // Axis Labels
+        ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '12px "Space Grotesk"';
+        ctx.fillText('Latent Dimension X (e.g. Masculine → Feminine, Present → Past)', O.x + 20, O.y + 20);
+        ctx.save();
+        ctx.translate(O.x - 20, 20);
+        ctx.rotate(-Math.PI/2);
+        ctx.fillText('Latent Dimension Y (e.g. Human → Royalty, Normal → Extreme)', -250, 0);
+        ctx.restore();
 
         // Draw labels
         function drawLabel(pos, label, color) {
@@ -1541,35 +1550,38 @@
         drawLabel(pb, an.b, '#4C9BE8'); 
         drawLabel(pc, an.c, '#8B5CF6');
         
-        let targetPos = pr;
         let vX = pa.x - pb.x; // Vector distance X
         let vY = pa.y - pb.y; // Vector distance Y
+        let originVectorNode = { x: O.x + vX, y: O.y + vY }; // The physical "Concept" vector relative to the origin
 
         // Formulate explanation logic
         if (step === 0) {
-          expl.innerHTML = `We have four related words plotted on a simplified 2D grid. We want to test if relationships are mathematically consistent.`;
+          expl.innerHTML = `We have four related words plotted on a simplified 2D grid. We want to test if relationships are mathematically consistent. Note: Real embeddings have 1024+ dimensions; we only show 2 latent dimensions here.`;
         } else if (step === 1) {
            drawArrow(pb, pa, '#EF4444', 3);
-          expl.innerHTML = `<strong>1: Extract Concept Vector.</strong> We calculate the visual distance algebraically from <em>${an.b}</em> to <em>${an.a}</em>. This vector isolates the concept of "status" or "change"!`;
+          expl.innerHTML = `<strong>1: Extract Vector.</strong> We calculate the visual distance algebraically from <em>${an.b}</em> to <em>${an.a}</em>.`;
         } else if (step === 2) {
           drawArrow(pb, pa, 'rgba(239,68,68,0.3)', 2);
-          drawLabel(pc, an.c, '#8B5CF6'); // Redraw over arrow
-          expl.innerHTML = `<strong>2: Mathematical Transfer.</strong> We take that exact extracted concept-vector and add it to the coordinate of <em>${an.c}</em>.`;
-        } else if (step >= 3) {
+          drawArrow(O, originVectorNode, '#EF4444', 3);
+          drawLabel(originVectorNode, 'Concept Vector', '#EF4444');
+          expl.innerHTML = `<strong>2: Isolate the Concept.</strong> By taking that difference (${an.a} - ${an.b}), we isolate a raw mathematical direction starting from the Origin. This vector purely represents the transformation (e.g., adding "Status" or "Time").`;
+        } else if (step === 3) {
           drawArrow(pb, pa, 'rgba(239,68,68,0.3)', 2);
+          drawArrow(O, originVectorNode, 'rgba(239,68,68,0.3)', 2);
           drawArrow(pc, { x: pc.x + vX, y: pc.y + vY }, '#EF4444', 3);
-          drawLabel(pr, an.r, '#F59E0B');
-          expl.innerHTML = `<strong>3: The Arrival.</strong> Moving along that vector from <em>${an.c}</em> lands us perfectly at our target destination: <em>${an.r}</em>!`;
+          drawLabel(pc, an.c, '#8B5CF6'); // Redraw over arrow
+          expl.innerHTML = `<strong>3: Mathematical Transfer.</strong> We take that exact extracted concept-vector and add it to the coordinate of <em>${an.c}</em>.`;
         }
 
-        // Show proximity dashed line at end
+        // Final result and proximity
         if (step === 4) {
           drawArrow(pb, pa, 'rgba(239,68,68,0.3)', 2);
           drawArrow(pc, { x: pc.x + vX, y: pc.y + vY }, '#EF4444', 3);
           drawLabel(pr, an.r, '#F59E0B');
           ctx.setLineDash([5, 5]); ctx.strokeStyle = '#F59E0B'; ctx.lineWidth = 1; ctx.beginPath(); 
           ctx.moveTo(pc.x + vX, pc.y + vY); ctx.lineTo(pr.x, pr.y); ctx.stroke(); ctx.setLineDash([]);
-          expl.innerHTML += `<br><br><span style="color:var(--amber)">This validates the latent structure! The math intrinsically captured analogical properties.</span>`;
+          expl.innerHTML = `<strong>4: The Arrival.</strong> Moving along the concept vector from <em>${an.c}</em> lands us perfectly at our target destination: <em>${an.r}</em>!`;
+          expl.innerHTML += `<br><br><span style="color:var(--amber)">This validates the latent structure! The math intrinsically captured analogical properties across dimensions.</span>`;
         }
 
         // Formula
