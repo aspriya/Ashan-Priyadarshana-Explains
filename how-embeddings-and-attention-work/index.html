@@ -1193,9 +1193,17 @@
    </div>
    <canvas id="s3-chart" style="width:100%;max-height:380px"></canvas>
   </div>
-  <div class="card" style="flex:1">
+  <div class="card" style="flex:1; display:flex; flex-direction:column;">
    <div class="card-header">Selected Word</div>
    <div id="s3-info" style="font-size:13px;color:var(--muted)">Click a point on the chart</div>
+   
+   <div style="margin-top:20px;font-size:12px;color:var(--muted);line-height:1.5">
+    <strong style="color:var(--teal)">How do they learn?</strong><br>
+    The model plays a "fill-in-the-blank" game across millions of books. To guess words correctly, it <em>must</em> cluster similar concepts closer together and push unrelated ones apart. The resulting coordinates become the embedding.<br><br>
+    <strong style="color:var(--teal)">Why are they called "dense"?</strong><br>
+    Unlike sparse one-hot vectors that are 99% zeros, a dense vector packs continuous, real-number values into <em>every single dimension</em>. Every decimal relates to a tiny, abstract fragment of meaning.
+   </div>
+
    <div class="insight-card" style="margin-top:auto">
     <strong>An embedding</strong> is a learned, dense, real-valued vector. Position in this space = meaning. Distance = semantic similarity.
    </div>
