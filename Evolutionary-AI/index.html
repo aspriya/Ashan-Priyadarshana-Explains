@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evolutionary AI — Genetic Algorithms</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #04090a;
+  --surface: #0c1618;
+  --surface2: #111f22;
+  --border: #1a3038;
+  --green: #00e676;
+  --green-dim: #00994f;
+  --amber: #ffab40;
+  --amber-dim: #b37300;
+  --teal: #26c6da;
+  --red: #ef5350;
+  --text: #d4eae8;
+  --muted: #5a8080;
+  --code-bg: #081215;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+::selection { background: rgba(0,230,118,.25); }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--green-dim); border-radius: 3px; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 52px;
+  background: rgba(4,9,10,.85); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: var(--font-mono); font-size: .75rem; color: var(--green); letter-spacing: .1em; }
+.nav-links { display: flex; gap: 1.5rem; }
+.nav-links a { font-size: .78rem; color: var(--muted); text-decoration: none; letter-spacing: .04em; transition: color .2s; }
+.nav-links a:hover { color: var(--green); }
+
+/* ── HERO ── */
+.hero {
+  position: relative; height: 100vh; min-height: 600px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+#hero-canvas { position: absolute; top: 80px; left: 0; right: 0; bottom: 0; }
+.hero-content { position: relative; text-align: center; padding: 3rem; max-width: 800px;
+  background: radial-gradient(circle, rgba(4,9,10,0.85) 0%, rgba(4,9,10,0.4) 60%, rgba(4,9,10,0) 80%);
+  border-radius: 50%;
+}
+.hero-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: .7rem;
+  color: var(--green); letter-spacing: .15em; text-transform: uppercase;
+  border: 1px solid var(--green-dim); padding: .25rem .75rem; border-radius: 2px;
+  margin-bottom: 1.5rem; animation: fadeUp .8s ease both;
+}
+.hero-title {
+  font-family: var(--font-display); font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-weight: 900; line-height: 1.05; color: #fff;
+  text-shadow: 0 4px 24px rgba(4,9,10,0.9), 0 2px 8px rgba(4,9,10,0.8);
+  animation: fadeUp .8s .1s ease both;
+}
+.hero-title em { font-style: italic; color: var(--green); text-shadow: 0 4px 24px rgba(4,9,10,0.9), 0 2px 8px rgba(4,9,10,0.8); }
+.hero-sub {
+  margin-top: 1.5rem; font-size: 1.1rem; color: #fff; max-width: 520px; margin-inline: auto;
+  text-shadow: 0 2px 12px rgba(4,9,10,0.9), 0 1px 4px rgba(4,9,10,0.8);
+  animation: fadeUp .8s .2s ease both;
+}
+.hero-scroll {
+  position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: .4rem;
+  font-family: var(--font-mono); font-size: .65rem; color: #fff; letter-spacing: .1em;
+  text-shadow: 0 2px 8px rgba(4,9,10,0.9);
+  animation: fadeUp .8s .5s ease both;
+}
+.scroll-arrow { animation: bounce 2s infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0)}50%{transform:translateY(6px)} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)} }
+
+/* ── SECTION WRAPPER ── */
+section { padding: 5rem 2rem; }
+.container { max-width: 960px; margin: 0 auto; }
+.section-label {
+  font-family: var(--font-mono); font-size: .7rem; color: var(--green);
+  letter-spacing: .15em; text-transform: uppercase; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.section-label::before { content:''; display:block; width:24px; height:1px; background:var(--green); }
+h2 {
+  font-family: var(--font-display); font-size: clamp(1.8rem,4vw,2.8rem);
+  font-weight: 700; line-height: 1.2; margin-bottom: 1.5rem; color: #fff;
+}
+h3 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; margin-bottom: .75rem; color: #fff; }
+p { margin-bottom: 1rem; color: var(--text); }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; padding: 1.5rem;
+}
+.card-grid { display: grid; gap: 1.5rem; }
+.card-grid.cols2 { grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); }
+.card-grid.cols3 { grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); }
+
+/* ── DIVIDER ── */
+.divider { height: 1px; background: var(--border); margin: 3rem 0; }
+
+/* ── INSIGHT BOXES ── */
+.insight {
+  background: linear-gradient(135deg, rgba(0,230,118,.06), rgba(0,230,118,.02));
+  border: 1px solid rgba(0,230,118,.25); border-radius: 6px;
+  padding: 1.25rem 1.5rem; margin: 2rem 0;
+  display: flex; gap: 1rem; align-items: flex-start;
+}
+.insight-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: .1rem; }
+.insight-text { font-size: .95rem; color: var(--text); }
+.insight-text strong { color: var(--green); }
+
+/* ── CODE BLOCK ── */
+pre {
+  background: var(--code-bg); border: 1px solid var(--border);
+  border-radius: 6px; padding: 1.25rem 1.5rem;
+  font-family: var(--font-mono); font-size: .82rem; line-height: 1.7;
+  overflow-x: auto; margin: 1.25rem 0;
+}
+.kw { color: var(--amber); }
+.fn { color: var(--teal); }
+.cm { color: var(--muted); font-style: italic; }
+.str { color: #a5d6a7; }
+.num { color: #ce93d8; }
+
+/* ── TABS ── */
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; flex-wrap: wrap; }
+.tab-btn {
+  background: none; border: none; color: var(--muted); cursor: pointer;
+  font-family: var(--font-body); font-size: .85rem; padding: .7rem 1.25rem;
+  border-bottom: 2px solid transparent; transition: all .2s; white-space: nowrap;
+}
+.tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
+.tab-btn:hover:not(.active) { color: var(--text); }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; animation: fadeUp .3s ease; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; gap: .4rem;
+  background: none; border: 1px solid var(--green); color: var(--green);
+  font-family: var(--font-mono); font-size: .78rem; padding: .5rem 1.1rem;
+  border-radius: 4px; cursor: pointer; transition: all .2s; text-decoration: none;
+  letter-spacing: .05em;
+}
+.btn:hover { background: rgba(0,230,118,.1); }
+.btn-amber { border-color: var(--amber); color: var(--amber); }
+.btn-amber:hover { background: rgba(255,171,64,.1); }
+.btn-solid { background: var(--green); color: #000; font-weight: 600; border-color: var(--green); }
+.btn-solid:hover { background: #33ff8e; }
+
+/* ── PROGRESS BAR ── */
+.progress-bar-wrap { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin: .4rem 0; }
+.progress-bar { height: 100%; background: var(--green); border-radius: 3px; transition: width .3s ease; }
+.progress-bar.amber { background: var(--amber); }
+.progress-bar.red { background: var(--red); }
+
+/* ── CHROMOSOME VIZ ── */
+.chromosome {
+  display: flex; gap: 3px; flex-wrap: wrap; margin: .5rem 0;
+  font-family: var(--font-mono); font-size: .85rem;
+}
+.gene {
+  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+  border-radius: 3px; border: 1px solid var(--border); transition: all .3s;
+  color: #000; font-weight: 600;
+}
+.gene.match { background: var(--green); border-color: var(--green); }
+.gene.close { background: var(--amber); border-color: var(--amber); }
+.gene.miss { background: var(--surface2); color: var(--text); }
+
+/* ── GA RUNNER ── */
+.ga-runner { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; }
+.gen-display { font-family: var(--font-mono); font-size: .8rem; color: var(--muted); }
+.gen-display .gen-num { color: var(--amber); font-size: 1.4rem; font-weight: 600; }
+.population-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: .5rem; max-height: 260px; overflow-y: auto;
+  padding: .5rem; background: var(--code-bg); border-radius: 4px;
+  font-family: var(--font-mono); font-size: .75rem;
+}
+.pop-individual { display: flex; justify-content: space-between; color: var(--muted); padding: .15rem .3rem; }
+.pop-individual.best { color: var(--green); }
+.fit-score { color: var(--amber); margin-left: .5rem; }
+
+/* ── LANDSCAPE CANVAS ── */
+canvas { display: block; border-radius: 6px; }
+
+/* ── COMPARISON TABLE ── */
+.compare-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.compare-table th, .compare-table td { padding: .75rem 1rem; border: 1px solid var(--border); text-align: left; }
+.compare-table th { background: var(--surface2); color: var(--amber); font-weight: 600; font-family: var(--font-mono); font-size: .8rem; }
+.compare-table td { background: var(--surface); }
+.compare-table tr:hover td { background: var(--surface2); }
+.yes { color: var(--green); }
+.no { color: var(--red); }
+.partial { color: var(--amber); }
+
+/* ── STEP INDICATOR ── */
+.step-track { display: flex; gap: 0; margin-bottom: 2rem; position: relative; }
+.step-track::before {
+  content:''; position:absolute; top:16px; left:16px; right:16px; height:1px;
+  background: var(--border); z-index: 0;
+}
+.step-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: .4rem; cursor: pointer; }
+.step-dot {
+  width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: .75rem; background: var(--bg);
+  z-index: 1; transition: all .3s; color: var(--muted);
+}
+.step-item.active .step-dot { border-color: var(--green); color: var(--green); background: rgba(0,230,118,.1); }
+.step-item.done .step-dot { background: var(--green); color: #000; border-color: var(--green); }
+.step-label { font-size: .68rem; color: var(--muted); text-align: center; font-family: var(--font-mono); letter-spacing: .04em; }
+.step-item.active .step-label { color: var(--green); }
+
+/* ── LIBRARY CARDS ── */
+.lib-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  overflow: hidden;
+}
+.lib-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.lib-name { font-family: var(--font-mono); font-size: 1rem; color: var(--amber); font-weight: 600; }
+.lib-tag { font-family: var(--font-mono); font-size: .65rem; color: var(--muted); border: 1px solid var(--border); padding: .15rem .5rem; border-radius: 2px; }
+.lib-body { padding: 1.25rem 1.5rem; }
+.lib-body p { font-size: .9rem; margin-bottom: .75rem; }
+
+/* ── APPLICATION CARDS ── */
+.app-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 1.5rem; display: flex; gap: 1rem; align-items: flex-start;
+  transition: border-color .2s, transform .2s;
+}
+.app-card:hover { border-color: var(--green-dim); transform: translateY(-2px); }
+.app-icon { font-size: 2rem; flex-shrink: 0; }
+.app-content h4 { font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: .35rem; }
+.app-content p { font-size: .875rem; color: var(--muted); margin: 0; }
+
+/* ── ROULETTE ── */
+#roulette-canvas { cursor: pointer; }
+
+/* ── INTERACTIVE FITNESS ── */
+.fitness-playground {
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem;
+}
+.slider-row { display: flex; align-items: center; gap: 1rem; margin: .5rem 0; }
+.slider-row label { font-family: var(--font-mono); font-size: .75rem; color: var(--muted); width: 100px; flex-shrink: 0; }
+input[type=range] { flex: 1; accent-color: var(--green); }
+.slider-val { font-family: var(--font-mono); font-size: .8rem; color: var(--amber); width: 40px; text-align: right; }
+
+/* ── CROSSOVER DEMO ── */
+.crossover-demo { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 1.5rem; }
+.cross-row { display: flex; align-items: center; gap: 1rem; margin: .6rem 0; flex-wrap: wrap; }
+.cross-label { font-family: var(--font-mono); font-size: .75rem; color: var(--muted); width: 60px; }
+
+/* ── FOOTER ── */
+footer {
+  padding: 3rem 2rem; border-top: 1px solid var(--border);
+  text-align: center; font-family: var(--font-mono); font-size: .75rem; color: var(--muted);
+}
+
+/* ── UTIL ── */
+.text-green { color: var(--green); }
+.text-amber { color: var(--amber); }
+.text-teal { color: var(--teal); }
+.text-muted { color: var(--muted); }
+.mt1 { margin-top: 1rem; }
+.mt2 { margin-top: 2rem; }
+.mb2 { margin-bottom: 2rem; }
+.flex { display: flex; }
+.flex-center { display: flex; align-items: center; }
+.gap1 { gap: 1rem; }
+.gap05 { gap: .5rem; }
+.bold { font-weight: 600; }
+
+/* ── PSEUDOCODE ── */
+.pseudocode {
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px;
+  font-family: var(--font-mono); font-size: .82rem; line-height: 2;
+  padding: 1.5rem; position: relative;
+}
+.pline { padding: .1rem .5rem; border-radius: 3px; transition: background .3s; cursor: default; }
+.pline.highlight { background: rgba(0,230,118,.12); border-left: 2px solid var(--green); padding-left: .75rem; }
+.pindent1 { padding-left: 1.5rem; }
+.pindent2 { padding-left: 3rem; }
+.pindent3 { padding-left: 4.5rem; }
+
+/* ── STAT BOX ── */
+.stat-row { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; }
+.stat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; flex: 1; min-width: 120px; }
+.stat-val { font-family: var(--font-mono); font-size: 1.6rem; font-weight: 700; color: var(--green); }
+.stat-label { font-size: .75rem; color: var(--muted); margin-top: .25rem; }
+
+/* ── HERO GENERATION COUNTER ── */
+.gen-counter-hero {
+  position: absolute; bottom: 6rem; left: 50%; transform: translateX(-50%);
+  font-family: var(--font-mono); font-size: .72rem; color: var(--green);
+  text-shadow: 0 2px 8px rgba(4,9,10,0.9);
+  background: rgba(4,9,10,0.6); padding: 0.4rem 1rem; border-radius: 4px; box-shadow: 0 4px 12px rgba(4,9,10,0.5);
+  letter-spacing: .1em; white-space: nowrap;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  nav { padding: 0 1rem; }
+  .nav-links { gap: .75rem; }
+  section { padding: 3.5rem 1.25rem; }
+  .step-label { display: none; }
+  .compare-table { font-size: .8rem; }
+  .compare-table th, .compare-table td { padding: .5rem .6rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <span class="nav-logo">// EVOLUTIONARY AI</span>
+  <div class="nav-links">
+    <a href="#thinking">The Idea</a>
+    <a href="#compare">vs Others</a>
+    <a href="#mechanics">How It Works</a>
+    <a href="#playground">Playground</a>
+    <a href="#libraries">Libraries</a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-tag">Evolutionary Computation</div>
+    <h1 class="hero-title">Nature's way of<br><em>finding answers</em></h1>
+    <p class="hero-sub">Genetic Algorithms — where survival of the fittest becomes a search strategy for solving the hardest problems in computing.</p>
+  </div>
+  <div class="gen-counter-hero" id="hero-gen-text">population initialising...</div>
+  <div class="hero-scroll">
+    <span>scroll to explore</span>
+    <span class="scroll-arrow">↓</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 1 — THE BIG IDEA
+══════════════════════════════════════ -->
+<section id="thinking">
+<div class="container">
+  <div class="section-label">01 — Foundation</div>
+  <h2>The Thinking Behind It</h2>
+  <p>Before a single line of code, let's ask the question that motivated everything: <strong style="color:#fff">How does nature solve impossibly hard problems without any instructions?</strong></p>
+  <p>A bird's wing is aerodynamically near-perfect. A bacteria's flagellum is a marvel of nano-engineering. DNA error-correction mechanisms are more robust than most software. Nobody designed these — they <em>emerged</em>, through billions of iterations of a brutally simple process.</p>
+
+  <div class="insight">
+    <div class="insight-icon">🔑</div>
+    <div class="insight-text">
+      <strong>The Core Insight:</strong> You don't need to know HOW to build the best solution. You just need to know how to <strong>judge</strong> one. Given a way to score solutions, evolution will find them for you.
+    </div>
+  </div>
+
+  <div class="card-grid cols2 mt2">
+    <div class="card">
+      <h3 style="color:var(--red)">The Traditional Way</h3>
+      <p style="font-size:.9rem">You define an exact procedure. Every step is explicit. The computer does exactly what you tell it — no more. The quality of the output is bounded by the quality of your instructions.</p>
+      <p style="font-size:.85rem;color:var(--muted)">Works well when you <em>already understand</em> the problem deeply enough to specify the solution path.</p>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--green)">The Evolutionary Way</h3>
+      <p style="font-size:.9rem">You define what a <em>good result looks like</em> (a scoring function). The algorithm explores, recombines, and refines candidate solutions autonomously across many generations.</p>
+      <p style="font-size:.85rem;color:var(--muted)">Works brilliantly when the search space is vast and the solution path is <em>unknown or unknowable</em>.</p>
+    </div>
+  </div>
+
+  <h3 class="mt2">Darwin's Algorithm, Distilled</h3>
+  <p>In 1859, Darwin described a mechanism so simple it fits in four lines — yet powerful enough to explain all of life's complexity:</p>
+
+  <div class="card mt1" style="border-color:rgba(0,230,118,.3)">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem">
+      <div>
+        <div style="font-family:var(--font-mono);font-size:.7rem;color:var(--green);letter-spacing:.1em;margin-bottom:.4rem">01 — VARIATION</div>
+        <p style="font-size:.9rem;margin:0">Individuals in a population are different from each other. No two are identical.</p>
+      </div>
+      <div>
+        <div style="font-family:var(--font-mono);font-size:.7rem;color:var(--green);letter-spacing:.1em;margin-bottom:.4rem">02 — HEREDITY</div>
+        <p style="font-size:.9rem;margin:0">Offspring resemble their parents. Traits are passed down through generations.</p>
+      </div>
+      <div>
+        <div style="font-family:var(--font-mono);font-size:.7rem;color:var(--amber);letter-spacing:.1em;margin-bottom:.4rem">03 — SELECTION</div>
+        <p style="font-size:.9rem;margin:0">Individuals better suited to the environment leave more offspring. The rest fade away.</p>
+      </div>
+      <div>
+        <div style="font-family:var(--font-mono);font-size:.7rem;color:var(--amber);letter-spacing:.1em;margin-bottom:.4rem">04 — TIME</div>
+        <p style="font-size:.9rem;margin:0">Given enough iterations, complex adaptations emerge from nothing but these three rules.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight mt2">
+    <div class="insight-icon">💡</div>
+    <div class="insight-text">
+      A Genetic Algorithm is a direct computer implementation of Darwin's mechanism — but instead of organisms adapting to nature, we have <strong>candidate solutions adapting to your problem</strong>.
+    </div>
+  </div>
+
+  <h3 class="mt2">What Problems Actually Need This?</h3>
+  <p>GA shines when the search space is too large for exhaustive search, when the problem has no clean mathematical derivative, or when you need "good enough" rather than provably optimal.</p>
+
+  <div class="card-grid cols3">
+    <div class="card">
+      <div class="text-amber bold" style="font-family:var(--font-mono);font-size:.75rem;margin-bottom:.5rem">COMBINATORIAL</div>
+      <p style="font-size:.875rem;margin:0">Route planning, scheduling, bin packing — problems where you're choosing from an astronomically large set of arrangements.</p>
+    </div>
+    <div class="card">
+      <div class="text-teal bold" style="font-family:var(--font-mono);font-size:.75rem;margin-bottom:.5rem">DESIGN SPACE</div>
+      <p style="font-size:.875rem;margin:0">Engineering shapes, neural architectures, circuit layouts — where the solution is a structure, not a number.</p>
+    </div>
+    <div class="card">
+      <div class="text-green bold" style="font-family:var(--font-mono);font-size:.75rem;margin-bottom:.5rem">MULTI-OBJECTIVE</div>
+      <p style="font-size:.875rem;margin:0">Optimise cost <em>and</em> performance <em>and</em> reliability simultaneously — trade-off problems with no single right answer.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 2 — COMPARISON
+══════════════════════════════════════ -->
+<section id="compare" style="background:var(--surface)">
+<div class="container">
+  <div class="section-label">02 — Context</div>
+  <h2>GA vs Other AI Approaches</h2>
+  <p>Different AI techniques are different <em>search strategies</em>. Understanding when to reach for GA (versus gradient descent, exhaustive search, or reinforcement learning) comes from understanding what each one assumes about the problem.</p>
+
+  <div class="tabs" id="compare-tabs">
+    <button class="tab-btn active" data-tab="landscape">Fitness Landscape</button>
+    <button class="tab-btn" data-tab="tsp">TSP Problem</button>
+    <button class="tab-btn" data-tab="neuro">Neural Nets</button>
+    <button class="tab-btn" data-tab="rl">Reinforcement Learning</button>
+    <button class="tab-btn" data-tab="table">Full Comparison</button>
+  </div>
+
+  <!-- LANDSCAPE TAB -->
+  <div class="tab-pane active" id="tab-landscape">
+    <div class="card-grid cols2">
+      <div>
+        <h3>The Fitness Landscape Analogy</h3>
+        <p style="font-size:.9rem">Imagine every possible solution to your problem laid out as a landscape. <strong style="color:#fff">Height = how good the solution is.</strong> Finding the best solution means finding the highest peak.</p>
+        <p style="font-size:.9rem">Gradient Descent is like a blindfolded hiker — they can only feel the slope under their feet and walk uphill. They'll reach <em>a</em> peak, but not necessarily <em>the</em> peak.</p>
+        <p style="font-size:.9rem">A Genetic Algorithm releases an entire <em>population</em> of hikers scattered across the landscape. They share information, combine their best positions, and occasionally take random jumps — dramatically increasing the odds of finding the true global maximum.</p>
+        <div class="insight" style="margin-top:1rem">
+          <div class="insight-icon">🏔️</div>
+          <div class="insight-text"><strong>Local vs Global Optima</strong> — this is the fundamental problem GA is designed to escape. When a gradient method gets trapped on a local hill, GA keeps the whole population alive to explore other valleys.</div>
+        </div>
+      </div>
+      <div>
+        <canvas id="landscape-canvas" width="420" height="300" style="width:100%;max-width:420px;border:1px solid var(--border)"></canvas>
+        <div style="display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap">
+          <button class="btn" id="btn-show-gd">▶ Show Gradient Descent</button>
+          <button class="btn btn-amber" id="btn-show-ga">▶ Show GA Population</button>
+          <button class="btn" style="border-color:var(--muted);color:var(--muted)" id="btn-reset-land">↺ Reset</button>
+        </div>
+        <div style="margin-top:.75rem;font-family:var(--font-mono);font-size:.72rem;color:var(--muted)">
+          <span style="color:var(--red)">●</span> Gradient Descent — gets trapped &nbsp;
+          <span style="color:var(--green)">●</span> GA Population — explores freely
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TSP TAB -->
+  <div class="tab-pane" id="tab-tsp">
+    <h3>The Travelling Salesman Problem (TSP)</h3>
+    <p style="font-size:.9rem">A salesman must visit 15 cities exactly once and return home. What's the shortest route? This is NP-hard — the number of possible routes is <strong style="color:var(--amber)">15! = 1.3 trillion</strong>.</p>
+    <div class="card-grid cols3">
+      <div class="card" style="border-color:rgba(239,83,80,.4)">
+        <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--red);margin-bottom:.5rem">BRUTE FORCE</div>
+        <p style="font-size:.875rem">Check every permutation. Guaranteed optimal. But with 15 cities and 1 trillion routes — at a billion checks/second — you're waiting <strong style="color:#fff">21 minutes</strong>. With 25 cities? Longer than the age of the universe.</p>
+        <div style="margin-top:.75rem">
+          <div class="progress-bar-wrap"><div class="progress-bar red" style="width:100%"></div></div>
+          <div style="font-size:.75rem;color:var(--muted)">Time complexity: O(n!)</div>
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(255,171,64,.4)">
+        <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--amber);margin-bottom:.5rem">NEAREST NEIGHBOUR</div>
+        <p style="font-size:.875rem">Greedy heuristic: always visit the closest unvisited city. Fast, but typically produces routes <strong style="color:#fff">20-25% worse</strong> than optimal. Gets trapped in local decisions it can't undo.</p>
+        <div style="margin-top:.75rem">
+          <div class="progress-bar-wrap"><div class="progress-bar amber" style="width:60%"></div></div>
+          <div style="font-size:.75rem;color:var(--muted)">Time complexity: O(n²)</div>
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(0,230,118,.4)">
+        <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--green);margin-bottom:.5rem">GENETIC ALGORITHM</div>
+        <p style="font-size:.875rem">Encodes routes as chromosomes. Crossover swaps city segments between parents. Mutation swaps two cities. Consistently finds routes within <strong style="color:#fff">1-3% of optimal</strong> in seconds.</p>
+        <div style="margin-top:.75rem">
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:30%"></div></div>
+          <div style="font-size:.75rem;color:var(--muted)">Time complexity: O(gen × pop × n)</div>
+        </div>
+      </div>
+    </div>
+    <div class="insight mt2">
+      <div class="insight-icon">🧭</div>
+      <div class="insight-text">Real logistics companies (FedEx, UPS, Amazon) use evolutionary algorithms for vehicle routing. UPS alone saves <strong>100 million miles per year</strong> using route optimisation. The TSP is not an academic toy — it's a billion-dollar problem.</div>
+    </div>
+  </div>
+
+  <!-- NEURAL NETS TAB -->
+  <div class="tab-pane" id="tab-neuro">
+    <h3>GA vs Neural Networks</h3>
+    <div class="card-grid cols2">
+      <div>
+        <p style="font-size:.9rem">Neural Networks and GAs are both inspired by biology, but they attack problems from opposite directions.</p>
+        <table class="compare-table" style="font-size:.82rem">
+          <tr>
+            <th>Dimension</th>
+            <th>Neural Network</th>
+            <th>Genetic Algorithm</th>
+          </tr>
+          <tr>
+            <td>Learning signal</td>
+            <td>Error gradient (requires differentiability)</td>
+            <td>Fitness score (any measurable criterion)</td>
+          </tr>
+          <tr>
+            <td>Data requirement</td>
+            <td>Large labelled datasets</td>
+            <td>Just a fitness function</td>
+          </tr>
+          <tr>
+            <td>What it optimises</td>
+            <td>Prediction accuracy</td>
+            <td>Any objective you can measure</td>
+          </tr>
+          <tr>
+            <td>Black-box friendly?</td>
+            <td class="no">No — needs gradients</td>
+            <td class="yes">Yes — treat it as a black box</td>
+          </tr>
+          <tr>
+            <td>Speed (per evaluation)</td>
+            <td>Fast inference</td>
+            <td>Each eval can be slow</td>
+          </tr>
+        </table>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:1rem">
+          <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--amber);margin-bottom:.5rem">REAL EXAMPLE: NEUROEVOLUTION</div>
+          <p style="font-size:.875rem">What if you use GA <em>to evolve neural networks</em>? This is called NeuroEvolution (NEAT algorithm). Instead of backpropagation, a GA evolves the network's topology and weights. OpenAI used this to evolve agents that play Atari games without any explicit reward shaping.</p>
+        </div>
+        <div class="card">
+          <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--green);margin-bottom:.5rem">REAL EXAMPLE: NEURAL ARCHITECTURE SEARCH</div>
+          <p style="font-size:.875rem">Google's AutoML uses evolutionary algorithms to search the space of neural network architectures. The GA discovers architectures that outperform those hand-designed by expert researchers — including finding EfficientNet, one of the most accurate image classifiers ever built.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RL TAB -->
+  <div class="tab-pane" id="tab-rl">
+    <h3>GA vs Reinforcement Learning</h3>
+    <div class="card-grid cols2">
+      <div>
+        <p style="font-size:.9rem">Both GA and Reinforcement Learning (RL) can train agents to behave intelligently — without labelled data. But the search strategy is fundamentally different.</p>
+        <div class="card" style="margin-bottom:1rem">
+          <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--amber);margin-bottom:.5rem">RL APPROACH</div>
+          <p style="font-size:.875rem;margin:0">One agent interacts with an environment over time. Receives rewards and penalties. Updates its policy incrementally using temporal difference learning. Sequential, correlated experience.</p>
+        </div>
+        <div class="card">
+          <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--green);margin-bottom:.5rem">GA APPROACH</div>
+          <p style="font-size:.875rem;margin:0">A <em>population</em> of policies (chromosomes) are evaluated in parallel. No credit assignment problem. No sparse reward issue. The fitness function evaluates complete episodes.</p>
+        </div>
+      </div>
+      <div>
+        <div class="insight">
+          <div class="insight-icon">🎮</div>
+          <div class="insight-text"><strong>Real example:</strong> Uber AI Labs showed in 2017 that simple genetic algorithms matched or beat deep RL (PPO, A3C) on many MuJoCo locomotion tasks — while being 10× simpler to implement and massively parallelisable across CPUs.</div>
+        </div>
+        <div class="card mt2">
+          <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--teal);margin-bottom:.5rem">WHEN TO CHOOSE GA OVER RL</div>
+          <ul style="font-size:.875rem;color:var(--text);padding-left:1.25rem;line-height:2">
+            <li>Reward is sparse or delayed (no step-by-step feedback)</li>
+            <li>You can parallelise environment evaluations</li>
+            <li>The episode is short enough to evaluate completely</li>
+            <li>You want to avoid the hyperparameter sensitivity of deep RL</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE TAB -->
+  <div class="tab-pane" id="tab-table">
+    <h3>Full Comparison Matrix</h3>
+    <div style="overflow-x:auto">
+    <table class="compare-table">
+      <tr>
+        <th>Property</th>
+        <th>Genetic Algorithm</th>
+        <th>Gradient Descent</th>
+        <th>Neural Network</th>
+        <th>Reinf. Learning</th>
+        <th>Exhaustive Search</th>
+      </tr>
+      <tr>
+        <td>Needs labelled data?</td>
+        <td class="yes">No</td>
+        <td class="partial">Depends</td>
+        <td class="no">Yes</td>
+        <td class="yes">No</td>
+        <td class="yes">No</td>
+      </tr>
+      <tr>
+        <td>Handles non-differentiable objectives?</td>
+        <td class="yes">Yes ✓</td>
+        <td class="no">No</td>
+        <td class="no">No</td>
+        <td class="yes">Yes</td>
+        <td class="yes">Yes</td>
+      </tr>
+      <tr>
+        <td>Escapes local optima?</td>
+        <td class="yes">Well</td>
+        <td class="no">Poorly</td>
+        <td class="partial">Sometimes</td>
+        <td class="partial">Sometimes</td>
+        <td class="yes">Yes (complete)</td>
+      </tr>
+      <tr>
+        <td>Scales to huge search spaces?</td>
+        <td class="yes">Yes</td>
+        <td class="yes">Yes</td>
+        <td class="yes">Yes</td>
+        <td class="yes">Yes</td>
+        <td class="no">No</td>
+      </tr>
+      <tr>
+        <td>Parallelisable?</td>
+        <td class="yes">Highly</td>
+        <td class="partial">Partially</td>
+        <td class="partial">Partially</td>
+        <td class="partial">Partially</td>
+        <td class="yes">Highly</td>
+      </tr>
+      <tr>
+        <td>Interpretable solution?</td>
+        <td class="yes">Yes (chromosome)</td>
+        <td class="partial">Sometimes</td>
+        <td class="no">Rarely</td>
+        <td class="no">Rarely</td>
+        <td class="yes">Yes</td>
+      </tr>
+      <tr>
+        <td>Requires problem structure knowledge?</td>
+        <td class="yes">Minimal</td>
+        <td class="no">High (gradient)</td>
+        <td class="no">Moderate</td>
+        <td class="partial">Some</td>
+        <td class="yes">None</td>
+      </tr>
+      <tr>
+        <td>Real-world example</td>
+        <td>TSP, scheduling, design</td>
+        <td>Linear regression, SVM</td>
+        <td>Image recognition, NLP</td>
+        <td>Game playing, robotics</td>
+        <td>Password cracking (small)</td>
+      </tr>
+    </table>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 3 — MECHANICS
+══════════════════════════════════════ -->
+<section id="mechanics">
+<div class="container">
+  <div class="section-label">03 — Core Mechanics</div>
+  <h2>How a Genetic Algorithm Works</h2>
+  <p>A GA has six moving parts. Each maps directly to a biological counterpart — and once you see that mapping, the whole thing becomes intuitive. Walk through each concept below.</p>
+
+  <!-- STEP TRACK -->
+  <div class="step-track" id="step-track">
+    <div class="step-item active" data-step="0"><div class="step-dot">1</div><div class="step-label">Encoding</div></div>
+    <div class="step-item" data-step="1"><div class="step-dot">2</div><div class="step-label">Population</div></div>
+    <div class="step-item" data-step="2"><div class="step-dot">3</div><div class="step-label">Fitness</div></div>
+    <div class="step-item" data-step="3"><div class="step-dot">4</div><div class="step-label">Selection</div></div>
+    <div class="step-item" data-step="4"><div class="step-dot">5</div><div class="step-label">Crossover</div></div>
+    <div class="step-item" data-step="5"><div class="step-dot">6</div><div class="step-label">Mutation</div></div>
+  </div>
+
+  <!-- STEP PANELS -->
+  <div id="step-panels">
+
+    <!-- STEP 0 — ENCODING -->
+    <div class="step-panel" data-panel="0">
+      <div class="card-grid cols2">
+        <div>
+          <h3>🧬 Encoding — The Chromosome</h3>
+          <p>The first challenge is representation: how do you encode a <em>candidate solution</em> as a string of data that can be mixed and mutated? This encoding is called a <strong style="color:var(--green)">chromosome</strong>.</p>
+          <p>The chromosome is the genome of your solution. Each position is a <strong style="color:var(--green)">gene</strong>. The value at each position is an <strong style="color:var(--amber)">allele</strong>.</p>
+          <div class="insight">
+            <div class="insight-icon">💡</div>
+            <div class="insight-text">The power of GA lies here: <strong>you can encode almost anything</strong>. A route, a weight, a schedule, a network architecture, a trading rule — anything reducible to a sequence of values becomes evolvable.</div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--amber);margin-bottom:1rem">ENCODING EXAMPLES</div>
+            <div style="font-size:.875rem;margin-bottom:1rem">
+              <div style="color:var(--muted);font-family:var(--font-mono);font-size:.7rem;margin-bottom:.3rem">BINARY — On/Off decisions (knapsack, feature selection)</div>
+              <div class="chromosome">
+                <div class="gene match">1</div><div class="gene miss">0</div><div class="gene match">1</div>
+                <div class="gene match">1</div><div class="gene miss">0</div><div class="gene miss">0</div>
+                <div class="gene match">1</div><div class="gene miss">0</div>
+              </div>
+            </div>
+            <div style="font-size:.875rem;margin-bottom:1rem">
+              <div style="color:var(--muted);font-family:var(--font-mono);font-size:.7rem;margin-bottom:.3rem">INTEGER — Ordered sequences (TSP route, scheduling)</div>
+              <div class="chromosome">
+                <div class="gene close">3</div><div class="gene close">1</div><div class="gene close">5</div>
+                <div class="gene close">7</div><div class="gene close">2</div><div class="gene close">4</div>
+                <div class="gene close">6</div>
+              </div>
+            </div>
+            <div style="font-size:.875rem">
+              <div style="color:var(--muted);font-family:var(--font-mono);font-size:.7rem;margin-bottom:.3rem">REAL-VALUED — Continuous parameters (neural weights)</div>
+              <div style="font-family:var(--font-mono);font-size:.8rem;color:var(--green)">[0.34, -1.2, 0.87, 0.01, -0.55, 2.1]</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap1 mt2">
+        <button class="btn btn-solid" onclick="nextStep()">Next: Population →</button>
+      </div>
+    </div>
+
+    <!-- STEP 1 — POPULATION -->
+    <div class="step-panel" data-panel="1" style="display:none">
+      <div class="card-grid cols2">
+        <div>
+          <h3>👥 Population</h3>
+          <p>Instead of starting with one solution and improving it (as gradient descent does), GA starts with a <strong style="color:var(--green)">population</strong> of many random solutions — typically 50 to 1000 chromosomes.</p>
+          <p>This is the core structural difference. You're not following one path through the search space. You're sampling many points simultaneously, which gives the algorithm a panoramic view of the landscape.</p>
+          <div class="insight">
+            <div class="insight-icon">🌍</div>
+            <div class="insight-text">Think of it like sending out 100 explorers instead of one. Even if most explorers find mediocre territory, the chances of <em>someone</em> landing near a great region are dramatically higher.</div>
+          </div>
+          <p>Population size is a key trade-off: larger populations explore more broadly but cost more computation per generation.</p>
+        </div>
+        <div>
+          <div class="card">
+            <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--amber);margin-bottom:.75rem">INITIAL POPULATION (random)</div>
+            <div id="pop-viz" style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem">
+              <!-- filled by JS -->
+            </div>
+            <button class="btn mt1" id="btn-repop" style="font-size:.72rem">↺ Randomise</button>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap1 mt2">
+        <button class="btn" onclick="prevStep()">← Back</button>
+        <button class="btn btn-solid" onclick="nextStep()">Next: Fitness →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 — FITNESS -->
+    <div class="step-panel" data-panel="2" style="display:none">
+      <div class="card-grid cols2">
+        <div>
+          <h3>📊 Fitness Function</h3>
+          <p>The fitness function is <strong style="color:var(--green)">the only thing you need to define</strong>. It takes a chromosome and returns a number: how good is this solution?</p>
+          <p>This is the most profound freedom GA gives you. The fitness function is a black box — it can call a physics simulation, run a game, query a database, measure protein folding energy, calculate sharpe ratio of a portfolio... anything.</p>
+          <div class="insight">
+            <div class="insight-icon">⚡</div>
+            <div class="insight-text"><strong>No gradients. No derivatives. No mathematical constraints.</strong> If you can evaluate a solution, you can evolve toward better ones. This is why GA works on problems that completely break gradient methods.</div>
+          </div>
+        </div>
+        <div>
+          <div class="fitness-playground">
+            <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--amber);margin-bottom:1rem">INTERACTIVE: Portfolio Fitness Function</div>
+            <p style="font-size:.8rem;color:var(--muted);margin-bottom:1rem">A chromosome encodes portfolio weights. Drag to simulate different allocations:</p>
+            <div class="slider-row">
+              <label>Tech stocks</label>
+              <input type="range" min="0" max="100" value="40" id="sl-tech" oninput="updatePortfolio()">
+              <span class="slider-val" id="sv-tech">40%</span>
+            </div>
+            <div class="slider-row">
+              <label>Bonds</label>
+              <input type="range" min="0" max="100" value="30" id="sl-bond" oninput="updatePortfolio()">
+              <span class="slider-val" id="sv-bond">30%</span>
+            </div>
+            <div class="slider-row">
+              <label>Commodities</label>
+              <input type="range" min="0" max="100" value="20" id="sl-comm" oninput="updatePortfolio()">
+              <span class="slider-val" id="sv-comm">20%</span>
+            </div>
+            <div class="slider-row">
+              <label>Cash</label>
+              <input type="range" min="0" max="100" value="10" id="sl-cash" oninput="updatePortfolio()">
+              <span class="slider-val" id="sv-cash">10%</span>
+            </div>
+            <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+              <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted);margin-bottom:.5rem">FITNESS SCORE</div>
+              <div id="portfolio-score" style="font-family:var(--font-mono);font-size:1.6rem;color:var(--green);font-weight:700">—</div>
+              <div id="portfolio-note" style="font-size:.78rem;color:var(--muted);margin-top:.25rem"></div>
+              <div class="progress-bar-wrap mt1"><div class="progress-bar" id="portfolio-bar" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap1 mt2">
+        <button class="btn" onclick="prevStep()">← Back</button>
+        <button class="btn btn-solid" onclick="nextStep()">Next: Selection →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 — SELECTION -->
+    <div class="step-panel" data-panel="3" style="display:none">
+      <div class="card-grid cols2">
+        <div>
+          <h3>🎯 Selection</h3>
+          <p>Selection picks which individuals get to reproduce. The key principle: <strong style="color:var(--green)">fitter individuals should reproduce more often</strong> — but not exclusively. If only the top 2 survive, diversity collapses.</p>
+          <div class="card" style="margin:1rem 0">
+            <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--amber);margin-bottom:.5rem">ROULETTE WHEEL (Fitness Proportionate)</div>
+            <p style="font-size:.85rem;margin:0">Each individual gets a slice of a wheel proportional to its fitness. Spin the wheel to select a parent. Fitter individuals have bigger slices — more likely to be chosen, but not guaranteed.</p>
+          </div>
+          <div class="card" style="margin-bottom:1rem">
+            <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--amber);margin-bottom:.5rem">TOURNAMENT SELECTION</div>
+            <p style="font-size:.85rem;margin:0">Pick k random individuals. The fittest among those k wins. Repeat for each parent slot. Simpler, controls selection pressure via k. Most widely used in practice.</p>
+          </div>
+          <div class="insight">
+            <div class="insight-icon">🎲</div>
+            <div class="insight-text">Selection <em>must</em> retain some randomness. Pure elitism (always take the best) leads to premature convergence — the population becomes a clone army stuck on one local hill.</div>
+          </div>
+        </div>
+        <div>
+          <canvas id="roulette-canvas" width="300" height="300" style="width:100%;max-width:300px;border:1px solid var(--border);border-radius:50%;display:block;margin:0 auto"></canvas>
+          <div style="text-align:center;margin-top:1rem">
+            <button class="btn" id="btn-spin">🎯 Spin to Select Parent</button>
+          </div>
+          <div id="spin-result" style="text-align:center;font-family:var(--font-mono);font-size:.85rem;margin-top:.75rem;color:var(--green);min-height:1.5rem"></div>
+        </div>
+      </div>
+      <div class="flex gap1 mt2">
+        <button class="btn" onclick="prevStep()">← Back</button>
+        <button class="btn btn-solid" onclick="nextStep()">Next: Crossover →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4 — CROSSOVER -->
+    <div class="step-panel" data-panel="4" style="display:none">
+      <h3>🔀 Crossover (Recombination)</h3>
+      <p>Two parent chromosomes combine to produce offspring. A random <strong style="color:var(--green)">crossover point</strong> is chosen — genes before the point come from Parent A, genes after come from Parent B (single-point crossover).</p>
+      <div class="crossover-demo" id="crossover-demo">
+        <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--amber);margin-bottom:1rem">INTERACTIVE CROSSOVER — Click to randomise parents, drag slider to move crossover point</div>
+        <div class="cross-row">
+          <span class="cross-label" style="color:var(--green)">Parent A</span>
+          <div class="chromosome" id="cross-p1"></div>
+        </div>
+        <div class="cross-row">
+          <span class="cross-label" style="color:var(--amber)">Parent B</span>
+          <div class="chromosome" id="cross-p2"></div>
+        </div>
+        <div class="cross-row" style="margin:.75rem 0">
+          <span class="cross-label" style="color:var(--muted)">Cut point</span>
+          <input type="range" min="1" max="7" value="4" id="cross-slider" style="flex:1;max-width:220px" oninput="drawCrossover()">
+          <span style="font-family:var(--font-mono);font-size:.8rem;color:var(--amber)" id="cross-pt-label">after gene 4</span>
+        </div>
+        <div class="cross-row">
+          <span class="cross-label" style="color:var(--teal)">Child</span>
+          <div class="chromosome" id="cross-child"></div>
+          <span style="font-family:var(--font-mono);font-size:.75rem;color:var(--muted);margin-left:.5rem" id="cross-inherit-label"></span>
+        </div>
+        <div style="margin-top:1rem;display:flex;gap:.75rem;flex-wrap:wrap">
+          <button class="btn" id="btn-new-parents">↺ New Parents</button>
+          <button class="btn btn-amber" id="btn-uniform-cross">Try Uniform Crossover</button>
+        </div>
+      </div>
+      <div class="insight mt2">
+        <div class="insight-icon">✨</div>
+        <div class="insight-text">Here's the non-obvious magic: a child can score <strong>higher than both parents</strong>. Parent A might have great genes on the left half, Parent B on the right. Crossover can combine both advantages in one individual — something neither parent or their siblings could achieve alone.</div>
+      </div>
+      <div class="flex gap1 mt2">
+        <button class="btn" onclick="prevStep()">← Back</button>
+        <button class="btn btn-solid" onclick="nextStep()">Next: Mutation →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5 — MUTATION -->
+    <div class="step-panel" data-panel="5" style="display:none">
+      <div class="card-grid cols2">
+        <div>
+          <h3>☢️ Mutation</h3>
+          <p>After crossover, each gene has a small probability (typically 0.1%–2%) of being randomly changed. This is mutation.</p>
+          <p>Mutation seems like random noise — and it is. But it's <em>essential</em> noise. Here's why:</p>
+          <p>Without mutation, the population can only ever recombine alleles already present in the initial population. If the optimal solution requires a gene value that nobody in your starting population has — you'll never find it. Mutation introduces genuinely new genetic material.</p>
+          <div class="insight">
+            <div class="insight-icon">🎲</div>
+            <div class="insight-text"><strong>Mutation rate is the search temperature.</strong> Too high → random walk, no convergence. Too low → premature convergence. The sweet spot keeps diversity alive while still allowing fitness to improve.</div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--amber);margin-bottom:1rem">INTERACTIVE: Mutation Simulator</div>
+            <div style="font-size:.8rem;color:var(--muted);margin-bottom:.75rem">Adjust mutation rate and observe the effect on a binary chromosome:</div>
+            <div class="slider-row">
+              <label>Mutation rate</label>
+              <input type="range" min="0" max="100" value="10" id="sl-mutrate" oninput="updateMutation()">
+              <span class="slider-val" id="sv-mutrate">10%</span>
+            </div>
+            <div style="margin:.75rem 0">
+              <div style="font-family:var(--font-mono);font-size:.7rem;color:var(--muted);margin-bottom:.4rem">Original chromosome</div>
+              <div class="chromosome" id="mut-original"></div>
+            </div>
+            <div style="margin:.75rem 0">
+              <div style="font-family:var(--font-mono);font-size:.7rem;color:var(--muted);margin-bottom:.4rem">After mutation <span id="mut-changed" style="color:var(--amber)"></span></div>
+              <div class="chromosome" id="mut-result"></div>
+            </div>
+            <button class="btn mt1" id="btn-mutate-again">↺ Mutate Again</button>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap1 mt2">
+        <button class="btn" onclick="prevStep()">← Back</button>
+        <button class="btn btn-solid" onclick="scrollToPlayground()">See It All Together →</button>
+      </div>
+    </div>
+
+  </div><!-- end step-panels -->
+
+  <!-- ── THE LOOP ── -->
+  <div class="divider"></div>
+  <h3>The Full Algorithm Loop</h3>
+  <p>All six mechanics combine into a simple iterative loop. This pseudocode is the complete algorithm:</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start" class="card-grid cols2">
+    <div class="pseudocode" id="pseudocode-block">
+      <div class="pline kw" id="pc0">INITIALISE population with random chromosomes</div>
+      <div class="pline kw" id="pc1">EVALUATE fitness of each individual</div>
+      <div class="pline" id="pc2"><span class="kw">WHILE</span> termination condition <span class="kw">not met</span> <span class="kw">DO</span></div>
+      <div class="pline pindent1" id="pc3"><span class="kw">SELECT</span> parents via fitness-proportionate selection</div>
+      <div class="pline pindent1" id="pc4"><span class="kw">APPLY</span> crossover → generate offspring</div>
+      <div class="pline pindent1" id="pc5"><span class="kw">APPLY</span> mutation to offspring (low probability)</div>
+      <div class="pline pindent1" id="pc6"><span class="kw">EVALUATE</span> fitness of offspring</div>
+      <div class="pline pindent1" id="pc7"><span class="kw">REPLACE</span> population (elitism + new offspring)</div>
+      <div class="pline pindent1" id="pc8"><span class="kw">INCREMENT</span> generation counter</div>
+      <div class="pline" id="pc9"><span class="kw">END WHILE</span></div>
+      <div class="pline kw" id="pc10">RETURN best individual found</div>
+    </div>
+    <div>
+      <div id="loop-explanation" class="card" style="min-height:200px">
+        <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted);margin-bottom:.75rem">← Hover a line to explain it</div>
+        <p style="font-size:.9rem;color:var(--muted)">Hover over any line of pseudocode to see what it means in practice.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 4 — PLAYGROUND
+══════════════════════════════════════ -->
+<section id="playground" style="background:var(--surface)">
+<div class="container">
+  <div class="section-label">04 — Live Demo</div>
+  <h2>Watch Evolution Happen</h2>
+  <p>This is a classic GA demo: evolve a population of random strings toward a target phrase. Every individual is scored by how many characters match the target. Watch generations of selection, crossover, and mutation drive the population toward the answer.</p>
+
+  <div class="ga-runner">
+    <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-end;margin-bottom:1.5rem">
+      <div style="flex:1;min-width:200px">
+        <label style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted);display:block;margin-bottom:.4rem">TARGET PHRASE</label>
+        <input type="text" id="ga-target" value="EVOLUTION WORKS" maxlength="20"
+          style="background:var(--code-bg);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:.9rem;padding:.5rem .75rem;border-radius:4px;width:100%;outline:none">
+      </div>
+      <div>
+        <label style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted);display:block;margin-bottom:.4rem">POP SIZE</label>
+        <select id="ga-popsize" style="background:var(--code-bg);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:.82rem;padding:.5rem .6rem;border-radius:4px">
+          <option value="50">50</option>
+          <option value="100" selected>100</option>
+          <option value="200">200</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted);display:block;margin-bottom:.4rem">MUTATION %</label>
+        <select id="ga-mutation" style="background:var(--code-bg);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:.82rem;padding:.5rem .6rem;border-radius:4px">
+          <option value="0.01">1%</option>
+          <option value="0.03" selected>3%</option>
+          <option value="0.07">7%</option>
+          <option value="0.15">15%</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-solid" id="btn-ga-start">▶ Start</button>
+        <button class="btn" id="btn-ga-reset">↺ Reset</button>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-val" id="stat-gen">0</div><div class="stat-label">Generation</div></div>
+      <div class="stat-box"><div class="stat-val" id="stat-best-fit" style="color:var(--amber)">0%</div><div class="stat-label">Best Fitness</div></div>
+      <div class="stat-box"><div class="stat-val" id="stat-avg-fit" style="color:var(--teal)">—</div><div class="stat-label">Avg Fitness</div></div>
+      <div class="stat-box"><div class="stat-val" id="stat-speed" style="color:var(--muted)">—</div><div class="stat-label">Gens/sec</div></div>
+    </div>
+
+    <!-- BEST INDIVIDUAL -->
+    <div style="background:var(--code-bg);border:1px solid var(--border);border-radius:6px;padding:1rem;margin-bottom:1rem">
+      <div style="font-family:var(--font-mono);font-size:.7rem;color:var(--muted);margin-bottom:.5rem">CURRENT BEST INDIVIDUAL</div>
+      <div id="best-chromosome" class="chromosome" style="flex-wrap:nowrap;overflow-x:auto"></div>
+      <div style="margin-top:.5rem">
+        <div class="progress-bar-wrap"><div class="progress-bar" id="fitness-progress" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- POPULATION SAMPLE -->
+    <div>
+      <div style="font-family:var(--font-mono);font-size:.7rem;color:var(--muted);margin-bottom:.4rem">POPULATION SAMPLE (top 20)</div>
+      <div class="population-grid" id="pop-sample"></div>
+    </div>
+
+    <!-- FITNESS CHART -->
+    <div style="margin-top:1.5rem">
+      <div style="font-family:var(--font-mono);font-size:.7rem;color:var(--muted);margin-bottom:.4rem">FITNESS OVER GENERATIONS</div>
+      <canvas id="fitness-chart" height="120" style="width:100%;border:1px solid var(--border);border-radius:4px;background:var(--code-bg)"></canvas>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 5 — REAL WORLD
+══════════════════════════════════════ -->
+<section id="applications">
+<div class="container">
+  <div class="section-label">05 — Real World</div>
+  <h2>Where Genetic Algorithms Are Used Today</h2>
+  <p>GA isn't a textbook curiosity. It's actively deployed in some of the world's most complex industrial and scientific systems.</p>
+
+  <div class="card-grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem">
+    <div class="app-card">
+      <div class="app-icon">✈️</div>
+      <div class="app-content">
+        <h4>Aerospace Engineering</h4>
+        <p>NASA used GA to evolve the shape of a satellite antenna for a 2006 mission. The resulting design was bizarre-looking — nothing a human would sketch — but outperformed all human-designed alternatives. It fit in a smaller package and performed better.</p>
+      </div>
+    </div>
+    <div class="app-card">
+      <div class="app-icon">🚚</div>
+      <div class="app-content">
+        <h4>Logistics & Routing</h4>
+        <p>Vehicle routing, delivery scheduling, airline crew rostering — all combinatorial NP-hard problems where GA finds near-optimal solutions. UPS ORION routing system saves ~100 million miles/year using evolutionary optimisation.</p>
+      </div>
+    </div>
+    <div class="app-card">
+      <div class="app-icon">💊</div>
+      <div class="app-content">
+        <h4>Drug Discovery</h4>
+        <p>Evolving molecular structures toward desired binding properties. GA explores the chemical search space (estimated at 10⁶⁰ drug-like molecules) far more efficiently than exhaustive search. Used in lead compound optimisation.</p>
+      </div>
+    </div>
+    <div class="app-card">
+      <div class="app-icon">📈</div>
+      <div class="app-content">
+        <h4>Quantitative Finance</h4>
+        <p>Evolving trading rules, portfolio weights, and strategy parameters. GA handles non-differentiable objectives (like Sharpe ratio, drawdown constraints) that gradient methods can't touch. Used by hedge funds for strategy discovery.</p>
+      </div>
+    </div>
+    <div class="app-card">
+      <div class="app-icon">🏗️</div>
+      <div class="app-content">
+        <h4>Structural Engineering</h4>
+        <p>Optimising beam placement, material distribution (topology optimisation), and load-bearing structures. GA finds lightweight, strong designs that structural engineers manually couldn't explore. Used in car chassis and bridge design.</p>
+      </div>
+    </div>
+    <div class="app-card">
+      <div class="app-icon">🧠</div>
+      <div class="app-content">
+        <h4>Neural Architecture Search</h4>
+        <p>Google's AmoebaNet and AutoML systems use evolutionary algorithms to discover CNN architectures. The evolved architectures consistently match or outperform human-designed ones on ImageNet benchmarks.</p>
+      </div>
+    </div>
+    <div class="app-card">
+      <div class="app-icon">🎮</div>
+      <div class="app-content">
+        <h4>Game AI & Simulation</h4>
+        <p>Evolving NPC behaviour trees, level designs, and game balancing parameters. Neuroevolution (NEAT) evolved the first agents to play Mario, Doom, and complex strategy games without handcrafted rules.</p>
+      </div>
+    </div>
+    <div class="app-card">
+      <div class="app-icon">⚡</div>
+      <div class="app-content">
+        <h4>Power Grid Optimisation</h4>
+        <p>Scheduling power generation, load balancing, and transmission routing in electrical grids. GA handles the combinatorial complexity of multi-constraint, multi-objective power flow problems that require near-real-time solutions.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SECTION 6 — LIBRARIES
+══════════════════════════════════════ -->
+<section id="libraries" style="background:var(--surface)">
+<div class="container">
+  <div class="section-label">06 — Implementation</div>
+  <h2>Libraries & Frameworks</h2>
+  <p>You don't need to implement GA from scratch for production systems. These battle-tested libraries handle the evolutionary machinery — you just define the chromosome encoding and fitness function.</p>
+
+  <div class="card-grid cols2">
+
+    <!-- DEAP -->
+    <div class="lib-card">
+      <div class="lib-header">
+        <div>
+          <div class="lib-name">DEAP</div>
+          <div style="font-size:.8rem;color:var(--muted);margin-top:.2rem">Distributed Evolutionary Algorithms in Python</div>
+        </div>
+        <div class="lib-tag">Python · Most Powerful</div>
+      </div>
+      <div class="lib-body">
+        <p>The gold standard for evolutionary computation research and industry. Supports GA, GP (genetic programming), ES, and multi-objective optimisation (NSGA-II). Highly flexible — you define everything.</p>
+        <pre><span class="kw">from</span> deap <span class="kw">import</span> base, creator, tools, algorithms
+<span class="kw">import</span> random
+
+<span class="cm"># Define fitness: maximise a single objective</span>
+creator.<span class="fn">create</span>(<span class="str">"FitnessMax"</span>, base.Fitness, weights=(<span class="num">1.0</span>,))
+creator.<span class="fn">create</span>(<span class="str">"Individual"</span>, list, fitness=creator.FitnessMax)
+
+toolbox = base.<span class="fn">Toolbox</span>()
+toolbox.<span class="fn">register</span>(<span class="str">"attr_bool"</span>, random.randint, <span class="num">0</span>, <span class="num">1</span>)
+toolbox.<span class="fn">register</span>(<span class="str">"individual"</span>, tools.initRepeat,
+    creator.Individual, toolbox.attr_bool, n=<span class="num">100</span>)
+toolbox.<span class="fn">register</span>(<span class="str">"population"</span>, tools.initRepeat,
+    list, toolbox.individual)
+
+<span class="cm"># YOUR fitness function — the only thing you write</span>
+<span class="kw">def</span> <span class="fn">eval_fitness</span>(individual):
+    <span class="kw">return</span> <span class="fn">sum</span>(individual),  <span class="cm"># must return a tuple</span>
+
+toolbox.<span class="fn">register</span>(<span class="str">"evaluate"</span>, eval_fitness)
+toolbox.<span class="fn">register</span>(<span class="str">"mate"</span>,    tools.cxTwoPoint)
+toolbox.<span class="fn">register</span>(<span class="str">"mutate"</span>,  tools.mutFlipBit, indpb=<span class="num">0.02</span>)
+toolbox.<span class="fn">register</span>(<span class="str">"select"</span>,  tools.selTournament, tournsize=<span class="num">3</span>)
+
+pop = toolbox.<span class="fn">population</span>(n=<span class="num">300</span>)
+result = algorithms.<span class="fn">eaSimple</span>(pop, toolbox,
+    cxpb=<span class="num">0.5</span>, mutpb=<span class="num">0.2</span>, ngen=<span class="num">40</span>, verbose=<span class="num">True</span>)</pre>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <a href="https://deap.readthedocs.io" target="_blank" class="btn" style="font-size:.72rem">📖 Docs</a>
+          <a href="https://github.com/DEAP/deap" target="_blank" class="btn btn-amber" style="font-size:.72rem">⭐ GitHub</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- PyGAD -->
+    <div class="lib-card">
+      <div class="lib-header">
+        <div>
+          <div class="lib-name">PyGAD</div>
+          <div style="font-size:.8rem;color:var(--muted);margin-top:.2rem">Python Genetic Algorithm Library</div>
+        </div>
+        <div class="lib-tag">Python · Easiest Start</div>
+      </div>
+      <div class="lib-body">
+        <p>The most beginner-friendly GA library. Works directly with NumPy arrays and has built-in Keras/PyTorch integration for neuroevolution. Minimal boilerplate — just define the fitness function and call <code style="font-family:var(--font-mono);color:var(--green)">run()</code>.</p>
+        <pre><span class="kw">import</span> pygad
+
+<span class="cm"># Fitness function — receives solution + its index</span>
+<span class="kw">def</span> <span class="fn">fitness_func</span>(ga_instance, solution, sol_idx):
+    output = <span class="fn">sum</span>(solution * [<span class="num">4</span>, <span class="num">-2</span>, <span class="num">3.5</span>, <span class="num">5</span>, <span class="num">-11</span>, <span class="num">-4.7</span>])
+    fitness = <span class="num">1.0</span> / (<span class="fn">abs</span>(output - <span class="num">44</span>) + <span class="num">0.000001</span>)
+    <span class="kw">return</span> fitness
+
+ga_instance = pygad.<span class="fn">GA</span>(
+    num_generations     = <span class="num">200</span>,
+    num_parents_mating  = <span class="num">5</span>,
+    fitness_func        = fitness_func,
+    sol_per_pop         = <span class="num">8</span>,
+    num_genes           = <span class="num">6</span>,
+    init_range_low      = <span class="num">-4</span>,
+    init_range_high     = <span class="num">4</span>,
+    mutation_percent_genes = <span class="num">10</span>
+)
+
+ga_instance.<span class="fn">run</span>()
+solution, fitness, idx = ga_instance.<span class="fn">best_solution</span>()
+<span class="fn">print</span>(<span class="str">f"Best: {solution}, Fitness: {fitness:.4f}"</span>)</pre>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <a href="https://pygad.readthedocs.io" target="_blank" class="btn" style="font-size:.72rem">📖 Docs</a>
+          <a href="https://github.com/ahmedfgad/GeneticAlgorithmPython" target="_blank" class="btn btn-amber" style="font-size:.72rem">⭐ GitHub</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- scipy.optimize (differential evolution) -->
+    <div class="lib-card">
+      <div class="lib-header">
+        <div>
+          <div class="lib-name">scipy.optimize.differential_evolution</div>
+          <div style="font-size:.8rem;color:var(--muted);margin-top:.2rem">Built into SciPy — zero extra install</div>
+        </div>
+        <div class="lib-tag">Python · Production Ready</div>
+      </div>
+      <div class="lib-body">
+        <p>Differential Evolution is a close cousin of GA — population-based, fitness-driven, no gradients needed. Built into SciPy, so zero dependencies. Best for real-valued continuous optimisation problems.</p>
+        <pre><span class="kw">from</span> scipy.optimize <span class="kw">import</span> differential_evolution
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># The Rastrigin function — notoriously hard, many local minima</span>
+<span class="kw">def</span> <span class="fn">rastrigin</span>(x):
+    n = <span class="fn">len</span>(x)
+    <span class="kw">return</span> <span class="num">10</span>*n + <span class="fn">sum</span>(xi**<span class="num">2</span> - <span class="num">10</span>*np.<span class="fn">cos</span>(<span class="num">2</span>*np.pi*xi) <span class="kw">for</span> xi <span class="kw">in</span> x)
+
+<span class="cm"># Define bounds for each gene</span>
+bounds = [(-<span class="num">5.12</span>, <span class="num">5.12</span>)] * <span class="num">10</span>  <span class="cm"># 10-dimensional problem</span>
+
+result = <span class="fn">differential_evolution</span>(
+    rastrigin, bounds,
+    strategy    = <span class="str">'best1bin'</span>,  <span class="cm"># crossover strategy</span>
+    maxiter     = <span class="num">1000</span>,
+    popsize     = <span class="num">15</span>,          <span class="cm"># pop = popsize × len(bounds)</span>
+    mutation    = (<span class="num">0.5</span>, <span class="num">1</span>),
+    recombination = <span class="num">0.7</span>,
+    seed        = <span class="num">42</span>
+)
+<span class="fn">print</span>(<span class="str">f"Global min ≈ {result.fun:.6f} at {result.x}"</span>)</pre>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html" target="_blank" class="btn" style="font-size:.72rem">📖 Docs</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSPYRED / pymoo -->
+    <div class="lib-card">
+      <div class="lib-header">
+        <div>
+          <div class="lib-name">pymoo</div>
+          <div style="font-size:.8rem;color:var(--muted);margin-top:.2rem">Multi-Objective Optimisation Framework</div>
+        </div>
+        <div class="lib-tag">Python · Multi-Objective</div>
+      </div>
+      <div class="lib-body">
+        <p>When you need to optimise multiple conflicting objectives simultaneously (e.g., minimise cost <em>and</em> maximise performance), pymoo provides state-of-the-art multi-objective algorithms including NSGA-II, NSGA-III, and MOEA/D.</p>
+        <pre><span class="kw">from</span> pymoo.algorithms.moo.nsga2 <span class="kw">import</span> NSGA2
+<span class="kw">from</span> pymoo.core.problem <span class="kw">import</span> Problem
+<span class="kw">from</span> pymoo.optimize <span class="kw">import</span> minimize
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># ZDT1: classic multi-objective benchmark</span>
+<span class="kw">class</span> <span class="fn">MyProblem</span>(Problem):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(n_var=<span class="num">30</span>, n_obj=<span class="num">2</span>,
+                          xl=np.<span class="fn">zeros</span>(<span class="num">30</span>), xu=np.<span class="fn">ones</span>(<span class="num">30</span>))
+    <span class="kw">def</span> <span class="fn">_evaluate</span>(<span class="kw">self</span>, x, out, *args, **kwargs):
+        f1 = x[:, <span class="num">0</span>]
+        g  = <span class="num">1</span> + <span class="num">9</span>/<span class="num">29</span> * np.<span class="fn">sum</span>(x[:, <span class="num">1</span>:], axis=<span class="num">1</span>)
+        f2 = g * (<span class="num">1</span> - (f1/g)**<span class="num">0.5</span>)
+        out[<span class="str">"F"</span>] = np.<span class="fn">column_stack</span>([f1, f2])
+
+result = <span class="fn">minimize</span>(
+    <span class="fn">MyProblem</span>(),
+    <span class="fn">NSGA2</span>(pop_size=<span class="num">100</span>),
+    (<span class="str">'n_gen'</span>, <span class="num">200</span>),
+    verbose=<span class="kw">True</span>
+)
+<span class="cm"># result.F contains the Pareto front</span></pre>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <a href="https://pymoo.org" target="_blank" class="btn" style="font-size:.72rem">📖 Docs</a>
+          <a href="https://github.com/msu-coinlab/pymoo" target="_blank" class="btn btn-amber" style="font-size:.72rem">⭐ GitHub</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end lib grid -->
+
+  <!-- COMPARISON TABLE -->
+  <div class="mt2">
+    <h3>Which Library Should You Use?</h3>
+    <div style="overflow-x:auto;margin-top:1rem">
+    <table class="compare-table">
+      <tr>
+        <th>Library</th>
+        <th>Best For</th>
+        <th>Learning Curve</th>
+        <th>Multi-Objective</th>
+        <th>Custom Encodings</th>
+        <th>Neuroevolution</th>
+      </tr>
+      <tr>
+        <td><span class="text-amber">DEAP</span></td>
+        <td>Research, complex encodings, GP</td>
+        <td class="partial">Moderate</td>
+        <td class="yes">Yes (NSGA-II)</td>
+        <td class="yes">Full control</td>
+        <td class="yes">Yes</td>
+      </tr>
+      <tr>
+        <td><span class="text-green">PyGAD</span></td>
+        <td>Beginners, Keras/PyTorch integration</td>
+        <td class="yes">Low</td>
+        <td class="no">No</td>
+        <td class="partial">Limited</td>
+        <td class="yes">Yes (built-in)</td>
+      </tr>
+      <tr>
+        <td><span class="text-teal">SciPy DE</span></td>
+        <td>Continuous optimisation, no install</td>
+        <td class="yes">Very Low</td>
+        <td class="no">No</td>
+        <td class="no">Real-valued only</td>
+        <td class="no">No</td>
+      </tr>
+      <tr>
+        <td><span class="text-amber">pymoo</span></td>
+        <td>Multi-objective, Pareto fronts</td>
+        <td class="partial">Moderate</td>
+        <td class="yes">Yes (best-in-class)</td>
+        <td class="yes">Good</td>
+        <td class="partial">Possible</td>
+      </tr>
+    </table>
+    </div>
+  </div>
+
+  <!-- FINAL INSIGHT -->
+  <div class="insight mt2" style="border-color:rgba(255,171,64,.3);background:linear-gradient(135deg,rgba(255,171,64,.06),rgba(255,171,64,.02))">
+    <div class="insight-icon">🔑</div>
+    <div class="insight-text" style="color:var(--text)">
+      <strong style="color:var(--amber)">The Takeaway:</strong> The entire power of a Genetic Algorithm flows from one idea — <strong style="color:#fff">you only need to judge solutions, not derive them</strong>. Once you internalise that, you'll recognise a remarkable category of problems around you — complex, multi-constraint, combinatorial — that traditional methods struggle with, but evolution handles elegantly. That's not a coincidence. Evolution is, in a very real sense, the universe's own general-purpose optimiser.
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div style="color:var(--green);margin-bottom:.5rem">// EVOLUTIONARY AI — GENETIC ALGORITHMS</div>
+  <div>Interactive learning material for technical students</div>
+  <div style="margin-top:.5rem;color:rgba(90,128,128,.5)">Built with HTML · CSS · Vanilla JS — no frameworks</div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════
+   HERO CANVAS — Evolutionary Lineage Flow
+═══════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('hero-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const genText = document.getElementById('hero-gen-text');
+  let W, H;
+  
+  function resize(){
+    const parent = canvas.parentElement;
+    W = canvas.width = parent ? parent.clientWidth : window.innerWidth;
+    H = canvas.height = parent ? parent.clientHeight : window.innerHeight;
+  }
+  
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      resize();
+      initPopulation();
+    }, 200);
+  });
+  resize();
+
+  const columnWidth = 240; 
+  const scrollSpeed = 1.0;
+  let targetY1, targetY2, targetY3;
+  let currentGeneration = 0;
+  
+  let generations = []; 
+
+  function evaluate(pop) {
+      pop.forEach(p => {
+          let d1 = Math.abs(p.y - targetY1);
+          let d2 = Math.abs(p.y - targetY2);
+          let d3 = Math.abs(p.y - targetY3);
+          let dist = Math.min(d1, d2, d3);
+          p.fitness = Math.max(0.01, 1 - (dist / (H*0.2)));
+      });
+  }
+
+  function evolve(startX) {
+      let lastPop = generations[generations.length - 1];
+      lastPop.sort((a,b) => b.fitness - a.fitness);
+      
+      let newPop = [];
+      let pool = lastPop.slice(0, 15); // Larger pool for 3 distinct multi-modal populations
+      
+      // Elitism: strictly preserve top 3 traits
+      for(let i=0; i<3; i++){
+          // Visually crossover locally with another elite from the same tier
+          let pB = pool.filter(p => p.id !== lastPop[i].id).sort((a,b) => Math.abs(a.y - lastPop[i].y) - Math.abs(b.y - lastPop[i].y))[0];
+          if(!pB) pB = pool[0]; 
+          newPop.push({
+              id: newPop.length, x: startX, y: lastPop[i].y,
+              parentIds: [lastPop[i].id, pB.id], fitness: 0, isMutated: false, isElite: true
+          });
+      }
+      
+      while(newPop.length < 32) { // Dense population to spread well
+          let parentA = pool[Math.floor(Math.random() * pool.length)];
+          
+          let poolB = pool.filter(p => p.id !== parentA.id);
+          let parentB = poolB.length > 0 ? poolB[Math.floor(Math.random() * poolB.length)] : parentA;
+          
+          let baseNewY = (parentA.y + parentB.y) / 2;
+          let newY = baseNewY;
+          
+          // Natural Heredity spread
+          if (Math.random() < 0.15) { 
+              // Occasional aggressive mutation
+              newY += (Math.random() - 0.5) * H * 0.4; 
+          } else {
+              // Mostly natural drift local to parents
+              newY += (Math.random() - 0.5) * 35; 
+          }
+          
+          if (newY < 15) newY = 15;
+          if (newY > H-15) newY = H-15;
+          
+          newPop.push({
+              id: newPop.length, x: startX, y: newY,
+              parentIds: [parentA.id, parentB.id], fitness: 0, isMutated: false, isElite: false
+          });
+      }
+      evaluate(newPop);
+      generations.push(newPop);
+      currentGeneration++;
+      
+      if(genText && startX >= W) { 
+          genText.textContent = `generation ${currentGeneration} · tracking solution space`;
+      }
+  }
+
+  function initPopulation() {
+    generations = [];
+    currentGeneration = 0;
+    targetY1 = H * 0.25;
+    targetY2 = H * 0.50;
+    targetY3 = H * 0.75;
+    
+    let pop = [];
+    let startX = W - (Math.ceil(W / columnWidth) * columnWidth);
+    for(let i=0; i<32; i++) {
+        pop.push({
+            id: i, x: startX, y: Math.random() * H * 0.95 + H * 0.025,
+            parentIds: [], fitness: 0, isMutated: false, isElite: false
+        });
+    }
+    evaluate(pop);
+    generations.push(pop);
+    
+    for(let xOffset = startX + columnWidth; xOffset <= W; xOffset += columnWidth) {
+        evolve(xOffset);
+    }
+  }
+
+  let animId;
+  function loop(time) {
+      animId = requestAnimationFrame(loop);
+      
+      ctx.fillStyle = '#04090a'; 
+      ctx.fillRect(0, 0, W, H);
+      
+      targetY1 = H * 0.25 + Math.sin(time/4000) * (H * 0.05); 
+      targetY2 = H * 0.50 + Math.cos(time/3300) * (H * 0.05); 
+      targetY3 = H * 0.75 + Math.sin(time/5000) * (H * 0.05); 
+      
+      generations.forEach(pop => {
+          pop.forEach(p => {
+              p.x -= scrollSpeed;
+              // Float amplitude scales with X: older dots (left) freeze, newer dots (right) actively explore
+              let activityScale = Math.max(0.05, p.x / W); 
+              p.y += Math.sin(time / 600 + p.id) * 0.45 * activityScale; 
+          });
+      });
+      
+      let latestPop = generations[generations.length-1];
+      if (latestPop && latestPop[0].x <= W - columnWidth) {
+          evolve(W);
+      }
+      
+      if (generations[0] && generations[0][0].x < -300) {
+          generations.shift();
+      }
+
+      for (let g = 1; g < generations.length; g++) {
+          let curr = generations[g]; // Right
+          let prev = generations[g-1]; // Left
+          
+          for (let i = 0; i < curr.length; i++) {
+              let pNode = curr[i];
+              if (pNode.parentIds) {
+                  pNode.parentIds.forEach(pid => {
+                      let pParent = prev.find(p => p.id === pid);
+                      if (pParent) {
+                          let hue = '90,128,128'; // standard gray/teal
+                          let alpha = 0.35;
+                          let lineWidth = 1.0;
+                          
+                          ctx.beginPath();
+                          ctx.moveTo(pNode.x, pNode.y); 
+                          ctx.bezierCurveTo(pNode.x - columnWidth/2, pNode.y, 
+                                            pParent.x + columnWidth/2, pParent.y, 
+                                            pParent.x, pParent.y);
+                          
+                          ctx.strokeStyle = `rgba(${hue}, ${alpha})`;
+                          ctx.lineWidth = lineWidth;
+                          ctx.stroke();
+                      }
+                  });
+              }
+          }
+      }
+
+      for (let g = 0; g < generations.length; g++) {
+          let pop = generations[g];
+          for (let i = 0; i < pop.length; i++) {
+              let p = pop[i];
+              
+              let hue = '90,128,128';
+              let alpha = 0.5;
+              let r = 2.0;
+
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(${hue}, ${alpha})`;
+              ctx.fill();
+          }
+      }
+  }
+
+  initPopulation();
+  requestAnimationFrame(loop);
+})();
+
+/* ═══════════════════════════════════════
+   TABS
+═══════════════════════════════════════ */
+document.querySelectorAll('.tabs').forEach(tabsEl=>{
+  tabsEl.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      tabsEl.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const id='tab-'+btn.dataset.tab;
+      document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+      document.getElementById(id)?.classList.add('active');
+    });
+  });
+});
+
+/* ═══════════════════════════════════════
+   FITNESS LANDSCAPE CANVAS
+═══════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('landscape-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+
+  function landscape(x){
+    const t = (x/W)*6;
+    return 0.4*Math.sin(t) + 0.25*Math.sin(2.3*t+1) + 0.15*Math.sin(5*t+2)
+           + 0.1*Math.sin(8*t) + 0.05*Math.sin(14*t+1);
+  }
+  function getY(x){ return H - (landscape(x)+1)*0.38*H - 40; }
+
+  function drawBase(){
+    ctx.fillStyle='#04090a'; ctx.fillRect(0,0,W,H);
+    // Gradient fill under curve
+    const grad=ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,'rgba(0,150,80,.25)'); grad.addColorStop(1,'rgba(0,150,80,.02)');
+    ctx.beginPath(); ctx.moveTo(0,H);
+    for(let x=0;x<=W;x++) ctx.lineTo(x,getY(x));
+    ctx.lineTo(W,H); ctx.closePath();
+    ctx.fillStyle=grad; ctx.fill();
+    // Curve line
+    ctx.beginPath(); ctx.moveTo(0,getY(0));
+    for(let x=1;x<=W;x++) ctx.lineTo(x,getY(x));
+    ctx.strokeStyle='rgba(0,230,118,.7)'; ctx.lineWidth=2; ctx.stroke();
+    // Labels
+    ctx.fillStyle='rgba(90,128,128,.7)'; ctx.font='11px JetBrains Mono,monospace';
+    ctx.fillText('solution quality (fitness)', 10, 20);
+    ctx.fillText('solution space', W-110, H-8);
+  }
+
+  drawBase();
+
+  // GD animation
+  let gdAnim=null, gaAnim=null;
+  document.getElementById('btn-show-gd').addEventListener('click',()=>{
+    if(gdAnim) cancelAnimationFrame(gdAnim);
+    drawBase(); if(gaAnim) cancelAnimationFrame(gaAnim);
+    let x=40; // start on a slope leading to local max
+    function step(){
+      const dx=1, dy0=getY(x), dy1=getY(x+dx);
+      if(dy1<dy0) x+=dx; else if(getY(x-dx)<dy0) x-=dx;
+      // else stuck
+      drawBase();
+      // Draw path
+      ctx.beginPath(); ctx.arc(x,getY(x),7,0,Math.PI*2);
+      ctx.fillStyle='rgba(239,83,80,.9)'; ctx.fill();
+      ctx.fillStyle='#fff'; ctx.font='10px JetBrains Mono,monospace';
+      ctx.fillText('GD',x-8,getY(x)+4);
+      // stuck indicator
+      const slope=Math.abs(getY(x+1)-getY(x));
+      if(slope<0.3){
+        ctx.fillStyle='rgba(239,83,80,.7)';
+        ctx.fillText('⚠ Trapped in local optimum!',x-60,getY(x)-15);
+      } else { gdAnim=requestAnimationFrame(step); }
+    }
+    gdAnim=requestAnimationFrame(step);
+  });
+
+  document.getElementById('btn-show-ga').addEventListener('click',()=>{
+    if(gaAnim) cancelAnimationFrame(gaAnim);
+    if(gdAnim) cancelAnimationFrame(gdAnim);
+    drawBase();
+    let pop=Array.from({length:20},()=>({x:Math.random()*W,fit:0}));
+    let gen=0;
+    function step(){
+      drawBase();
+      // evaluate & draw
+      pop.forEach(p=>{
+        p.fit=-getY(p.x);
+        ctx.beginPath(); ctx.arc(p.x,getY(p.x),4,0,Math.PI*2);
+        ctx.fillStyle=`rgba(0,230,118,.8)`; ctx.fill();
+      });
+      // evolve every 12 frames
+      if(gen%12===0){
+        pop.sort((a,b)=>b.fit-a.fit);
+        const top=pop.slice(0,10);
+        pop=pop.slice(0,10);
+        for(let i=0;i<10;i++){
+          const pa=top[Math.floor(Math.random()*top.length)];
+          const pb=top[Math.floor(Math.random()*top.length)];
+          pop.push({x:(pa.x+pb.x)/2+(Math.random()-.5)*30, fit:0});
+        }
+        pop.forEach(p=>{p.x=Math.max(0,Math.min(W,p.x));});
+      }
+      gen++;
+      ctx.fillStyle='rgba(0,230,118,.7)'; ctx.font='10px JetBrains Mono,monospace';
+      ctx.fillText(`GA population (gen ${Math.floor(gen/4)})`, 10, H-20);
+      gaAnim=requestAnimationFrame(step);
+    }
+    gaAnim=requestAnimationFrame(step);
+  });
+
+  document.getElementById('btn-reset-land').addEventListener('click',()=>{
+    if(gdAnim) cancelAnimationFrame(gdAnim);
+    if(gaAnim) cancelAnimationFrame(gaAnim);
+    drawBase();
+  });
+})();
+
+/* ═══════════════════════════════════════
+   STEP NAVIGATION
+═══════════════════════════════════════ */
+let currentStep=0;
+function showStep(n){
+  document.querySelectorAll('.step-item').forEach((el,i)=>{
+    el.classList.toggle('active',i===n);
+    el.classList.toggle('done',i<n);
+  });
+  document.querySelectorAll('.step-panel').forEach((el,i)=>{ el.style.display=i===n?'block':'none'; });
+  currentStep=n;
+}
+function nextStep(){ if(currentStep<5) showStep(currentStep+1); }
+function prevStep(){ if(currentStep>0) showStep(currentStep-1); }
+function scrollToPlayground(){ document.getElementById('playground').scrollIntoView({behavior:'smooth'}); }
+document.querySelectorAll('.step-item').forEach(el=>{ el.addEventListener('click',()=>showStep(+el.dataset.step)); });
+
+/* ═══════════════════════════════════════
+   POPULATION VISUALISER (Step 1)
+═══════════════════════════════════════ */
+const ALPHABET = 'ABCDEFGHIJ';
+function renderPopViz(){
+  const el=document.getElementById('pop-viz');
+  if(!el) return;
+  el.innerHTML='';
+  for(let i=0;i<8;i++){
+    const ind=document.createElement('div');
+    ind.style.cssText='font-family:var(--font-mono);font-size:.72rem;color:var(--muted);background:var(--code-bg);padding:.3rem .5rem;border-radius:3px;border:1px solid var(--border)';
+    const genes=Array.from({length:8},()=>ALPHABET[Math.floor(Math.random()*10)]).join('');
+    const fit=Math.floor(Math.random()*100);
+    ind.innerHTML=`<span style="color:var(--text)">${genes}</span> <span style="color:var(--amber);float:right">${fit}</span>`;
+    el.appendChild(ind);
+  }
+}
+renderPopViz();
+document.getElementById('btn-repop')?.addEventListener('click', renderPopViz);
+
+/* ═══════════════════════════════════════
+   PORTFOLIO FITNESS (Step 2)
+═══════════════════════════════════════ */
+function updatePortfolio(){
+  const tech=+document.getElementById('sl-tech').value;
+  const bond=+document.getElementById('sl-bond').value;
+  const comm=+document.getElementById('sl-comm').value;
+  const cash=+document.getElementById('sl-cash').value;
+  document.getElementById('sv-tech').textContent=tech+'%';
+  document.getElementById('sv-bond').textContent=bond+'%';
+  document.getElementById('sv-comm').textContent=comm+'%';
+  document.getElementById('sv-cash').textContent=cash+'%';
+  const total=tech+bond+comm+cash;
+  // Penalise if doesn't sum to ~100
+  const penalty=Math.abs(total-100)/100;
+  // Simulated returns and volatility
+  const expectedReturn=tech*.12 + bond*.04 + comm*.08 + cash*.01;
+  const volatility=tech*.20 + bond*.06 + comm*.15 + cash*.005;
+  const sharpe=(expectedReturn-0.03)/(volatility+.001);
+  const fitness=Math.max(0,(sharpe-penalty)*100);
+  document.getElementById('portfolio-score').textContent=fitness.toFixed(1);
+  document.getElementById('portfolio-bar').style.width=Math.min(100,fitness)+'%';
+  let note='';
+  if(total!==100) note=`⚠ Weights sum to ${total}% (should be 100%)`;
+  else if(sharpe>1.5) note='🟢 Excellent risk-adjusted return';
+  else if(sharpe>0.8) note='🟡 Acceptable — room for improvement';
+  else note='🔴 Poor risk/return trade-off';
+  document.getElementById('portfolio-note').textContent=note;
+}
+updatePortfolio();
+
+/* ═══════════════════════════════════════
+   ROULETTE WHEEL (Step 3)
+═══════════════════════════════════════ */
+(function(){
+  const canvas=document.getElementById('roulette-canvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const individuals=[
+    {name:'Alpha',fitness:38,color:'#00e676'},
+    {name:'Beta', fitness:24,color:'#ffab40'},
+    {name:'Gamma',fitness:18,color:'#26c6da'},
+    {name:'Delta',fitness:12,color:'#ce93d8'},
+    {name:'Epsilon',fitness:8,color:'#ef9a9a'},
+  ];
+  const total=individuals.reduce((a,i)=>a+i.fitness,0);
+  let angle=0, spinning=false;
+
+  function draw(highlight=-1){
+    ctx.clearRect(0,0,300,300);
+    const cx=150,cy=150,r=130;
+    let start=angle*(Math.PI/180);
+    individuals.forEach((ind,i)=>{
+      const slice=(ind.fitness/total)*Math.PI*2;
+      ctx.beginPath(); ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,r,start,start+slice); ctx.closePath();
+      ctx.fillStyle=highlight===i?'#fff':ind.color+'cc';
+      ctx.fill(); ctx.strokeStyle='#04090a'; ctx.lineWidth=2; ctx.stroke();
+      // Label
+      const mid=start+slice/2;
+      ctx.fillStyle='#000'; ctx.font='bold 11px DM Sans,sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(ind.name, cx+Math.cos(mid)*80, cy+Math.sin(mid)*80);
+      ctx.font='10px JetBrains Mono,monospace';
+      ctx.fillText((ind.fitness/total*100).toFixed(0)+'%', cx+Math.cos(mid)*55, cy+Math.sin(mid)*55+14);
+      start+=slice;
+    });
+    // Arrow at top
+    ctx.beginPath(); ctx.moveTo(cx,cy-r-10); ctx.lineTo(cx-8,cy-r+8); ctx.lineTo(cx+8,cy-r+8); ctx.closePath();
+    ctx.fillStyle='#fff'; ctx.fill();
+  }
+  draw();
+
+  document.getElementById('btn-spin')?.addEventListener('click',()=>{
+    if(spinning) return;
+    spinning=true;
+    document.getElementById('spin-result').textContent='';
+    const spinDeg=720+Math.random()*720;
+    let current=0, speed=spinDeg/60;
+    function spin(){
+      if(current>=spinDeg){ spinning=false;
+        // Find winner: arrow points to top (270 deg from 0)
+        const normalised=((360-(angle%360))%360)*(Math.PI/180);
+        let start=0; const tot=individuals.reduce((a,i)=>a+i.fitness,0);
+        for(let i=0;i<individuals.length;i++){
+          const s=(individuals[i].fitness/tot)*Math.PI*2;
+          if(normalised>=start && normalised<start+s){
+            draw(i);
+            document.getElementById('spin-result').textContent=`Selected: ${individuals[i].name} (fitness ${individuals[i].fitness}%)`;
+            return;
+          }
+          start+=s;
+        }
+        draw(); return;
+      }
+      current+=speed; speed*=.985;
+      angle=(angle+speed)%360;
+      draw(); requestAnimationFrame(spin);
+    }
+    requestAnimationFrame(spin);
+  });
+})();
+
+/* ═══════════════════════════════════════
+   CROSSOVER DEMO (Step 4)
+═══════════════════════════════════════ */
+let parent1=[], parent2=[];
+const COLORS_A=['#00e676','#00e676','#00e676','#00e676','#00e676','#00e676','#00e676','#00e676'];
+const COLORS_B=['#ffab40','#ffab40','#ffab40','#ffab40','#ffab40','#ffab40','#ffab40','#ffab40'];
+
+function randomGenes(){ return Array.from({length:8},()=>String.fromCharCode(65+Math.floor(Math.random()*26))); }
+
+function drawCrossover(){
+  const pt=+document.getElementById('cross-slider').value;
+  document.getElementById('cross-pt-label').textContent=`after gene ${pt}`;
+  const p1el=document.getElementById('cross-p1');
+  const p2el=document.getElementById('cross-p2');
+  const chel=document.getElementById('cross-child');
+  if(!p1el||!parent1.length) return;
+  p1el.innerHTML=''; p2el.innerHTML=''; chel.innerHTML='';
+  for(let i=0;i<8;i++){
+    const g1=document.createElement('div');
+    g1.className='gene'; g1.textContent=parent1[i];
+    g1.style.background=COLORS_A[0]+'cc'; g1.style.color='#000';
+    if(i<pt) g1.style.border='2px solid #00e676';
+    p1el.appendChild(g1);
+    const g2=document.createElement('div');
+    g2.className='gene'; g2.textContent=parent2[i];
+    g2.style.background=COLORS_B[0]+'cc'; g2.style.color='#000';
+    if(i>=pt) g2.style.border='2px solid #ffab40';
+    p2el.appendChild(g2);
+    const gc=document.createElement('div');
+    gc.className='gene'; gc.textContent=i<pt?parent1[i]:parent2[i];
+    gc.style.background=i<pt?COLORS_A[0]+'cc':COLORS_B[0]+'cc'; gc.style.color='#000';
+    gc.style.border=i<pt?'2px solid #00e676':'2px solid #ffab40';
+    chel.appendChild(gc);
+  }
+  document.getElementById('cross-inherit-label').textContent=`← ${pt} from A, ${8-pt} from B`;
+}
+
+function newParents(){
+  parent1=randomGenes(); parent2=randomGenes();
+  drawCrossover();
+}
+newParents();
+document.getElementById('btn-new-parents')?.addEventListener('click', newParents);
+document.getElementById('cross-slider')?.addEventListener('input', drawCrossover);
+document.getElementById('btn-uniform-cross')?.addEventListener('click',()=>{
+  const p1el=document.getElementById('cross-p1');
+  const p2el=document.getElementById('cross-p2');
+  const chel=document.getElementById('cross-child');
+  if(!p1el) return;
+  p1el.innerHTML=''; p2el.innerHTML=''; chel.innerHTML='';
+  for(let i=0;i<8;i++){
+    const fromA=Math.random()>.5;
+    [p1el,p2el].forEach((el,pi)=>{ const g=document.createElement('div');g.className='gene';g.textContent=[parent1,parent2][pi][i];g.style.background=pi===0?COLORS_A[0]+'cc':COLORS_B[0]+'cc';g.style.color='#000';el.appendChild(g); });
+    const gc=document.createElement('div'); gc.className='gene';
+    gc.textContent=fromA?parent1[i]:parent2[i];
+    gc.style.background=fromA?COLORS_A[0]+'cc':COLORS_B[0]+'cc'; gc.style.color='#000';
+    gc.style.border=fromA?'2px solid #00e676':'2px solid #ffab40';
+    chel.appendChild(gc);
+  }
+  document.getElementById('cross-pt-label').textContent='uniform';
+  document.getElementById('cross-inherit-label').textContent='← random per gene';
+});
+
+/* ═══════════════════════════════════════
+   MUTATION DEMO (Step 5)
+═══════════════════════════════════════ */
+let mutOriginal=Array.from({length:12},()=>Math.random()>.5?1:0);
+function renderMutation(){
+  const origEl=document.getElementById('mut-original');
+  const resEl=document.getElementById('mut-result');
+  if(!origEl) return;
+  origEl.innerHTML=''; resEl.innerHTML='';
+  const rate=+document.getElementById('sl-mutrate').value/100;
+  document.getElementById('sv-mutrate').textContent=document.getElementById('sl-mutrate').value+'%';
+  let changed=0;
+  mutOriginal.forEach((g,i)=>{
+    const og=document.createElement('div'); og.className='gene'; og.textContent=g;
+    og.style.background='var(--surface2)'; og.style.color='var(--text)';
+    origEl.appendChild(og);
+    const mutated=Math.random()<rate;
+    if(mutated) changed++;
+    const rg=document.createElement('div'); rg.className='gene'; rg.textContent=mutated?(1-g):g;
+    rg.style.background=mutated?'rgba(239,83,80,.6)':'var(--surface2)';
+    rg.style.color=mutated?'#fff':'var(--text)';
+    if(mutated) rg.style.border='2px solid var(--red)';
+    resEl.appendChild(rg);
+  });
+  document.getElementById('mut-changed').textContent=changed?`(${changed} gene${changed>1?'s':''} flipped)`:'(no change this time)';
+}
+renderMutation();
+document.getElementById('sl-mutrate')?.addEventListener('input',renderMutation);
+document.getElementById('btn-mutate-again')?.addEventListener('click',()=>{
+  mutOriginal=Array.from({length:12},()=>Math.random()>.5?1:0);
+  renderMutation();
+});
+
+/* ═══════════════════════════════════════
+   PSEUDOCODE HOVER
+═══════════════════════════════════════ */
+const PC_EXPLAIN={
+  pc0:'<strong style="color:var(--green)">Initialisation:</strong> Create the starting population by randomly generating chromosomes. This random diversity is crucial — it ensures you start with broad coverage of the search space. Population size typically ranges from 50 to 1000 depending on problem complexity.',
+  pc1:'<strong style="color:var(--green)">First Evaluation:</strong> Run every chromosome through your fitness function to get its score. This is the most computationally expensive step — if your fitness function calls a physics sim or runs a game, this is where time is spent.',
+  pc2:'<strong style="color:var(--amber)">Main Loop:</strong> Continue iterating until a termination condition is met. Common conditions: max generations reached, fitness threshold achieved, improvement stalled for N generations, or wall-clock time limit.',
+  pc3:'<strong style="color:var(--amber)">Selection:</strong> Pick pairs of parents for reproduction. Fitter individuals have a higher probability of being chosen. Tournament selection or roulette wheel selection are most common. Crucially, even low-fitness individuals can occasionally be selected — maintaining diversity.',
+  pc4:'<strong style="color:var(--teal)">Crossover:</strong> Combine two parent chromosomes to create offspring. A crossover probability (typically 0.6–0.9) determines whether crossover happens or parents are copied unchanged. Single-point, two-point, or uniform crossover are common strategies.',
+  pc5:'<strong style="color:var(--teal)">Mutation:</strong> Randomly alter a small fraction of genes in the new offspring. Mutation probability is typically very low (0.001–0.05 per gene). This step introduces genuinely novel genetic material that crossover alone cannot create.',
+  pc6:'<strong style="color:var(--green)">Re-evaluation:</strong> Score the new offspring using the fitness function. Only the offspring need re-evaluation — surviving parents already have known fitness scores.',
+  pc7:'<strong style="color:var(--green)">Replacement:</strong> Form the new population. Pure generational replacement swaps everything out. Elitism keeps the top k% from the previous generation unchanged — this guarantees fitness never decreases between generations.',
+  pc8:'<strong style="color:var(--muted)">Generation Counter:</strong> Increment the counter used for termination checking and logging. Also used to schedule adaptive strategies (e.g., decrease mutation rate as generations increase).',
+  pc9:'<strong style="color:var(--muted)">Loop End:</strong> Return to the top of the while loop and repeat selection → crossover → mutation → evaluation → replacement.',
+  pc10:'<strong style="color:var(--green)">Return:</strong> Output the best chromosome found across all generations. This is your evolved solution — the fittest individual the population ever produced.'
+};
+document.querySelectorAll('[id^="pc"]').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    document.querySelectorAll('[id^="pc"]').forEach(e=>e.classList.remove('highlight'));
+    el.classList.add('highlight');
+    document.getElementById('loop-explanation').innerHTML=`<p style="font-size:.9rem">${PC_EXPLAIN[el.id]||''}</p>`;
+  });
+});
+
+/* ═══════════════════════════════════════
+   GENETIC ALGORITHM RUNNER (Playground)
+═══════════════════════════════════════ */
+(function(){
+  const CHARS=' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.,';
+  let pop=[], target='', running=false, gen=0, intervalId=null;
+  let bestHistory=[], t0=0, lastGenTime=0;
+
+  function randChar(){ return CHARS[Math.floor(Math.random()*CHARS.length)]; }
+  function fitness(ind){ return ind.split('').filter((c,i)=>c===target[i]).length/target.length; }
+  function initPop(){
+    target=document.getElementById('ga-target').value.toUpperCase();
+    const ps=+document.getElementById('ga-popsize').value;
+    pop=Array.from({length:ps},()=>Array.from({length:target.length},()=>randChar()).join(''));
+    gen=0; bestHistory=[];
+    renderStats(); renderBest(); renderSample(); renderChart();
+  }
+  function select(){
+    const fits=pop.map(fitness);
+    const total=fits.reduce((a,b)=>a+b,0);
+    let r=Math.random()*total, acc=0;
+    for(let i=0;i<pop.length;i++){ acc+=fits[i]; if(acc>=r) return pop[i]; }
+    return pop[pop.length-1];
+  }
+  function crossover(a,b){
+    const pt=Math.floor(Math.random()*target.length);
+    return a.slice(0,pt)+b.slice(pt);
+  }
+  function mutate(ind){
+    const mr=+document.getElementById('ga-mutation').value;
+    return ind.split('').map(c=>Math.random()<mr?randChar():c).join('');
+  }
+  function evolve(){
+    const fits=pop.map(fitness);
+    pop.sort((a,b)=>fitness(b)-fitness(a));
+    const newPop=pop.slice(0,Math.max(1,Math.floor(pop.length*.05))); // elitism 5%
+    while(newPop.length<pop.length) newPop.push(mutate(crossover(select(),select())));
+    pop=newPop; gen++;
+    const gensPerSec=1000/(Date.now()-lastGenTime);
+    lastGenTime=Date.now();
+    const best=pop.reduce((a,b)=>fitness(b)>fitness(a)?b:a);
+    const bestFit=fitness(best);
+    bestHistory.push(bestFit);
+    renderStats(best,bestFit,fits.reduce((a,b)=>a+b,0)/fits.length,gensPerSec);
+    renderBest(best,bestFit);
+    renderSample();
+    renderChart();
+    if(bestFit>=1){ stop(); return; }
+  }
+  function renderStats(best,bf,af,fps){
+    document.getElementById('stat-gen').textContent=gen;
+    if(bf!==undefined){
+      document.getElementById('stat-best-fit').textContent=(bf*100).toFixed(1)+'%';
+      document.getElementById('stat-avg-fit').textContent=(af*100).toFixed(1)+'%';
+      document.getElementById('stat-speed').textContent=(fps||0).toFixed(0);
+    }
+  }
+  function renderBest(best,bf){
+    const el=document.getElementById('best-chromosome');
+    el.innerHTML='';
+    if(!best||!target){ el.innerHTML='<span style="font-family:var(--font-mono);color:var(--muted);font-size:.8rem">Hit Start to run</span>'; return; }
+    best.split('').forEach((c,i)=>{
+      const g=document.createElement('div'); g.className='gene';
+      if(c===target[i]) g.classList.add('match');
+      else if(Math.abs(c.charCodeAt(0)-target[i].charCodeAt(0))<5) g.classList.add('close');
+      else g.classList.add('miss');
+      g.textContent=c; el.appendChild(g);
+    });
+    document.getElementById('fitness-progress').style.width=(bf*100)+'%';
+  }
+  function renderSample(){
+    const el=document.getElementById('pop-sample');
+    el.innerHTML='';
+    const sorted=[...pop].sort((a,b)=>fitness(b)-fitness(a)).slice(0,20);
+    sorted.forEach((ind,i)=>{
+      const div=document.createElement('div');
+      div.className='pop-individual'+(i===0?' best':'');
+      div.innerHTML=`<span>${ind}</span><span class="fit-score">${(fitness(ind)*100).toFixed(0)}%</span>`;
+      el.appendChild(div);
+    });
+  }
+  function renderChart(){
+    const canvas=document.getElementById('fitness-chart');
+    if(!canvas) return;
+    const ctx=canvas.getContext('2d');
+    const W=canvas.offsetWidth||canvas.width; canvas.width=W;
+    const H=canvas.height;
+    ctx.fillStyle='#081215'; ctx.fillRect(0,0,W,H);
+    if(bestHistory.length<2) return;
+    // Draw grid
+    ctx.strokeStyle='rgba(26,48,56,.8)'; ctx.lineWidth=1;
+    for(let y=0;y<=4;y++){
+      const gy=H-y*(H/4);
+      ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke();
+      ctx.fillStyle='rgba(90,128,128,.5)'; ctx.font='9px JetBrains Mono,monospace';
+      ctx.fillText((y*25)+'%',4,gy-2);
+    }
+    // Draw fitness line
+    ctx.beginPath();
+    bestHistory.forEach((f,i)=>{
+      const x=(i/(Math.max(bestHistory.length-1,1)))*W;
+      const y=H-(f*H);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.strokeStyle='rgba(0,230,118,.9)'; ctx.lineWidth=2; ctx.stroke();
+    // Fill
+    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+    ctx.fillStyle='rgba(0,230,118,.08)'; ctx.fill();
+  }
+
+  function stop(){ running=false; clearInterval(intervalId); document.getElementById('btn-ga-start').textContent='▶ Start'; }
+  document.getElementById('btn-ga-start').addEventListener('click',()=>{
+    if(running){ stop(); return; }
+    initPop(); running=true; lastGenTime=Date.now();
+    document.getElementById('btn-ga-start').textContent='⏸ Pause';
+    intervalId=setInterval(evolve, 30);
+  });
+  document.getElementById('btn-ga-reset').addEventListener('click',()=>{
+    stop(); initPop();
+    document.getElementById('best-chromosome').innerHTML='<span style="font-family:var(--font-mono);color:var(--muted);font-size:.8rem">Hit Start to run</span>';
+  });
+  initPop();
+})();
+</script>
+</body>
+</html>
