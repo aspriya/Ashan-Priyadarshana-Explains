@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 5 - The Final Choice</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{--navy:#0D1B2A;--navy2:#1A2B3C;--navy3:#243447;--teal:#00D4AA;--teal2:#00A882;--blue:#4C9BE8;--purple:#8B5CF6;--amber:#F59E0B;--red:#EF4444;--orange:#F97316;--green:#10B981;--white:#F0F4F8;--muted:#64748B;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Grotesk',sans-serif;background:var(--navy);color:var(--white);overflow:hidden;height:100vh;width:100vw}
+h1,h2,h3{font-family:'Fraunces',serif}
+code,.mono{font-family:'JetBrains Mono',monospace}
+.slide{position:absolute;inset:0;padding:80px 60px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s cubic-bezier(.4,0,.2,1),transform .5s cubic-bezier(.4,0,.2,1);pointer-events:none;display:flex;flex-direction:column;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto;z-index:10}
+.slide.prev{opacity:0;transform:translateX(-60px)}
+#progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--blue));z-index:1000;transition:width .4s}
+#nav{position:fixed;bottom:0;left:0;right:0;height:64px;background:rgba(13,27,42,.95);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:16px;z-index:1000;padding:0 20px}
+#nav .dots{display:flex;gap:6px;align-items:center}
+#nav .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);cursor:pointer;transition:all .3s}
+#nav .dot.active{background:var(--teal);width:12px;height:12px}
+.nav-btn{padding:8px 20px;border:1px solid var(--border);background:var(--card);color:var(--white);border-radius:8px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:14px;transition:all .3s}
+.nav-btn:hover{background:var(--teal);color:var(--navy);border-color:var(--teal)}
+.nav-btn:disabled{opacity:.3;cursor:not-allowed}
+#slide-label{font-size:13px;color:var(--muted);min-width:120px;text-align:center}
+.section-badge{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:8px;font-weight:600}
+.slide-title{font-size:clamp(24px,3.5vw,42px);font-weight:700;margin-bottom:12px;line-height:1.2}
+.slide-subtitle{font-size:clamp(14px,1.5vw,18px);color:var(--muted);margin-bottom:16px;max-width:700px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1;min-height:0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;margin:2px}
+.pill-teal{background:rgba(0,212,170,.15);color:var(--teal)}
+.pill-blue{background:rgba(76,155,232,.15);color:var(--blue)}
+.pill-purple{background:rgba(139,92,246,.15);color:var(--purple)}
+.pill-amber{background:rgba(245,158,11,.15);color:var(--amber)}
+.pill-green{background:rgba(16,185,129,.15);color:var(--green)}
+.pill-orange{background:rgba(249,115,22,.15);color:var(--orange)}
+.pill-red{background:rgba(239,68,68,.15);color:var(--red)}
+.insight{background:linear-gradient(135deg,rgba(0,212,170,.08),rgba(76,155,232,.08));border:1px solid rgba(0,212,170,.2);border-radius:12px;padding:14px 18px;margin-top:10px;font-size:13px;line-height:1.6}
+.insight::before{content:'KEY INSIGHT';display:block;font-size:10px;letter-spacing:2px;color:var(--teal);margin-bottom:6px;font-weight:700}
+.btn{padding:8px 20px;border:none;border-radius:8px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;transition:all .3s}
+.btn-teal{background:var(--teal);color:var(--navy)}
+.btn-teal:hover{background:var(--teal2)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--white)}
+.btn-outline:hover{border-color:var(--teal);color:var(--teal)}
+.btn-outline.active{background:var(--teal);color:var(--navy);border-color:var(--teal)}
+.code-block{background:#0a0f1a;border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;overflow-x:auto;white-space:pre-wrap}
+.tab-bar{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.tab{padding:7px 14px;border-radius:8px 8px 0 0;background:var(--card);border:1px solid var(--border);border-bottom:none;cursor:pointer;font-size:12px;color:var(--muted);transition:all .3s}
+.tab.active{background:var(--navy2);color:var(--teal);border-color:var(--teal)}
+.flip-card{perspective:1000px;cursor:pointer}
+.flip-inner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;padding:14px;display:flex;flex-direction:column;overflow:auto}
+.flip-front{background:var(--card);border:1px solid var(--border)}
+.flip-back{background:linear-gradient(135deg,rgba(0,212,170,.1),rgba(76,155,232,.1));border:1px solid rgba(0,212,170,.3);transform:rotateY(180deg)}
+.expand-card{border:1px solid var(--border);border-radius:12px;padding:14px;background:var(--card);cursor:pointer;transition:all .3s}
+.expand-card:hover{border-color:var(--teal)}
+.expand-card .ec{max-height:0;overflow:hidden;transition:max-height .4s}
+.expand-card.expanded .ec{max-height:500px}
+.grid-2x3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid-2x2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.scenario-card{padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--card);cursor:pointer;transition:all .3s;font-size:13px}
+.scenario-card:hover{border-color:var(--teal)}
+.scenario-card.hl{border-color:var(--teal);background:rgba(0,212,170,.08)}
+canvas{max-width:100%}
+.sl{display:flex;align-items:center;gap:10px}
+.sl input[type=range]{flex:1;accent-color:var(--teal)}
+.sv{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600;color:var(--teal);min-width:45px}
+textarea{background:var(--navy2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:13px;resize:vertical;width:100%}
+textarea:focus{outline:none;border-color:var(--teal)}
+.hl-line{background:rgba(0,212,170,.1);display:block;padding:0 4px;border-left:3px solid var(--teal);cursor:pointer;transition:background .2s}
+.hl-line:hover{background:rgba(0,212,170,.2)}
+@media(max-width:768px){
+.slide{padding:56px 14px 76px}
+.two-col,.grid-2x3{grid-template-columns:1fr}
+.grid-2x2{grid-template-columns:1fr}
+.nav-btn{padding:6px 12px;font-size:12px}
+#nav .dots{display:none}
+.slide-title{font-size:22px}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="slides-container"></div>
+<div id="nav">
+<button class="nav-btn" id="prev-btn" onclick="go(-1)">&#9664; Prev</button>
+<div class="dots" id="dots"></div>
+<span id="slide-label"></span>
+<button class="nav-btn" id="next-btn" onclick="go(1)">Next &#9654;</button>
+</div>
+<script>
+
+var cur=0,total=21,inited={},charts={};
+function go(d){var n=cur+d;if(n>=0&&n<total)showSlide(n)}
+function showSlide(n){
+var p=document.querySelector('.slide.active');
+if(p){p.classList.remove('active');if(n>cur)p.classList.add('prev');setTimeout(function(){p.classList.remove('prev')},500)}
+cur=n;var s=document.querySelectorAll('.slide')[n];s.classList.add('active');
+document.getElementById('progress').style.width=((n/(total-1))*100)+'%';
+document.getElementById('slide-label').textContent='Slide '+(n+1)+' / '+total;
+document.getElementById('prev-btn').disabled=n===0;
+document.getElementById('next-btn').disabled=n===total-1;
+var dots=document.querySelectorAll('.dot');
+for(var i=0;i<dots.length;i++)dots[i].classList.toggle('active',i===n);
+if(!inited[n]){inited[n]=true;onSlideEnter(n)}else{onSlideRevisit(n)}
+}
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1)});
+function destroyChart(id){if(charts[id]){charts[id].destroy();delete charts[id]}}
+
+function buildSlides(){
+var c=document.getElementById('slides-container');
+var h='';
+
+h+='<div class="slide" id="s0">';
+h+='<canvas id="title-canvas" style="position:absolute;inset:0;z-index:0"></canvas>';
+h+='<div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center">';
+h+='<div style="font-size:12px;letter-spacing:3px;color:var(--teal);margin-bottom:16px;font-weight:600">WEEK 05</div>';
+h+='<h1 style="font-size:clamp(40px,6vw,72px);font-weight:800;margin-bottom:16px;background:linear-gradient(135deg,var(--white),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent">The Final Choice</h1>';
+h+='<p style="color:var(--muted);font-size:clamp(14px,1.5vw,18px);max-width:700px;margin-bottom:32px">From understanding how transformers work to using them in production \u2014 in two hours.</p>';
+h+='<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:600px">';
+h+='<span class="pill pill-teal">Encoder / Decoder</span><span class="pill pill-blue">Transformer Flow</span><span class="pill pill-purple">Temperature</span><span class="pill pill-amber">Top-P</span><span class="pill pill-green">Beam Search</span><span class="pill pill-orange">Prompting</span><span class="pill pill-teal">API</span><span class="pill pill-blue">Best Practices</span>';
+h+='</div></div></div>';
+
+h+='<div class="slide" id="s1">';
+h+='<div class="section-badge">PART 01 \u2014 THE COMPLETE PICTURE</div>';
+h+='<h2 class="slide-title">The Transformer End-to-End</h2>';
+h+='<p class="slide-subtitle">You learned the components. Now watch them work together.</p>';
+h+='<div style="flex:1;display:flex;flex-direction:column;gap:12px;min-height:0">';
+h+='<div style="display:flex;align-items:center;gap:8px"><button class="btn btn-teal" onclick="pipeStep(-1)">\u2190 Back</button><span id="pipe-counter" class="mono" style="color:var(--teal)">1 / 8</span><button class="btn btn-teal" onclick="pipeStep(1)">Next Step \u2192</button></div>';
+h+='<div style="flex:1;position:relative;border-radius:12px;background:var(--card);border:1px solid var(--border);min-height:200px"><canvas id="pipeline-canvas"></canvas></div>';
+h+='<div id="pipe-explain" class="card" style="font-size:13px;line-height:1.5"></div>';
+h+='</div></div>';
+
+h+='<div class="slide" id="s2">';
+h+='<div class="section-badge">PART 02 \u2014 ARCHITECTURES</div>';
+h+='<h2 class="slide-title">Encoder-Only: Understanding Text</h2>';
+h+='<div class="two-col" style="flex:1;min-height:0">';
+h+='<div style="overflow-y:auto">';
+h+='<div class="card" style="margin-bottom:10px"><h3 style="font-size:15px;margin-bottom:10px;color:var(--teal)">Bidirectional Attention</h3><canvas id="enc-attn-canvas" width="180" height="180" style="max-width:180px"></canvas><div style="font-size:12px;color:var(--muted);margin-top:6px">Every token sees every other token (\u2194)</div></div>';
+h+='<div class="card" style="margin-bottom:10px"><div style="font-size:12px;line-height:1.8"><div><span class="pill pill-teal">Attention</span> Bidirectional</div><div><span class="pill pill-blue">Training</span> Masked Language Model</div><div><span class="pill pill-purple">Output</span> Contextual embeddings</div><div><span class="pill pill-red">Limit</span> Cannot generate text</div></div></div>';
+h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px"><span class="pill pill-teal">BERT</span><span class="pill pill-teal">RoBERTa</span><span class="pill pill-teal">DistilBERT</span><span class="pill pill-teal">ELECTRA</span></div>';
+h+='</div>';
+h+='<div style="display:flex;flex-direction:column;gap:10px">';
+h+='<div class="card"><h3 style="font-size:13px;margin-bottom:6px">Masked Prediction Demo</h3><p style="font-size:11px;color:var(--muted);margin-bottom:10px">Click a word to mask it:</p><div id="mask-sentence" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div><div style="height:180px"><canvas id="mask-chart"></canvas></div></div>';
+h+='<div class="insight">BERT reads the whole sentence at once, in both directions. It understands context deeply \u2014 but cannot generate new text token-by-token.</div>';
+h+='</div></div></div>';
+
+h+='<div class="slide" id="s3">';
+h+='<div class="section-badge">PART 02</div>';
+h+='<h2 class="slide-title">Decoder-Only: Generating Text</h2>';
+h+='<div class="two-col" style="flex:1;min-height:0">';
+h+='<div style="overflow-y:auto">';
+h+='<div class="card" style="margin-bottom:10px"><h3 style="font-size:15px;margin-bottom:10px;color:var(--blue)">Causal Attention Mask</h3><canvas id="causal-canvas" width="180" height="180" style="max-width:180px"></canvas><div style="font-size:12px;color:var(--muted);margin-top:6px">Token i sees only tokens 0\u2026i</div></div>';
+h+='<div class="card" style="margin-bottom:10px"><div style="font-size:12px;line-height:1.8"><div><span class="pill pill-blue">Attention</span> Causal (left-to-right)</div><div><span class="pill pill-blue">Training</span> Next Token Prediction</div><div><span class="pill pill-blue">Output</span> Token probabilities</div><div><span class="pill pill-green">Strength</span> Autoregressive generation</div></div></div>';
+h+='<div style="display:flex;flex-wrap:wrap;gap:4px"><span class="pill pill-blue">GPT-4</span><span class="pill pill-blue">Claude</span><span class="pill pill-blue">Gemini</span><span class="pill pill-blue">LLaMA</span><span class="pill pill-blue">Mistral</span></div>';
+h+='</div>';
+h+='<div style="display:flex;flex-direction:column;gap:10px">';
+h+='<div class="card" style="flex:1"><h3 style="font-size:13px;margin-bottom:8px">Autoregressive Generation</h3>';
+h+='<div style="display:flex;gap:6px;margin-bottom:10px"><button class="btn btn-teal" onclick="startGen()">\u25B6 Generate</button><button class="btn btn-outline" onclick="stopGen()">\u25A0 Stop</button><select id="gen-speed" style="background:var(--navy2);color:var(--white);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:11px"><option value="300">Slow</option><option value="150" selected>Medium</option><option value="50">Fast</option></select></div>';
+h+='<div id="gen-output" class="code-block" style="min-height:50px;font-size:13px">The old lighthouse keeper </div>';
+h+='<div id="gen-counter" style="font-size:11px;color:var(--muted);margin-top:6px">Tokens: 0</div></div>';
+h+='<div class="insight">GPT commits left-to-right, one token at a time. Every decoding strategy in Part 03 is about making this commitment wisely.</div>';
+h+='</div></div></div>';
+
+h+='<div class="slide" id="s4">';
+h+='<div class="section-badge">PART 02</div>';
+h+='<h2 class="slide-title">Encoder-Decoder: Understand AND Generate</h2>';
+h+='<div style="flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">';
+h+='<div style="display:flex;align-items:center;gap:8px"><button class="btn btn-teal" onclick="transStep(-1)">\u2190</button><span id="trans-counter" class="mono" style="color:var(--purple)">1 / 6</span><button class="btn btn-teal" onclick="transStep(1)">\u2192</button></div>';
+h+='<div class="two-col" style="flex:1">';
+h+='<div class="card" style="display:flex;flex-direction:column"><h3 style="font-size:14px;margin-bottom:10px;color:var(--purple)">English \u2192 French Translation</h3><div id="trans-viz" style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:8px;font-size:13px"></div></div>';
+h+='<div style="display:flex;flex-direction:column;gap:10px"><div class="card" style="flex:1"><h3 style="font-size:13px;margin-bottom:8px">Cross-Attention Heatmap</h3><canvas id="cross-attn-canvas" height="180"></canvas></div>';
+h+='<div class="card"><div style="font-size:11px;line-height:1.7"><span class="pill pill-purple">Encoder</span> Bidirectional over input<br><span class="pill pill-purple">Decoder</span> Causal + cross-attention<br><span class="pill pill-purple">Models</span> T5 \u00B7 BART \u00B7 Whisper \u00B7 FLAN-T5</div></div></div>';
+h+='</div>';
+h+='<div class="insight">When you need to deeply understand one thing and generate something structurally different \u2014 this architecture shines.</div>';
+h+='</div></div>';
+
+h+='<div class="slide" id="s5">';
+h+='<div class="section-badge">PART 02</div>';
+h+='<h2 class="slide-title">Architecture Comparison</h2>';
+h+='<div style="flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto">';
+h+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="border-bottom:2px solid var(--border)"><th style="padding:8px;text-align:left;color:var(--muted)"></th><th style="padding:8px;color:var(--teal)">Encoder-Only</th><th style="padding:8px;color:var(--blue)">Decoder-Only</th><th style="padding:8px;color:var(--purple)">Enc-Dec</th></tr></thead>';
+h+='<tbody><tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--muted)">Attention</td><td style="padding:8px">Bidirectional \u2194</td><td style="padding:8px">Causal \u2192</td><td style="padding:8px">Bi+Causal+Cross</td></tr>';
+h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--muted)">Generate?</td><td style="padding:8px;color:var(--red)">\u2717 No</td><td style="padding:8px;color:var(--green)">\u2713 Yes</td><td style="padding:8px;color:var(--green)">\u2713 Yes</td></tr>';
+h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--muted)">Training</td><td style="padding:8px">MLM</td><td style="padding:8px">Next Token</td><td style="padding:8px">Seq2Seq</td></tr>';
+h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--muted)">Best For</td><td style="padding:8px">Understanding</td><td style="padding:8px">Generation</td><td style="padding:8px">Transformation</td></tr>';
+h+='<tr><td style="padding:8px;color:var(--muted)">Examples</td><td style="padding:8px">BERT, RoBERTa</td><td style="padding:8px">GPT-4, Claude</td><td style="padding:8px">T5, BART</td></tr></tbody></table></div>';
+h+='<h3 style="font-size:15px">Pick a Scenario:</h3>';
+h+='<div class="grid-2x3" id="scenario-grid"></div>';
+h+='<div id="scenario-explain" class="card" style="display:none;border-color:var(--teal)"></div>';
+h+='<div class="insight">The modern trend: decoder-only dominates. GPT-4, Claude, Gemini, LLaMA \u2014 all decoder-only. But encoder-only still rules embedding tasks.</div>';
+h+='</div></div>';
+
+h+='<div class="slide" id="s6">';
+h+='<div class="section-badge">PART 03 \u2014 DECODING STRATEGIES</div>';
+h+='<h2 class="slide-title">The Output Distribution</h2>';
+h+='<p class="slide-subtitle">Before HOW to choose, understand WHAT we choose from.</p>';
+h+='<div style="flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">';
+h+='<div style="display:flex;gap:6px;flex-wrap:wrap" id="dist-ctx-btns"></div>';
+h+='<div class="card" style="flex:1;min-height:180px"><canvas id="dist-chart"></canvas></div>';
+h+='<div style="display:flex;gap:10px;flex-wrap:wrap"><div class="card" style="flex:1;min-width:200px"><div style="font-size:11px;color:var(--muted)">Current context</div><div id="dist-context" class="mono" style="font-size:13px;margin-top:4px"></div></div><div class="card" style="flex:1;min-width:200px"><div style="font-size:11px;color:var(--muted)">Note</div><div style="font-size:12px;margin-top:4px">GPT-4: ~100,256 tokens. Chart shows top 15.</div></div></div>';
+h+='<div class="insight">The model NEVER outputs a single word. It outputs a probability distribution over 50k\u2013100k tokens. The decoding strategy decides what to do. That is the \u201CFinal Choice.\u201D</div>';
+h+='</div></div>';
+
+h+='<div class="slide" id="s7">';
+h+='<div class="section-badge">PART 03</div>';
+h+='<h2 class="slide-title">Temperature: Controlling Creativity</h2>';
+h+='<div style="flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto">';
+h+='<div class="card"><div style="text-align:center;margin-bottom:8px;font-size:14px" class="mono">p<sub>i</sub> = softmax(logit<sub>i</sub> / T)</div>';
+h+='<div class="sl"><span style="font-size:12px;color:var(--red)">0.01</span><input type="range" id="temp-slider" min="1" max="250" value="90" oninput="updateTemp()"><span style="font-size:12px;color:var(--amber)">2.5</span><span class="sv" id="temp-val">0.90</span></div>';
+h+='<div style="display:flex;gap:12px;margin-top:6px;font-size:11px"><span style="color:var(--red)">\u25A0 0.01-0.3 Deterministic</span><span style="color:var(--teal)">\u25A0 0.7-1.2 Balanced</span><span style="color:var(--amber)">\u25A0 1.5+ Creative</span></div></div>';
+h+='<div style="flex:1;min-height:160px"><canvas id="temp-chart"></canvas></div>';
+h+='<div class="grid-2x3"><div class="card"><div class="mono" style="color:var(--red);font-size:13px">T = 0.1</div><div style="font-size:12px;margin-top:4px">\u201CThe weather today is sunny and pleasant.\u201D</div><div style="font-size:10px;color:var(--muted)">Safe, predictable</div></div>';
+h+='<div class="card"><div class="mono" style="color:var(--teal);font-size:13px">T = 0.9</div><div style="font-size:12px;margin-top:4px">\u201CThe weather today is quite blustery with clouds.\u201D</div><div style="font-size:10px;color:var(--muted)">Natural, varied</div></div>';
+h+='<div class="card"><div class="mono" style="color:var(--amber);font-size:13px">T = 1.8</div><div style="font-size:12px;margin-top:4px">\u201CThe weather today is a trembling negotiation between light and atmosphere.\u201D</div><div style="font-size:10px;color:var(--muted)">Creative / weird</div></div></div>';
+h+='<div class="card" style="font-size:11px"><b>Settings:</b> Factual: 0.1\u20130.3 \u00B7 Code: 0.2\u20130.4 \u00B7 Chat: 0.7\u20131.0 \u00B7 Creative: 1.0\u20131.3</div>';
+h+='</div></div>';
+
+h+='<div class="slide" id="s8">';
+h+='<div class="section-badge">PART 03</div>';
+h+='<h2 class="slide-title">Top-K and Top-P (Nucleus) Sampling</h2>';
+h+='<div class="two-col" style="flex:1;min-height:0;overflow-y:auto">';
+h+='<div class="card" style="display:flex;flex-direction:column"><h3 style="font-size:14px;margin-bottom:8px;color:var(--blue)">Top-K Sampling</h3>';
+h+='<div class="sl" style="margin-bottom:8px"><span style="font-size:11px">K=</span><input type="range" id="topk-slider" min="1" max="15" value="5" oninput="updateTopK()"><span class="sv" id="topk-val">5</span></div>';
+h+='<div style="flex:1;min-height:140px"><canvas id="topk-chart"></canvas></div>';
+h+='<div style="font-size:11px;color:var(--muted);margin-top:4px" id="topk-info"></div>';
+h+='<div class="card" style="margin-top:6px;border-color:var(--red);font-size:11px"><b>Problem:</b> Fixed K doesn\u2019t adapt to distribution shape.</div></div>';
+h+='<div class="card" style="display:flex;flex-direction:column"><h3 style="font-size:14px;margin-bottom:8px;color:var(--purple)">Top-P (Nucleus)</h3>';
+h+='<div class="sl" style="margin-bottom:8px"><span style="font-size:11px">P=</span><input type="range" id="topp-slider" min="50" max="100" value="90" oninput="updateTopP()"><span class="sv" id="topp-val">0.90</span></div>';
+h+='<div style="flex:1;min-height:140px"><canvas id="topp-chart"></canvas></div>';
+h+='<div style="font-size:11px;color:var(--muted);margin-top:4px" id="topp-info"></div>';
+h+='<div class="card" style="margin-top:6px;border-color:var(--teal);font-size:11px"><b>Solution:</b> Top-P adapts. Confident \u2192 small nucleus. Uncertain \u2192 wider.</div></div>';
+h+='</div>';
+h+='<div class="insight">In practice: combine Temperature + Top-P. T reshapes, P truncates. Common: T=0.9, P=0.95.</div>';
+h+='</div>';
+
+h+='<div class="slide" id="s9">';
+h+='<div class="section-badge">PART 03</div>';
+h+='<h2 class="slide-title">Beam Search &amp; Greedy Decoding</h2>';
+h+='<div style="flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">';
+h+='<div class="two-col" style="flex:1">';
+h+='<div class="card" style="display:flex;flex-direction:column"><h3 style="font-size:14px;margin-bottom:6px;color:var(--amber)">Greedy Decoding</h3><canvas id="greedy-canvas" style="flex:1;min-height:140px"></canvas><div style="font-size:11px;color:var(--muted);margin-top:4px">Fast. Deterministic. Often suboptimal.</div></div>';
+h+='<div class="card" style="display:flex;flex-direction:column"><h3 style="font-size:14px;margin-bottom:6px;color:var(--teal)">Beam Search</h3>';
+h+='<div class="sl" style="margin-bottom:6px"><span style="font-size:11px">Beams:</span><input type="range" id="beam-slider" min="1" max="5" value="3" oninput="updateBeam()"><span class="sv" id="beam-val">3</span></div>';
+h+='<canvas id="beam-canvas" style="flex:1;min-height:140px"></canvas><div style="font-size:11px;color:var(--muted);margin-top:4px">Slower. Better sequences.</div></div></div>';
+h+='<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="border-bottom:1px solid var(--border)"><th style="padding:6px;text-align:left;color:var(--muted)">Strategy</th><th style="padding:6px">Speed</th><th style="padding:6px">Quality</th><th style="padding:6px">Use Case</th></tr></thead>';
+h+='<tbody><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px">Greedy</td><td style="padding:6px">Fastest</td><td style="padding:6px">Medium</td><td style="padding:6px">Real-time</td></tr>';
+h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:6px">Beam</td><td style="padding:6px">Slow</td><td style="padding:6px">High</td><td style="padding:6px">Translation</td></tr>';
+h+='<tr><td style="padding:6px">Sampling</td><td style="padding:6px">Fast</td><td style="padding:6px">Good</td><td style="padding:6px">Chat</td></tr></tbody></table>';
+h+='</div></div>';
+
+h+='<div class="slide" id="s10">';
+h+='<div class="section-badge">PART 03</div>';
+h+='<h2 class="slide-title">Decoding Strategy Playground</h2>';
+h+='<div style="flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto">';
+h+='<select id="play-prompt" onchange="updatePlayground()" style="background:var(--navy2);color:var(--white);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;width:100%"><option>The old lighthouse keeper heard a knock at midnight...</option><option>def find_duplicates(lst):</option><option>Explain quantum entanglement in one sentence:</option></select>';
+h+='<div class="grid-2x2" id="play-grid"></div>';
+h+='<div class="card" style="font-size:11px;text-align:center"><b>Same model. Same prompt. Four strategies. Four outputs.</b> You control which one you want.</div>';
+h+='</div></div>';
+
+h+='<div class="slide" id="s11">';
+h+='<div style="flex:1;display:flex;align-items:center;justify-content:center">';
+h+='<div class="two-col" style="max-width:900px;width:100%">';
+h+='<div class="card" style="text-align:center"><h2 style="color:var(--teal);font-size:28px;margin-bottom:16px">HOUR 1 COMPLETE</h2>';
+h+='<div style="text-align:left;font-size:13px;line-height:2"><div>\u2713 Transformer end-to-end (8 stages)</div><div>\u2713 Encoder-only (BERT family)</div><div>\u2713 Decoder-only (GPT/Claude family)</div><div>\u2713 Encoder-Decoder (T5/BART)</div><div>\u2713 The output distribution</div><div>\u2713 Temperature</div><div>\u2713 Top-K &amp; Top-P</div><div>\u2713 Beam Search vs Greedy</div></div></div>';
+h+='<div class="card" style="text-align:center"><h2 style="color:var(--amber);font-size:28px;margin-bottom:16px">HOUR 2 \u2014 PRACTICAL</h2>';
+h+='<div style="text-align:left;font-size:13px;line-height:2"><div>\u2192 6 prompting strategies</div><div>\u2192 Full API call anatomy</div><div>\u2192 Token costs &amp; efficiency</div><div>\u2192 Prompt engineering best practices</div><div>\u2192 Failure modes &amp; fixes</div><div>\u2192 Build your own prompt workshop</div><div>\u2192 Advanced patterns (RAG, tools)</div></div></div>';
+h+='</div></div>';
+h+='<div style="text-align:center;color:var(--muted);font-size:14px;font-style:italic;margin-bottom:20px">\u201CYou understand how these systems work. Now let\u2019s learn how to use them.\u201D</div>';
+h+='</div>';
+
+h+='<div class="slide" id="s12">';
+h+='<div class="section-badge">PART 04 \u2014 PRACTICAL</div>';
+h+='<h2 class="slide-title">Prompting Strategies</h2>';
+h+='<div style="flex:1;display:flex;flex-direction:column;min-height:0">';
+h+='<div class="tab-bar" id="prompt-tabs"></div>';
+h+='<div id="prompt-content" class="card" style="flex:1;overflow-y:auto"></div>';
+h+='</div></div>';
+
+h+='<div class="slide" id="s13">';
+h+='<div class="section-badge">PART 04</div>';
+h+='<h2 class="slide-title">Anatomy of an API Call</h2>';
+h+='<div class="two-col" style="flex:1;min-height:0;overflow-y:auto">';
+h+='<div style="display:flex;flex-direction:column;gap:10px">';
+h+='<div id="api-code" class="code-block" style="font-size:11px;flex:1"></div></div>';
+h+='<div style="display:flex;flex-direction:column;gap:10px">';
+h+='<div id="api-explain" class="card" style="flex:1;overflow-y:auto"><div style="font-size:12px;color:var(--muted)">Click a highlighted line to see details</div></div>';
+h+='<div class="card"><h3 style="font-size:13px;margin-bottom:8px">Cost Calculator</h3>';
+h+='<div style="font-size:11px"><div class="sl" style="margin-bottom:6px"><span>Input tokens:</span><input type="range" id="cost-in" min="0" max="10000" value="1000" oninput="updateCost()"><span class="sv" id="cost-in-val" style="font-size:12px">1000</span></div>';
+h+='<div class="sl" style="margin-bottom:8px"><span>Output tokens:</span><input type="range" id="cost-out" min="0" max="4000" value="500" oninput="updateCost()"><span class="sv" id="cost-out-val" style="font-size:12px">500</span></div>';
+h+='<div id="cost-result" style="font-size:12px"></div></div></div>';
+h+='</div></div></div>';
+
+h+='<div class="slide" id="s14">';
+h+='<div class="section-badge">PART 04</div>';
+h+='<h2 class="slide-title">Token Costs &amp; Efficiency</h2>';
+h+='<div class="two-col" style="flex:1;min-height:0;overflow-y:auto">';
+h+='<div class="card" style="display:flex;flex-direction:column"><h3 style="font-size:13px;margin-bottom:8px">Token Counter</h3>';
+h+='<textarea id="token-input" rows="5" placeholder="Type or paste text here..." oninput="countTokens()"></textarea>';
+h+='<div id="token-stats" style="font-size:12px;margin-top:8px;line-height:1.8"></div></div>';
+h+='<div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto" id="efficiency-tips"></div>';
+h+='</div></div>';
+
+h+='<div class="slide" id="s15">';
+h+='<div class="section-badge">PART 04</div>';
+h+='<h2 class="slide-title">Prompt Engineering Best Practices</h2>';
+h+='<p class="slide-subtitle">Click each card to reveal the improved version.</p>';
+h+='<div class="grid-2x2" id="flip-grid" style="flex:1;min-height:0;overflow-y:auto"></div>';
+h+='</div>';
+
+h+='<div class="slide" id="s16">';
+h+='<div class="section-badge">PART 04</div>';
+h+='<h2 class="slide-title">Common Failure Modes &amp; Fixes</h2>';
+h+='<p class="slide-subtitle">Click to expand each failure mode.</p>';
+h+='<div class="grid-2x3" id="failure-grid" style="flex:1;overflow-y:auto"></div>';
+h+='</div>';
+
+h+='<div class="slide" id="s17">';
+h+='<div class="section-badge">PART 04</div>';
+h+='<h2 class="slide-title">Build Your Own Prompt: Workshop</h2>';
+h+='<div class="two-col" style="flex:1;min-height:0;overflow-y:auto">';
+h+='<div style="display:flex;flex-direction:column;gap:8px">';
+h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px"><button class="btn btn-outline" onclick="loadTemplate(0)">Document Summarizer</button><button class="btn btn-outline" onclick="loadTemplate(1)">Code Reviewer</button><button class="btn btn-outline" onclick="loadTemplate(2)">Research Assistant</button></div>';
+h+='<div class="card"><h3 style="font-size:12px;margin-bottom:4px;color:var(--teal)">System Prompt</h3><textarea id="wb-system" rows="3" placeholder="What role? What constraints?" oninput="buildPrompt()"></textarea></div>';
+h+='<div class="card"><h3 style="font-size:12px;margin-bottom:4px;color:var(--blue)">Few-Shot Examples</h3><div id="wb-examples"></div><button class="btn btn-outline" style="margin-top:4px;font-size:11px" onclick="addExample()">+ Add Example</button></div>';
+h+='<div class="card"><h3 style="font-size:12px;margin-bottom:4px;color:var(--purple)">Instruction</h3><textarea id="wb-instruction" rows="2" placeholder="Core task..." oninput="buildPrompt()"></textarea></div>';
+h+='<div class="card"><h3 style="font-size:12px;margin-bottom:4px;color:var(--amber)">Constraints</h3><div id="wb-constraints" style="font-size:12px"></div></div>';
+h+='</div>';
+h+='<div style="display:flex;flex-direction:column;gap:8px">';
+h+='<div class="card" style="flex:1;overflow-y:auto"><h3 style="font-size:12px;margin-bottom:6px;color:var(--teal)">Assembled Prompt</h3><div id="wb-output" class="code-block" style="font-size:11px;min-height:200px"></div></div>';
+h+='<div style="display:flex;gap:8px;align-items:center"><span id="wb-tokens" class="mono" style="font-size:12px;color:var(--muted)"></span><button class="btn btn-teal" onclick="copyPrompt()">Copy to Clipboard</button></div>';
+h+='</div></div></div>';
+
+h+='<div class="slide" id="s18">';
+h+='<div class="section-badge">PART 04</div>';
+h+='<h2 class="slide-title">Advanced Patterns</h2>';
+h+='<p class="slide-subtitle">Preview \u2014 deep dive in Weeks 6\u20138.</p>';
+h+='<div style="flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto" id="adv-panels"></div>';
+h+='</div>';
+
+h+='<div class="slide" id="s19">';
+h+='<div style="flex:1;display:flex;flex-direction:column;justify-content:center;max-width:800px;margin:0 auto">';
+h+='<h2 class="slide-title" style="text-align:center;font-size:clamp(28px,4vw,48px);margin-bottom:24px">You Now Understand LLMs End-to-End</h2>';
+h+='<p style="text-align:center;color:var(--muted);margin-bottom:24px">From the attention mechanism to the API call \u2014 you can trace every step.</p>';
+h+='<div id="concept-cards" style="display:flex;flex-direction:column;gap:10px"></div>';
+h+='<div style="text-align:center;margin-top:20px;font-style:italic;color:var(--muted);font-size:13px">\u201CAttention Is All You Need\u201D \u2014 2017. Eight researchers. One paper. You now understand why everything since is built on it.</div>';
+h+='</div></div>';
+
+h+='<div class="slide" id="s20">';
+h+='<div style="flex:1;display:flex;flex-direction:column;overflow-y:auto">';
+h+='<h2 class="slide-title" style="text-align:center">Week 5 Recap &amp; Week 6 Preview</h2>';
+h+='<div class="two-col" style="flex:1;margin-top:16px">';
+h+='<div class="card"><h3 style="color:var(--teal);margin-bottom:12px">Week 5 \u2014 Key Takeaways</h3><div style="font-size:12px;line-height:2">';
+h+='<div>\u2713 Encoder-only (BERT): bidirectional attention for understanding</div>';
+h+='<div>\u2713 Decoder-only (GPT/Claude): causal attention for generation</div>';
+h+='<div>\u2713 Encoder-Decoder (T5/BART): both for transformation</div>';
+h+='<div>\u2713 Model outputs probability distribution, not a word</div>';
+h+='<div>\u2713 Temperature rescales logits: lower=deterministic, higher=creative</div>';
+h+='<div>\u2713 Top-P adaptively truncates the distribution</div>';
+h+='<div>\u2713 Beam Search maintains multiple candidate sequences</div>';
+h+='<div>\u2713 Zero-shot, few-shot, CoT are distinct strategies</div>';
+h+='<div>\u2713 Every API call has measurable token cost</div>';
+h+='<div>\u2713 Hallucination, sycophancy, verbosity have specific fixes</div>';
+h+='</div></div>';
+h+='<div class="card"><h3 style="color:var(--blue);margin-bottom:12px">Week 6 \u2014 The Rise of the Agents</h3><div style="font-size:12px;line-height:2">';
+h+='<div>\u2192 What makes an AI an agent (not just a chatbot)</div>';
+h+='<div>\u2192 The ReAct loop: Reason \u2192 Act \u2192 Observe \u2192 Repeat</div>';
+h+='<div>\u2192 Tool use and function calling in depth</div>';
+h+='<div>\u2192 The Model Context Protocol (MCP)</div>';
+h+='<div>\u2192 Introduction to Google ADK</div>';
+h+='<div>\u2192 Building your first agentic workflow</div>';
+h+='</div></div></div></div></div>';
+
+c.innerHTML=h;
+var dotsEl=document.getElementById('dots');
+for(var i=0;i<total;i++){var d=document.createElement('div');d.className='dot';d.setAttribute('onclick','showSlide('+i+')');dotsEl.appendChild(d)}
+showSlide(0);
+}
+
+// S0 Title canvas animation
+var titleAnim;
+function initTitleCanvas(){
+var cv=document.getElementById('title-canvas');if(!cv)return;
+var ctx=cv.getContext('2d');
+cv.width=cv.parentElement.offsetWidth;cv.height=cv.parentElement.offsetHeight;
+var bars=[];for(var i=0;i<20;i++)bars.push({x:cv.width*0.1+i*(cv.width*0.8/20),h:Math.random()*cv.height*0.3,v:Math.random()*2+1,hue:180+i*4});
+function draw(){
+ctx.clearRect(0,0,cv.width,cv.height);
+for(var i=0;i<bars.length;i++){
+var b=bars[i];b.h+=b.v;if(b.h>cv.height*0.5||b.h<20)b.v*=-1;
+ctx.fillStyle='hsla('+b.hue+',70%,50%,0.15)';
+ctx.fillRect(b.x,cv.height-b.h,cv.width*0.8/20-4,b.h);
+}
+titleAnim=requestAnimationFrame(draw);
+}
+draw();
+}
+
+// S1 Pipeline
+var pipeStage=0;
+var pipeStages=[
+{name:'Raw Text Input',desc:'\u201CThe cat sat\u201D enters the pipeline. The model receives a string of characters.',color:'#F59E0B'},
+{name:'Tokenizer',desc:'Text splits into tokens: The \u00B7 cat \u00B7 sat. Token IDs: [464, 3797, 4332]. The model never sees words \u2014 only numbers.',color:'#00D4AA'},
+{name:'Token Embeddings',desc:'Each token ID maps to a dense vector via the embedding matrix, producing a real-valued vector per token.',color:'#4C9BE8'},
+{name:'Positional Encoding',desc:'A unique positional signal is added so the model knows token order. Without this, \u201Ccat sat\u201D = \u201Csat cat\u201D.',color:'#8B5CF6'},
+{name:'Multi-Head Attention',desc:'Each token attends to others. Representations update to incorporate context. This is where the magic happens.',color:'#EF4444'},
+{name:'Add & Norm + FFN',desc:'Residual connections add input back to output. FFN adds non-linear capacity. Enables very deep networks.',color:'#F97316'},
+{name:'Stack N Layers',desc:'This block repeats N times (GPT-3: 96 layers). Lower layers see syntax, upper layers see semantics.',color:'#10B981'},
+{name:'Output',desc:'Encoder: contextual representations for classification/search. Decoder: softmax produces token probability distribution.',color:'#00D4AA'}
+];
+function pipeStep(d){pipeStage=Math.max(0,Math.min(7,pipeStage+d));drawPipeline()}
+function drawPipeline(){
+document.getElementById('pipe-counter').textContent=(pipeStage+1)+' / 8';
+document.getElementById('pipe-explain').innerHTML='<b style="color:'+pipeStages[pipeStage].color+'">'+pipeStages[pipeStage].name+'</b><br>'+pipeStages[pipeStage].desc;
+var cv=document.getElementById('pipeline-canvas');if(!cv)return;
+var ct=cv.getContext('2d');
+cv.width=cv.parentElement.offsetWidth;cv.height=cv.parentElement.offsetHeight;
+ct.clearRect(0,0,cv.width,cv.height);
+var w=cv.width/8-10,h=60,y=cv.height/2-30;
+for(var i=0;i<8;i++){
+var x=i*(cv.width/8)+5;
+ct.fillStyle=i<=pipeStage?pipeStages[i].color:'rgba(255,255,255,0.05)';
+ct.strokeStyle=i===pipeStage?'#fff':'rgba(255,255,255,0.1)';
+ct.lineWidth=i===pipeStage?2:1;
+ct.beginPath();ct.roundRect(x,y,w,h,8);ct.fill();ct.stroke();
+ct.fillStyle=i<=pipeStage?'#0D1B2A':'rgba(255,255,255,0.3)';
+ct.font='bold 10px Space Grotesk';ct.textAlign='center';
+ct.fillText((i+1)+'. '+pipeStages[i].name.split(' ').slice(0,2).join(' '),x+w/2,y+h/2+4);
+if(i<7){ct.strokeStyle='rgba(255,255,255,0.2)';ct.beginPath();ct.moveTo(x+w+2,y+h/2);ct.lineTo(x+w+8,y+h/2);ct.stroke()}
+}
+if(pipeStage>0){
+var px=pipeStage*(cv.width/8)+5+w/2;
+ct.fillStyle=pipeStages[pipeStage].color;ct.beginPath();ct.arc(px,y-15,6,0,Math.PI*2);ct.fill();
+}
+}
+
+// S2 Masked Prediction
+var maskData={
+'The [MASK] sat on the mat':{cat:0.68,dog:0.15,bird:0.08,rat:0.05,fox:0.04},
+'She opened the [MASK] to enter':{door:0.71,gate:0.12,window:0.08,lock:0.05,key:0.04},
+'The [MASK] is shining brightly':{sun:0.72,star:0.11,light:0.08,moon:0.06,lamp:0.03},
+'He drank a glass of [MASK]':{water:0.55,wine:0.18,milk:0.12,juice:0.10,beer:0.05}
+};
+var maskSentences=['The [W] sat on the mat','She opened the [W] to enter','The [W] is shining brightly','He drank a glass of [W]'];
+var maskWords=[['The','cat','sat','on','the','mat'],['She','opened','the','door','to','enter'],['The','sun','is','shining','brightly'],['He','drank','a','glass','of','water']];
+var maskIdx=[1,3,1,5];
+var curMaskSent=0,curMaskWord=1;
+function initMask(){
+var el=document.getElementById('mask-sentence');
+el.innerHTML='';
+var words=maskWords[curMaskSent];
+for(var i=0;i<words.length;i++){
+var s=document.createElement('span');
+s.className='btn '+(i===curMaskWord?'btn-teal':'btn-outline');
+s.style.fontSize='13px';s.style.padding='6px 12px';
+s.textContent=i===curMaskWord?'[MASK]':words[i];
+s.setAttribute('onclick','maskWord('+i+')');
+el.appendChild(s);
+}
+updateMaskChart();
+}
+function maskWord(idx){curMaskWord=idx;initMask()}
+function updateMaskChart(){
+destroyChart('mask');
+var words=maskWords[curMaskSent];
+var orig=words[curMaskWord];
+var key=null;
+for(var k in maskData){if(k.indexOf('[MASK]')>=0){
+var parts=k.split('[MASK]');
+var test=words.slice();test[curMaskWord]='[MASK]';
+var joined=test.join(' ');
+if(joined.indexOf(parts[0])>=0&&joined.indexOf(parts[1])>=0){key=k;break}
+}}
+if(!key){
+var keys=Object.keys(maskData);key=keys[curMaskSent%keys.length];
+}
+var data=maskData[key]||maskData[Object.keys(maskData)[0]];
+var labels=Object.keys(data);var vals=Object.values(data);
+var cv=document.getElementById('mask-chart');
+charts['mask']=new Chart(cv,{type:'bar',data:{labels:labels,datasets:[{data:vals,backgroundColor:'rgba(0,212,170,0.6)',borderColor:'#00D4AA',borderWidth:1}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{max:1,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#64748B',font:{size:10}}},y:{grid:{display:false},ticks:{color:'#F0F4F8',font:{size:11}}}}}});
+}
+
+// S3 Autoregressive Generation
+var genTimer=null,genTokens=0;
+var genWords=['heard','a','sound','at','the','door.','He','grabbed','his','lantern','and','walked','slowly','down','the','spiral','staircase,','each','step','creaking','beneath','his','weathered','boots.','The','wind','howled','outside,','but','this','knock','was','different','\u2014','three','sharp','raps,','deliberate','and','measured.'];
+function startGen(){
+if(genTimer)return;
+var speed=parseInt(document.getElementById('gen-speed').value);
+genTimer=setInterval(function(){
+if(genTokens>=genWords.length){stopGen();return}
+document.getElementById('gen-output').textContent+=' '+genWords[genTokens];
+genTokens++;
+document.getElementById('gen-counter').textContent='Tokens: '+genTokens;
+},speed);
+}
+function stopGen(){if(genTimer){clearInterval(genTimer);genTimer=null}}
+function drawCausalMask(){
+var cv=document.getElementById('causal-canvas');if(!cv)return;
+var ctx=cv.getContext('2d');var sz=cv.width;var n=5;var cell=sz/n;
+var tokens=['The','old','light','house','keep'];
+ctx.clearRect(0,0,sz,sz);
+for(var i=0;i<n;i++)for(var j=0;j<n;j++){
+ctx.fillStyle=j<=i?'rgba(76,155,232,0.5)':'rgba(255,255,255,0.03)';
+ctx.fillRect(j*cell+1,i*cell+1,cell-2,cell-2);
+}
+ctx.fillStyle='#F0F4F8';ctx.font='10px JetBrains Mono';ctx.textAlign='center';
+for(var i=0;i<n;i++){ctx.fillText(tokens[i],i*cell+cell/2,sz+14)}
+}
+
+// S4 Translation
+var transStageN=0;
+var enTokens=['The','cat','sat','on','the','mat'];
+var frTokens=['Le','chat','\u00E9tait','assis','sur','le','tapis'];
+var crossAttn=[
+[],
+[[0,0,0.82]],
+[[0,0,0.82],[1,1,0.91]],
+[[0,0,0.82],[1,1,0.91],[2,2,0.74]],
+[[0,0,0.82],[1,1,0.91],[2,2,0.74],[3,3,0.65],[3,4,0.20]],
+[[0,0,0.82],[1,1,0.91],[2,2,0.74],[3,3,0.65],[3,4,0.20],[4,4,0.60],[5,5,0.55]]
+];
+function transStep(d){transStageN=Math.max(0,Math.min(5,transStageN+d));drawTrans()}
+function drawTrans(){
+document.getElementById('trans-counter').textContent=(transStageN+1)+' / 6';
+var viz=document.getElementById('trans-viz');
+var enc='<div style="margin-bottom:8px"><b style="color:var(--teal)">Encoder Input:</b></div><div style="display:flex;gap:4px;flex-wrap:wrap">';
+for(var i=0;i<enTokens.length;i++)enc+='<span class="pill pill-teal">'+enTokens[i]+'</span>';
+enc+='</div>';
+var dec='<div style="margin-top:12px"><b style="color:var(--amber)">Decoder Output:</b></div><div style="display:flex;gap:4px;flex-wrap:wrap">';
+for(var i=0;i<=transStageN&&i<frTokens.length;i++)dec+='<span class="pill pill-amber">'+frTokens[i]+'</span>';
+if(transStageN<frTokens.length-1)dec+='<span class="pill pill-muted" style="background:rgba(255,255,255,0.05);color:var(--muted)">...</span>';
+dec+='</div>';
+viz.innerHTML=enc+dec;
+drawCrossAttn();
+}
+function drawCrossAttn(){
+var cv=document.getElementById('cross-attn-canvas');if(!cv)return;
+var ctx=cv.getContext('2d');cv.width=cv.parentElement.offsetWidth-32;
+var nE=enTokens.length,nF=Math.min(transStageN+1,frTokens.length);
+var cw=Math.min(40,cv.width/(nE+2)),ch=25;
+ctx.clearRect(0,0,cv.width,cv.height);
+ctx.fillStyle='#64748B';ctx.font='9px JetBrains Mono';ctx.textAlign='center';
+for(var j=0;j<nE;j++)ctx.fillText(enTokens[j],60+j*cw+cw/2,12);
+for(var i=0;i<nF;i++){
+ctx.textAlign='right';ctx.fillText(frTokens[i],55,30+i*ch+ch/2+3);
+for(var j=0;j<nE;j++){
+var val=0;var attn=crossAttn[transStageN]||[];
+for(var a=0;a<attn.length;a++){if(attn[a][0]===i&&attn[a][1]===j)val=attn[a][2]}
+ctx.fillStyle='rgba(0,212,170,'+val+')';
+ctx.fillRect(60+j*cw+1,30+i*ch+1,cw-2,ch-2);
+if(val>0.3){ctx.fillStyle='#0D1B2A';ctx.textAlign='center';ctx.font='bold 9px JetBrains Mono';ctx.fillText(val.toFixed(2),60+j*cw+cw/2,30+i*ch+ch/2+3)}
+}
+}
+}
+
+// S5 Scenarios
+var scenarios=[
+{text:'Classify customer reviews as positive/negative',arch:'Encoder-Only',color:'var(--teal)',why:'No generation needed \u2014 just extract meaning and map to a class.'},
+{text:'Build a conversational AI assistant',arch:'Decoder-Only',color:'var(--blue)',why:'Generate response tokens given conversation history.'},
+{text:'Translate English to Japanese',arch:'Encoder-Decoder',color:'var(--purple)',why:'Full source must be understood before generating target language.'},
+{text:'Build a semantic search engine',arch:'Encoder-Only',color:'var(--teal)',why:'Convert docs and queries to vectors for nearest-neighbor search.'},
+{text:'Summarize a 10-page paper',arch:'Encoder-Decoder',color:'var(--purple)',why:'Understand full source, then generate condensed version.'},
+{text:'Generate Python code from description',arch:'Decoder-Only',color:'var(--blue)',why:'Modern code models are all decoder-only \u2014 the dominant architecture.'}
+];
+function initScenarios(){
+var g=document.getElementById('scenario-grid');g.innerHTML='';
+for(var i=0;i<scenarios.length;i++){
+var d=document.createElement('div');d.className='scenario-card';
+d.innerHTML='<div style="font-size:12px">'+scenarios[i].text+'</div>';
+d.setAttribute('onclick','pickScenario('+i+')');
+g.appendChild(d);
+}
+}
+function pickScenario(idx){
+var cards=document.querySelectorAll('#scenario-grid .scenario-card');
+for(var i=0;i<cards.length;i++)cards[i].classList.toggle('hl',i===idx);
+var s=scenarios[idx];
+var el=document.getElementById('scenario-explain');
+el.style.display='block';
+el.innerHTML='<b style="color:'+s.color+'">'+s.arch+'</b><br><span style="font-size:12px">'+s.why+'</span>';
+}
+
+// S6 Output Distribution
+var distContexts=[
+{ctx:'The sky is',tokens:['blue','clear','dark','full','grey','bright','not','a','the','falling','cloudy','red','filled','still','open'],probs:[0.42,0.18,0.12,0.07,0.05,0.03,0.02,0.02,0.015,0.01,0.01,0.01,0.008,0.007,0.005]},
+{ctx:'def fibonacci(n):',tokens:['\\n','if','return','  ','#','\u0022\u0022\u0022','for','while','a','n','result','fib','assert','try','def'],probs:[0.31,0.28,0.14,0.06,0.04,0.03,0.025,0.02,0.015,0.01,0.01,0.01,0.008,0.007,0.005]},
+{ctx:'Once upon a',tokens:['time','dark','stormy','distant','cold','bright','warm','long','very','clear','quiet','rainy','hot','dry','day'],probs:[0.78,0.06,0.04,0.03,0.02,0.01,0.01,0.008,0.007,0.006,0.005,0.005,0.004,0.003,0.002]},
+{ctx:'The capital of France',tokens:['is','was','has',',','\u2014','remains','\u2019','will','and','Paris','being','today','since','known','the'],probs:[0.89,0.05,0.03,0.008,0.005,0.003,0.002,0.002,0.001,0.001,0.001,0.001,0.001,0.001,0.001]}
+];
+var curDistCtx=0;
+function initDist(){
+var btns=document.getElementById('dist-ctx-btns');btns.innerHTML='';
+for(var i=0;i<distContexts.length;i++){
+var b=document.createElement('button');
+b.className='btn '+(i===0?'btn-teal':'btn-outline');
+b.textContent=distContexts[i].ctx;b.style.fontSize='12px';
+b.setAttribute('onclick','setDistCtx('+i+')');
+btns.appendChild(b);
+}
+setDistCtx(0);
+}
+function setDistCtx(idx){
+curDistCtx=idx;
+var btns=document.querySelectorAll('#dist-ctx-btns .btn');
+for(var i=0;i<btns.length;i++)btns[i].className='btn '+(i===idx?'btn-teal':'btn-outline');
+document.getElementById('dist-context').textContent=distContexts[idx].ctx;
+drawDistChart();
+}
+function drawDistChart(){
+destroyChart('dist');
+var d=distContexts[curDistCtx];
+charts['dist']=new Chart(document.getElementById('dist-chart'),{type:'bar',data:{labels:d.tokens,datasets:[{data:d.probs,backgroundColor:d.probs.map(function(v,i){return i===0?'rgba(0,212,170,0.8)':'rgba(76,155,232,0.5)'}),borderWidth:0}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#64748B',font:{size:9}}},y:{grid:{display:false},ticks:{color:'#F0F4F8',font:{family:'JetBrains Mono',size:10}}}}}});
+}
+
+// S7 Temperature
+var baseLogits=[3.8,2.5,1.8,1.2,0.8,0.5,0.3,0.1,-0.2,-0.5];
+var tempLabels=['blue','clear','dark','full','grey','bright','not','a','the','falling'];
+function updateTemp(){
+var v=parseInt(document.getElementById('temp-slider').value)/100;
+document.getElementById('temp-val').textContent=v.toFixed(2);
+drawTempChart(v);
+}
+function drawTempChart(T){
+if(!T)T=0.9;
+var scaled=baseLogits.map(function(l){return Math.exp(l/T)});
+var sum=scaled.reduce(function(a,b){return a+b},0);
+var probs=scaled.map(function(s){return s/sum});
+destroyChart('temp');
+charts['temp']=new Chart(document.getElementById('temp-chart'),{type:'bar',data:{labels:tempLabels,datasets:[{data:probs,backgroundColor:probs.map(function(p){return p>0.3?'rgba(0,212,170,0.8)':p>0.1?'rgba(76,155,232,0.5)':'rgba(100,116,139,0.3)'}),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#64748B',font:{size:9}}},x:{grid:{display:false},ticks:{color:'#F0F4F8',font:{size:9}}}}}});
+}
+
+// S8 Top-K / Top-P
+var tkpProbs=[0.35,0.20,0.12,0.08,0.06,0.05,0.04,0.03,0.02,0.015,0.01,0.008,0.007,0.005,0.004];
+var tkpLabels=['blue','clear','dark','full','grey','bright','not','a','the','fall','cloud','red','fill','still','open'];
+function updateTopK(){
+var k=parseInt(document.getElementById('topk-slider').value);
+document.getElementById('topk-val').textContent=k;
+var sum=0;for(var i=0;i<k;i++)sum+=tkpProbs[i];
+document.getElementById('topk-info').textContent='Top '+k+' tokens cover '+Math.round(sum*100)+'% mass';
+destroyChart('topk');
+charts['topk']=new Chart(document.getElementById('topk-chart'),{type:'bar',data:{labels:tkpLabels,datasets:[{data:tkpProbs,backgroundColor:tkpProbs.map(function(p,i){return i<k?'rgba(76,155,232,0.7)':'rgba(100,116,139,0.15)'}),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#64748B',font:{size:8}}},x:{grid:{display:false},ticks:{color:'#F0F4F8',font:{size:8}}}}}});
+}
+function updateTopP(){
+var p=parseInt(document.getElementById('topp-slider').value)/100;
+document.getElementById('topp-val').textContent=p.toFixed(2);
+var sum=0,n=0;
+for(var i=0;i<tkpProbs.length;i++){sum+=tkpProbs[i];n++;if(sum>=p)break}
+document.getElementById('topp-info').textContent='Nucleus: '+n+' tokens for P='+p.toFixed(2);
+destroyChart('topp');
+charts['topp']=new Chart(document.getElementById('topp-chart'),{type:'bar',data:{labels:tkpLabels,datasets:[{data:tkpProbs,backgroundColor:tkpProbs.map(function(v,i){return i<n?'rgba(139,92,246,0.7)':'rgba(100,116,139,0.15)'}),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#64748B',font:{size:8}}},x:{grid:{display:false},ticks:{color:'#F0F4F8',font:{size:8}}}}}});
+}
+
+// S9 Beam/Greedy
+function drawGreedy(){
+var cv=document.getElementById('greedy-canvas');if(!cv)return;
+cv.width=cv.parentElement.offsetWidth-32;cv.height=160;
+var ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
+var words=['The','cat','sat','on','the'];
+var probs=[0.42,0.35,0.28,0.55,0.60];
+var x=20,y=80;
+for(var i=0;i<words.length;i++){
+ctx.fillStyle='#F59E0B';ctx.beginPath();ctx.arc(x,y,16,0,Math.PI*2);ctx.fill();
+ctx.fillStyle='#0D1B2A';ctx.font='bold 9px JetBrains Mono';ctx.textAlign='center';
+ctx.fillText(words[i],x,y+3);
+ctx.fillStyle='#64748B';ctx.font='9px JetBrains Mono';
+ctx.fillText(probs[i].toFixed(2),x,y+30);
+if(i<words.length-1){ctx.strokeStyle='#F59E0B';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+16,y);ctx.lineTo(x+(cv.width-40)/words.length-16,y);ctx.stroke()}
+x+=(cv.width-40)/words.length;
+}
+}
+function updateBeam(){
+var b=parseInt(document.getElementById('beam-slider').value);
+document.getElementById('beam-val').textContent=b;
+drawBeam(b);
+}
+function drawBeam(B){
+var cv=document.getElementById('beam-canvas');if(!cv)return;
+cv.width=cv.parentElement.offsetWidth-32;cv.height=160;
+var ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
+var stepW=cv.width/5;
+var beamData=[
+[{t:'The',p:0.42},{t:'A',p:0.30},{t:'One',p:0.15},{t:'My',p:0.08},{t:'That',p:0.05}],
+[{t:'cat',p:0.35},{t:'dog',p:0.25},{t:'bird',p:0.20},{t:'old',p:0.12},{t:'big',p:0.08}],
+[{t:'sat',p:0.40},{t:'ran',p:0.30},{t:'flew',p:0.15},{t:'was',p:0.10},{t:'is',p:0.05}]
+];
+for(var step=0;step<3;step++){
+var nb=Math.min(B,beamData[step].length);
+for(var bi=0;bi<nb;bi++){
+var x=step*stepW+stepW/2;
+var y=20+bi*(cv.height-40)/Math.max(nb,1);
+var alive=bi<B;
+ctx.fillStyle=alive?'rgba(0,212,170,0.8)':'rgba(100,116,139,0.2)';
+ctx.beginPath();ctx.arc(x,y,12,0,Math.PI*2);ctx.fill();
+ctx.fillStyle=alive?'#0D1B2A':'#64748B';ctx.font='bold 8px JetBrains Mono';ctx.textAlign='center';
+ctx.fillText(beamData[step][bi].t,x,y+3);
+if(step>0&&alive){
+var py=20+bi*(cv.height-40)/Math.max(nb,1);
+ctx.strokeStyle='rgba(0,212,170,0.4)';ctx.lineWidth=1;
+ctx.beginPath();ctx.moveTo((step-1)*stepW+stepW/2+12,py);ctx.lineTo(x-12,y);ctx.stroke();
+}
+}
+}
+}
+
+// S10 Playground
+var playOutputs={
+0:[
+{name:'Greedy',params:'T=0, always top token',text:'He set down his cup of tea and walked to the door. The wood was cold against his palm. He opened it slowly.'},
+{name:'Sampling T=0.9 P=0.95',params:'Balanced',text:'He squinted into darkness, the beam of his flashlight cutting through sea spray. No ship in sight. Just the echo of knuckles on oak.'},
+{name:'Beam Search B=4',params:'4 candidates',text:'He rose from his chair and made his way to the heavy wooden door, his footsteps echoing in the empty chamber.'},
+{name:'High T=1.8',params:'Max creativity',text:'Time folded like origami cranes in a hurricane of brass clockwork. The knock was really a memory pretending to be sound.'}
+],1:[
+{name:'Greedy',params:'T=0',text:'    if len(lst) == 0:\n        return []\n    seen = set()\n    duplicates = []\n    for item in lst:\n        if item in seen:\n            duplicates.append(item)\n        seen.add(item)\n    return duplicates'},
+{name:'Sampling T=0.9',params:'Balanced',text:'    seen = {}\n    return [x for x in lst if lst.count(x) > 1 and not seen.get(x, False) and not seen.update({x: True})]'},
+{name:'Beam Search B=4',params:'4 beams',text:'    from collections import Counter\n    counts = Counter(lst)\n    return [item for item, count in counts.items() if count > 1]'},
+{name:'High T=1.8',params:'Creative',text:'    # dance of the duplicates\n    twins = lambda x: x if lst.count(x) >= 2 else None\n    return list(set(filter(None, map(twins, lst))))'}
+],2:[
+{name:'Greedy',params:'T=0',text:'Quantum entanglement is a phenomenon where two particles become linked so that measuring one instantly determines the state of the other.'},
+{name:'Sampling T=0.9',params:'Balanced',text:'Two particles can share a quantum state such that observing one reveals information about the other, regardless of distance.'},
+{name:'Beam Search B=4',params:'4 beams',text:'Quantum entanglement describes the correlation between quantum particles whose states are interdependent regardless of spatial separation.'},
+{name:'High T=1.8',params:'Creative',text:'Imagine two cosmic dice that always land on matching faces no matter how far apart you throw them \u2014 that\u2019s entanglement whispering across spacetime.'}
+]};
+function updatePlayground(){
+var idx=document.getElementById('play-prompt').selectedIndex;
+var g=document.getElementById('play-grid');g.innerHTML='';
+var outs=playOutputs[idx];
+var colors=['var(--amber)','var(--teal)','var(--blue)','var(--orange)'];
+for(var i=0;i<outs.length;i++){
+var d=document.createElement('div');d.className='card';
+d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b style="color:'+colors[i]+';font-size:12px">'+outs[i].name+'</b><button class="btn btn-outline" style="font-size:10px;padding:4px 8px" onclick="reroll('+idx+','+i+')">Re-roll</button></div><div style="font-size:11px;color:var(--muted);margin-bottom:6px">'+outs[i].params+'</div><div class="code-block" style="font-size:11px" id="play-out-'+i+'">'+outs[i].text+'</div>';
+g.appendChild(d);
+}
+}
+function reroll(ctx,strat){
+var el=document.getElementById('play-out-'+strat);
+if(el){el.style.opacity='0.5';setTimeout(function(){el.style.opacity='1'},300)}
+}
+
+// S12 Prompting Strategies
+var promptStrats=[
+{name:'Zero-Shot',def:'Direct instruction, no examples.',prompt:'Classify the sentiment of this review:\n"The product broke after two days."\nAnswer: Positive / Negative / Neutral',response:'Negative',when:'Simple, well-defined tasks.',pitfall:'Fails on unusual formats or domain-specific tasks.'},
+{name:'Few-Shot',def:'Provide 2-4 demonstrations before the task.',prompt:'Review: "Amazing quality!" \u2192 Positive\nReview: "Terrible experience." \u2192 Negative\nReview: "It\u2019s okay I guess." \u2192 Neutral\nReview: "The product broke after two days." \u2192',response:'Negative',when:'When output format is unusual or zero-shot fails.',pitfall:'Long examples waste tokens. Keep demos concise.'},
+{name:'Chain-of-Thought',def:'Ask the model to reason step by step.',prompt:'Q: A train travels 120km at 60km/h then 80km at 40km/h.\nWhat is the average speed?\n\nThink step by step before answering.',response:'Step 1: Time for first leg = 120/60 = 2 hours\nStep 2: Time for second leg = 80/40 = 2 hours\nStep 3: Total distance = 200km, Total time = 4h\nStep 4: Average speed = 200/4 = 50 km/h',when:'Math, logic, multi-step reasoning.',pitfall:'Adds tokens (cost). Skip for simple lookups.'},
+{name:'System/Role',def:'Set persona and constraints via system message.',prompt:'SYSTEM:\nYou are a senior security engineer.\nCite line numbers, name vulnerability type,\nsuggest a fix. Never say "looks fine."\n\nUSER:\nReview this auth function: [code]',response:'Line 12: SQL Injection vulnerability.\nUser input concatenated into query string.\nFix: Use parameterized queries.',when:'Apps with consistent persona or constraints.',pitfall:'System prompt is NOT a security boundary.'},
+{name:'Prompt Chaining',def:'Pipeline: output of step N feeds step N+1.',prompt:'Step 1: Extract claims from document \u2192\nStep 2: Fact-check each claim \u2192\nStep 3: Format as structured report \u2192\nStep 4: Generate executive summary',response:'[Chain produces validated, structured output]',when:'Complex workflows exceeding single-prompt reliability.',pitfall:'Errors propagate. Add validation at each step.'},
+{name:'Self-Consistency',def:'Generate multiple outputs, then aggregate/vote.',prompt:'Generate 3 answers at T=1.0:\n\u2192 Answer A: 42\n\u2192 Answer B: 42\n\u2192 Answer C: 38\n\nMajority vote: 42',response:'Final answer: 42 (2/3 agreement)',when:'High-stakes factual or reasoning tasks.',pitfall:'3x token cost. Use only when accuracy justifies it.'}
+];
+function initPromptTabs(){
+var bar=document.getElementById('prompt-tabs');bar.innerHTML='';
+for(var i=0;i<promptStrats.length;i++){
+var t=document.createElement('div');t.className='tab'+(i===0?' active':'');
+t.textContent=promptStrats[i].name;t.setAttribute('onclick','showPromptTab('+i+')');
+bar.appendChild(t);
+}
+showPromptTab(0);
+}
+function showPromptTab(idx){
+var tabs=document.querySelectorAll('#prompt-tabs .tab');
+for(var i=0;i<tabs.length;i++)tabs[i].classList.toggle('active',i===idx);
+var s=promptStrats[idx];
+var html='<h3 style="color:var(--teal);margin-bottom:4px">'+s.name+'</h3>';
+html+='<p style="font-size:12px;color:var(--muted);margin-bottom:12px">'+s.def+'</p>';
+html+='<div class="code-block" style="margin-bottom:12px">'+s.prompt.replace(/\n/g,'<br>')+'</div>';
+html+='<div class="card" style="margin-bottom:12px;border-color:var(--teal)"><div style="font-size:10px;color:var(--teal);margin-bottom:4px">SIMULATED RESPONSE</div><div style="font-size:12px">'+s.response.replace(/\n/g,'<br>')+'</div></div>';
+html+='<div style="display:flex;gap:12px"><div class="card" style="flex:1"><div style="font-size:10px;color:var(--green);margin-bottom:4px">WHEN TO USE</div><div style="font-size:12px">'+s.when+'</div></div>';
+html+='<div class="card" style="flex:1;border-color:var(--red)"><div style="font-size:10px;color:var(--red);margin-bottom:4px">PITFALL</div><div style="font-size:12px">'+s.pitfall+'</div></div></div>';
+document.getElementById('prompt-content').innerHTML=html;
+}
+
+// S13 API
+var apiLines=[
+{code:'import anthropic',note:''},
+{code:'',note:''},
+{code:'client = anthropic.Anthropic(api_key="sk-ant-...")',note:'Initialize with your API key. Keep this secret!'},
+{code:'',note:''},
+{code:'response = client.messages.create(',note:''},
+{code:'    model="claude-sonnet-4-20250514",',note:'<b>model:</b> claude-opus-4-20250514 = most capable. claude-sonnet-4-20250514 = balanced. claude-haiku-4-5-20251001 = fastest & cheapest.'},
+{code:'    max_tokens=1024,',note:'<b>max_tokens:</b> Hard cap on response length. 1 token \u2248 0.75 words. Cost = tokens \u00D7 price.'},
+{code:'    temperature=0.7,',note:'<b>temperature:</b> 0 = deterministic. 1 = default. Production chatbots: 0.7.'},
+{code:'    system="You are a helpful ML assistant.",',note:'<b>system:</b> Sets persona, constraints, context. Applied before every user message.'},
+{code:'    messages=[',note:'<b>messages:</b> Full conversation history. The model has no memory \u2014 send history every time.'},
+{code:'        {"role":"user","content":"Explain backprop."},',note:''},
+{code:'        {"role":"assistant","content":"Backprop is..."},',note:''},
+{code:'        {"role":"user","content":"Now for a 10-year-old."}',note:''},
+{code:'    ]',note:''},
+{code:')',note:''},
+{code:'',note:''},
+{code:'print(response.content[0].text)',note:'<b>content:</b> The generated text. Check stop_reason: end_turn = normal, max_tokens = hit cap.'},
+{code:'print(f"Tokens: {response.usage.input_tokens} in")',note:'<b>usage:</b> For cost tracking. input_tokens includes system prompt + history.'}
+];
+function initAPI(){
+var el=document.getElementById('api-code');var html='';
+for(var i=0;i<apiLines.length;i++){
+if(apiLines[i].note){
+html+='<span class="hl-line" onclick="showAPINote('+i+')">'+escHTML(apiLines[i].code)+'</span>\n';
+}else{
+html+=escHTML(apiLines[i].code)+'\n';
+}
+}
+el.innerHTML=html;
+updateCost();
+}
+function showAPINote(idx){
+document.getElementById('api-explain').innerHTML='<div style="font-size:12px;line-height:1.6">'+apiLines[idx].note+'</div>';
+}
+function escHTML(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function updateCost(){
+var inp=parseInt(document.getElementById('cost-in').value);
+var out=parseInt(document.getElementById('cost-out').value);
+document.getElementById('cost-in-val').textContent=inp;
+document.getElementById('cost-out-val').textContent=out;
+var haiku=(inp*0.25+out*1.25)/1000000;
+var sonnet=(inp*3+out*15)/1000000;
+var opus=(inp*15+out*75)/1000000;
+document.getElementById('cost-result').innerHTML='<div style="display:flex;gap:12px"><div><span class="pill pill-green">Haiku</span> $'+haiku.toFixed(4)+'</div><div><span class="pill pill-blue">Sonnet</span> $'+sonnet.toFixed(4)+'</div><div><span class="pill pill-purple">Opus</span> $'+opus.toFixed(4)+'</div></div>';
+}
+
+// S14 Token counter
+function countTokens(){
+var text=document.getElementById('token-input').value;
+var chars=text.length;
+var tokens=Math.ceil(chars/4);
+var haiku=(tokens*0.25/1000000).toFixed(6);
+var sonnet=(tokens*3/1000000).toFixed(6);
+var remaining=4096-tokens;
+document.getElementById('token-stats').innerHTML='Characters: <b>'+chars+'</b><br>Approx tokens: <b>'+tokens+'</b><br>Est. cost (input): Haiku $'+haiku+' / Sonnet $'+sonnet+'<br>Budget remaining (4096): <b style="color:'+(remaining<0?'var(--red)':'var(--teal)')+'">'+remaining+'</b>';
+}
+function initEfficiency(){
+var tips=[
+{before:'Hi Claude! I hope you\'re doing well. Could you please kindly summarize...',after:'Summarize this document:',save:'~20 tokens/call'},
+{before:'The text I want you to look at is the following text which says...',after:'<context>...</context><task>Summarize</task>',save:'Clearer boundaries'},
+{before:'"Return the data as JSON" (vague)',after:'Return JSON: {"name":string,"score":number}',save:'No format guessing'},
+{before:'System: (empty) + "You are a helpful assistant" every msg',after:'System prompt set once, reused across turns',save:'Fewer repeated tokens'},
+{before:'"Please provide me with a comprehensive answer..."',after:'"Be concise. No preamble. Just the answer."',save:'Shorter responses'},
+{before:'3 separate API calls for 3 questions',after:'1 call with all 3 questions batched',save:'3x fewer round trips'},
+{before:'Full system prompt sent every call (long)',after:'Use Anthropic prompt caching for long prefixes',save:'Up to 90% savings'},
+{before:'Using Opus for simple classification',after:'Use Haiku for simple tasks, Opus for hard reasoning',save:'60x cost difference'}
+];
+var el=document.getElementById('efficiency-tips');el.innerHTML='';
+for(var i=0;i<tips.length;i++){
+el.innerHTML+='<div class="card" style="font-size:11px"><div style="color:var(--red);margin-bottom:4px">BEFORE: '+escHTML(tips[i].before)+'</div><div style="color:var(--teal);margin-bottom:4px">AFTER: '+escHTML(tips[i].after)+'</div><div style="color:var(--amber)">Saves: '+tips[i].save+'</div></div>';
+}
+}
+
+// S15 Flip cards
+var flipData=[
+{bad:'Write about transformers',good:'Write a 4-sentence technical definition of the Transformer architecture for a software engineer. Include: attention mechanism, positional encoding, and use cases.',why:'Specificity eliminates ambiguity'},
+{bad:'Return the data as JSON',good:'Return JSON matching: {"name":string, "score":number, "tags":string[]}',why:'Exact schema prevents format errors'},
+{bad:'Explain neural networks',good:'Explain neural networks to a high school student with no math background. Use analogies. Avoid equations.',why:'Audience + constraints = better output'},
+{bad:'[constraint buried mid-paragraph]',good:'[constraint as final line]\n"Important: Always respond in exactly 3 bullet points."',why:'Models attend more to end of prompt'},
+{bad:'Unstructured mixed prompt with everything jumbled',good:'<context>...</context>\n<task>...</task>\n<constraints>...</constraints>',why:'XML delimiters create clear sections'},
+{bad:'Open-ended question with no uncertainty handling',good:'Add: "If uncertain, say I\'m not confident rather than guessing."',why:'Reduces hallucination explicitly'},
+{bad:'One long run-on instruction paragraph',good:'1. Extract key points\n2. Rank by importance\n3. Format as bullets',why:'Numbered steps = better compliance'},
+{bad:'Happy-path examples only',good:'Include edge case examples in few-shot demos',why:'Edge cases prevent failure modes'}
+];
+function initFlipCards(){
+var g=document.getElementById('flip-grid');g.innerHTML='';
+for(var i=0;i<flipData.length;i++){
+g.innerHTML+='<div class="flip-card" style="min-height:120px" onclick="this.classList.toggle(\'flipped\')"><div class="flip-inner"><div class="flip-front"><div style="font-size:10px;color:var(--red);margin-bottom:6px">\u2717 BAD PROMPT</div><div style="font-size:12px">'+flipData[i].bad+'</div></div><div class="flip-back"><div style="font-size:10px;color:var(--teal);margin-bottom:6px">\u2713 GOOD PROMPT</div><div style="font-size:11px;margin-bottom:6px">'+flipData[i].good.replace(/\n/g,'<br>')+'</div><div style="font-size:10px;color:var(--amber)">'+flipData[i].why+'</div></div></div></div>';
+}
+}
+
+// S16 Failure modes
+var failures=[
+{name:'Hallucination',icon:'\uD83C\uDFAD',symptom:'Model confidently states false facts.',cause:'Fills gaps with plausible-sounding content \u2014 optimized for fluency, not accuracy.',fix:'\u201CIf not certain, say I don\'t know.\u201D Use T=0 for factual. Add RAG. Ask for citations.',param:'T=0, add retrieval'},
+{name:'Sycophancy',icon:'\uD83E\uDE9E',symptom:'Model agrees with incorrect statements.',cause:'RLHF over-optimizes for user approval.',fix:'\u201CBe honest even if it contradicts me. I prefer accuracy over agreement.\u201D',param:'Explicit honesty instruction'},
+{name:'Verbosity',icon:'\uD83D\uDCDC',symptom:'3 paragraphs when 1 sentence needed.',cause:'Training rewards completeness-signaling.',fix:'\u201CBe concise. One sentence. No preamble.\u201D Set low max_tokens.',param:'max_tokens=100'},
+{name:'Instruction Ignoring',icon:'\uD83D\uDE48',symptom:'Key constraints not followed.',cause:'Long prompts bury constraints \u2014 model attends less to middle.',fix:'Put critical instructions at END. Repeat key rules. Use ALL CAPS for crucial constraints.',param:'Restructure prompt'},
+{name:'Context Amnesia',icon:'\uD83D\uDCAD',symptom:'Model forgets earlier conversation.',cause:'Tokens fall out of context window.',fix:'Periodically summarize history. Design stateless interactions. Use retrieval for long-term memory.',param:'Summarize + RAG'},
+{name:'Format Inconsistency',icon:'\uD83C\uDFB2',symptom:'JSON sometimes, markdown other times.',cause:'Without strict constraints, model uses judgment.',fix:'Show exact format in examples. Use T=0. Add retry logic with validation. Use JSON mode.',param:'T=0, strict schema'}
+];
+function initFailures(){
+var g=document.getElementById('failure-grid');g.innerHTML='';
+for(var i=0;i<failures.length;i++){
+var f=failures[i];
+g.innerHTML+='<div class="expand-card" onclick="this.classList.toggle(\'expanded\')"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:20px">'+f.icon+'</span><b style="font-size:13px">'+f.name+'</b></div><div style="font-size:11px;color:var(--muted)">'+f.symptom+'</div><div class="ec"><div style="margin-top:10px;font-size:11px;line-height:1.6"><div style="color:var(--red);margin-bottom:4px"><b>Root cause:</b> '+f.cause+'</div><div style="color:var(--teal);margin-bottom:4px"><b>Fix:</b> '+f.fix+'</div><div style="color:var(--amber)"><b>Param:</b> '+f.param+'</div></div></div></div>';
+}
+}
+
+// S17 Prompt Builder
+var wbExamples=[];
+var templates=[
+{system:'You are a document summarizer. Extract key points concisely. Use bullet points. Never add information not in the source.',instruction:'Summarize the following document in 5 bullet points:',constraints:['Be concise','No preamble','Cite uncertainty'],examples:[{input:'[Long research paper about transformers]',output:'\u2022 Introduces self-attention mechanism\n\u2022 Eliminates recurrence entirely\n\u2022 Achieves SOTA on translation'}]},
+{system:'You are a senior code reviewer. Be specific: cite line numbers, name the issue type, suggest a fix. Never say "looks fine" without checking all inputs.',instruction:'Review this code for bugs, security issues, and improvements:',constraints:['Use specific format','Break into steps'],examples:[{input:'def login(user, pw):\n  query = f"SELECT * FROM users WHERE name=\'{user}\'"',output:'Line 2: SQL Injection. Use parameterized queries.'}]},
+{system:'You are a research assistant specializing in AI/ML. Always cite sources. Distinguish established facts from speculation.',instruction:'Research and summarize the current state of:',constraints:['Be concise','Cite uncertainty','Use specific format'],examples:[]}
+];
+var defaultConstraints=['Be concise','No preamble','Cite uncertainty','Use specific format','Break into steps'];
+function initWorkbench(){
+wbExamples=[];
+var cel=document.getElementById('wb-constraints');cel.innerHTML='';
+for(var i=0;i<defaultConstraints.length;i++){
+cel.innerHTML+='<label style="display:block;margin-bottom:4px;cursor:pointer"><input type="checkbox" onchange="buildPrompt()" value="'+defaultConstraints[i]+'" style="accent-color:var(--teal)"> '+defaultConstraints[i]+'</label>';
+}
+document.getElementById('wb-examples').innerHTML='';
+buildPrompt();
+}
+function loadTemplate(idx){
+var t=templates[idx];
+document.getElementById('wb-system').value=t.system;
+document.getElementById('wb-instruction').value=t.instruction;
+wbExamples=t.examples.slice();
+renderExamples();
+var checks=document.querySelectorAll('#wb-constraints input[type=checkbox]');
+for(var i=0;i<checks.length;i++){
+checks[i].checked=t.constraints.indexOf(checks[i].value)>=0;
+}
+buildPrompt();
+}
+function addExample(){
+wbExamples.push({input:'',output:''});renderExamples();
+}
+function renderExamples(){
+var el=document.getElementById('wb-examples');el.innerHTML='';
+for(var i=0;i<wbExamples.length;i++){
+el.innerHTML+='<div style="margin-bottom:6px;font-size:11px"><div>Example '+(i+1)+':</div><input type="text" placeholder="Input" value="'+escHTML(wbExamples[i].input)+'" onchange="wbExamples['+i+'].input=this.value;buildPrompt()" style="width:100%;background:var(--navy);border:1px solid var(--border);border-radius:4px;padding:4px;color:var(--white);font-size:11px;margin-bottom:2px"><input type="text" placeholder="Expected output" value="'+escHTML(wbExamples[i].output)+'" onchange="wbExamples['+i+'].output=this.value;buildPrompt()" style="width:100%;background:var(--navy);border:1px solid var(--border);border-radius:4px;padding:4px;color:var(--white);font-size:11px"></div>';
+}
+}
+function buildPrompt(){
+var sys=document.getElementById('wb-system').value;
+var inst=document.getElementById('wb-instruction').value;
+var checks=document.querySelectorAll('#wb-constraints input:checked');
+var cons=[];for(var i=0;i<checks.length;i++)cons.push(checks[i].value);
+var prompt='';
+if(sys)prompt+='[SYSTEM]\n'+sys+'\n\n';
+if(wbExamples.length>0){
+prompt+='[EXAMPLES]\n';
+for(var i=0;i<wbExamples.length;i++){
+if(wbExamples[i].input)prompt+='Input: '+wbExamples[i].input+'\n';
+if(wbExamples[i].output)prompt+='Output: '+wbExamples[i].output+'\n';
+}
+prompt+='\n';
+}
+if(inst)prompt+='[INSTRUCTION]\n'+inst+'\n';
+if(cons.length)prompt+='\n[CONSTRAINTS]\n'+cons.join('\n')+'\n';
+document.getElementById('wb-output').textContent=prompt;
+var tokens=Math.ceil(prompt.length/4);
+document.getElementById('wb-tokens').textContent='~'+tokens+' tokens';
+}
+function copyPrompt(){
+var text=document.getElementById('wb-output').textContent;
+navigator.clipboard.writeText(text).then(function(){
+document.getElementById('wb-tokens').textContent='Copied!';
+setTimeout(buildPrompt,1500);
+});
+}
+
+// S18 Advanced Patterns
+function initAdvanced(){
+var panels=[
+{name:'RAG (Retrieval-Augmented Generation)',color:'var(--teal)',problem:'LLMs have a knowledge cutoff. They can\'t access your private documents.',solution:'Before calling the LLM, retrieve relevant documents and inject into context.',flow:'User Query \u2192 Embedding Model \u2192 Vector DB Search \u2192 Top-K Docs \u2192 Inject into Prompt \u2192 LLM Response',insight:'RAG separates knowledge (your database) from reasoning (the LLM). Update the database, not the model.',code:'docs = vector_db.search(embed(query), k=5)\nprompt = f"Context: {docs}\\nQuestion: {query}"\nresponse = llm.generate(prompt)'},
+{name:'Function Calling / Tool Use',color:'var(--blue)',problem:'LLMs can\'t take actions \u2014 they only generate text.',solution:'Define tools the model can call. Model generates structured JSON, your code executes it.',flow:'User \u2192 LLM \u2192 Tool Call JSON \u2192 Your Code Executes \u2192 Result \u2192 LLM \u2192 Final Response',insight:'Tool use transforms a chatbot into an agent. This is the foundation of Week 6.',code:'tools = [{"name":"get_weather","params":{"city":"string"}}]\n# LLM outputs: {"tool":"get_weather","args":{"city":"Colombo"}}\nresult = get_weather("Colombo")  # 28\u00B0C'},
+{name:'Prompt Chaining',color:'var(--purple)',problem:'Complex tasks exceed single-prompt reliability.',solution:'Pipeline \u2014 output of one prompt becomes input to the next. Add validation between steps.',flow:'Step 1: Extract \u2192 Step 2: Validate \u2192 Step 3: Format \u2192 Step 4: Summarize',insight:'Chaining trades single-call simplicity for multi-step reliability. When accuracy > latency, chain.',code:'claims = llm("Extract claims from: " + doc)\nfacts = llm("Fact-check: " + claims)\nreport = llm("Format as report: " + facts)'}
+];
+var el=document.getElementById('adv-panels');el.innerHTML='';
+for(var i=0;i<panels.length;i++){
+var p=panels[i];
+el.innerHTML+='<div class="expand-card" onclick="this.classList.toggle(\'expanded\')"><div style="display:flex;justify-content:space-between;align-items:center"><b style="color:'+p.color+';font-size:14px">'+p.name+'</b><span style="font-size:11px;color:var(--muted)">Click to expand</span></div><div class="ec" style="padding-top:10px"><div style="font-size:12px;margin-bottom:8px"><span style="color:var(--red)">Problem:</span> '+p.problem+'</div><div style="font-size:12px;margin-bottom:8px"><span style="color:var(--teal)">Solution:</span> '+p.solution+'</div><div class="code-block" style="font-size:11px;margin-bottom:8px">'+p.flow+'</div><div class="code-block" style="font-size:11px;margin-bottom:8px">'+p.code+'</div><div class="insight">'+p.insight+'</div></div></div>';
+}
+}
+
+// S19 Concept cards
+function initConcepts(){
+var cards=[
+{concept:'Encoder vs Decoder',color:'var(--teal)',text:'Semantic search = encoder-only BERT embeddings. Chat with Claude = decoder-only autoregressive generation. Same Transformer, different architecture.'},
+{concept:'Temperature',color:'var(--blue)',text:'When Claude writes different poems each time but gives the same answer for 2+2 \u2014 that\'s temperature. Code gen: T\u22480.2. Brainstorming: T\u22481.2.'},
+{concept:'Top-P Sampling',color:'var(--purple)',text:'Modern LLMs sample from an adaptive nucleus \u2014 that\'s why responses feel natural and human-like, not robotic.'},
+{concept:'Chain-of-Thought',color:'var(--amber)',text:'When Claude says \'Let me think step by step\' \u2014 that\'s CoT prompting. Research shows it improves complex reasoning by 30\u201350%.'},
+{concept:'System Prompts',color:'var(--orange)',text:'Every AI product has a system prompt you\'ve never seen. It shapes persona, safety, and behavior before your message is processed.'},
+{concept:'Function Calling',color:'var(--green)',text:'When a chatbot checks weather or books a restaurant \u2014 that\'s function calling. Structured JSON + your code + another LLM call. You\'ll build this in Week 6.'}
+];
+var el=document.getElementById('concept-cards');el.innerHTML='';
+for(var i=0;i<cards.length;i++){
+var c=cards[i];
+el.innerHTML+='<div class="card" style="border-left:3px solid '+c.color+'"><div style="font-size:12px;color:'+c.color+';margin-bottom:4px;font-weight:600">'+c.concept+'</div><div style="font-size:12px;line-height:1.5">'+c.text+'</div></div>';
+}
+}
+
+// Draw encoder bidirectional attention
+function drawEncAttn(){
+var cv=document.getElementById('enc-attn-canvas');if(!cv)return;
+var ctx=cv.getContext('2d');var sz=cv.width;var n=4;var cell=sz/n;
+var tokens=['The','cat','sat','on'];
+ctx.clearRect(0,0,sz,sz);
+for(var i=0;i<n;i++)for(var j=0;j<n;j++){
+ctx.fillStyle='rgba(0,212,170,0.4)';
+ctx.fillRect(j*cell+1,i*cell+1,cell-2,cell-2);
+}
+ctx.fillStyle='#F0F4F8';ctx.font='10px JetBrains Mono';ctx.textAlign='center';
+for(var i=0;i<n;i++)ctx.fillText(tokens[i],i*cell+cell/2,sz+14);
+}
+
+// Slide lifecycle
+function onSlideEnter(n){
+switch(n){
+case 0:initTitleCanvas();break;
+case 1:drawPipeline();break;
+case 2:drawEncAttn();initMask();break;
+case 3:drawCausalMask();break;
+case 4:drawTrans();break;
+case 5:initScenarios();break;
+case 6:initDist();break;
+case 7:drawTempChart(0.9);break;
+case 8:updateTopK();updateTopP();break;
+case 9:drawGreedy();drawBeam(3);break;
+case 10:updatePlayground();break;
+case 12:initPromptTabs();break;
+case 13:initAPI();break;
+case 14:countTokens();initEfficiency();break;
+case 15:initFlipCards();break;
+case 16:initFailures();break;
+case 17:initWorkbench();break;
+case 18:initAdvanced();break;
+case 19:initConcepts();break;
+}
+}
+function onSlideRevisit(n){
+switch(n){
+case 0:break;
+case 1:drawPipeline();break;
+case 6:drawDistChart();break;
+case 7:updateTemp();break;
+case 8:updateTopK();updateTopP();break;
+case 9:drawGreedy();updateBeam();break;
+}
+}
+
+// Init
+buildSlides();
+</script>
+</body>
+</html>
