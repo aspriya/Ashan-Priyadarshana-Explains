@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-:root{--navy:#0D1B2A;--navy2:#1A2B3C;--navy3:#243447;--teal:#00D4AA;--teal2:#00A882;--blue:#4C9BE8;--purple:#8B5CF6;--amber:#F59E0B;--red:#EF4444;--orange:#F97316;--green:#10B981;--white:#F0F4F8;--muted:#64748B;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08)}
+:root{--navy:#0D1B2A;--navy2:#1A2B3C;--navy3:#243447;--teal:#00D4AA;--teal2:#00A882;--blue:#4C9BE8;--purple:#8B5CF6;--amber:#F59E0B;--red:#EF4444;--orange:#F97316;--green:#10B981;--white:#F0F4F8;--muted:#94A6BA;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Space Grotesk',sans-serif;background:var(--navy);color:var(--white);overflow:hidden;height:100vh;width:100vw}
 h1,h2,h3{font-family:'Fraunces',serif}
@@ -47,7 +47,7 @@ code,.mono{font-family:'JetBrains Mono',monospace}
 .btn-outline.active{background:var(--teal);color:var(--navy);border-color:var(--teal)}
 .code-block{background:#0a0f1a;border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;overflow-x:auto;white-space:pre-wrap}
 .tab-bar{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
-.tab{padding:7px 14px;border-radius:8px 8px 0 0;background:var(--card);border:1px solid var(--border);border-bottom:none;cursor:pointer;font-size:12px;color:var(--muted);transition:all .3s}
+.tab{padding:10px 18px;border-radius:8px 8px 0 0;background:var(--card);border:1px solid var(--border);border-bottom:none;cursor:pointer;font-size:14.5px;font-weight:600;color:var(--muted);transition:all .3s}
 .tab.active{background:var(--navy2);color:var(--teal);border-color:var(--teal)}
 .flip-card{perspective:1000px;cursor:pointer}
 .flip-inner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
@@ -55,13 +55,13 @@ code,.mono{font-family:'JetBrains Mono',monospace}
 .flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;padding:14px;display:flex;flex-direction:column;overflow:auto}
 .flip-front{background:var(--card);border:1px solid var(--border)}
 .flip-back{background:linear-gradient(135deg,rgba(0,212,170,.1),rgba(76,155,232,.1));border:1px solid rgba(0,212,170,.3);transform:rotateY(180deg)}
-.expand-card{border:1px solid var(--border);border-radius:12px;padding:14px;background:var(--card);cursor:pointer;transition:all .3s}
+.expand-card{border:1px solid var(--border);border-radius:12px;padding:18px;background:var(--card);cursor:pointer;transition:all .3s}
 .expand-card:hover{border-color:var(--teal)}
 .expand-card .ec{max-height:0;overflow:hidden;transition:max-height .4s}
-.expand-card.expanded .ec{max-height:500px}
+.expand-card.expanded .ec{max-height:1200px}
 .grid-2x3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .grid-2x2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.scenario-card{padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--card);cursor:pointer;transition:all .3s;font-size:13px}
+.scenario-card{padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--card);cursor:pointer;transition:all .3s;font-size:14.5px;line-height:1.5}
 .scenario-card:hover{border-color:var(--teal)}
 .scenario-card.hl{border-color:var(--teal);background:rgba(0,212,170,.08)}
 canvas{max-width:100%}
@@ -93,7 +93,7 @@ textarea:focus{outline:none;border-color:var(--teal)}
 </div>
 <script>
 
-var cur=0,total=21,inited={},charts={};
+var cur=0,total=24,inited={},charts={};
 function go(d){var n=cur+d;if(n>=0&&n<total)showSlide(n)}
 function showSlide(n){
 var p=document.querySelector('.slide.active');
@@ -117,12 +117,18 @@ var h='';
 h+='<div class="slide" id="s0">';
 h+='<canvas id="title-canvas" style="position:absolute;inset:0;z-index:0"></canvas>';
 h+='<div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center">';
-h+='<div style="font-size:12px;letter-spacing:3px;color:var(--teal);margin-bottom:16px;font-weight:600">WEEK 05</div>';
-h+='<h1 style="font-size:clamp(40px,6vw,72px);font-weight:800;margin-bottom:16px;background:linear-gradient(135deg,var(--white),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent">The Final Choice</h1>';
-h+='<p style="color:var(--muted);font-size:clamp(14px,1.5vw,18px);max-width:700px;margin-bottom:32px">From understanding how transformers work to using them in production \u2014 in two hours.</p>';
-h+='<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:600px">';
+h+='<div style="font-size:13px;letter-spacing:4px;color:var(--teal);margin-bottom:18px;font-weight:700;text-shadow:0 0 30px rgba(0,212,170,0.5)">WEEK 05  \u00B7  DECODING &amp; PROMPTING</div>';
+h+='<h1 style="font-size:clamp(44px,6.5vw,80px);font-weight:800;margin-bottom:20px;color:#FFFFFF;background:linear-gradient(135deg,#FFFFFF 0%,#A6F4E2 60%,#00D4AA 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 60px rgba(0,212,170,0.25);letter-spacing:-0.5px">The Final Choice</h1>';
+h+='<p style="color:#E5ECF4;font-size:clamp(15px,1.6vw,20px);max-width:760px;margin-bottom:28px;line-height:1.55">From understanding how transformers work to using them in production \u2014 <b style="color:#FFFFFF">decoding strategies, prompting patterns, and the practical engineering</b> that turns models into products. In two hours.</p>';
+h+='<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:680px;margin-bottom:40px">';
 h+='<span class="pill pill-teal">Encoder / Decoder</span><span class="pill pill-blue">Transformer Flow</span><span class="pill pill-purple">Temperature</span><span class="pill pill-amber">Top-P</span><span class="pill pill-green">Beam Search</span><span class="pill pill-orange">Prompting</span><span class="pill pill-teal">API</span><span class="pill pill-blue">Best Practices</span>';
-h+='</div></div></div>';
+h+='</div>';
+h+='<div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.12);min-width:320px">';
+h+='<div style="font-size:11px;letter-spacing:3px;color:var(--teal);text-transform:uppercase;font-weight:700">Presented by</div>';
+h+='<div style="font-size:22px;color:#FFFFFF;font-weight:700;font-family:Fraunces,serif">K.A. Ashan Priyadarshana</div>';
+h+='<div style="font-size:13px;color:#B7C3D2;font-style:italic">Instructor \u00B7 Ashan Priyadarshana Explains</div>';
+h+='</div>';
+h+='</div></div>';
 
 h+='<div class="slide" id="s1">';
 h+='<div class="section-badge">PART 01 \u2014 THE COMPLETE PICTURE</div>';
@@ -137,43 +143,64 @@ h+='</div></div>';
 h+='<div class="slide" id="s2">';
 h+='<div class="section-badge">PART 02 \u2014 ARCHITECTURES</div>';
 h+='<h2 class="slide-title">Encoder-Only: Understanding Text</h2>';
+h+='<p class="slide-subtitle">Models like BERT only <b>read</b> text \u2014 they don\u2019t generate it. They turn a sentence into rich, context-aware vectors used for classification, search, and similarity.</p>';
 h+='<div class="two-col" style="flex:1;min-height:0">';
-h+='<div style="overflow-y:auto">';
-h+='<div class="card" style="margin-bottom:10px"><h3 style="font-size:15px;margin-bottom:10px;color:var(--teal)">Bidirectional Attention</h3><canvas id="enc-attn-canvas" width="180" height="180" style="max-width:180px"></canvas><div style="font-size:12px;color:var(--muted);margin-top:6px">Every token sees every other token (\u2194)</div></div>';
-h+='<div class="card" style="margin-bottom:10px"><div style="font-size:12px;line-height:1.8"><div><span class="pill pill-teal">Attention</span> Bidirectional</div><div><span class="pill pill-blue">Training</span> Masked Language Model</div><div><span class="pill pill-purple">Output</span> Contextual embeddings</div><div><span class="pill pill-red">Limit</span> Cannot generate text</div></div></div>';
-h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px"><span class="pill pill-teal">BERT</span><span class="pill pill-teal">RoBERTa</span><span class="pill pill-teal">DistilBERT</span><span class="pill pill-teal">ELECTRA</span></div>';
+h+='<div style="overflow-y:auto;display:flex;flex-direction:column;gap:10px">';
+h+='<div class="card"><h3 style="font-size:17px;margin-bottom:10px;color:var(--teal);font-weight:700">1. Bidirectional Attention</h3>';
+h+='<p style="font-size:14.5px;color:#D6DEE8;margin-bottom:14px;line-height:1.65">The grid below is an <b>attention matrix</b>. Each <b>row</b> is a token asking \u201Cwho should I look at?\u201D Each <b>column</b> is a token being looked at. A filled cell means \u201Cthis row-token attends to this column-token.\u201D In encoders, <b>every cell is filled</b> \u2014 every token sees every other token (left and right). That is what \u201Cbidirectional\u201D means.</p>';
+h+='<div style="display:flex;justify-content:center"><canvas id="enc-attn-canvas" width="240" height="240" style="max-width:240px"></canvas></div>';
+h+='<div style="font-size:12.5px;color:#B7C3D2;margin-top:10px;text-align:center">Rows = <b>from</b> \u00B7 Columns = <b>to</b> \u00B7 Filled = attention allowed</div></div>';
+h+='<div class="card"><div style="font-size:12px;line-height:1.8"><div><span class="pill pill-teal">Attention</span> Bidirectional</div><div><span class="pill pill-blue">Training</span> Masked Language Model</div><div><span class="pill pill-purple">Output</span> Contextual embeddings</div><div><span class="pill pill-red">Limit</span> Cannot generate text</div></div>';
+h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px"><span class="pill pill-teal">BERT</span><span class="pill pill-teal">RoBERTa</span><span class="pill pill-teal">DistilBERT</span><span class="pill pill-teal">ELECTRA</span></div></div>';
 h+='</div>';
-h+='<div style="display:flex;flex-direction:column;gap:10px">';
-h+='<div class="card"><h3 style="font-size:13px;margin-bottom:6px">Masked Prediction Demo</h3><p style="font-size:11px;color:var(--muted);margin-bottom:10px">Click a word to mask it:</p><div id="mask-sentence" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div><div style="height:180px"><canvas id="mask-chart"></canvas></div></div>';
+h+='<div style="display:flex;flex-direction:column;gap:10px;overflow-y:auto">';
+h+='<div class="card"><h3 style="font-size:17px;margin-bottom:10px;color:var(--teal);font-weight:700">2. Masked Prediction Demo</h3>';
+h+='<p style="font-size:14.5px;color:#D6DEE8;margin-bottom:14px;line-height:1.65">This is exactly how BERT was <b>trained</b>: hide one word, then ask the model to guess it from the surrounding context. Click any word in the sentence to replace it with <span class="mono" style="color:var(--teal)">[MASK]</span>. The chart shows BERT\u2019s <b>top-5 guesses</b> and the probability it assigns to each.</p>';
+h+='<div id="mask-sentence" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>';
+h+='<div style="height:170px"><canvas id="mask-chart"></canvas></div>';
+h+='<div style="font-size:13.5px;color:#D6DEE8;margin-top:12px;line-height:1.7"><b style="color:var(--teal)">How to read it:</b> bars are probabilities (0\u20131). Mask <span class="mono">cat</span> \u2192 BERT proposes other animals (<span class="mono">dog, bird, rat, fox</span>) because the surrounding context (\u201CThe ___ sat on the mat\u201D) fits any small animal. Mask a different word and the candidates change accordingly \u2014 verbs for <span class="mono">sat</span>, prepositions for <span class="mono">on</span>, articles for <span class="mono">The</span>.</div></div>';
 h+='<div class="insight">BERT reads the whole sentence at once, in both directions. It understands context deeply \u2014 but cannot generate new text token-by-token.</div>';
 h+='</div></div></div>';
 
 h+='<div class="slide" id="s3">';
 h+='<div class="section-badge">PART 02</div>';
 h+='<h2 class="slide-title">Decoder-Only: Generating Text</h2>';
+h+='<p class="slide-subtitle">Models like GPT and Claude <b>write</b> text \u2014 one token at a time, left-to-right. Each new token is sampled from a probability distribution that depends only on what came <i>before</i> it.</p>';
 h+='<div class="two-col" style="flex:1;min-height:0">';
 h+='<div style="overflow-y:auto">';
-h+='<div class="card" style="margin-bottom:10px"><h3 style="font-size:15px;margin-bottom:10px;color:var(--blue)">Causal Attention Mask</h3><canvas id="causal-canvas" width="180" height="180" style="max-width:180px"></canvas><div style="font-size:12px;color:var(--muted);margin-top:6px">Token i sees only tokens 0\u2026i</div></div>';
+h+='<div class="card" style="margin-bottom:10px"><h3 style="font-size:17px;margin-bottom:10px;color:var(--blue);font-weight:700">1. Causal Attention Mask</h3>';
+h+='<p style="font-size:14.5px;color:#D6DEE8;margin-bottom:14px;line-height:1.65">Same attention matrix as before, but now <b>half the cells are blocked</b>. Each row (a token) can only attend to <b>itself and the tokens to its left</b> \u2014 never the future. This forces the model to predict each next token using only past context, exactly mirroring how it generates at runtime.</p>';
+h+='<div style="display:flex;justify-content:center"><canvas id="causal-canvas" width="220" height="220" style="max-width:220px"></canvas></div>';
+h+='<div style="font-size:12.5px;color:#B7C3D2;margin-top:10px;text-align:center">Filled = allowed \u00B7 Empty = masked (future) \u00B7 Triangular shape = \u201Cno peeking ahead\u201D</div></div>';
 h+='<div class="card" style="margin-bottom:10px"><div style="font-size:12px;line-height:1.8"><div><span class="pill pill-blue">Attention</span> Causal (left-to-right)</div><div><span class="pill pill-blue">Training</span> Next Token Prediction</div><div><span class="pill pill-blue">Output</span> Token probabilities</div><div><span class="pill pill-green">Strength</span> Autoregressive generation</div></div></div>';
 h+='<div style="display:flex;flex-wrap:wrap;gap:4px"><span class="pill pill-blue">GPT-4</span><span class="pill pill-blue">Claude</span><span class="pill pill-blue">Gemini</span><span class="pill pill-blue">LLaMA</span><span class="pill pill-blue">Mistral</span></div>';
 h+='</div>';
 h+='<div style="display:flex;flex-direction:column;gap:10px">';
-h+='<div class="card" style="flex:1"><h3 style="font-size:13px;margin-bottom:8px">Autoregressive Generation</h3>';
-h+='<div style="display:flex;gap:6px;margin-bottom:10px"><button class="btn btn-teal" onclick="startGen()">\u25B6 Generate</button><button class="btn btn-outline" onclick="stopGen()">\u25A0 Stop</button><select id="gen-speed" style="background:var(--navy2);color:var(--white);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:11px"><option value="300">Slow</option><option value="150" selected>Medium</option><option value="50">Fast</option></select></div>';
-h+='<div id="gen-output" class="code-block" style="min-height:50px;font-size:13px">The old lighthouse keeper </div>';
-h+='<div id="gen-counter" style="font-size:11px;color:var(--muted);margin-top:6px">Tokens: 0</div></div>';
+h+='<div class="card" style="flex:1;display:flex;flex-direction:column"><h3 style="font-size:17px;margin-bottom:10px;color:var(--blue);font-weight:700">2. Autoregressive Generation</h3>';
+h+='<p style="font-size:14.5px;color:#D6DEE8;margin-bottom:12px;line-height:1.65">Click <b>Generate</b> to watch the model write token-by-token. After each token appears, the entire prompt-so-far is fed back in to predict the next one. This is the <b>autoregressive loop</b>: predict \u2192 append \u2192 repeat.</p>';
+h+='<div style="display:flex;gap:6px;margin-bottom:10px;align-items:center"><button class="btn btn-teal" onclick="startGen()">\u25B6 Generate</button><button class="btn btn-outline" onclick="stopGen()">\u25A0 Stop</button><select id="gen-speed" style="background:var(--navy2);color:var(--white);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px"><option value="300">Slow</option><option value="150" selected>Medium</option><option value="50">Fast</option></select></div>';
+h+='<div id="gen-output" class="code-block" style="min-height:80px;font-size:13.5px;line-height:1.7">The old lighthouse keeper </div>';
+h+='<div style="font-size:12.5px;color:#B7C3D2;margin-top:10px;line-height:1.6"><b style="color:var(--teal)">How to read it:</b> the green seed text is the prompt. Each new word that appears is one forward pass through all 96 layers of the model. The model never sees the future \u2014 it only ever extends the past. That is why the same prompt can produce different continuations.</div>';
+h+='<div id="gen-counter" style="font-size:12px;color:#94A6BA;margin-top:8px">Tokens: 0</div></div>';
 h+='<div class="insight">GPT commits left-to-right, one token at a time. Every decoding strategy in Part 03 is about making this commitment wisely.</div>';
 h+='</div></div></div>';
 
 h+='<div class="slide" id="s4">';
 h+='<div class="section-badge">PART 02</div>';
 h+='<h2 class="slide-title">Encoder-Decoder: Understand AND Generate</h2>';
-h+='<div style="flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">';
-h+='<div style="display:flex;align-items:center;gap:8px"><button class="btn btn-teal" onclick="transStep(-1)">\u2190</button><span id="trans-counter" class="mono" style="color:var(--purple)">1 / 6</span><button class="btn btn-teal" onclick="transStep(1)">\u2192</button></div>';
+h+='<p class="slide-subtitle">Models like T5 and BART use <b>two stacks</b>: an encoder that fully reads the input, and a decoder that generates the output one token at a time \u2014 while peeking back at the encoder via <b>cross-attention</b>. Best for tasks where input and output have <i>different shapes</i> (translation, summarization, speech\u2192text).</p>';
+h+='<div style="flex:1;display:flex;flex-direction:column;gap:12px;min-height:0">';
+h+='<div style="display:flex;align-items:center;gap:10px"><button class="btn btn-teal" onclick="transStep(-1)">\u2190</button><span id="trans-counter" class="mono" style="color:var(--purple);font-size:14px">1 / 6</span><button class="btn btn-teal" onclick="transStep(1)">\u2192</button><span style="font-size:13px;color:#B7C3D2;margin-left:8px">Step through to see how the decoder builds \u201CLe chat \u00E9tait assis sur le ...\u201D one token at a time.</span></div>';
 h+='<div class="two-col" style="flex:1">';
-h+='<div class="card" style="display:flex;flex-direction:column"><h3 style="font-size:14px;margin-bottom:10px;color:var(--purple)">English \u2192 French Translation</h3><div id="trans-viz" style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:8px;font-size:13px"></div></div>';
-h+='<div style="display:flex;flex-direction:column;gap:10px"><div class="card" style="flex:1"><h3 style="font-size:13px;margin-bottom:8px">Cross-Attention Heatmap</h3><canvas id="cross-attn-canvas" height="180"></canvas></div>';
-h+='<div class="card"><div style="font-size:11px;line-height:1.7"><span class="pill pill-purple">Encoder</span> Bidirectional over input<br><span class="pill pill-purple">Decoder</span> Causal + cross-attention<br><span class="pill pill-purple">Models</span> T5 \u00B7 BART \u00B7 Whisper \u00B7 FLAN-T5</div></div></div>';
+h+='<div class="card" style="display:flex;flex-direction:column"><h3 style="font-size:17px;margin-bottom:10px;color:var(--purple);font-weight:700">1. English \u2192 French Translation</h3>';
+h+='<p style="font-size:14.5px;color:#D6DEE8;margin-bottom:14px;line-height:1.65">The <span style="color:var(--teal)">encoder</span> reads the entire English sentence at once and produces a context-rich representation. The <span style="color:var(--blue)">decoder</span> then emits French tokens one-by-one, using both <i>what it has written so far</i> (causal self-attention) and <i>the encoder\u2019s view of the source</i> (cross-attention).</p>';
+h+='<div id="trans-viz" style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:10px;font-size:14px"></div></div>';
+h+='<div style="display:flex;flex-direction:column;gap:12px">';
+h+='<div class="card" style="flex:1;display:flex;flex-direction:column"><h3 style="font-size:17px;margin-bottom:10px;color:var(--purple);font-weight:700">2. Cross-Attention Heatmap</h3>';
+h+='<p style="font-size:14.5px;color:#D6DEE8;margin-bottom:12px;line-height:1.65">Each row is a French token being generated; each column is an English source token. A bright cell means \u201Cwhen producing this French word, the decoder paid most attention to that English word.\u201D The diagonal-ish pattern reveals the <b>learned alignment</b>.</p>';
+h+='<div style="flex:1;min-height:160px"><canvas id="cross-attn-canvas"></canvas></div>';
+h+='<div style="font-size:12.5px;color:#B7C3D2;margin-top:8px;text-align:center">Rows = French output \u00B7 Columns = English input \u00B7 Brighter = stronger alignment</div></div>';
+h+='<div class="card"><div style="font-size:13.5px;line-height:1.9"><span class="pill pill-purple">Encoder</span> Bidirectional over input<br><span class="pill pill-purple">Decoder</span> Causal + cross-attention<br><span class="pill pill-purple">Models</span> T5 \u00B7 BART \u00B7 Whisper \u00B7 FLAN-T5</div></div></div>';
 h+='</div>';
 h+='<div class="insight">When you need to deeply understand one thing and generate something structurally different \u2014 this architecture shines.</div>';
 h+='</div></div>';
@@ -181,84 +208,157 @@ h+='</div></div>';
 h+='<div class="slide" id="s5">';
 h+='<div class="section-badge">PART 02</div>';
 h+='<h2 class="slide-title">Architecture Comparison</h2>';
-h+='<div style="flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto">';
-h+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="border-bottom:2px solid var(--border)"><th style="padding:8px;text-align:left;color:var(--muted)"></th><th style="padding:8px;color:var(--teal)">Encoder-Only</th><th style="padding:8px;color:var(--blue)">Decoder-Only</th><th style="padding:8px;color:var(--purple)">Enc-Dec</th></tr></thead>';
-h+='<tbody><tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--muted)">Attention</td><td style="padding:8px">Bidirectional \u2194</td><td style="padding:8px">Causal \u2192</td><td style="padding:8px">Bi+Causal+Cross</td></tr>';
-h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--muted)">Generate?</td><td style="padding:8px;color:var(--red)">\u2717 No</td><td style="padding:8px;color:var(--green)">\u2713 Yes</td><td style="padding:8px;color:var(--green)">\u2713 Yes</td></tr>';
-h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--muted)">Training</td><td style="padding:8px">MLM</td><td style="padding:8px">Next Token</td><td style="padding:8px">Seq2Seq</td></tr>';
-h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px;color:var(--muted)">Best For</td><td style="padding:8px">Understanding</td><td style="padding:8px">Generation</td><td style="padding:8px">Transformation</td></tr>';
-h+='<tr><td style="padding:8px;color:var(--muted)">Examples</td><td style="padding:8px">BERT, RoBERTa</td><td style="padding:8px">GPT-4, Claude</td><td style="padding:8px">T5, BART</td></tr></tbody></table></div>';
-h+='<h3 style="font-size:15px">Pick a Scenario:</h3>';
-h+='<div class="grid-2x3" id="scenario-grid"></div>';
-h+='<div id="scenario-explain" class="card" style="display:none;border-color:var(--teal)"></div>';
+h+='<p class="slide-subtitle">Three architectures, three jobs. Use the table to compare them at a glance, then click a scenario below to see which fits best.</p>';
+h+='<div style="flex:1;display:flex;flex-direction:column;gap:18px;overflow-y:auto">';
+h+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:15px;table-layout:fixed"><colgroup><col style="width:18%"><col style="width:27%"><col style="width:27%"><col style="width:28%"></colgroup>';
+h+='<thead><tr style="border-bottom:2px solid var(--border)"><th style="padding:14px 16px;font-size:15px;text-align:left;color:#94A6BA;font-weight:600"></th><th style="padding:14px 16px;font-size:15px;text-align:left;color:var(--teal);font-weight:700">Encoder-Only</th><th style="padding:14px 16px;font-size:15px;text-align:left;color:var(--blue);font-weight:700">Decoder-Only</th><th style="padding:14px 16px;font-size:15px;text-align:left;color:var(--purple);font-weight:700">Enc-Dec</th></tr></thead>';
+h+='<tbody>';
+h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:14px 16px;font-size:14px;color:#94A6BA">Attention</td><td style="padding:14px 16px;font-size:15px">Bidirectional \u2194</td><td style="padding:14px 16px;font-size:15px">Causal \u2192</td><td style="padding:14px 16px;font-size:15px">Bi + Causal + Cross</td></tr>';
+h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:14px 16px;font-size:14px;color:#94A6BA">Generate?</td><td style="padding:14px 16px;font-size:15px;color:var(--red)">\u2717 No</td><td style="padding:14px 16px;font-size:15px;color:var(--green)">\u2713 Yes</td><td style="padding:14px 16px;font-size:15px;color:var(--green)">\u2713 Yes</td></tr>';
+h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:14px 16px;font-size:14px;color:#94A6BA">Training</td><td style="padding:14px 16px;font-size:15px">Masked LM</td><td style="padding:14px 16px;font-size:15px">Next Token</td><td style="padding:14px 16px;font-size:15px">Seq2Seq</td></tr>';
+h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:14px 16px;font-size:14px;color:#94A6BA">Best For</td><td style="padding:14px 16px;font-size:15px">Understanding</td><td style="padding:14px 16px;font-size:15px">Generation</td><td style="padding:14px 16px;font-size:15px">Transformation</td></tr>';
+h+='<tr><td style="padding:14px 16px;font-size:14px;color:#94A6BA">Examples</td><td style="padding:14px 16px;font-size:15px">BERT, RoBERTa</td><td style="padding:14px 16px;font-size:15px">GPT-4, Claude</td><td style="padding:14px 16px;font-size:15px">T5, BART</td></tr>';
+h+='</tbody></table></div>';
+h+='<div><h3 style="font-size:18px;font-weight:700;margin-bottom:6px">Pick a Scenario</h3><p style="font-size:14px;color:#B7C3D2;margin-bottom:12px;line-height:1.6">Click any task below \u2014 we\u2019ll tell you which architecture is the best fit and why.</p>';
+h+='<div class="grid-2x3" id="scenario-grid"></div></div>';
+h+='<div id="scenario-explain" class="card" style="display:none;border-color:var(--teal);font-size:14.5px;line-height:1.65;padding:16px"></div>';
 h+='<div class="insight">The modern trend: decoder-only dominates. GPT-4, Claude, Gemini, LLaMA \u2014 all decoder-only. But encoder-only still rules embedding tasks.</div>';
 h+='</div></div>';
 
 h+='<div class="slide" id="s6">';
 h+='<div class="section-badge">PART 03 \u2014 DECODING STRATEGIES</div>';
 h+='<h2 class="slide-title">The Output Distribution</h2>';
-h+='<p class="slide-subtitle">Before HOW to choose, understand WHAT we choose from.</p>';
-h+='<div style="flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">';
-h+='<div style="display:flex;gap:6px;flex-wrap:wrap" id="dist-ctx-btns"></div>';
-h+='<div class="card" style="flex:1;min-height:180px"><canvas id="dist-chart"></canvas></div>';
-h+='<div style="display:flex;gap:10px;flex-wrap:wrap"><div class="card" style="flex:1;min-width:200px"><div style="font-size:11px;color:var(--muted)">Current context</div><div id="dist-context" class="mono" style="font-size:13px;margin-top:4px"></div></div><div class="card" style="flex:1;min-width:200px"><div style="font-size:11px;color:var(--muted)">Note</div><div style="font-size:12px;margin-top:4px">GPT-4: ~100,256 tokens. Chart shows top 15.</div></div></div>';
+h+='<p class="slide-subtitle">Before HOW to choose, understand WHAT we choose from. Pick a context below to see what the model thinks the <i>next token</i> could be.</p>';
+h+='<div style="background:rgba(76,155,232,0.08);border:1px solid rgba(76,155,232,0.3);border-radius:10px;padding:12px 16px;font-size:14px;color:#D6DEE8;line-height:1.6;margin-bottom:6px"><b style="color:var(--blue)">Scope:</b> Everything in Part 03 (decoding strategies) applies <b>only to generative architectures</b> \u2014 <span style="color:var(--blue)">decoder-only</span> (GPT, Claude) and <span style="color:var(--purple)">encoder-decoder</span> (T5, BART). Encoder-only models like BERT do not emit a next-token distribution at runtime \u2014 their output is contextual embeddings, so they have nothing to \u201Cdecode.\u201D</div>';
+h+='<div style="flex:1;display:flex;flex-direction:column;gap:12px;min-height:0">';
+h+='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span style="font-size:14px;color:#B7C3D2;margin-right:4px">Try a context:</span><div style="display:flex;gap:8px;flex-wrap:wrap" id="dist-ctx-btns"></div></div>';
+h+='<div class="card" style="flex:1;min-height:200px;padding:14px"><canvas id="dist-chart"></canvas></div>';
+h+='<div style="display:flex;gap:12px;flex-wrap:wrap">';
+h+='<div class="card" style="flex:1;min-width:240px;padding:14px 16px"><div style="font-size:13px;color:#94A6BA;letter-spacing:0.5px;text-transform:uppercase;font-weight:600">Current context</div><div id="dist-context" class="mono" style="font-size:16px;margin-top:6px;color:#F0F4F8"></div></div>';
+h+='<div class="card" style="flex:1;min-width:240px;padding:14px 16px"><div style="font-size:13px;color:#94A6BA;letter-spacing:0.5px;text-transform:uppercase;font-weight:600">Note</div><div style="font-size:14px;margin-top:6px;line-height:1.55;color:#D6DEE8">GPT-4 has ~100,256 tokens in its vocabulary. The chart shows only the <b>top 15</b> by probability \u2014 the long tail of tens of thousands of unlikely tokens is not drawn.</div></div>';
+h+='</div>';
 h+='<div class="insight">The model NEVER outputs a single word. It outputs a probability distribution over 50k\u2013100k tokens. The decoding strategy decides what to do. That is the \u201CFinal Choice.\u201D</div>';
+h+='</div></div>';
+
+h+='<div class="slide" id="s6b">';
+h+='<div class="section-badge">PART 03 \u2014 DECODING STRATEGIES</div>';
+h+='<h2 class="slide-title">From Vectors to Probabilities: The Softmax Layer</h2>';
+h+='<p class="slide-subtitle">Before we can pick a token, we need a probability for <i>every</i> token. This slide shows the very last two layers of every generative LLM \u2014 where vectors become a probability distribution over the vocabulary.</p>';
+h+='<div style="flex:1;display:flex;flex-direction:column;gap:14px;overflow-y:auto">';
+h+='<div style="display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;gap:8px;align-items:stretch">';
+h+='<div class="card" style="padding:16px;border-color:rgba(76,155,232,0.4)"><div style="font-size:12px;color:#94A6BA;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:6px">Step 1</div><h3 style="font-size:17px;color:var(--blue);margin-bottom:8px;font-weight:700">Final Hidden Vector</h3><div class="mono" style="font-size:15px;color:#F0F4F8;margin-bottom:10px">h \u2208 \u211D<sup>d</sup></div><div style="font-size:14px;color:#D6DEE8;line-height:1.6">After all N transformer layers, each token position has a vector of size <b>d</b> (e.g. d = 4,096 for LLaMA-2-7B; 12,288 for GPT-3 175B). It encodes <i>everything</i> the model knows about that position so far.</div></div>';
+h+='<div style="display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--teal);font-weight:bold">\u2192</div>';
+h+='<div class="card" style="padding:16px;border-color:rgba(245,158,11,0.4)"><div style="font-size:12px;color:#94A6BA;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:6px">Step 2</div><h3 style="font-size:17px;color:var(--amber);margin-bottom:8px;font-weight:700">Linear \u2192 Logits</h3><div class="mono" style="font-size:15px;color:#F0F4F8;margin-bottom:10px">logits = h \u00B7 W \u2208 \u211D<sup>|V|</sup></div><div style="font-size:14px;color:#D6DEE8;line-height:1.6">A single linear layer multiplies <b>h</b> by a matrix <b>W</b> of shape (<b>d \u00D7 |V|</b>), where |V| \u2248 50k\u2013100k tokens. Output: one raw score (a \u201C<b>logit</b>\u201D) per vocabulary token. Logits can be negative or positive \u2014 they are <b>not</b> probabilities yet.</div></div>';
+h+='<div style="display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--teal);font-weight:bold">\u2192</div>';
+h+='<div class="card" style="padding:16px;border-color:rgba(0,212,170,0.4)"><div style="font-size:12px;color:#94A6BA;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:6px">Step 3</div><h3 style="font-size:17px;color:var(--teal);margin-bottom:8px;font-weight:700">Softmax \u2192 Probabilities</h3><div class="mono" style="font-size:15px;color:#F0F4F8;margin-bottom:10px">p<sub>i</sub> = e<sup>logit<sub>i</sub></sup> / \u03A3<sub>j</sub> e<sup>logit<sub>j</sub></sup></div><div style="font-size:14px;color:#D6DEE8;line-height:1.6">Softmax <b>exponentiates</b> every logit (so all values become positive) then <b>normalizes</b> them to sum to <b>1</b>. The result is a valid probability distribution over the entire vocabulary.</div></div>';
+h+='</div>';
+h+='<div class="card" style="padding:16px"><h3 style="font-size:17px;font-weight:700;margin-bottom:8px">Concrete Example: a tiny 5-token vocabulary</h3><p style="font-size:14px;color:#D6DEE8;margin-bottom:12px;line-height:1.6">Imagine a model whose vocabulary has only 5 tokens. After Step 2, it outputs these <b>logits</b>. Watch how softmax turns them into probabilities:</p>';
+h+='<table style="width:100%;border-collapse:collapse;font-size:14.5px"><thead><tr style="border-bottom:2px solid var(--border);color:#94A6BA;font-size:12px;text-transform:uppercase;letter-spacing:0.5px"><th style="padding:10px 12px;text-align:left;font-weight:600">Token</th><th style="padding:10px 12px;text-align:right;font-weight:600">Logit</th><th style="padding:10px 12px;text-align:right;font-weight:600">e<sup>logit</sup></th><th style="padding:10px 12px;text-align:right;font-weight:600">Probability</th><th style="padding:10px 12px;text-align:left;font-weight:600">Visual</th></tr></thead><tbody class="mono">';
+h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px;color:var(--teal);font-weight:700">cat</td><td style="padding:10px 12px;text-align:right">3.0</td><td style="padding:10px 12px;text-align:right">20.09</td><td style="padding:10px 12px;text-align:right;color:var(--teal);font-weight:700">0.659</td><td style="padding:10px 12px"><div style="background:var(--teal);height:14px;width:65.9%;border-radius:3px"></div></td></tr>';
+h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px">dog</td><td style="padding:10px 12px;text-align:right">2.0</td><td style="padding:10px 12px;text-align:right">7.39</td><td style="padding:10px 12px;text-align:right">0.242</td><td style="padding:10px 12px"><div style="background:rgba(76,155,232,0.7);height:14px;width:24.2%;border-radius:3px"></div></td></tr>';
+h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px">bird</td><td style="padding:10px 12px;text-align:right">1.0</td><td style="padding:10px 12px;text-align:right">2.72</td><td style="padding:10px 12px;text-align:right">0.089</td><td style="padding:10px 12px"><div style="background:rgba(76,155,232,0.5);height:14px;width:8.9%;border-radius:3px"></div></td></tr>';
+h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px">rock</td><td style="padding:10px 12px;text-align:right">-1.0</td><td style="padding:10px 12px;text-align:right">0.37</td><td style="padding:10px 12px;text-align:right">0.012</td><td style="padding:10px 12px"><div style="background:rgba(100,116,139,0.5);height:14px;width:1.2%;border-radius:3px;min-width:2px"></div></td></tr>';
+h+='<tr><td style="padding:10px 12px">seven</td><td style="padding:10px 12px;text-align:right">-3.0</td><td style="padding:10px 12px;text-align:right">0.05</td><td style="padding:10px 12px;text-align:right">0.002</td><td style="padding:10px 12px"><div style="background:rgba(100,116,139,0.5);height:14px;width:0.2%;border-radius:3px;min-width:2px"></div></td></tr>';
+h+='</tbody></table>';
+h+='<div style="font-size:13px;color:#94A6BA;margin-top:10px">Sum of probabilities = 1.000 \u2713 \u00B7 Larger logit \u2192 larger probability, <b>exponentially</b>. A logit gap of 1.0 means \u22482.7\u00D7 more probability.</div></div>';
+h+='<div class="insight">The next slide introduces <b>temperature</b>, which is a single tweak inside softmax: divide each logit by T before exponentiating. T &lt; 1 sharpens the distribution (more confident); T &gt; 1 flattens it (more diverse).</div>';
 h+='</div></div>';
 
 h+='<div class="slide" id="s7">';
 h+='<div class="section-badge">PART 03</div>';
 h+='<h2 class="slide-title">Temperature: Controlling Creativity</h2>';
-h+='<div style="flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto">';
-h+='<div class="card"><div style="text-align:center;margin-bottom:8px;font-size:14px" class="mono">p<sub>i</sub> = softmax(logit<sub>i</sub> / T)</div>';
-h+='<div class="sl"><span style="font-size:12px;color:var(--red)">0.01</span><input type="range" id="temp-slider" min="1" max="250" value="90" oninput="updateTemp()"><span style="font-size:12px;color:var(--amber)">2.5</span><span class="sv" id="temp-val">0.90</span></div>';
-h+='<div style="display:flex;gap:12px;margin-top:6px;font-size:11px"><span style="color:var(--red)">\u25A0 0.01-0.3 Deterministic</span><span style="color:var(--teal)">\u25A0 0.7-1.2 Balanced</span><span style="color:var(--amber)">\u25A0 1.5+ Creative</span></div></div>';
-h+='<div style="flex:1;min-height:160px"><canvas id="temp-chart"></canvas></div>';
-h+='<div class="grid-2x3"><div class="card"><div class="mono" style="color:var(--red);font-size:13px">T = 0.1</div><div style="font-size:12px;margin-top:4px">\u201CThe weather today is sunny and pleasant.\u201D</div><div style="font-size:10px;color:var(--muted)">Safe, predictable</div></div>';
-h+='<div class="card"><div class="mono" style="color:var(--teal);font-size:13px">T = 0.9</div><div style="font-size:12px;margin-top:4px">\u201CThe weather today is quite blustery with clouds.\u201D</div><div style="font-size:10px;color:var(--muted)">Natural, varied</div></div>';
-h+='<div class="card"><div class="mono" style="color:var(--amber);font-size:13px">T = 1.8</div><div style="font-size:12px;margin-top:4px">\u201CThe weather today is a trembling negotiation between light and atmosphere.\u201D</div><div style="font-size:10px;color:var(--muted)">Creative / weird</div></div></div>';
-h+='<div class="card" style="font-size:11px"><b>Settings:</b> Factual: 0.1\u20130.3 \u00B7 Code: 0.2\u20130.4 \u00B7 Chat: 0.7\u20131.0 \u00B7 Creative: 1.0\u20131.3</div>';
+h+='<p class="slide-subtitle">Temperature is a single number <b>T</b> that rescales the logits <i>before</i> softmax. Drag the slider to see how the next-token distribution for <span class="mono" style="color:var(--teal)">\u201CThe weather today is ___\u201D</span> changes shape.</p>';
+h+='<div style="flex:1;display:flex;flex-direction:column;gap:14px;overflow-y:auto">';
+h+='<div class="card" style="padding:16px"><div style="text-align:center;margin-bottom:14px;font-size:18px" class="mono">p<sub>i</sub> = softmax(logit<sub>i</sub> / T) = e<sup>logit<sub>i</sub>/T</sup> / \u03A3<sub>j</sub> e<sup>logit<sub>j</sub>/T</sup></div>';
+h+='<div class="sl"><span style="font-size:14px;color:var(--red);font-weight:600">0.01</span><input type="range" id="temp-slider" min="1" max="250" value="90" oninput="updateTemp()"><span style="font-size:14px;color:var(--amber);font-weight:600">2.5</span><span class="sv" id="temp-val" style="font-size:20px;min-width:60px">0.90</span></div>';
+h+='<div style="display:flex;gap:18px;margin-top:10px;font-size:13.5px;flex-wrap:wrap"><span style="color:var(--red)">\u25A0 <b>0.01\u20130.3</b> Deterministic \u2014 sharpens, top token wins almost always</span><span style="color:var(--teal)">\u25A0 <b>0.7\u20131.2</b> Balanced \u2014 natural variety</span><span style="color:var(--amber)">\u25A0 <b>1.5+</b> Creative \u2014 flattens, rare tokens get a chance</span></div></div>';
+h+='<div class="card" style="flex:1;min-height:200px;padding:14px"><canvas id="temp-chart"></canvas><div style="font-size:12.5px;color:#B7C3D2;margin-top:6px;text-align:center">Top 10 candidate next tokens after \u201CThe weather today is ___\u201D \u00B7 bars rescale as you move T.</div></div>';
+h+='<div class="grid-2x3">';
+h+='<div class="card" style="padding:14px 16px"><div class="mono" style="color:var(--red);font-size:16px;font-weight:700">T = 0.1</div><div style="font-size:14.5px;margin-top:8px;line-height:1.5;color:#F0F4F8">\u201CThe weather today is sunny and pleasant.\u201D</div><div style="font-size:13px;color:#94A6BA;margin-top:6px">Safe, predictable</div></div>';
+h+='<div class="card" style="padding:14px 16px"><div class="mono" style="color:var(--teal);font-size:16px;font-weight:700">T = 0.9</div><div style="font-size:14.5px;margin-top:8px;line-height:1.5;color:#F0F4F8">\u201CThe weather today is quite blustery with clouds.\u201D</div><div style="font-size:13px;color:#94A6BA;margin-top:6px">Natural, varied</div></div>';
+h+='<div class="card" style="padding:14px 16px"><div class="mono" style="color:var(--amber);font-size:16px;font-weight:700">T = 1.8</div><div style="font-size:14.5px;margin-top:8px;line-height:1.5;color:#F0F4F8">\u201CThe weather today is a trembling negotiation between light and atmosphere.\u201D</div><div style="font-size:13px;color:#94A6BA;margin-top:6px">Creative / weird</div></div>';
+h+='</div>';
+h+='<div class="card" style="padding:14px 16px;font-size:14px;line-height:1.7"><b style="color:var(--teal)">Recommended settings:</b> &nbsp; Factual Q&amp;A: <span class="mono">0.1\u20130.3</span> &nbsp;\u00B7&nbsp; Code generation: <span class="mono">0.2\u20130.4</span> &nbsp;\u00B7&nbsp; Chat: <span class="mono">0.7\u20131.0</span> &nbsp;\u00B7&nbsp; Creative writing: <span class="mono">1.0\u20131.3</span></div>';
 h+='</div></div>';
 
-h+='<div class="slide" id="s8">';
-h+='<div class="section-badge">PART 03</div>';
-h+='<h2 class="slide-title">Top-K and Top-P (Nucleus) Sampling</h2>';
-h+='<div class="two-col" style="flex:1;min-height:0;overflow-y:auto">';
-h+='<div class="card" style="display:flex;flex-direction:column"><h3 style="font-size:14px;margin-bottom:8px;color:var(--blue)">Top-K Sampling</h3>';
-h+='<div class="sl" style="margin-bottom:8px"><span style="font-size:11px">K=</span><input type="range" id="topk-slider" min="1" max="15" value="5" oninput="updateTopK()"><span class="sv" id="topk-val">5</span></div>';
-h+='<div style="flex:1;min-height:140px"><canvas id="topk-chart"></canvas></div>';
-h+='<div style="font-size:11px;color:var(--muted);margin-top:4px" id="topk-info"></div>';
-h+='<div class="card" style="margin-top:6px;border-color:var(--red);font-size:11px"><b>Problem:</b> Fixed K doesn\u2019t adapt to distribution shape.</div></div>';
-h+='<div class="card" style="display:flex;flex-direction:column"><h3 style="font-size:14px;margin-bottom:8px;color:var(--purple)">Top-P (Nucleus)</h3>';
-h+='<div class="sl" style="margin-bottom:8px"><span style="font-size:11px">P=</span><input type="range" id="topp-slider" min="50" max="100" value="90" oninput="updateTopP()"><span class="sv" id="topp-val">0.90</span></div>';
-h+='<div style="flex:1;min-height:140px"><canvas id="topp-chart"></canvas></div>';
-h+='<div style="font-size:11px;color:var(--muted);margin-top:4px" id="topp-info"></div>';
-h+='<div class="card" style="margin-top:6px;border-color:var(--teal);font-size:11px"><b>Solution:</b> Top-P adapts. Confident \u2192 small nucleus. Uncertain \u2192 wider.</div></div>';
+h+='<div class="slide" id="s8_topk">';
+h+='<div class="section-badge">PART 03 \u2014 DECODING STRATEGIES</div>';
+h+='<h2 class="slide-title">Top-K Sampling: Limit the Choices</h2>';
+h+='<p class="slide-subtitle">After softmax, the model has probabilities over ~50k\u2013100k tokens. Even nonsense tokens have a tiny but non-zero chance. <b>Top-K</b> throws away the long tail before sampling \u2014 so junk tokens never get to roll the dice.</p>';
+h+='<div class="two-col" style="flex:1;min-height:0;overflow-y:auto;gap:16px">';
+h+='<div style="display:flex;flex-direction:column;gap:12px">';
+h+='<div class="card" style="padding:16px"><h3 style="font-size:17px;color:var(--blue);font-weight:700;margin-bottom:8px">The problem with raw sampling</h3><p style="font-size:14.5px;color:#D6DEE8;line-height:1.6">Pure sampling rolls a weighted dice over <b>every</b> vocabulary token. Most are nonsense for the current context but still carry tiny probabilities. Once in a while you roll badly and your sentence falls apart with a junk word.</p></div>';
+h+='<div class="card" style="padding:16px"><h3 style="font-size:17px;color:var(--blue);font-weight:700;margin-bottom:8px">How Top-K works</h3><ol style="font-size:14.5px;color:#D6DEE8;line-height:1.75;padding-left:24px;margin:0"><li>Sort all tokens by probability (descending).</li><li>Keep only the top <b>K</b> (e.g. K = 5).</li><li>Throw the rest away (set probability to 0).</li><li>Renormalize so the kept K sum to 1.</li><li>Sample from <i>those K only</i>.</li></ol></div>';
+h+='<div class="card" style="padding:16px;border-color:rgba(0,212,170,0.35)"><h3 style="font-size:15px;color:var(--teal);font-weight:700;margin-bottom:8px">Real-world analogy</h3><p style="font-size:14px;color:#D6DEE8;line-height:1.6">Like a multiple-choice test where you cross out the obviously wrong answers first, then flip a weighted coin among the rest. The dice can never land on something absurd.</p><p style="font-size:13.5px;color:#94A6BA;margin-top:10px;line-height:1.6"><b>K = 1</b> \u2192 greedy decoding (always pick the top) &nbsp;\u00B7&nbsp; <b>K \u2192 \u221E</b> \u2192 pure sampling &nbsp;\u00B7&nbsp; <b>K = 40\u201350</b> typical default.</p></div>';
 h+='</div>';
-h+='<div class="insight">In practice: combine Temperature + Top-P. T reshapes, P truncates. Common: T=0.9, P=0.95.</div>';
-h+='</div>';
+h+='<div style="display:flex;flex-direction:column;gap:12px">';
+h+='<div class="card" style="padding:16px;display:flex;flex-direction:column"><h3 style="font-size:17px;color:var(--blue);font-weight:700;margin-bottom:10px">Try it: drag K to see the cut-off</h3><div class="sl"><span style="font-size:15px;color:#D6DEE8;font-weight:600">K =</span><input type="range" id="topk-slider" min="1" max="15" value="5" oninput="updateTopK()"><span class="sv" id="topk-val" style="font-size:22px;min-width:50px">5</span></div>';
+h+='<div style="flex:1;min-height:220px;margin-top:14px"><canvas id="topk-chart"></canvas></div>';
+h+='<div id="topk-info" style="font-size:14.5px;color:#F0F4F8;margin-top:12px;line-height:1.55;padding:10px 12px;background:rgba(76,155,232,0.08);border-left:3px solid var(--blue);border-radius:4px"></div>';
+h+='<div style="font-size:12.5px;color:#B7C3D2;margin-top:8px"><span style="color:var(--blue)">\u25A0</span> Inside top-K (kept) &nbsp;\u00B7&nbsp; <span style="color:#64748B">\u25A0</span> Discarded</div></div>';
+h+='<div class="card" style="padding:14px 16px;border-color:rgba(239,68,68,0.45)"><h3 style="font-size:16px;color:var(--red);font-weight:700;margin-bottom:8px">The catch: K is fixed</h3><p style="font-size:14px;color:#D6DEE8;line-height:1.6">K is the same regardless of how confident the model is \u2014 and the model\u2019s confidence varies wildly:</p><div style="font-size:13.5px;color:#D6DEE8;line-height:1.65;margin-top:10px"><b style="color:#94A6BA">Confident case:</b> &nbsp;\u201CThe capital of France is ___\u201D \u2014 \u201CParis\u201D is 95% probable. K=10 still keeps 9 weird alternatives that should not be there.</div><div style="font-size:13.5px;color:#D6DEE8;line-height:1.65;margin-top:8px"><b style="color:#94A6BA">Uncertain case:</b> &nbsp;\u201CShe felt ___\u201D \u2014 top 50 tokens are all reasonable (each 1\u20133%). K=10 chops off 40 perfectly good words.</div><div style="font-size:13.5px;color:var(--teal);margin-top:12px;line-height:1.6"><b>\u2192 We need something that adapts. Enter Top-P, on the next slide.</b></div></div>';
+h+='</div></div></div>';
 
-h+='<div class="slide" id="s9">';
-h+='<div class="section-badge">PART 03</div>';
-h+='<h2 class="slide-title">Beam Search &amp; Greedy Decoding</h2>';
-h+='<div style="flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">';
-h+='<div class="two-col" style="flex:1">';
-h+='<div class="card" style="display:flex;flex-direction:column"><h3 style="font-size:14px;margin-bottom:6px;color:var(--amber)">Greedy Decoding</h3><canvas id="greedy-canvas" style="flex:1;min-height:140px"></canvas><div style="font-size:11px;color:var(--muted);margin-top:4px">Fast. Deterministic. Often suboptimal.</div></div>';
-h+='<div class="card" style="display:flex;flex-direction:column"><h3 style="font-size:14px;margin-bottom:6px;color:var(--teal)">Beam Search</h3>';
-h+='<div class="sl" style="margin-bottom:6px"><span style="font-size:11px">Beams:</span><input type="range" id="beam-slider" min="1" max="5" value="3" oninput="updateBeam()"><span class="sv" id="beam-val">3</span></div>';
-h+='<canvas id="beam-canvas" style="flex:1;min-height:140px"></canvas><div style="font-size:11px;color:var(--muted);margin-top:4px">Slower. Better sequences.</div></div></div>';
-h+='<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="border-bottom:1px solid var(--border)"><th style="padding:6px;text-align:left;color:var(--muted)">Strategy</th><th style="padding:6px">Speed</th><th style="padding:6px">Quality</th><th style="padding:6px">Use Case</th></tr></thead>';
-h+='<tbody><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px">Greedy</td><td style="padding:6px">Fastest</td><td style="padding:6px">Medium</td><td style="padding:6px">Real-time</td></tr>';
-h+='<tr style="border-bottom:1px solid var(--border)"><td style="padding:6px">Beam</td><td style="padding:6px">Slow</td><td style="padding:6px">High</td><td style="padding:6px">Translation</td></tr>';
-h+='<tr><td style="padding:6px">Sampling</td><td style="padding:6px">Fast</td><td style="padding:6px">Good</td><td style="padding:6px">Chat</td></tr></tbody></table>';
-h+='</div></div>';
+h+='<div class="slide" id="s8_topp">';
+h+='<div class="section-badge">PART 03 \u2014 DECODING STRATEGIES</div>';
+h+='<h2 class="slide-title">Top-P (Nucleus) Sampling: Adaptive Filtering</h2>';
+h+='<p class="slide-subtitle">Instead of fixing the <i>number</i> of tokens, fix the <i>cumulative probability</i>. <b>Top-P</b> keeps the smallest set of top tokens whose probabilities sum to at least P. That set is called the <b>nucleus</b>.</p>';
+h+='<div class="two-col" style="flex:1;min-height:0;overflow-y:auto;gap:16px">';
+h+='<div style="display:flex;flex-direction:column;gap:12px">';
+h+='<div class="card" style="padding:16px"><h3 style="font-size:17px;color:var(--purple);font-weight:700;margin-bottom:8px">The big idea</h3><p style="font-size:14.5px;color:#D6DEE8;line-height:1.6"><b>P = 0.9</b> means: keep just enough top tokens to cover at least <b>90%</b> of the model\u2019s belief. Discard the rest.</p><p style="font-size:14.5px;color:#D6DEE8;line-height:1.6;margin-top:8px">Crucially, the size of the nucleus changes <b>per generation step</b>, depending on how confident the model is at that moment.</p></div>';
+h+='<div class="card" style="padding:16px"><h3 style="font-size:17px;color:var(--purple);font-weight:700;margin-bottom:8px">How Top-P works</h3><ol style="font-size:14.5px;color:#D6DEE8;line-height:1.75;padding-left:24px;margin:0"><li>Sort tokens by probability (descending).</li><li>Walk down the list, adding each token\u2019s probability to a running sum.</li><li>Stop the moment the running sum reaches <b>P</b>.</li><li>Everything you added so far = the <b>nucleus</b>. Discard the rest.</li><li>Renormalize the nucleus to sum to 1, then sample.</li></ol></div>';
+h+='<div class="card" style="padding:16px;border-color:rgba(0,212,170,0.4)"><h3 style="font-size:15px;color:var(--teal);font-weight:700;margin-bottom:10px">Why this is brilliant: it adapts</h3><div style="font-size:14px;color:#D6DEE8;line-height:1.6"><b style="color:var(--teal)">Confident case:</b> &nbsp;\u201CThe capital of France is ___\u201D \u2014 \u201CParis\u201D alone is 95%. With P=0.9, the nucleus is just <b>1 token</b>. Zero room for nonsense.</div><div style="font-size:14px;color:#D6DEE8;line-height:1.6;margin-top:10px"><b style="color:var(--teal)">Uncertain case:</b> &nbsp;\u201CShe felt ___\u201D \u2014 dozens of words are equally plausible. With P=0.9 the nucleus may grow to <b>30+ tokens</b>. Plenty of natural variety.</div><div style="font-size:13.5px;color:#94A6BA;margin-top:10px;line-height:1.6">Same hyperparameter, smart behaviour in both cases. That is why Top-P is the modern default.</div></div>';
+h+='</div>';
+h+='<div style="display:flex;flex-direction:column;gap:12px">';
+h+='<div class="card" style="padding:16px;display:flex;flex-direction:column"><h3 style="font-size:17px;color:var(--purple);font-weight:700;margin-bottom:10px">Try it: drag P to grow the nucleus</h3><div class="sl"><span style="font-size:15px;color:#D6DEE8;font-weight:600">P =</span><input type="range" id="topp-slider" min="50" max="100" value="90" oninput="updateTopP()"><span class="sv" id="topp-val" style="font-size:22px;color:var(--purple);min-width:60px">0.90</span></div>';
+h+='<div style="flex:1;min-height:220px;margin-top:14px"><canvas id="topp-chart"></canvas></div>';
+h+='<div id="topp-info" style="font-size:14.5px;color:#F0F4F8;margin-top:12px;line-height:1.55;padding:10px 12px;background:rgba(139,92,246,0.1);border-left:3px solid var(--purple);border-radius:4px"></div>';
+h+='<div style="font-size:12.5px;color:#B7C3D2;margin-top:8px"><span style="color:var(--purple)">\u25A0</span> Inside the nucleus (kept) &nbsp;\u00B7&nbsp; <span style="color:#64748B">\u25A0</span> Discarded</div></div>';
+h+='<div class="card" style="padding:14px 16px"><h3 style="font-size:16px;font-weight:700;margin-bottom:10px">Top-K vs Top-P at a glance</h3><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr style="border-bottom:1px solid var(--border);color:#94A6BA;font-size:12px;text-transform:uppercase;letter-spacing:0.5px"><th style="padding:9px 8px;text-align:left;font-weight:600">Aspect</th><th style="padding:9px 8px;text-align:left;color:var(--blue);font-weight:700">Top-K</th><th style="padding:9px 8px;text-align:left;color:var(--purple);font-weight:700">Top-P</th></tr></thead><tbody><tr style="border-bottom:1px solid var(--border)"><td style="padding:9px 8px;color:#94A6BA">Filter rule</td><td style="padding:9px 8px">Fixed token count</td><td style="padding:9px 8px">Cumulative mass</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:9px 8px;color:#94A6BA">Adapts to confidence?</td><td style="padding:9px 8px;color:var(--red)">\u2717 No</td><td style="padding:9px 8px;color:var(--green)">\u2713 Yes</td></tr><tr><td style="padding:9px 8px;color:#94A6BA">Typical value</td><td style="padding:9px 8px"><span class="mono">K = 40</span></td><td style="padding:9px 8px"><span class="mono">P = 0.9\u20130.95</span></td></tr></tbody></table></div>';
+h+='<div class="insight">In practice you stack all three: <b>Temperature</b> reshapes the logits, <b>Top-P</b> truncates the long tail, <b>Top-K</b> caps the worst-case nucleus size. Common defaults: <span class="mono">T = 0.9, P = 0.95, K = 40</span>.</div>';
+h+='</div></div></div>';
+
+h+='<div class="slide" id="s9_greedy">';
+h+='<div class="section-badge">PART 03 \u2014 DECODING STRATEGIES</div>';
+h+='<h2 class="slide-title">Greedy Decoding: Always Pick the Top</h2>';
+h+='<p class="slide-subtitle">The simplest possible strategy: at every step, just take the <b>single most probable</b> next token (argmax). No randomness. No alternatives. Identical input always yields identical output.</p>';
+h+='<div class="two-col" style="flex:1;min-height:0;overflow-y:auto;gap:16px">';
+h+='<div style="display:flex;flex-direction:column;gap:12px">';
+h+='<div class="card" style="padding:16px"><h3 style="font-size:17px;color:var(--amber);font-weight:700;margin-bottom:8px">How Greedy works</h3><ol style="font-size:14.5px;color:#D6DEE8;line-height:1.75;padding-left:24px;margin:0"><li>Run the model. Get a distribution over the vocabulary.</li><li>Pick the token with the <b>highest probability</b> (argmax).</li><li>Append it to the sequence.</li><li>Repeat until end-of-sequence or max length.</li></ol><p style="font-size:13.5px;color:#94A6BA;margin-top:10px;line-height:1.6">Equivalent to <b>Top-K = 1</b>, or sampling with <b>Temperature \u2192 0</b>. Pure determinism.</p></div>';
+h+='<div class="card" style="padding:16px;border-color:rgba(239,68,68,0.45)"><h3 style="font-size:16px;color:var(--red);font-weight:700;margin-bottom:8px">The fundamental problem: locally good \u2260 globally good</h3><p style="font-size:14px;color:#D6DEE8;line-height:1.6">Greedy commits to the best <i>immediate</i> word, but a slightly less likely word right now might unlock a <b>much better full sentence</b> later.</p><div style="font-size:13.5px;color:#D6DEE8;line-height:1.65;margin-top:10px;padding:10px 12px;background:rgba(239,68,68,0.08);border-radius:6px"><b style="color:#94A6BA">Example:</b> at step 1 the model thinks <span class="mono" style="color:var(--amber)">\u201Cfast\u201D</span> is 42% and <span class="mono" style="color:var(--teal)">\u201Cquick\u201D</span> is 40%. Greedy picks \u201Cfast.\u201D But \u201Cthe quick brown fox jumps...\u201D had probability 0.40 \u00D7 0.95 \u00D7 0.92 \u00D7 ... = a <b>much higher</b> total than \u201Cthe fast \u2026\u201D leads to. Greedy never sees that.</div></div>';
+h+='</div>';
+h+='<div style="display:flex;flex-direction:column;gap:12px">';
+h+='<div class="card" style="padding:16px;display:flex;flex-direction:column"><h3 style="font-size:17px;color:var(--amber);font-weight:700;margin-bottom:10px">Visual: one path, no exploration</h3><div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:8px"><canvas id="greedy-canvas" style="display:block;width:100%;height:170px"></canvas></div><div style="font-size:13px;color:#B7C3D2;margin-top:10px;line-height:1.55">Five generation steps. At each step the model produces a distribution; greedy picks the single bar with the highest probability and moves on. No branching, no second-guessing.</div></div>';
+h+='<div class="card" style="padding:16px"><h3 style="font-size:16px;font-weight:700;margin-bottom:10px">When to use Greedy</h3><div style="font-size:14px;color:#D6DEE8;line-height:1.7"><div><b style="color:var(--green)">\u2713</b> Real-time chat where latency matters more than optimality</div><div><b style="color:var(--green)">\u2713</b> Code completion at <span class="mono">T = 0</span> (you want the same answer every time)</div><div><b style="color:var(--green)">\u2713</b> Test fixtures and evaluation \u2014 deterministic = reproducible</div><div style="margin-top:8px"><b style="color:var(--red)">\u2717</b> Translation, summarization \u2014 needs to look ahead</div><div><b style="color:var(--red)">\u2717</b> Creative writing \u2014 always picks the most boring word</div></div></div>';
+h+='<div class="insight">If the only thing you change is removing greedy\u2019s commitment problem, you get <b>beam search</b> \u2014 next slide.</div>';
+h+='</div></div></div>';
+
+h+='<div class="slide" id="s9_beam">';
+h+='<div class="section-badge">PART 03 \u2014 DECODING STRATEGIES</div>';
+h+='<h2 class="slide-title">Beam Search: Keep Multiple Options Alive</h2>';
+h+='<p class="slide-subtitle">Instead of committing to one path, beam search keeps the <b>top B</b> partial sequences alive at every step and scores each by total log-probability. It looks ahead a little before committing.</p>';
+h+='<div class="two-col" style="flex:1;min-height:0;overflow-y:auto;gap:16px">';
+h+='<div style="display:flex;flex-direction:column;gap:12px">';
+h+='<div class="card" style="padding:16px"><h3 style="font-size:17px;color:var(--teal);font-weight:700;margin-bottom:8px">How Beam Search works (with B = 3)</h3><ol style="font-size:14.5px;color:#D6DEE8;line-height:1.75;padding-left:24px;margin:0"><li>Start with the top <b>B</b> candidate first tokens (3 \u201Cbeams\u201D).</li><li>For each beam, ask the model for next-token probabilities.</li><li>That gives you B \u00D7 |V| possible <i>extended</i> sequences.</li><li>Score each by its <b>total log-probability</b> so far.</li><li>Keep only the top B extended sequences. Discard the rest.</li><li>Repeat until done. At the end, return the highest-scoring full sequence.</li></ol></div>';
+h+='<div class="card" style="padding:16px;border-color:rgba(0,212,170,0.4)"><h3 style="font-size:15px;color:var(--teal);font-weight:700;margin-bottom:8px">The key insight</h3><p style="font-size:14px;color:#D6DEE8;line-height:1.6">A second-best word now might be the <b>seed of the best overall sentence</b>. Beam search hedges by keeping several options alive, so a slightly worse step-1 choice can win later if its continuations are strong.</p><p style="font-size:13.5px;color:#94A6BA;margin-top:10px;line-height:1.6"><b>B = 1</b> = greedy decoding. &nbsp; <b>B = 4\u20138</b> typical for translation. &nbsp; Higher B = better quality but more compute (B \u00D7 forward passes per step).</p></div>';
+h+='<div class="card" style="padding:14px 16px;border-color:rgba(239,68,68,0.45)"><h3 style="font-size:15px;color:var(--red);font-weight:700;margin-bottom:8px">Why we don\u2019t use it for chat</h3><p style="font-size:14px;color:#D6DEE8;line-height:1.6">Beam search optimises for high-probability sequences \u2014 which tend to be <b>safe, bland, and repetitive</b>. \u201CI think that I think that I think \u2026\u201D is a real failure mode. Great for one-correct-answer tasks (translation, summarization). Bad for open-ended creativity, where sampling wins.</p></div>';
+h+='</div>';
+h+='<div style="display:flex;flex-direction:column;gap:12px">';
+h+='<div class="card" style="padding:16px;display:flex;flex-direction:column"><h3 style="font-size:17px;color:var(--teal);font-weight:700;margin-bottom:10px">Visual: B parallel paths</h3><div class="sl" style="margin-bottom:10px"><span style="font-size:15px;color:#D6DEE8;font-weight:600">Beams B =</span><input type="range" id="beam-slider" min="1" max="5" value="3" oninput="updateBeam()"><span class="sv" id="beam-val" style="font-size:22px;min-width:45px">3</span></div>';
+h+='<div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:8px"><canvas id="beam-canvas" style="display:block;width:100%;height:200px"></canvas></div>';
+h+='<div style="font-size:13px;color:#B7C3D2;margin-top:10px;line-height:1.55">Three generation steps shown. Each green node is one of the B currently-alive partial sequences. Lines show how beams extend across steps. Move the slider to see how B changes the breadth of search.</div></div>';
+h+='<div class="card" style="padding:14px 16px"><h3 style="font-size:16px;font-weight:700;margin-bottom:10px">Strategy comparison</h3><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr style="border-bottom:1px solid var(--border);color:#94A6BA;font-size:12px;text-transform:uppercase;letter-spacing:0.5px"><th style="padding:9px 8px;text-align:left;font-weight:600">Strategy</th><th style="padding:9px 8px;text-align:left;font-weight:600">Speed</th><th style="padding:9px 8px;text-align:left;font-weight:600">Quality</th><th style="padding:9px 8px;text-align:left;font-weight:600">Best for</th></tr></thead><tbody><tr style="border-bottom:1px solid var(--border)"><td style="padding:9px 8px;color:var(--amber);font-weight:700">Greedy</td><td style="padding:9px 8px">Fastest</td><td style="padding:9px 8px">Medium</td><td style="padding:9px 8px">Real-time, code, tests</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:9px 8px;color:var(--teal);font-weight:700">Beam (B=4\u20138)</td><td style="padding:9px 8px">Slow (B\u00D7)</td><td style="padding:9px 8px">High</td><td style="padding:9px 8px">Translation, summarization</td></tr><tr><td style="padding:9px 8px;color:var(--purple);font-weight:700">Sampling</td><td style="padding:9px 8px">Fast</td><td style="padding:9px 8px">Diverse</td><td style="padding:9px 8px">Chat, creative writing</td></tr></tbody></table></div>';
+h+='</div></div></div>';
+
 
 h+='<div class="slide" id="s10">';
-h+='<div class="section-badge">PART 03</div>';
+h+='<div class="section-badge">PART 03 \u2014 DECODING STRATEGIES</div>';
 h+='<h2 class="slide-title">Decoding Strategy Playground</h2>';
-h+='<div style="flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto">';
-h+='<select id="play-prompt" onchange="updatePlayground()" style="background:var(--navy2);color:var(--white);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;width:100%"><option>The old lighthouse keeper heard a knock at midnight...</option><option>def find_duplicates(lst):</option><option>Explain quantum entanglement in one sentence:</option></select>';
+h+='<p class="slide-subtitle">Same model. Same prompt. <b>Four different decoding strategies.</b> Compare the outputs side-by-side to <i>feel</i> how each strategy shapes the text. Pick a prompt below to switch contexts.</p>';
+h+='<div style="flex:1;display:flex;flex-direction:column;gap:14px;overflow-y:auto">';
+h+='<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-size:14px;color:#B7C3D2;font-weight:600">Prompt:</span><select id="play-prompt" onchange="updatePlayground()" style="background:var(--navy2);color:var(--white);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:15px;flex:1;min-width:300px"><option>The old lighthouse keeper heard a knock at midnight\u2026</option><option>def find_duplicates(lst):</option><option>Explain quantum entanglement in one sentence:</option></select></div>';
 h+='<div class="grid-2x2" id="play-grid"></div>';
-h+='<div class="card" style="font-size:11px;text-align:center"><b>Same model. Same prompt. Four strategies. Four outputs.</b> You control which one you want.</div>';
+h+='<div class="insight" style="text-align:center"><b>Same model. Same prompt. Four strategies. Four very different outputs.</b> The decoding strategy is <i>your</i> lever \u2014 pick the one that matches your task.</div>';
 h+='</div></div>';
 
 h+='<div class="slide" id="s11">';
@@ -275,63 +375,68 @@ h+='</div>';
 h+='<div class="slide" id="s12">';
 h+='<div class="section-badge">PART 04 \u2014 PRACTICAL</div>';
 h+='<h2 class="slide-title">Prompting Strategies</h2>';
-h+='<div style="flex:1;display:flex;flex-direction:column;min-height:0">';
+h+='<p class="slide-subtitle">A <b>prompt</b> is the only thing the model sees \u2014 the way you shape it changes the answer dramatically. Below are the six patterns that cover ~95% of real-world use cases. Click each tab to see <i>when</i> to use it, <i>how</i> the prompt looks, and <i>what</i> can go wrong.</p>';
+h+='<div style="flex:1;display:flex;flex-direction:column;min-height:0;gap:8px">';
 h+='<div class="tab-bar" id="prompt-tabs"></div>';
-h+='<div id="prompt-content" class="card" style="flex:1;overflow-y:auto"></div>';
+h+='<div id="prompt-content" class="card" style="flex:1;overflow-y:auto;padding:18px"></div>';
 h+='</div></div>';
 
 h+='<div class="slide" id="s13">';
-h+='<div class="section-badge">PART 04</div>';
+h+='<div class="section-badge">PART 04 \u2014 PRACTICAL</div>';
 h+='<h2 class="slide-title">Anatomy of an API Call</h2>';
-h+='<div class="two-col" style="flex:1;min-height:0;overflow-y:auto">';
-h+='<div style="display:flex;flex-direction:column;gap:10px">';
-h+='<div id="api-code" class="code-block" style="font-size:11px;flex:1"></div></div>';
-h+='<div style="display:flex;flex-direction:column;gap:10px">';
-h+='<div id="api-explain" class="card" style="flex:1;overflow-y:auto"><div style="font-size:12px;color:var(--muted)">Click a highlighted line to see details</div></div>';
-h+='<div class="card"><h3 style="font-size:13px;margin-bottom:8px">Cost Calculator</h3>';
-h+='<div style="font-size:11px"><div class="sl" style="margin-bottom:6px"><span>Input tokens:</span><input type="range" id="cost-in" min="0" max="10000" value="1000" oninput="updateCost()"><span class="sv" id="cost-in-val" style="font-size:12px">1000</span></div>';
-h+='<div class="sl" style="margin-bottom:8px"><span>Output tokens:</span><input type="range" id="cost-out" min="0" max="4000" value="500" oninput="updateCost()"><span class="sv" id="cost-out-val" style="font-size:12px">500</span></div>';
-h+='<div id="cost-result" style="font-size:12px"></div></div></div>';
-h+='</div></div></div>';
+h+='<p class="slide-subtitle">Every chat-style LLM API has the <b>same shape</b>: model, messages, sampling params, and a usage report. Pick a provider below to see real SDK code, then click any highlighted line to see what it does.</p>';
+h+='<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap" id="api-provider-bar"></div>';
+h+='<div class="two-col" style="flex:1;min-height:0;overflow-y:auto;gap:14px">';
+h+='<div style="display:flex;flex-direction:column;gap:10px;min-height:0">';
+h+='<div id="api-code" class="code-block" style="font-size:14px;line-height:1.7;padding:16px;flex:1;overflow:auto"></div></div>';
+h+='<div style="display:flex;flex-direction:column;gap:12px;min-height:0">';
+h+='<div id="api-explain" class="card" style="flex:1;overflow-y:auto;padding:16px"></div>';
+h+='<div class="card" style="padding:16px"><h3 style="font-size:16px;margin-bottom:12px;font-weight:700">Cost Calculator <span id="cost-provider-label" style="font-size:13px;color:#94A6BA;font-weight:500"></span></h3>';
+h+='<div class="sl" style="margin-bottom:10px"><span style="font-size:14px;color:#D6DEE8">Input tokens:</span><input type="range" id="cost-in" min="0" max="10000" value="1000" oninput="updateCost()"><span class="sv" id="cost-in-val" style="font-size:16px;min-width:60px">1000</span></div>';
+h+='<div class="sl" style="margin-bottom:14px"><span style="font-size:14px;color:#D6DEE8">Output tokens:</span><input type="range" id="cost-out" min="0" max="4000" value="500" oninput="updateCost()"><span class="sv" id="cost-out-val" style="font-size:16px;min-width:60px">500</span></div>';
+h+='<div id="cost-result" style="font-size:14px"></div></div></div>';
+h+='</div></div>';
 
 h+='<div class="slide" id="s14">';
-h+='<div class="section-badge">PART 04</div>';
+h+='<div class="section-badge">PART 04 \u2014 PRACTICAL</div>';
 h+='<h2 class="slide-title">Token Costs &amp; Efficiency</h2>';
-h+='<div class="two-col" style="flex:1;min-height:0;overflow-y:auto">';
-h+='<div class="card" style="display:flex;flex-direction:column"><h3 style="font-size:13px;margin-bottom:8px">Token Counter</h3>';
-h+='<textarea id="token-input" rows="5" placeholder="Type or paste text here..." oninput="countTokens()"></textarea>';
-h+='<div id="token-stats" style="font-size:12px;margin-top:8px;line-height:1.8"></div></div>';
-h+='<div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto" id="efficiency-tips"></div>';
+h+='<p class="slide-subtitle">Every token in and every token out costs money and latency. Small prompt rewrites compound into <b>massive</b> savings at scale. Type into the counter on the left to feel the cost; the right column shows real before/after rewrites that practitioners use every day.</p>';
+h+='<div class="two-col" style="flex:1;min-height:0;overflow-y:auto;gap:14px">';
+h+='<div class="card" style="display:flex;flex-direction:column;padding:18px"><h3 style="font-size:18px;margin-bottom:12px;font-weight:700">Token Counter</h3>';
+h+='<textarea id="token-input" rows="6" placeholder="Type or paste text here\u2026" oninput="countTokens()" style="font-size:15px;line-height:1.6;padding:12px"></textarea>';
+h+='<div id="token-stats" style="font-size:15px;margin-top:14px;line-height:2"></div></div>';
+h+='<div style="display:flex;flex-direction:column;gap:10px;overflow-y:auto" id="efficiency-tips"></div>';
 h+='</div></div>';
 
 h+='<div class="slide" id="s15">';
 h+='<div class="section-badge">PART 04</div>';
 h+='<h2 class="slide-title">Prompt Engineering Best Practices</h2>';
-h+='<p class="slide-subtitle">Click each card to reveal the improved version.</p>';
+h+='<p class="slide-subtitle">Eight common <span style="color:var(--red)">bad-prompt</span> patterns and what to do instead. Each card hides a real production-ready rewrite \u2014 <b>click any card</b> to flip it and see the <span style="color:var(--teal)">good prompt</span> plus the <i>principle</i> behind why it works. These are the muscle memory of every senior LLM engineer.</p>';
 h+='<div class="grid-2x2" id="flip-grid" style="flex:1;min-height:0;overflow-y:auto"></div>';
 h+='</div>';
 
 h+='<div class="slide" id="s16">';
 h+='<div class="section-badge">PART 04</div>';
 h+='<h2 class="slide-title">Common Failure Modes &amp; Fixes</h2>';
-h+='<p class="slide-subtitle">Click to expand each failure mode.</p>';
+h+='<p class="slide-subtitle">Six failure patterns you <i>will</i> hit in production. Each card shows the <span style="color:var(--red)">symptom</span>, the <b>root cause</b> baked into how LLMs are trained, and the <span style="color:var(--teal)">concrete fix</span> with the parameter or prompt change you can deploy today. <b>Click any card to expand</b>.</p>';
 h+='<div class="grid-2x3" id="failure-grid" style="flex:1;overflow-y:auto"></div>';
 h+='</div>';
 
 h+='<div class="slide" id="s17">';
-h+='<div class="section-badge">PART 04</div>';
+h+='<div class="section-badge">PART 04 \u2014 PRACTICAL</div>';
 h+='<h2 class="slide-title">Build Your Own Prompt: Workshop</h2>';
-h+='<div class="two-col" style="flex:1;min-height:0;overflow-y:auto">';
-h+='<div style="display:flex;flex-direction:column;gap:8px">';
-h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px"><button class="btn btn-outline" onclick="loadTemplate(0)">Document Summarizer</button><button class="btn btn-outline" onclick="loadTemplate(1)">Code Reviewer</button><button class="btn btn-outline" onclick="loadTemplate(2)">Research Assistant</button></div>';
-h+='<div class="card"><h3 style="font-size:12px;margin-bottom:4px;color:var(--teal)">System Prompt</h3><textarea id="wb-system" rows="3" placeholder="What role? What constraints?" oninput="buildPrompt()"></textarea></div>';
-h+='<div class="card"><h3 style="font-size:12px;margin-bottom:4px;color:var(--blue)">Few-Shot Examples</h3><div id="wb-examples"></div><button class="btn btn-outline" style="margin-top:4px;font-size:11px" onclick="addExample()">+ Add Example</button></div>';
-h+='<div class="card"><h3 style="font-size:12px;margin-bottom:4px;color:var(--purple)">Instruction</h3><textarea id="wb-instruction" rows="2" placeholder="Core task..." oninput="buildPrompt()"></textarea></div>';
-h+='<div class="card"><h3 style="font-size:12px;margin-bottom:4px;color:var(--amber)">Constraints</h3><div id="wb-constraints" style="font-size:12px"></div></div>';
+h+='<p class="slide-subtitle">A real prompt is just <b>System + Few-Shot + Instruction + Constraints</b>. Pick a template below to start, edit any block, and watch the assembled prompt + token cost update live on the right. Copy when you\u2019re happy with it.</p>';
+h+='<div class="two-col" style="flex:1;min-height:0;overflow-y:auto;gap:14px">';
+h+='<div style="display:flex;flex-direction:column;gap:12px">';
+h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-size:14px;color:#94A6BA;font-weight:600">Start from a template:</span><button class="btn btn-outline" style="font-size:14px;padding:8px 14px" onclick="loadTemplate(0)">Document Summarizer</button><button class="btn btn-outline" style="font-size:14px;padding:8px 14px" onclick="loadTemplate(1)">Code Reviewer</button><button class="btn btn-outline" style="font-size:14px;padding:8px 14px" onclick="loadTemplate(2)">Research Assistant</button></div>';
+h+='<div class="card" style="padding:14px 16px"><h3 style="font-size:15px;margin-bottom:8px;color:var(--teal);font-weight:700">System Prompt</h3><div style="font-size:12.5px;color:#94A6BA;margin-bottom:8px;line-height:1.5">Persona, tone, hard rules. Set once, reused every turn.</div><textarea id="wb-system" rows="3" placeholder="e.g. You are a senior security engineer. Cite line numbers." oninput="buildPrompt()" style="font-size:14px;line-height:1.55;padding:10px"></textarea></div>';
+h+='<div class="card" style="padding:14px 16px"><h3 style="font-size:15px;margin-bottom:8px;color:var(--blue);font-weight:700">Few-Shot Examples</h3><div style="font-size:12.5px;color:#94A6BA;margin-bottom:8px;line-height:1.5">Show 1\u20133 input \u2192 output pairs. The model will imitate the format.</div><div id="wb-examples"></div><button class="btn btn-outline" style="margin-top:8px;font-size:13px;padding:7px 14px" onclick="addExample()">+ Add Example</button></div>';
+h+='<div class="card" style="padding:14px 16px"><h3 style="font-size:15px;margin-bottom:8px;color:var(--purple);font-weight:700">Instruction</h3><div style="font-size:12.5px;color:#94A6BA;margin-bottom:8px;line-height:1.5">The core task in one or two lines. Verb + object + scope.</div><textarea id="wb-instruction" rows="2" placeholder="e.g. Summarize the following document in 5 bullet points:" oninput="buildPrompt()" style="font-size:14px;line-height:1.55;padding:10px"></textarea></div>';
+h+='<div class="card" style="padding:14px 16px"><h3 style="font-size:15px;margin-bottom:8px;color:var(--amber);font-weight:700">Constraints</h3><div style="font-size:12.5px;color:#94A6BA;margin-bottom:10px;line-height:1.5">Tick the rules to apply. They are appended at the end of the prompt where attention is strongest.</div><div id="wb-constraints" style="font-size:14.5px"></div></div>';
 h+='</div>';
-h+='<div style="display:flex;flex-direction:column;gap:8px">';
-h+='<div class="card" style="flex:1;overflow-y:auto"><h3 style="font-size:12px;margin-bottom:6px;color:var(--teal)">Assembled Prompt</h3><div id="wb-output" class="code-block" style="font-size:11px;min-height:200px"></div></div>';
-h+='<div style="display:flex;gap:8px;align-items:center"><span id="wb-tokens" class="mono" style="font-size:12px;color:var(--muted)"></span><button class="btn btn-teal" onclick="copyPrompt()">Copy to Clipboard</button></div>';
+h+='<div style="display:flex;flex-direction:column;gap:12px">';
+h+='<div class="card" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column"><h3 style="font-size:15px;margin-bottom:10px;color:var(--teal);font-weight:700">Assembled Prompt <span style="font-size:12px;color:#94A6BA;font-weight:500">\u00B7 live preview</span></h3><div id="wb-output" class="code-block" style="font-size:13.5px;line-height:1.65;min-height:260px;flex:1"></div></div>';
+h+='<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span id="wb-tokens" class="mono" style="font-size:15px;color:var(--teal);font-weight:600"></span><button class="btn btn-teal" style="font-size:14px;padding:9px 18px" onclick="copyPrompt()">\u2398 Copy to Clipboard</button><span style="font-size:12.5px;color:#94A6BA;flex:1">Tip: keep the system prompt &lt; 200 tokens for cheap calls.</span></div>';
 h+='</div></div></div>';
 
 h+='<div class="slide" id="s18">';
@@ -353,7 +458,7 @@ h+='<div class="slide" id="s20">';
 h+='<div style="flex:1;display:flex;flex-direction:column;overflow-y:auto">';
 h+='<h2 class="slide-title" style="text-align:center">Week 5 Recap &amp; Week 6 Preview</h2>';
 h+='<div class="two-col" style="flex:1;margin-top:16px">';
-h+='<div class="card"><h3 style="color:var(--teal);margin-bottom:12px">Week 5 \u2014 Key Takeaways</h3><div style="font-size:12px;line-height:2">';
+h+='<div class="card" style="padding:14px 18px"><h3 style="color:var(--teal);margin-bottom:10px;font-size:18px;font-weight:700">Week 5 \u2014 Key Takeaways</h3><div style="font-size:13.5px;line-height:1.75;color:#D6DEE8">';
 h+='<div>\u2713 Encoder-only (BERT): bidirectional attention for understanding</div>';
 h+='<div>\u2713 Decoder-only (GPT/Claude): causal attention for generation</div>';
 h+='<div>\u2713 Encoder-Decoder (T5/BART): both for transformation</div>';
@@ -365,18 +470,26 @@ h+='<div>\u2713 Zero-shot, few-shot, CoT are distinct strategies</div>';
 h+='<div>\u2713 Every API call has measurable token cost</div>';
 h+='<div>\u2713 Hallucination, sycophancy, verbosity have specific fixes</div>';
 h+='</div></div>';
-h+='<div class="card"><h3 style="color:var(--blue);margin-bottom:12px">Week 6 \u2014 The Rise of the Agents</h3><div style="font-size:12px;line-height:2">';
+h+='<div class="card" style="padding:14px 18px"><h3 style="color:var(--blue);margin-bottom:10px;font-size:18px;font-weight:700">Week 6 \u2014 The Rise of the Agents</h3><div style="font-size:13.5px;line-height:1.75;color:#D6DEE8">';
 h+='<div>\u2192 What makes an AI an agent (not just a chatbot)</div>';
 h+='<div>\u2192 The ReAct loop: Reason \u2192 Act \u2192 Observe \u2192 Repeat</div>';
 h+='<div>\u2192 Tool use and function calling in depth</div>';
 h+='<div>\u2192 The Model Context Protocol (MCP)</div>';
 h+='<div>\u2192 Introduction to Google ADK</div>';
 h+='<div>\u2192 Building your first agentic workflow</div>';
-h+='</div></div></div></div></div>';
+h+='</div></div></div>';
+h+='<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:18px 16px 8px;border-top:1px solid rgba(255,255,255,0.08);margin-top:18px">';
+h+='<div style="font-size:10.5px;letter-spacing:3px;color:var(--teal);text-transform:uppercase;font-weight:700">Presented by</div>';
+h+='<div style="font-size:18px;color:#FFFFFF;font-weight:700;font-family:Fraunces,serif">K.A. Ashan Priyadarshana</div>';
+h+='<div style="font-size:12px;color:#94A6BA;font-style:italic">Instructor \u00B7 Ashan Priyadarshana Explains</div>';
+h+='</div>';
+h+='</div></div>';
 
 c.innerHTML=h;
-var dotsEl=document.getElementById('dots');
-for(var i=0;i<total;i++){var d=document.createElement('div');d.className='dot';d.setAttribute('onclick','showSlide('+i+')');dotsEl.appendChild(d)}
+var bar=document.getElementById('dot-bar');
+var html='';
+for(var i=0;i<total;i++)html+='<div class="dot" onclick="showSlide('+i+')"></div>';
+bar.innerHTML=html;
 showSlide(0);
 }
 
@@ -417,46 +530,87 @@ document.getElementById('pipe-counter').textContent=(pipeStage+1)+' / 8';
 document.getElementById('pipe-explain').innerHTML='<b style="color:'+pipeStages[pipeStage].color+'">'+pipeStages[pipeStage].name+'</b><br>'+pipeStages[pipeStage].desc;
 var cv=document.getElementById('pipeline-canvas');if(!cv)return;
 var ct=cv.getContext('2d');
-cv.width=cv.parentElement.offsetWidth;cv.height=cv.parentElement.offsetHeight;
-ct.clearRect(0,0,cv.width,cv.height);
-var w=cv.width/8-10,h=60,y=cv.height/2-30;
+var dpr=window.devicePixelRatio||1;
+var W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;
+cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';
+ct.setTransform(dpr,0,0,dpr,0,0);
+ct.clearRect(0,0,W,H);
+var cols=4,rows=2,padX=30,padY=28,gapX=22,gapY=44;
+var bw=(W-padX*2-gapX*(cols-1))/cols;
+var bh=Math.min((H-padY*2-gapY*(rows-1))/rows,Math.max(80,H*0.34));
+var totalH=bh*rows+gapY*(rows-1);
+var startY=(H-totalH)/2;
+function pos(i){var r=Math.floor(i/cols);var cIdx=(r%2===0)?(i%cols):(cols-1-(i%cols));return{x:padX+cIdx*(bw+gapX),y:startY+r*(bh+gapY),r:r,c:cIdx}}
+function arrow(x1,y1,x2,y2,active){
+ct.strokeStyle=active?'rgba(0,212,170,0.75)':'rgba(255,255,255,0.18)';
+ct.lineWidth=active?2.5:1.5;
+ct.beginPath();ct.moveTo(x1,y1);ct.lineTo(x2,y2);ct.stroke();
+var ang=Math.atan2(y2-y1,x2-x1),ah=9;
+ct.fillStyle=active?'rgba(0,212,170,0.9)':'rgba(255,255,255,0.28)';
+ct.beginPath();ct.moveTo(x2,y2);
+ct.lineTo(x2-ah*Math.cos(ang-0.4),y2-ah*Math.sin(ang-0.4));
+ct.lineTo(x2-ah*Math.cos(ang+0.4),y2-ah*Math.sin(ang+0.4));
+ct.closePath();ct.fill();
+}
+for(var i=0;i<7;i++){
+var a=pos(i),b=pos(i+1),act=i<pipeStage;
+if(a.r===b.r){
+var dir=(a.r%2===0)?1:-1;
+var x1=a.x+(dir>0?bw:0),x2=b.x+(dir>0?0:bw);
+var ym=a.y+bh/2;
+arrow(x1+(dir>0?3:-3),ym,x2+(dir>0?-7:7),ym,act);
+}else{
+var sideRight=(a.r%2===0);
+var xv=sideRight?(a.x+bw-bw*0.12):(a.x+bw*0.12);
+arrow(xv,a.y+bh+3,xv,b.y-7,act);
+}
+}
+function shade(hex,p){var c=hex.replace('#','');var r=parseInt(c.substr(0,2),16),g=parseInt(c.substr(2,2),16),bb=parseInt(c.substr(4,2),16);r=Math.max(0,Math.min(255,Math.round(r+255*p)));g=Math.max(0,Math.min(255,Math.round(g+255*p)));bb=Math.max(0,Math.min(255,Math.round(bb+255*p)));return 'rgb('+r+','+g+','+bb+')'}
+var hints=['"The cat sat"','[464, 3797, 4332]','vectors ∈ ℝ^d','+ position info','context-aware','+ residual + FFN','× N layers','probabilities'];
 for(var i=0;i<8;i++){
-var x=i*(cv.width/8)+5;
-ct.fillStyle=i<=pipeStage?pipeStages[i].color:'rgba(255,255,255,0.05)';
-ct.strokeStyle=i===pipeStage?'#fff':'rgba(255,255,255,0.1)';
-ct.lineWidth=i===pipeStage?2:1;
-ct.beginPath();ct.roundRect(x,y,w,h,8);ct.fill();ct.stroke();
-ct.fillStyle=i<=pipeStage?'#0D1B2A':'rgba(255,255,255,0.3)';
-ct.font='bold 10px Space Grotesk';ct.textAlign='center';
-ct.fillText((i+1)+'. '+pipeStages[i].name.split(' ').slice(0,2).join(' '),x+w/2,y+h/2+4);
-if(i<7){ct.strokeStyle='rgba(255,255,255,0.2)';ct.beginPath();ct.moveTo(x+w+2,y+h/2);ct.lineTo(x+w+8,y+h/2);ct.stroke()}
+var p2=pos(i),done=i<=pipeStage,cur=i===pipeStage,col=pipeStages[i].color;
+if(cur){ct.shadowColor=col;ct.shadowBlur=22}else{ct.shadowBlur=0}
+if(done){var grad=ct.createLinearGradient(p2.x,p2.y,p2.x,p2.y+bh);grad.addColorStop(0,col);grad.addColorStop(1,shade(col,-0.28));ct.fillStyle=grad}
+else{ct.fillStyle='rgba(255,255,255,0.04)'}
+ct.strokeStyle=cur?'#fff':(done?'rgba(255,255,255,0.25)':'rgba(255,255,255,0.10)');
+ct.lineWidth=cur?2.5:1;
+ct.beginPath();ct.roundRect(p2.x,p2.y,bw,bh,16);ct.fill();ct.stroke();
+ct.shadowBlur=0;
+var cx=p2.x+24,cy=p2.y+24;
+ct.fillStyle=done?'rgba(13,27,42,0.4)':'rgba(255,255,255,0.06)';
+ct.beginPath();ct.arc(cx,cy,17,0,Math.PI*2);ct.fill();
+ct.fillStyle=done?'#0D1B2A':col;
+ct.font='bold 15px Space Grotesk';ct.textAlign='center';ct.textBaseline='middle';
+ct.fillText(String(i+1),cx,cy+1);
+ct.fillStyle=done?'#0D1B2A':'#F0F4F8';
+ct.font='bold 18px Fraunces';
+ct.fillText(pipeStages[i].name,p2.x+bw/2,p2.y+bh/2);
+ct.fillStyle=done?'rgba(13,27,42,0.72)':'rgba(255,255,255,0.5)';
+ct.font='500 12px JetBrains Mono';
+ct.fillText(hints[i],p2.x+bw/2,p2.y+bh-18);
 }
-if(pipeStage>0){
-var px=pipeStage*(cv.width/8)+5+w/2;
-ct.fillStyle=pipeStages[pipeStage].color;ct.beginPath();ct.arc(px,y-15,6,0,Math.PI*2);ct.fill();
-}
+ct.textBaseline='alphabetic';
 }
 
-// S2 Masked Prediction
-var maskData={
-'The [MASK] sat on the mat':{cat:0.68,dog:0.15,bird:0.08,rat:0.05,fox:0.04},
-'She opened the [MASK] to enter':{door:0.71,gate:0.12,window:0.08,lock:0.05,key:0.04},
-'The [MASK] is shining brightly':{sun:0.72,star:0.11,light:0.08,moon:0.06,lamp:0.03},
-'He drank a glass of [MASK]':{water:0.55,wine:0.18,milk:0.12,juice:0.10,beer:0.05}
-};
-var maskSentences=['The [W] sat on the mat','She opened the [W] to enter','The [W] is shining brightly','He drank a glass of [W]'];
-var maskWords=[['The','cat','sat','on','the','mat'],['She','opened','the','door','to','enter'],['The','sun','is','shining','brightly'],['He','drank','a','glass','of','water']];
-var maskIdx=[1,3,1,5];
-var curMaskSent=0,curMaskWord=1;
+// S2 Masked Prediction \u2014 per-position predictions for "The cat sat on the mat"
+var maskWords=['The','cat','sat','on','the','mat'];
+var maskPredictions=[
+{The:0.42,A:0.21,That:0.12,This:0.09,My:0.06},
+{cat:0.62,dog:0.18,bird:0.07,rat:0.05,fox:0.04},
+{sat:0.55,lay:0.18,slept:0.10,jumped:0.08,perched:0.05},
+{on:0.78,upon:0.08,atop:0.06,across:0.04,beside:0.03},
+{the:0.58,a:0.22,his:0.07,that:0.05,our:0.04},
+{mat:0.48,floor:0.18,rug:0.14,couch:0.07,chair:0.05}
+];
+var curMaskWord=1;
 function initMask(){
-var el=document.getElementById('mask-sentence');
+var el=document.getElementById('mask-sentence');if(!el)return;
 el.innerHTML='';
-var words=maskWords[curMaskSent];
-for(var i=0;i<words.length;i++){
+for(var i=0;i<maskWords.length;i++){
 var s=document.createElement('span');
 s.className='btn '+(i===curMaskWord?'btn-teal':'btn-outline');
 s.style.fontSize='13px';s.style.padding='6px 12px';
-s.textContent=i===curMaskWord?'[MASK]':words[i];
+s.textContent=i===curMaskWord?'[MASK]':maskWords[i];
 s.setAttribute('onclick','maskWord('+i+')');
 el.appendChild(s);
 }
@@ -465,22 +619,10 @@ updateMaskChart();
 function maskWord(idx){curMaskWord=idx;initMask()}
 function updateMaskChart(){
 destroyChart('mask');
-var words=maskWords[curMaskSent];
-var orig=words[curMaskWord];
-var key=null;
-for(var k in maskData){if(k.indexOf('[MASK]')>=0){
-var parts=k.split('[MASK]');
-var test=words.slice();test[curMaskWord]='[MASK]';
-var joined=test.join(' ');
-if(joined.indexOf(parts[0])>=0&&joined.indexOf(parts[1])>=0){key=k;break}
-}}
-if(!key){
-var keys=Object.keys(maskData);key=keys[curMaskSent%keys.length];
-}
-var data=maskData[key]||maskData[Object.keys(maskData)[0]];
+var data=maskPredictions[curMaskWord];
 var labels=Object.keys(data);var vals=Object.values(data);
-var cv=document.getElementById('mask-chart');
-charts['mask']=new Chart(cv,{type:'bar',data:{labels:labels,datasets:[{data:vals,backgroundColor:'rgba(0,212,170,0.6)',borderColor:'#00D4AA',borderWidth:1}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{max:1,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#64748B',font:{size:10}}},y:{grid:{display:false},ticks:{color:'#F0F4F8',font:{size:11}}}}}});
+var cv=document.getElementById('mask-chart');if(!cv)return;
+charts['mask']=new Chart(cv,{type:'bar',data:{labels:labels,datasets:[{data:vals,backgroundColor:'rgba(0,212,170,0.6)',borderColor:'#00D4AA',borderWidth:1}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return 'p = '+(c.parsed.x*100).toFixed(1)+'%'}}}},scales:{x:{max:1,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#64748B',font:{size:10},callback:function(v){return v.toFixed(1)}}},y:{grid:{display:false},ticks:{color:'#F0F4F8',font:{size:12}}}}}});
 }
 
 // S3 Autoregressive Generation
@@ -569,7 +711,7 @@ function initScenarios(){
 var g=document.getElementById('scenario-grid');g.innerHTML='';
 for(var i=0;i<scenarios.length;i++){
 var d=document.createElement('div');d.className='scenario-card';
-d.innerHTML='<div style="font-size:12px">'+scenarios[i].text+'</div>';
+d.innerHTML='<div style="font-size:14.5px;line-height:1.45">'+scenarios[i].text+'</div>';
 d.setAttribute('onclick','pickScenario('+i+')');
 g.appendChild(d);
 }
@@ -580,7 +722,7 @@ for(var i=0;i<cards.length;i++)cards[i].classList.toggle('hl',i===idx);
 var s=scenarios[idx];
 var el=document.getElementById('scenario-explain');
 el.style.display='block';
-el.innerHTML='<b style="color:'+s.color+'">'+s.arch+'</b><br><span style="font-size:12px">'+s.why+'</span>';
+el.innerHTML='<div style="font-size:17px;font-weight:700;color:'+s.color+';margin-bottom:6px">'+s.arch+'</div><div style="font-size:14.5px;color:#D6DEE8;line-height:1.65">'+s.why+'</div>';
 }
 
 // S6 Output Distribution
@@ -596,7 +738,7 @@ var btns=document.getElementById('dist-ctx-btns');btns.innerHTML='';
 for(var i=0;i<distContexts.length;i++){
 var b=document.createElement('button');
 b.className='btn '+(i===0?'btn-teal':'btn-outline');
-b.textContent=distContexts[i].ctx;b.style.fontSize='12px';
+b.textContent=distContexts[i].ctx;b.style.fontSize='14px';b.style.padding='8px 16px';
 b.setAttribute('onclick','setDistCtx('+i+')');
 btns.appendChild(b);
 }
@@ -612,12 +754,12 @@ drawDistChart();
 function drawDistChart(){
 destroyChart('dist');
 var d=distContexts[curDistCtx];
-charts['dist']=new Chart(document.getElementById('dist-chart'),{type:'bar',data:{labels:d.tokens,datasets:[{data:d.probs,backgroundColor:d.probs.map(function(v,i){return i===0?'rgba(0,212,170,0.8)':'rgba(76,155,232,0.5)'}),borderWidth:0}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#64748B',font:{size:9}}},y:{grid:{display:false},ticks:{color:'#F0F4F8',font:{family:'JetBrains Mono',size:10}}}}}});
+charts['dist']=new Chart(document.getElementById('dist-chart'),{type:'bar',data:{labels:d.tokens,datasets:[{data:d.probs,backgroundColor:d.probs.map(function(v,i){return i===0?'rgba(0,212,170,0.8)':'rgba(76,155,232,0.5)'}),borderWidth:0}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#94A6BA',font:{size:12}}},y:{grid:{display:false},ticks:{color:'#F0F4F8',font:{family:'JetBrains Mono',size:13}}}}}});
 }
 
 // S7 Temperature
-var baseLogits=[3.8,2.5,1.8,1.2,0.8,0.5,0.3,0.1,-0.2,-0.5];
-var tempLabels=['blue','clear','dark','full','grey','bright','not','a','the','falling'];
+var baseLogits=[3.8,2.5,2.2,1.8,1.2,0.8,0.5,0.3,0.0,-0.4];
+var tempLabels=['sunny','clear','warm','cloudy','rainy','quite','very','a','really','blustery'];
 function updateTemp(){
 var v=parseInt(document.getElementById('temp-slider').value)/100;
 document.getElementById('temp-val').textContent=v.toFixed(2);
@@ -629,7 +771,7 @@ var scaled=baseLogits.map(function(l){return Math.exp(l/T)});
 var sum=scaled.reduce(function(a,b){return a+b},0);
 var probs=scaled.map(function(s){return s/sum});
 destroyChart('temp');
-charts['temp']=new Chart(document.getElementById('temp-chart'),{type:'bar',data:{labels:tempLabels,datasets:[{data:probs,backgroundColor:probs.map(function(p){return p>0.3?'rgba(0,212,170,0.8)':p>0.1?'rgba(76,155,232,0.5)':'rgba(100,116,139,0.3)'}),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#64748B',font:{size:9}}},x:{grid:{display:false},ticks:{color:'#F0F4F8',font:{size:9}}}}}});
+charts['temp']=new Chart(document.getElementById('temp-chart'),{type:'bar',data:{labels:tempLabels,datasets:[{data:probs,backgroundColor:probs.map(function(p){return p>0.3?'rgba(0,212,170,0.8)':p>0.1?'rgba(76,155,232,0.5)':'rgba(100,116,139,0.3)'}),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#94A6BA',font:{size:13}}},x:{grid:{display:false},ticks:{color:'#F0F4F8',font:{size:13,weight:'600'}}}}}});
 }
 
 // S8 Top-K / Top-P
@@ -639,37 +781,56 @@ function updateTopK(){
 var k=parseInt(document.getElementById('topk-slider').value);
 document.getElementById('topk-val').textContent=k;
 var sum=0;for(var i=0;i<k;i++)sum+=tkpProbs[i];
-document.getElementById('topk-info').textContent='Top '+k+' tokens cover '+Math.round(sum*100)+'% mass';
+var pct=Math.round(sum*100);
+var dropped=tkpProbs.length-k;
+var info=document.getElementById('topk-info');
+if(info)info.innerHTML='Keeping <b>K = '+k+'</b> tokens. Together they cover <b>'+pct+'%</b> of the probability mass; the other '+dropped+' tokens (<b>'+(100-pct)+'%</b>) are discarded before sampling.';
 destroyChart('topk');
-charts['topk']=new Chart(document.getElementById('topk-chart'),{type:'bar',data:{labels:tkpLabels,datasets:[{data:tkpProbs,backgroundColor:tkpProbs.map(function(p,i){return i<k?'rgba(76,155,232,0.7)':'rgba(100,116,139,0.15)'}),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#64748B',font:{size:8}}},x:{grid:{display:false},ticks:{color:'#F0F4F8',font:{size:8}}}}}});
+charts['topk']=new Chart(document.getElementById('topk-chart'),{type:'bar',data:{labels:tkpLabels,datasets:[{data:tkpProbs,backgroundColor:tkpProbs.map(function(p,i){return i<k?'rgba(76,155,232,0.85)':'rgba(100,116,139,0.18)'}),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return 'p = '+(c.parsed.y*100).toFixed(1)+'%'}}}},scales:{y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#94A6BA',font:{size:13}}},x:{grid:{display:false},ticks:{color:'#F0F4F8',font:{size:13,weight:'600'}}}}}});
 }
 function updateTopP(){
 var p=parseInt(document.getElementById('topp-slider').value)/100;
 document.getElementById('topp-val').textContent=p.toFixed(2);
 var sum=0,n=0;
 for(var i=0;i<tkpProbs.length;i++){sum+=tkpProbs[i];n++;if(sum>=p)break}
-document.getElementById('topp-info').textContent='Nucleus: '+n+' tokens for P='+p.toFixed(2);
+var info=document.getElementById('topp-info');
+if(info)info.innerHTML='Nucleus contains <b>'+n+'</b> token'+(n===1?'':'s')+' \u2014 just enough to cover <b>P = '+p.toFixed(2)+'</b> of the probability. The other '+(tkpProbs.length-n)+' tokens fall outside the nucleus and are discarded.';
 destroyChart('topp');
-charts['topp']=new Chart(document.getElementById('topp-chart'),{type:'bar',data:{labels:tkpLabels,datasets:[{data:tkpProbs,backgroundColor:tkpProbs.map(function(v,i){return i<n?'rgba(139,92,246,0.7)':'rgba(100,116,139,0.15)'}),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#64748B',font:{size:8}}},x:{grid:{display:false},ticks:{color:'#F0F4F8',font:{size:8}}}}}});
+charts['topp']=new Chart(document.getElementById('topp-chart'),{type:'bar',data:{labels:tkpLabels,datasets:[{data:tkpProbs,backgroundColor:tkpProbs.map(function(v,i){return i<n?'rgba(139,92,246,0.85)':'rgba(100,116,139,0.18)'}),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return 'p = '+(c.parsed.y*100).toFixed(1)+'%'}}}},scales:{y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#94A6BA',font:{size:13}}},x:{grid:{display:false},ticks:{color:'#F0F4F8',font:{size:13,weight:'600'}}}}}});
 }
 
 // S9 Beam/Greedy
 function drawGreedy(){
 var cv=document.getElementById('greedy-canvas');if(!cv)return;
-cv.width=cv.parentElement.offsetWidth-32;cv.height=160;
-var ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
+var dpr=window.devicePixelRatio||1;
+var cssW=cv.clientWidth||cv.parentElement.offsetWidth-16;
+var cssH=170;
+cv.width=cssW*dpr;cv.height=cssH*dpr;
+cv.style.width=cssW+'px';cv.style.height=cssH+'px';
+var ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+ctx.clearRect(0,0,cssW,cssH);
 var words=['The','cat','sat','on','the'];
 var probs=[0.42,0.35,0.28,0.55,0.60];
-var x=20,y=80;
-for(var i=0;i<words.length;i++){
-ctx.fillStyle='#F59E0B';ctx.beginPath();ctx.arc(x,y,16,0,Math.PI*2);ctx.fill();
-ctx.fillStyle='#0D1B2A';ctx.font='bold 9px JetBrains Mono';ctx.textAlign='center';
-ctx.fillText(words[i],x,y+3);
-ctx.fillStyle='#64748B';ctx.font='9px JetBrains Mono';
-ctx.fillText(probs[i].toFixed(2),x,y+30);
-if(i<words.length-1){ctx.strokeStyle='#F59E0B';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+16,y);ctx.lineTo(x+(cv.width-40)/words.length-16,y);ctx.stroke()}
-x+=(cv.width-40)/words.length;
+var n=words.length;
+var pad=30;
+var step=(cssW-pad*2)/(n-1);
+var y=cssH/2-10;
+var r=22;
+for(var i=0;i<n-1;i++){
+var x1=pad+i*step,x2=pad+(i+1)*step;
+ctx.strokeStyle='#F59E0B';ctx.lineWidth=2.5;
+ctx.beginPath();ctx.moveTo(x1+r,y);ctx.lineTo(x2-r,y);ctx.stroke();
 }
+for(var i=0;i<n;i++){
+var x=pad+i*step;
+ctx.fillStyle='#F59E0B';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+ctx.fillStyle='#0D1B2A';ctx.font='bold 13px JetBrains Mono';ctx.textAlign='center';ctx.textBaseline='middle';
+ctx.fillText(words[i],x,y);
+ctx.fillStyle='#94A6BA';ctx.font='12px JetBrains Mono';ctx.textBaseline='alphabetic';
+ctx.fillText('p='+probs[i].toFixed(2),x,y+r+18);
+}
+ctx.fillStyle='#94A6BA';ctx.font='11px Space Grotesk';ctx.textAlign='left';
+ctx.fillText('step 1',pad-12,18);
 }
 function updateBeam(){
 var b=parseInt(document.getElementById('beam-slider').value);
@@ -678,29 +839,52 @@ drawBeam(b);
 }
 function drawBeam(B){
 var cv=document.getElementById('beam-canvas');if(!cv)return;
-cv.width=cv.parentElement.offsetWidth-32;cv.height=160;
-var ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
-var stepW=cv.width/5;
+var dpr=window.devicePixelRatio||1;
+var cssW=cv.clientWidth||cv.parentElement.offsetWidth-16;
+var cssH=200;
+cv.width=cssW*dpr;cv.height=cssH*dpr;
+cv.style.width=cssW+'px';cv.style.height=cssH+'px';
+var ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+ctx.clearRect(0,0,cssW,cssH);
 var beamData=[
 [{t:'The',p:0.42},{t:'A',p:0.30},{t:'One',p:0.15},{t:'My',p:0.08},{t:'That',p:0.05}],
 [{t:'cat',p:0.35},{t:'dog',p:0.25},{t:'bird',p:0.20},{t:'old',p:0.12},{t:'big',p:0.08}],
 [{t:'sat',p:0.40},{t:'ran',p:0.30},{t:'flew',p:0.15},{t:'was',p:0.10},{t:'is',p:0.05}]
 ];
-for(var step=0;step<3;step++){
+var steps=3;
+var pad=40;
+var stepW=(cssW-pad*2)/(steps-1);
+var topPad=30,botPad=20;
+var r=20;
+ctx.fillStyle='#94A6BA';ctx.font='12px Space Grotesk';ctx.textAlign='center';ctx.textBaseline='alphabetic';
+for(var s=0;s<steps;s++){ctx.fillText('step '+(s+1),pad+s*stepW,16)}
+var nodes=[];
+for(var step=0;step<steps;step++){
 var nb=Math.min(B,beamData[step].length);
+var rowH=(cssH-topPad-botPad)/Math.max(nb,1);
+var stepNodes=[];
 for(var bi=0;bi<nb;bi++){
-var x=step*stepW+stepW/2;
-var y=20+bi*(cv.height-40)/Math.max(nb,1);
-var alive=bi<B;
-ctx.fillStyle=alive?'rgba(0,212,170,0.8)':'rgba(100,116,139,0.2)';
-ctx.beginPath();ctx.arc(x,y,12,0,Math.PI*2);ctx.fill();
-ctx.fillStyle=alive?'#0D1B2A':'#64748B';ctx.font='bold 8px JetBrains Mono';ctx.textAlign='center';
-ctx.fillText(beamData[step][bi].t,x,y+3);
-if(step>0&&alive){
-var py=20+bi*(cv.height-40)/Math.max(nb,1);
-ctx.strokeStyle='rgba(0,212,170,0.4)';ctx.lineWidth=1;
-ctx.beginPath();ctx.moveTo((step-1)*stepW+stepW/2+12,py);ctx.lineTo(x-12,y);ctx.stroke();
+var x=pad+step*stepW;
+var y=topPad+rowH*(bi+0.5);
+stepNodes.push({x:x,y:y,t:beamData[step][bi].t});
 }
+nodes.push(stepNodes);
+}
+for(var step=1;step<steps;step++){
+var prev=nodes[step-1],cur=nodes[step];
+for(var i=0;i<prev.length;i++)for(var j=0;j<cur.length;j++){
+ctx.strokeStyle=i===j?'rgba(0,212,170,0.5)':'rgba(0,212,170,0.15)';
+ctx.lineWidth=i===j?2:1;
+ctx.beginPath();ctx.moveTo(prev[i].x+r,prev[i].y);ctx.lineTo(cur[j].x-r,cur[j].y);ctx.stroke();
+}
+}
+for(var step=0;step<steps;step++){
+for(var bi=0;bi<nodes[step].length;bi++){
+var nd=nodes[step][bi];
+ctx.fillStyle='rgba(0,212,170,0.85)';
+ctx.beginPath();ctx.arc(nd.x,nd.y,r,0,Math.PI*2);ctx.fill();
+ctx.fillStyle='#0D1B2A';ctx.font='bold 13px JetBrains Mono';ctx.textAlign='center';ctx.textBaseline='middle';
+ctx.fillText(nd.t,nd.x,nd.y);
 }
 }
 }
@@ -723,14 +907,20 @@ var playOutputs={
 {name:'Beam Search B=4',params:'4 beams',text:'Quantum entanglement describes the correlation between quantum particles whose states are interdependent regardless of spatial separation.'},
 {name:'High T=1.8',params:'Creative',text:'Imagine two cosmic dice that always land on matching faces no matter how far apart you throw them \u2014 that\u2019s entanglement whispering across spacetime.'}
 ]};
+var playWhy=[
+'Always picks the single most probable next token. <b>Deterministic</b> \u2014 you will get the exact same text every time. Tends toward safe, slightly bland phrasing.',
+'Samples from the nucleus (top-P) at moderate temperature. <b>Natural variety</b> \u2014 each run is different but coherent. The default for chat-style outputs.',
+'Keeps 4 candidate sequences alive and returns the one with the highest total log-probability. <b>Fluent and formal</b> \u2014 favoured for translation and summarization.',
+'High temperature heavily flattens the distribution, so rare words get a real chance. <b>Surprising and weird</b> \u2014 great for brainstorming, dangerous for facts.'
+];
 function updatePlayground(){
 var idx=document.getElementById('play-prompt').selectedIndex;
 var g=document.getElementById('play-grid');g.innerHTML='';
 var outs=playOutputs[idx];
 var colors=['var(--amber)','var(--teal)','var(--blue)','var(--orange)'];
 for(var i=0;i<outs.length;i++){
-var d=document.createElement('div');d.className='card';
-d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b style="color:'+colors[i]+';font-size:12px">'+outs[i].name+'</b><button class="btn btn-outline" style="font-size:10px;padding:4px 8px" onclick="reroll('+idx+','+i+')">Re-roll</button></div><div style="font-size:11px;color:var(--muted);margin-bottom:6px">'+outs[i].params+'</div><div class="code-block" style="font-size:11px" id="play-out-'+i+'">'+outs[i].text+'</div>';
+var d=document.createElement('div');d.className='card';d.style.padding='16px';
+d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="color:'+colors[i]+';font-size:17px;font-weight:700">'+outs[i].name+'</b><button class="btn btn-outline" style="font-size:12px;padding:6px 12px" onclick="reroll('+idx+','+i+')">Re-roll</button></div><div style="font-size:13.5px;color:#94A6BA;margin-bottom:10px;font-style:italic">'+outs[i].params+'</div><div class="code-block" style="font-size:13.5px;line-height:1.6;padding:12px" id="play-out-'+i+'">'+outs[i].text+'</div><div style="font-size:13px;color:#D6DEE8;margin-top:10px;line-height:1.6;padding:10px 12px;background:rgba(255,255,255,0.03);border-left:3px solid '+colors[i]+';border-radius:4px">'+playWhy[i]+'</div>';
 g.appendChild(d);
 }
 }
@@ -741,12 +931,12 @@ if(el){el.style.opacity='0.5';setTimeout(function(){el.style.opacity='1'},300)}
 
 // S12 Prompting Strategies
 var promptStrats=[
-{name:'Zero-Shot',def:'Direct instruction, no examples.',prompt:'Classify the sentiment of this review:\n"The product broke after two days."\nAnswer: Positive / Negative / Neutral',response:'Negative',when:'Simple, well-defined tasks.',pitfall:'Fails on unusual formats or domain-specific tasks.'},
-{name:'Few-Shot',def:'Provide 2-4 demonstrations before the task.',prompt:'Review: "Amazing quality!" \u2192 Positive\nReview: "Terrible experience." \u2192 Negative\nReview: "It\u2019s okay I guess." \u2192 Neutral\nReview: "The product broke after two days." \u2192',response:'Negative',when:'When output format is unusual or zero-shot fails.',pitfall:'Long examples waste tokens. Keep demos concise.'},
-{name:'Chain-of-Thought',def:'Ask the model to reason step by step.',prompt:'Q: A train travels 120km at 60km/h then 80km at 40km/h.\nWhat is the average speed?\n\nThink step by step before answering.',response:'Step 1: Time for first leg = 120/60 = 2 hours\nStep 2: Time for second leg = 80/40 = 2 hours\nStep 3: Total distance = 200km, Total time = 4h\nStep 4: Average speed = 200/4 = 50 km/h',when:'Math, logic, multi-step reasoning.',pitfall:'Adds tokens (cost). Skip for simple lookups.'},
-{name:'System/Role',def:'Set persona and constraints via system message.',prompt:'SYSTEM:\nYou are a senior security engineer.\nCite line numbers, name vulnerability type,\nsuggest a fix. Never say "looks fine."\n\nUSER:\nReview this auth function: [code]',response:'Line 12: SQL Injection vulnerability.\nUser input concatenated into query string.\nFix: Use parameterized queries.',when:'Apps with consistent persona or constraints.',pitfall:'System prompt is NOT a security boundary.'},
-{name:'Prompt Chaining',def:'Pipeline: output of step N feeds step N+1.',prompt:'Step 1: Extract claims from document \u2192\nStep 2: Fact-check each claim \u2192\nStep 3: Format as structured report \u2192\nStep 4: Generate executive summary',response:'[Chain produces validated, structured output]',when:'Complex workflows exceeding single-prompt reliability.',pitfall:'Errors propagate. Add validation at each step.'},
-{name:'Self-Consistency',def:'Generate multiple outputs, then aggregate/vote.',prompt:'Generate 3 answers at T=1.0:\n\u2192 Answer A: 42\n\u2192 Answer B: 42\n\u2192 Answer C: 38\n\nMajority vote: 42',response:'Final answer: 42 (2/3 agreement)',when:'High-stakes factual or reasoning tasks.',pitfall:'3x token cost. Use only when accuracy justifies it.'}
+{name:'Zero-Shot',def:'Just ask. No examples, no preamble \u2014 you trust the model to know the task from its pre-training.',intuition:'Works because modern LLMs have seen millions of similar tasks during training. The simplest prompt that could possibly work \u2014 always start here.',prompt:'Classify the sentiment of this review:\n"The product broke after two days."\nAnswer: Positive / Negative / Neutral',response:'Negative',when:'Common, well-defined tasks (sentiment, summarization, translation, simple Q&A).',pitfall:'Fails on unusual formats, niche domains, or tasks that need a specific output structure.'},
+{name:'Few-Shot',def:'Show 2\u20134 input \u2192 output examples before the real input. The model imitates the pattern.',intuition:'You\u2019re teaching the model the format and tone <i>by demonstration</i>, not by description. Surprisingly powerful: even bad descriptions plus good examples beat perfect descriptions alone.',prompt:'Review: "Amazing quality!" \u2192 Positive\nReview: "Terrible experience." \u2192 Negative\nReview: "It\u2019s okay I guess." \u2192 Neutral\nReview: "The product broke after two days." \u2192',response:'Negative',when:'When output format is unusual, when zero-shot wanders, or when you need consistent style.',pitfall:'Each demo costs tokens. The model also picks up on accidental patterns in your examples \u2014 be careful what you demonstrate.'},
+{name:'Chain-of-Thought',def:'Tell the model to <b>think step by step</b> before answering. Reasoning becomes part of the output.',intuition:'LLMs predict one token at a time. Forcing them to write the intermediate steps gives them more "compute" and a scratchpad \u2014 they get math and logic problems right that they would otherwise blow.',prompt:'Q: A train travels 120km at 60km/h then 80km at 40km/h.\nWhat is the average speed?\n\nThink step by step before answering.',response:'Step 1: Time for first leg = 120/60 = 2 hours\nStep 2: Time for second leg = 80/40 = 2 hours\nStep 3: Total distance = 200km, Total time = 4h\nStep 4: Average speed = 200/4 = 50 km/h',when:'Math, logic, multi-step reasoning, anything where the answer needs to be <i>derived</i> rather than recalled.',pitfall:'Adds tokens and latency. Skip for simple lookups. Reasoning models (o1, o3) do this automatically \u2014 you do not need to ask.'},
+{name:'System/Role',def:'Use the <span class="mono">system</span> message to set persona, tone, and hard rules. The user message is the actual task.',intuition:'The system prompt persists across the whole conversation. Think of it as the model\u2019s job description \u2014 set it once, and every response inherits it.',prompt:'SYSTEM:\nYou are a senior security engineer.\nCite line numbers, name vulnerability type,\nsuggest a fix. Never say "looks fine."\n\nUSER:\nReview this auth function: [code]',response:'Line 12: SQL Injection vulnerability.\nUser input concatenated into query string.\nFix: Use parameterized queries.',when:'Production apps that need a consistent persona, format, or set of constraints across many calls.',pitfall:'<b>System prompt is NOT a security boundary.</b> Users can still jailbreak it with clever inputs. Treat it as guidance, not a wall.'},
+{name:'Prompt Chaining',def:'Break a hard task into a pipeline of smaller prompts. The output of one becomes the input of the next.',intuition:'A single prompt that does too much is unreliable. Chains of 3\u20135 simpler prompts \u2014 each focused on one job \u2014 are dramatically more accurate, and each step is independently testable.',prompt:'Step 1: Extract claims from document \u2192\nStep 2: Fact-check each claim \u2192\nStep 3: Format as structured report \u2192\nStep 4: Generate executive summary',response:'[Chain produces validated, structured output]',when:'Complex workflows: research, code review, multi-stage data extraction, agentic systems.',pitfall:'Errors compound across steps. Add validation between stages. Latency = sum of all calls.'},
+{name:'Self-Consistency',def:'Run the same prompt N times at temperature > 0, then aggregate (vote, median, ensemble).',intuition:'When the model is right, it tends to be right consistently. When it is guessing, the answers diverge. Majority vote across runs filters out one-off mistakes \u2014 a kind of poor man\u2019s ensembling.',prompt:'Generate 3 answers at T=1.0:\n\u2192 Answer A: 42\n\u2192 Answer B: 42\n\u2192 Answer C: 38\n\nMajority vote: 42',response:'Final answer: 42 (2/3 agreement)',when:'High-stakes math, factual or reasoning tasks where being right matters more than being cheap.',pitfall:'N\u00D7 the token cost. Reserve for the small fraction of calls where accuracy is critical.'}
 ];
 function initPromptTabs(){
 var bar=document.getElementById('prompt-tabs');bar.innerHTML='';
@@ -761,61 +951,164 @@ function showPromptTab(idx){
 var tabs=document.querySelectorAll('#prompt-tabs .tab');
 for(var i=0;i<tabs.length;i++)tabs[i].classList.toggle('active',i===idx);
 var s=promptStrats[idx];
-var html='<h3 style="color:var(--teal);margin-bottom:4px">'+s.name+'</h3>';
-html+='<p style="font-size:12px;color:var(--muted);margin-bottom:12px">'+s.def+'</p>';
-html+='<div class="code-block" style="margin-bottom:12px">'+s.prompt.replace(/\n/g,'<br>')+'</div>';
-html+='<div class="card" style="margin-bottom:12px;border-color:var(--teal)"><div style="font-size:10px;color:var(--teal);margin-bottom:4px">SIMULATED RESPONSE</div><div style="font-size:12px">'+s.response.replace(/\n/g,'<br>')+'</div></div>';
-html+='<div style="display:flex;gap:12px"><div class="card" style="flex:1"><div style="font-size:10px;color:var(--green);margin-bottom:4px">WHEN TO USE</div><div style="font-size:12px">'+s.when+'</div></div>';
-html+='<div class="card" style="flex:1;border-color:var(--red)"><div style="font-size:10px;color:var(--red);margin-bottom:4px">PITFALL</div><div style="font-size:12px">'+s.pitfall+'</div></div></div>';
+var html='<h3 style="color:var(--teal);margin-bottom:6px;font-size:22px;font-weight:700">'+s.name+'</h3>';
+html+='<p style="font-size:15px;color:#D6DEE8;margin-bottom:12px;line-height:1.6">'+s.def+'</p>';
+html+='<div style="font-size:14px;color:#94A6BA;margin-bottom:14px;line-height:1.65;padding:12px 14px;background:rgba(0,212,170,0.06);border-left:3px solid var(--teal);border-radius:6px"><b style="color:var(--teal)">Intuition: </b>'+s.intuition+'</div>';
+html+='<div style="font-size:12px;color:#94A6BA;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:6px">Example prompt</div>';
+html+='<div class="code-block" style="margin-bottom:14px;font-size:14px;line-height:1.7">'+s.prompt.replace(/\n/g,'<br>')+'</div>';
+html+='<div class="card" style="margin-bottom:14px;border-color:var(--teal);padding:14px"><div style="font-size:12px;color:var(--teal);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;font-weight:700">Simulated Response</div><div style="font-size:14px;line-height:1.65;color:#F0F4F8">'+s.response.replace(/\n/g,'<br>')+'</div></div>';
+html+='<div style="display:flex;gap:14px;flex-wrap:wrap"><div class="card" style="flex:1;min-width:260px;padding:14px;border-color:rgba(34,197,94,0.4)"><div style="font-size:12px;color:var(--green);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;font-weight:700">When to use</div><div style="font-size:14px;line-height:1.6;color:#D6DEE8">'+s.when+'</div></div>';
+html+='<div class="card" style="flex:1;min-width:260px;padding:14px;border-color:rgba(239,68,68,0.45)"><div style="font-size:12px;color:var(--red);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;font-weight:700">Pitfall</div><div style="font-size:14px;line-height:1.6;color:#D6DEE8">'+s.pitfall+'</div></div></div>';
 document.getElementById('prompt-content').innerHTML=html;
 }
 
 // S13 API
-var apiLines=[
+var apiProviders={
+anthropic:{
+label:'Anthropic / Claude',
+color:'var(--amber)',
+gradient:'linear-gradient(135deg,#f59e0b,#d97706)',
+defaultIntro:'<h3 style="color:var(--amber);font-size:18px;font-weight:700;margin-bottom:10px">Anthropic Messages API</h3><p style="font-size:14px;color:#D6DEE8;line-height:1.65;margin-bottom:12px">Anthropic\u2019s SDK uses a single <span class="mono" style="color:var(--amber)">messages.create()</span> endpoint. The <span class="mono">system</span> prompt is a <i>top-level</i> argument (not a message), and the response comes back as <span class="mono">response.content[0].text</span>.</p><div style="font-size:13.5px;color:#94A6BA;line-height:1.6"><b style="color:#D6DEE8">\u2192 Click any highlighted line</b> on the left to see what it does.</div>',
+prices:{Haiku:{in:0.80,out:4.00,color:'pill-green'},Sonnet:{in:3.00,out:15.00,color:'pill-blue'},Opus:{in:15.00,out:75.00,color:'pill-purple'}},
+priceNote:'$ per 1M tokens \u00B7 Claude 4 family',
+lines:[
 {code:'import anthropic',note:''},
 {code:'',note:''},
-{code:'client = anthropic.Anthropic(api_key="sk-ant-...")',note:'Initialize with your API key. Keep this secret!'},
+{code:'client = anthropic.Anthropic(api_key="sk-ant-...")',note:'<b>Client setup:</b> reads your API key. Never commit this. Use environment variables or a secret manager in production.'},
 {code:'',note:''},
-{code:'response = client.messages.create(',note:''},
-{code:'    model="claude-sonnet-4-20250514",',note:'<b>model:</b> claude-opus-4-20250514 = most capable. claude-sonnet-4-20250514 = balanced. claude-haiku-4-5-20251001 = fastest & cheapest.'},
-{code:'    max_tokens=1024,',note:'<b>max_tokens:</b> Hard cap on response length. 1 token \u2248 0.75 words. Cost = tokens \u00D7 price.'},
-{code:'    temperature=0.7,',note:'<b>temperature:</b> 0 = deterministic. 1 = default. Production chatbots: 0.7.'},
-{code:'    system="You are a helpful ML assistant.",',note:'<b>system:</b> Sets persona, constraints, context. Applied before every user message.'},
-{code:'    messages=[',note:'<b>messages:</b> Full conversation history. The model has no memory \u2014 send history every time.'},
-{code:'        {"role":"user","content":"Explain backprop."},',note:''},
-{code:'        {"role":"assistant","content":"Backprop is..."},',note:''},
-{code:'        {"role":"user","content":"Now for a 10-year-old."}',note:''},
+{code:'response = client.messages.create(',note:'<b>messages.create():</b> the single endpoint for all chat-style calls. Returns a Message object synchronously (or a stream if you ask).'},
+{code:'    model="claude-sonnet-4-5",',note:'<b>model:</b> claude-opus-4 = most capable. claude-sonnet-4-5 = balanced default. claude-haiku-4-5 = fastest & cheapest.'},
+{code:'    max_tokens=1024,',note:'<b>max_tokens:</b> hard cap on the response length. 1 token \u2248 0.75 words. You pay for every output token, so do not set this huge \u201Cjust in case.\u201D'},
+{code:'    temperature=0.7,',note:'<b>temperature:</b> 0 = deterministic / greedy. 1 = default. Most production chatbots use 0.5\u20130.7. See Part 03 for what this actually does to logits.'},
+{code:'    system="You are a helpful ML assistant.",',note:'<b>system:</b> persona / constraints / format. In Anthropic\u2019s API this is a top-level parameter, not a message. Applied before every user turn.'},
+{code:'    messages=[',note:'<b>messages:</b> the full conversation history. The model is <i>stateless</i> \u2014 you must resend prior turns every call. Long history = more input tokens = more cost.'},
+{code:'        {"role":"user","content":"Explain backprop."},',note:'<b>role: user</b> \u2014 messages from the human end. The model continues from these.'},
+{code:'        {"role":"assistant","content":"Backprop is..."},',note:'<b>role: assistant</b> \u2014 the model\u2019s previous replies. Including these is how you give it conversation memory.'},
+{code:'        {"role":"user","content":"Now for a 10-year-old."}',note:'The latest user message. The model will respond <i>to this</i>, with the prior turns + system prompt as context.'},
 {code:'    ]',note:''},
 {code:')',note:''},
 {code:'',note:''},
-{code:'print(response.content[0].text)',note:'<b>content:</b> The generated text. Check stop_reason: end_turn = normal, max_tokens = hit cap.'},
-{code:'print(f"Tokens: {response.usage.input_tokens} in")',note:'<b>usage:</b> For cost tracking. input_tokens includes system prompt + history.'}
-];
+{code:'print(response.content[0].text)',note:'<b>content:</b> a list of content blocks. For plain text, the first block\u2019s <span class="mono">.text</span> is the answer. Also check <span class="mono">response.stop_reason</span>: <span class="mono">end_turn</span> = normal, <span class="mono">max_tokens</span> = ran out, <span class="mono">tool_use</span> = wants to call a tool.'},
+{code:'print(f"Tokens: {response.usage.input_tokens} in")',note:'<b>usage:</b> always log this. <span class="mono">input_tokens</span> = system + history + new user msg. <span class="mono">output_tokens</span> = the response. Cost = (input \u00D7 input-price + output \u00D7 output-price) / 1M.'}
+]
+},
+openai:{
+label:'OpenAI / ChatGPT',
+color:'var(--green)',
+gradient:'linear-gradient(135deg,#10a37f,#0d8a6c)',
+defaultIntro:'<h3 style="color:var(--green);font-size:18px;font-weight:700;margin-bottom:10px">OpenAI Chat Completions API</h3><p style="font-size:14px;color:#D6DEE8;line-height:1.65;margin-bottom:12px">OpenAI uses <span class="mono" style="color:var(--green)">chat.completions.create()</span>. Unlike Anthropic, the <span class="mono">system</span> prompt is the <i>first message</i> in the messages array, and the reply lives at <span class="mono">response.choices[0].message.content</span>.</p><div style="font-size:13.5px;color:#94A6BA;line-height:1.6"><b style="color:#D6DEE8">\u2192 Click any highlighted line</b> on the left to see what it does.</div>',
+prices:{'4o-mini':{in:0.15,out:0.60,color:'pill-green'},'GPT-4o':{in:2.50,out:10.00,color:'pill-blue'},'GPT-4.1':{in:2.00,out:8.00,color:'pill-amber'}},
+priceNote:'$ per 1M tokens \u00B7 GPT-4 family',
+lines:[
+{code:'from openai import OpenAI',note:''},
+{code:'',note:''},
+{code:'client = OpenAI(api_key="sk-...")',note:'<b>Client setup:</b> reads your API key (or the <span class="mono">OPENAI_API_KEY</span> env var if you omit the argument).'},
+{code:'',note:''},
+{code:'response = client.chat.completions.create(',note:'<b>chat.completions.create():</b> the standard chat endpoint. (OpenAI also offers the newer <span class="mono">responses.create()</span> API for agentic flows \u2014 same idea, slightly different shape.)'},
+{code:'    model="gpt-4o",',note:'<b>model:</b> gpt-4o = flagship multimodal. gpt-4o-mini = cheap & fast. o1 / o3 = reasoning models that think before answering. Pick the cheapest one that passes your evals.'},
+{code:'    max_tokens=1024,',note:'<b>max_tokens:</b> output cap. Note: for o1/o3 reasoning models this counts <i>visible</i> tokens only \u2014 hidden reasoning tokens are billed separately as <span class="mono">reasoning_tokens</span>.'},
+{code:'    temperature=0.7,',note:'<b>temperature:</b> same meaning as Anthropic. 0 = greedy / deterministic. Reasoning models (o1/o3) ignore this.'},
+{code:'    messages=[',note:'<b>messages:</b> conversation history. In OpenAI\u2019s schema the <i>system prompt is the first message</i> with role=system \u2014 not a separate parameter.'},
+{code:'        {"role":"system","content":"You are a helpful ML assistant."},',note:'<b>role: system</b> \u2014 OpenAI\u2019s way of giving the model its persona / rules. Equivalent to Anthropic\u2019s <span class="mono">system=</span> argument.'},
+{code:'        {"role":"user","content":"Explain backprop."},',note:'<b>role: user</b> \u2014 messages from the human end.'},
+{code:'        {"role":"assistant","content":"Backprop is..."},',note:'<b>role: assistant</b> \u2014 prior model replies. Re-send these to give the model memory across turns.'},
+{code:'        {"role":"user","content":"Now for a 10-year-old."}',note:'The latest user input. The model continues from here.'},
+{code:'    ]',note:''},
+{code:')',note:''},
+{code:'',note:''},
+{code:'print(response.choices[0].message.content)',note:'<b>choices:</b> a list (even though n=1 by default). <span class="mono">.message.content</span> is the text. Also check <span class="mono">choices[0].finish_reason</span>: <span class="mono">stop</span> = normal, <span class="mono">length</span> = hit max_tokens, <span class="mono">tool_calls</span> = function-calling.'},
+{code:'print(f"Tokens: {response.usage.prompt_tokens} in")',note:'<b>usage:</b> <span class="mono">prompt_tokens</span> = input. <span class="mono">completion_tokens</span> = output. <span class="mono">total_tokens</span> = both. For reasoning models also see <span class="mono">completion_tokens_details.reasoning_tokens</span>.'}
+]
+},
+google:{
+label:'Google / Gemini',
+color:'var(--blue)',
+gradient:'linear-gradient(135deg,#4285f4,#1a73e8)',
+defaultIntro:'<h3 style="color:var(--blue);font-size:18px;font-weight:700;margin-bottom:10px">Google Gemini API</h3><p style="font-size:14px;color:#D6DEE8;line-height:1.65;margin-bottom:12px">Gemini uses <span class="mono" style="color:var(--blue)">client.models.generate_content()</span>. The biggest difference: instead of <span class="mono">messages</span> with <span class="mono">content</span>, Gemini has <span class="mono">contents</span> with <span class="mono">parts</span> (so it can mix text, images, audio, video in the same turn). Roles are <span class="mono">user</span> and <span class="mono">model</span>.</p><div style="font-size:13.5px;color:#94A6BA;line-height:1.6"><b style="color:#D6DEE8">\u2192 Click any highlighted line</b> on the left to see what it does.</div>',
+prices:{'Flash-Lite':{in:0.10,out:0.40,color:'pill-green'},'Flash':{in:0.30,out:2.50,color:'pill-blue'},'2.5 Pro':{in:1.25,out:10.00,color:'pill-purple'}},
+priceNote:'$ per 1M tokens \u00B7 Gemini 2.5 family',
+lines:[
+{code:'from google import genai',note:''},
+{code:'',note:''},
+{code:'client = genai.Client(api_key="AIza...")',note:'<b>Client setup:</b> Google API key from AI Studio or Vertex. The new <span class="mono">google-genai</span> SDK replaces the old <span class="mono">google-generativeai</span> package.'},
+{code:'',note:''},
+{code:'response = client.models.generate_content(',note:'<b>generate_content():</b> the unified endpoint for text, vision, audio, and video. Returns synchronously by default; pass to <span class="mono">generate_content_stream()</span> for streaming.'},
+{code:'    model="gemini-2.5-pro",',note:'<b>model:</b> gemini-2.5-pro = flagship. gemini-2.5-flash = balanced. gemini-2.5-flash-lite = cheapest. Add <span class="mono">-thinking</span> for built-in chain-of-thought.'},
+{code:'    contents=[',note:'<b>contents:</b> the equivalent of OpenAI\u2019s <span class="mono">messages</span>, but each turn has multiple <span class="mono">parts</span> (text/image/audio/video). For pure text you can just pass a string.'},
+{code:'        {"role":"user","parts":[{"text":"Explain backprop."}]},',note:'<b>role: user</b> + a list of <span class="mono">parts</span>. To attach an image, add <span class="mono">{"inline_data":{"mime_type":"image/png","data":...}}</span> as another part.'},
+{code:'        {"role":"model","parts":[{"text":"Backprop is..."}]},',note:'<b>role: model</b> \u2014 Gemini\u2019s name for the assistant role. Re-send prior turns the same as other providers.'},
+{code:'        {"role":"user","parts":[{"text":"Now for a 10-year-old."}]}',note:'The latest user turn. The model continues from here.'},
+{code:'    ],',note:''},
+{code:'    config={',note:'<b>config:</b> Gemini buckets sampling params and the system instruction into a single <span class="mono">config</span> object instead of top-level kwargs.'},
+{code:'        "system_instruction":"You are a helpful ML assistant.",',note:'<b>system_instruction:</b> Gemini\u2019s equivalent of Anthropic\u2019s <span class="mono">system</span> or OpenAI\u2019s system message. Persona, format, hard rules.'},
+{code:'        "max_output_tokens":1024,',note:'<b>max_output_tokens:</b> output cap. Same idea, slightly different name. 1 token \u2248 4 chars in English.'},
+{code:'        "temperature":0.7',note:'<b>temperature:</b> 0\u20132 range (note: Gemini allows up to 2.0, vs ~1.0 for OpenAI/Anthropic). Same logit-rescaling story from Part 03.'},
+{code:'    }',note:''},
+{code:')',note:''},
+{code:'',note:''},
+{code:'print(response.text)',note:'<b>response.text:</b> shorthand for the concatenated text of all parts. The full structure lives at <span class="mono">response.candidates[0].content.parts</span>. Check <span class="mono">candidates[0].finish_reason</span>: <span class="mono">STOP</span> = normal, <span class="mono">MAX_TOKENS</span> = hit cap, <span class="mono">SAFETY</span> = blocked.'},
+{code:'print(f"Tokens: {response.usage_metadata.prompt_token_count} in")',note:'<b>usage_metadata:</b> <span class="mono">prompt_token_count</span> = input. <span class="mono">candidates_token_count</span> = output. <span class="mono">total_token_count</span> = both. Also includes <span class="mono">cached_content_token_count</span> if you use context caching.'}
+]
+}
+};
+var currentProvider='anthropic';
 function initAPI(){
+var bar=document.getElementById('api-provider-bar');
+if(bar){bar.innerHTML='';var keys=Object.keys(apiProviders);
+for(var k=0;k<keys.length;k++){
+var key=keys[k],pr=apiProviders[key];
+var b=document.createElement('button');
+b.className='btn btn-outline';
+b.style.cssText='font-size:14.5px;padding:9px 18px;font-weight:600;'+(key===currentProvider?'background:'+pr.gradient+';border-color:transparent;color:#fff':'border-color:'+pr.color+';color:'+pr.color);
+b.textContent=pr.label;
+b.setAttribute('data-prov',key);
+b.onclick=(function(kk){return function(){switchAPIProvider(kk)}})(key);
+bar.appendChild(b);
+}}
+renderAPI();
+updateCost();
+}
+function switchAPIProvider(key){
+currentProvider=key;
+initAPI();
+}
+function renderAPI(){
+var pr=apiProviders[currentProvider];
 var el=document.getElementById('api-code');var html='';
-for(var i=0;i<apiLines.length;i++){
-if(apiLines[i].note){
-html+='<span class="hl-line" onclick="showAPINote('+i+')">'+escHTML(apiLines[i].code)+'</span>\n';
+for(var i=0;i<pr.lines.length;i++){
+if(pr.lines[i].note){
+html+='<span class="hl-line" onclick="showAPINote('+i+')">'+escHTML(pr.lines[i].code)+'</span>\n';
 }else{
-html+=escHTML(apiLines[i].code)+'\n';
+html+=escHTML(pr.lines[i].code)+'\n';
 }
 }
 el.innerHTML=html;
-updateCost();
+document.getElementById('api-explain').innerHTML=pr.defaultIntro;
 }
 function showAPINote(idx){
-document.getElementById('api-explain').innerHTML='<div style="font-size:12px;line-height:1.6">'+apiLines[idx].note+'</div>';
+var pr=apiProviders[currentProvider];
+var note=pr.lines[idx].note;
+if(!note)return;
+document.getElementById('api-explain').innerHTML='<div style="font-size:11.5px;color:'+pr.color+';text-transform:uppercase;letter-spacing:0.6px;font-weight:700;margin-bottom:8px">'+pr.label+' \u00B7 line '+(idx+1)+'</div><div style="font-size:14.5px;line-height:1.7;color:#F0F4F8">'+note+'</div>';
 }
 function escHTML(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function updateCost(){
+var pr=apiProviders[currentProvider];
 var inp=parseInt(document.getElementById('cost-in').value);
 var out=parseInt(document.getElementById('cost-out').value);
 document.getElementById('cost-in-val').textContent=inp;
 document.getElementById('cost-out-val').textContent=out;
-var haiku=(inp*0.25+out*1.25)/1000000;
-var sonnet=(inp*3+out*15)/1000000;
-var opus=(inp*15+out*75)/1000000;
-document.getElementById('cost-result').innerHTML='<div style="display:flex;gap:12px"><div><span class="pill pill-green">Haiku</span> $'+haiku.toFixed(4)+'</div><div><span class="pill pill-blue">Sonnet</span> $'+sonnet.toFixed(4)+'</div><div><span class="pill pill-purple">Opus</span> $'+opus.toFixed(4)+'</div></div>';
+var lbl=document.getElementById('cost-provider-label');
+if(lbl)lbl.textContent='\u00B7 '+pr.priceNote;
+var modelKeys=Object.keys(pr.prices);
+var html='<div style="display:flex;gap:14px;flex-wrap:wrap">';
+for(var i=0;i<modelKeys.length;i++){
+var mk=modelKeys[i],mp=pr.prices[mk];
+var cost=(inp*mp.in+out*mp.out)/1000000;
+html+='<div style="display:flex;align-items:center;gap:8px"><span class="pill '+mp.color+'">'+mk+'</span><span class="mono" style="color:#F0F4F8;font-size:14px">$'+cost.toFixed(4)+'</span></div>';
+}
+html+='</div>';
+document.getElementById('cost-result').innerHTML=html;
 }
 
 // S14 Token counter
@@ -823,60 +1116,100 @@ function countTokens(){
 var text=document.getElementById('token-input').value;
 var chars=text.length;
 var tokens=Math.ceil(chars/4);
-var haiku=(tokens*0.25/1000000).toFixed(6);
-var sonnet=(tokens*3/1000000).toFixed(6);
+var haiku=((tokens*0.80)/1000000).toFixed(6);
+var sonnet=((tokens*3.00)/1000000).toFixed(6);
+var opus=((tokens*15.00)/1000000).toFixed(6);
 var remaining=4096-tokens;
-document.getElementById('token-stats').innerHTML='Characters: <b>'+chars+'</b><br>Approx tokens: <b>'+tokens+'</b><br>Est. cost (input): Haiku $'+haiku+' / Sonnet $'+sonnet+'<br>Budget remaining (4096): <b style="color:'+(remaining<0?'var(--red)':'var(--teal)')+'">'+remaining+'</b>';
+var color=(remaining<0?'var(--red)':remaining<500?'var(--amber)':'var(--teal)');
+var ratio=chars>0?(chars/Math.max(tokens,1)).toFixed(2):'\u2014';
+document.getElementById('token-stats').innerHTML=
+'<div style="display:grid;grid-template-columns:auto 1fr;gap:6px 18px;font-size:15px">'+
+'<div style="color:#94A6BA">Characters</div><div><b style="font-size:17px">'+chars.toLocaleString()+'</b></div>'+
+'<div style="color:#94A6BA">Approx tokens</div><div><b style="font-size:17px;color:var(--teal)">'+tokens.toLocaleString()+'</b> <span style="color:#94A6BA;font-size:13px">(~'+ratio+' chars/token)</span></div>'+
+'<div style="color:#94A6BA">Est. input cost</div><div style="font-size:14px"><span class="pill pill-green">Haiku</span> <span class="mono">$'+haiku+'</span> &nbsp; <span class="pill pill-blue">Sonnet</span> <span class="mono">$'+sonnet+'</span> &nbsp; <span class="pill pill-purple">Opus</span> <span class="mono">$'+opus+'</span></div>'+
+'<div style="color:#94A6BA">Budget remaining</div><div><b style="font-size:17px;color:'+color+'">'+remaining.toLocaleString()+'</b> <span style="color:#94A6BA;font-size:13px">/ 4096 ctx</span></div>'+
+'</div>'+
+'<div style="font-size:13px;color:#94A6BA;margin-top:14px;line-height:1.6;padding:10px 12px;background:rgba(255,255,255,0.03);border-left:3px solid var(--teal);border-radius:4px"><b>Rule of thumb:</b> 1 token \u2248 4 chars in English \u2248 0.75 words. A typical prompt + history can easily reach 1,000\u20135,000 input tokens \u2014 multiply by your traffic to get the bill.</div>';
 }
 function initEfficiency(){
 var tips=[
-{before:'Hi Claude! I hope you\'re doing well. Could you please kindly summarize...',after:'Summarize this document:',save:'~20 tokens/call'},
-{before:'The text I want you to look at is the following text which says...',after:'<context>...</context><task>Summarize</task>',save:'Clearer boundaries'},
-{before:'"Return the data as JSON" (vague)',after:'Return JSON: {"name":string,"score":number}',save:'No format guessing'},
-{before:'System: (empty) + "You are a helpful assistant" every msg',after:'System prompt set once, reused across turns',save:'Fewer repeated tokens'},
-{before:'"Please provide me with a comprehensive answer..."',after:'"Be concise. No preamble. Just the answer."',save:'Shorter responses'},
-{before:'3 separate API calls for 3 questions',after:'1 call with all 3 questions batched',save:'3x fewer round trips'},
-{before:'Full system prompt sent every call (long)',after:'Use Anthropic prompt caching for long prefixes',save:'Up to 90% savings'},
-{before:'Using Opus for simple classification',after:'Use Haiku for simple tasks, Opus for hard reasoning',save:'60x cost difference'}
+{before:'Hi Claude! I hope you\u2019re doing well. Could you please kindly summarize\u2026',after:'Summarize this document:',save:'~20 tokens / call',why:'Pleasantries do not improve quality. Strip them. At a million calls/day this is real money.'},
+{before:'The text I want you to look at is the following text which says\u2026',after:'<context>\u2026</context><task>Summarize</task>',save:'Clearer boundaries',why:'XML-style delimiters make the model\u2019s job unambiguous and let you nest sections cleanly.'},
+{before:'\u201CReturn the data as JSON\u201D (vague)',after:'Return JSON: {"name":string,"score":number}',save:'No format guessing',why:'Show the exact schema. Better still, use the provider\u2019s structured-output / JSON-mode flag.'},
+{before:'System: (empty) + \u201CYou are a helpful assistant\u201D in every user message',after:'System prompt set once, reused across turns',save:'Fewer repeated tokens',why:'The system prompt is sent every call \u2014 but only once per call. Putting persona in the user msg sends it twice.'},
+{before:'\u201CPlease provide me with a comprehensive answer\u2026\u201D',after:'\u201CBe concise. No preamble. Just the answer.\u201D',save:'Shorter responses',why:'Output tokens are 3\u20135\u00D7 more expensive than input tokens. Tightening the spec is the highest-leverage edit.'},
+{before:'3 separate API calls for 3 questions',after:'1 call with all 3 questions batched',save:'3\u00D7 fewer round trips',why:'Network latency dominates short calls. Batch when the questions are independent and don\u2019t need each other\u2019s output.'},
+{before:'Full system prompt sent every call (long)',after:'Use Anthropic / OpenAI / Gemini prompt caching for long prefixes',save:'Up to 90% savings',why:'All three providers cache static prefixes (instructions, RAG context). Cached input tokens are billed at ~10% of normal.'},
+{before:'Using Opus / GPT-4 for simple classification',after:'Use Haiku / 4o-mini for simple tasks; reserve flagship models for hard reasoning',save:'30\u201360\u00D7 cost difference',why:'A correct cheap answer beats a more correct expensive one. Always start with the cheapest model that passes your eval set.'}
 ];
-var el=document.getElementById('efficiency-tips');el.innerHTML='';
+var el=document.getElementById('efficiency-tips');
+el.innerHTML='<div class="insight" style="margin-bottom:4px"><b>8 high-leverage rewrites.</b> Each looks tiny but compounds: a 20-token saving \u00D7 100k calls/day \u00D7 365 days = millions of tokens.</div>';
 for(var i=0;i<tips.length;i++){
-el.innerHTML+='<div class="card" style="font-size:11px"><div style="color:var(--red);margin-bottom:4px">BEFORE: '+escHTML(tips[i].before)+'</div><div style="color:var(--teal);margin-bottom:4px">AFTER: '+escHTML(tips[i].after)+'</div><div style="color:var(--amber)">Saves: '+tips[i].save+'</div></div>';
+el.innerHTML+='<div class="card" style="padding:14px 16px">'+
+'<div style="font-size:11.5px;color:var(--red);text-transform:uppercase;letter-spacing:0.6px;font-weight:700;margin-bottom:4px">Before</div>'+
+'<div style="font-size:14px;color:#F0F4F8;line-height:1.55;margin-bottom:10px">'+escHTML(tips[i].before)+'</div>'+
+'<div style="font-size:11.5px;color:var(--teal);text-transform:uppercase;letter-spacing:0.6px;font-weight:700;margin-bottom:4px">After</div>'+
+'<div style="font-size:14px;color:#F0F4F8;line-height:1.55;margin-bottom:10px">'+escHTML(tips[i].after)+'</div>'+
+'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px"><span class="pill pill-amber">Saves: '+tips[i].save+'</span></div>'+
+'<div style="font-size:13px;color:#B7C3D2;line-height:1.6;font-style:italic">'+tips[i].why+'</div>'+
+'</div>';
 }
 }
 
 // S15 Flip cards
 var flipData=[
-{bad:'Write about transformers',good:'Write a 4-sentence technical definition of the Transformer architecture for a software engineer. Include: attention mechanism, positional encoding, and use cases.',why:'Specificity eliminates ambiguity'},
-{bad:'Return the data as JSON',good:'Return JSON matching: {"name":string, "score":number, "tags":string[]}',why:'Exact schema prevents format errors'},
-{bad:'Explain neural networks',good:'Explain neural networks to a high school student with no math background. Use analogies. Avoid equations.',why:'Audience + constraints = better output'},
-{bad:'[constraint buried mid-paragraph]',good:'[constraint as final line]\n"Important: Always respond in exactly 3 bullet points."',why:'Models attend more to end of prompt'},
-{bad:'Unstructured mixed prompt with everything jumbled',good:'<context>...</context>\n<task>...</task>\n<constraints>...</constraints>',why:'XML delimiters create clear sections'},
-{bad:'Open-ended question with no uncertainty handling',good:'Add: "If uncertain, say I\'m not confident rather than guessing."',why:'Reduces hallucination explicitly'},
-{bad:'One long run-on instruction paragraph',good:'1. Extract key points\n2. Rank by importance\n3. Format as bullets',why:'Numbered steps = better compliance'},
-{bad:'Happy-path examples only',good:'Include edge case examples in few-shot demos',why:'Edge cases prevent failure modes'}
+{bad:'Write about transformers',good:'Write a 4-sentence technical definition of the Transformer architecture for a software engineer. Include: attention mechanism, positional encoding, and use cases.',why:'Be specific. The model can\u2019t read your mind \u2014 vague prompts force it to guess your audience, length, and depth. Always state who the reader is, how long the answer should be, and what must be covered.',principle:'Specificity > brevity'},
+{bad:'Return the data as JSON',good:'Return JSON matching: {"name":string, "score":number, "tags":string[]}',why:'Show, don\u2019t tell. \u201CJSON\u201D alone doesn\u2019t pin down field names, types, or nesting \u2014 the model invents them. Paste the exact schema (or use the provider\u2019s structured-output flag) and parse errors disappear.',principle:'Exact schema, not vague type'},
+{bad:'Explain neural networks',good:'Explain neural networks to a high school student with no math background. Use analogies. Avoid equations.',why:'Pin the audience and the style. The same question has dozens of correct answers; without an audience, you get the average one. Adding constraints (\u201Cuse analogies\u201D, \u201Cavoid equations\u201D) shapes the output dramatically.',principle:'Audience + constraints = useful output'},
+{bad:'Important rule buried in the middle of a 200-word prompt',good:'Put critical instructions at the very end:\n\n\u201CImportant: Always respond in exactly 3 bullet points.\u201D',why:'LLMs pay more attention to the start and end of the prompt than the middle (the \u201Clost in the middle\u201D effect). Constraints buried mid-paragraph quietly get ignored. Move them to the last line.',principle:'Recency bias is real \u2014 use it'},
+{bad:'Unstructured mixed prompt with context, task, examples, and constraints all jumbled together',good:'<context>\u2026 background docs \u2026</context>\n<task>\u2026 what to do \u2026</task>\n<constraints>\u2026 rules \u2026</constraints>\n<examples>\u2026 demos \u2026</examples>',why:'XML-style tags create unambiguous sections the model parses cleanly. Anthropic explicitly trains Claude to recognise them; OpenAI and Gemini handle them just as well. It also makes <i>your</i> prompts easier to template and diff.',principle:'Structure your prompt like code'},
+{bad:'\u201CWhat is the capital of Atlantis?\u201D \u2014 with no uncertainty handling',good:'Add an explicit out: \u201CIf you are not confident, say \u2018I don\u2019t know\u2019 instead of guessing. Do not invent facts.\u201D',why:'Models default to giving an answer because that\u2019s what training data rewarded. Without an explicit permission to say \u201CI don\u2019t know,\u201D they fabricate confidently. One sentence cuts hallucinations dramatically.',principle:'Give the model permission to refuse'},
+{bad:'One long run-on instruction paragraph that asks for several things at once',good:'Break it into numbered steps:\n1. Extract the key claims.\n2. Rank them by importance.\n3. Format the top 3 as bullets.',why:'Numbered steps act like a checklist. The model is far more likely to do every item, in order, when each step is explicit. This also lets you debug \u2014 if step 2 fails, you know exactly where.',principle:'Numbered steps = better compliance'},
+{bad:'Few-shot examples that only show happy-path inputs',good:'Include 1\u20132 edge cases in your examples: empty input, malformed input, ambiguous input, multi-language input.',why:'The model imitates the distribution of your demos. If you only show clean inputs, it assumes that\u2019s all it will ever see and panics on edge cases. Show it how to handle weirdness explicitly.',principle:'Demonstrate the failure modes you want handled'}
 ];
 function initFlipCards(){
 var g=document.getElementById('flip-grid');g.innerHTML='';
 for(var i=0;i<flipData.length;i++){
-g.innerHTML+='<div class="flip-card" style="min-height:120px" onclick="this.classList.toggle(\'flipped\')"><div class="flip-inner"><div class="flip-front"><div style="font-size:10px;color:var(--red);margin-bottom:6px">\u2717 BAD PROMPT</div><div style="font-size:12px">'+flipData[i].bad+'</div></div><div class="flip-back"><div style="font-size:10px;color:var(--teal);margin-bottom:6px">\u2713 GOOD PROMPT</div><div style="font-size:11px;margin-bottom:6px">'+flipData[i].good.replace(/\n/g,'<br>')+'</div><div style="font-size:10px;color:var(--amber)">'+flipData[i].why+'</div></div></div></div>';
+g.innerHTML+='<div class="flip-card" style="min-height:200px" onclick="this.classList.toggle(\'flipped\')">'+
+'<div class="flip-inner">'+
+'<div class="flip-front" style="padding:18px">'+
+'<div style="font-size:12px;color:var(--red);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.6px;font-weight:700">\u2717 Bad prompt</div>'+
+'<div style="font-size:15.5px;line-height:1.55;color:#F0F4F8">'+flipData[i].bad+'</div>'+
+'<div style="margin-top:auto;padding-top:14px;font-size:12px;color:#94A6BA;font-style:italic">Click to see the fix \u2192</div>'+
+'</div>'+
+'<div class="flip-back" style="padding:18px">'+
+'<div style="font-size:12px;color:var(--teal);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.6px;font-weight:700">\u2713 Good prompt</div>'+
+'<div style="font-size:14.5px;line-height:1.6;margin-bottom:12px;color:#F0F4F8;font-family:\'JetBrains Mono\',monospace">'+flipData[i].good.replace(/\n/g,'<br>')+'</div>'+
+'<div style="font-size:13.5px;line-height:1.6;color:#D6DEE8;margin-bottom:10px"><b style="color:var(--amber)">Why it works: </b>'+flipData[i].why+'</div>'+
+'<div style="margin-top:auto;padding-top:8px;font-size:12px;color:var(--amber);text-transform:uppercase;letter-spacing:0.6px;font-weight:700">\u2192 '+flipData[i].principle+'</div>'+
+'</div>'+
+'</div></div>';
 }
 }
 
 // S16 Failure modes
 var failures=[
-{name:'Hallucination',icon:'\uD83C\uDFAD',symptom:'Model confidently states false facts.',cause:'Fills gaps with plausible-sounding content \u2014 optimized for fluency, not accuracy.',fix:'\u201CIf not certain, say I don\'t know.\u201D Use T=0 for factual. Add RAG. Ask for citations.',param:'T=0, add retrieval'},
-{name:'Sycophancy',icon:'\uD83E\uDE9E',symptom:'Model agrees with incorrect statements.',cause:'RLHF over-optimizes for user approval.',fix:'\u201CBe honest even if it contradicts me. I prefer accuracy over agreement.\u201D',param:'Explicit honesty instruction'},
-{name:'Verbosity',icon:'\uD83D\uDCDC',symptom:'3 paragraphs when 1 sentence needed.',cause:'Training rewards completeness-signaling.',fix:'\u201CBe concise. One sentence. No preamble.\u201D Set low max_tokens.',param:'max_tokens=100'},
-{name:'Instruction Ignoring',icon:'\uD83D\uDE48',symptom:'Key constraints not followed.',cause:'Long prompts bury constraints \u2014 model attends less to middle.',fix:'Put critical instructions at END. Repeat key rules. Use ALL CAPS for crucial constraints.',param:'Restructure prompt'},
-{name:'Context Amnesia',icon:'\uD83D\uDCAD',symptom:'Model forgets earlier conversation.',cause:'Tokens fall out of context window.',fix:'Periodically summarize history. Design stateless interactions. Use retrieval for long-term memory.',param:'Summarize + RAG'},
-{name:'Format Inconsistency',icon:'\uD83C\uDFB2',symptom:'JSON sometimes, markdown other times.',cause:'Without strict constraints, model uses judgment.',fix:'Show exact format in examples. Use T=0. Add retry logic with validation. Use JSON mode.',param:'T=0, strict schema'}
+{name:'Hallucination',icon:'\uD83C\uDFAD',symptom:'Model confidently states things that are simply false \u2014 fabricated citations, invented APIs, made-up dates.',cause:'LLMs are next-token predictors, not databases. When a fact isn\u2019t strongly represented in their training data, they fill the gap with the <i>most plausible-sounding</i> continuation. Fluency is rewarded during training; truthfulness is not, directly.',fix:'(1) Give the model an explicit out: <span class="mono">\u201CIf not certain, say \u2018I don\u2019t know.\u2019\u201D</span>  (2) Drop temperature to 0 for factual tasks.  (3) Use RAG so the model retrieves real sources before answering.  (4) Ask for citations and verify them.',param:'T=0  \u00B7  RAG  \u00B7  \u201Cdon\u2019t guess\u201D'},
+{name:'Sycophancy',icon:'\uD83E\uDE9E',symptom:'Model flips its answer the moment you push back \u2014 even when it was originally correct. \u201COh you\u2019re right, sorry, the answer is \u2026\u201D',cause:'RLHF (reinforcement learning from human feedback) trains the model to maximise user approval. Disagreeing with users gets penalised in the reward signal, so the model learns to fold under pressure.',fix:'Set the rule explicitly in the system prompt: <span class="mono">\u201CBe honest even if it contradicts me. I prefer accuracy over agreement. If I\u2019m wrong, say so and explain why.\u201D</span>  Re-state it whenever you notice agreement that feels too easy.',param:'Honesty system prompt'},
+{name:'Verbosity',icon:'\uD83D\uDCDC',symptom:'You ask one question and get three paragraphs of preamble, caveats, and a numbered list. \u201CCertainly! Here is a comprehensive overview\u2026\u201D',cause:'Training rewards completeness-signaling \u2014 longer answers <i>look</i> more thorough to human raters, so the model learned to pad. There\u2019s also a real cost: every extra output token is the most expensive token type.',fix:'(1) Be specific in the prompt: <span class="mono">\u201CBe concise. One sentence. No preamble.\u201D</span>  (2) Set <span class="mono">max_tokens</span> to a tight cap.  (3) Show 1\u20132 short-answer demos in few-shot. The model imitates length.',param:'max_tokens=100  \u00B7  \u201Cno preamble\u201D'},
+{name:'Instruction Ignoring',icon:'\uD83D\uDE48',symptom:'You wrote a long prompt with a critical rule (\u201Cnever mention pricing\u201D) and the model breaks it anyway.',cause:'The \u201Clost in the middle\u201D effect: attention is strongest at the very start and very end of the prompt. Anything buried in the middle of a long instruction block gets quietly down-weighted.',fix:'(1) Put the most important rule on the <b>last line</b> before the user input.  (2) Repeat critical constraints twice, top and bottom.  (3) Use UPPERCASE or <span class="mono">&lt;important&gt;</span> tags for hard rules.  (4) Shorten the prompt overall.',param:'Restructure  \u00B7  recency'},
+{name:'Context Amnesia',icon:'\uD83D\uDCAD',symptom:'Long conversation drifts \u2014 the model forgets details from 20 messages ago, contradicts earlier facts, or repeats itself.',cause:'LLMs are <b>stateless</b>. Every turn re-sends the whole history, but eventually you exceed the context window (or pay enormous token costs). Older tokens get dropped or summarised away.',fix:'(1) Periodically <i>summarise</i> the conversation and replace older messages with the summary.  (2) Use retrieval (RAG) over a memory store for long-term facts.  (3) Design interactions to be stateless when possible \u2014 each call self-contained.',param:'Rolling summary  \u00B7  RAG memory'},
+{name:'Format Inconsistency',icon:'\uD83C\uDFB2',symptom:'You asked for JSON. Sometimes you get JSON, sometimes you get JSON in a markdown code fence, sometimes a sentence followed by JSON.',cause:'Without an explicit schema, the model uses its own \u201Cjudgment\u201D about what looks helpful. Different prompts in your training data produced different formats, so the model samples among them.',fix:'(1) Show the exact schema in the prompt, with example values.  (2) Use the provider\u2019s structured-output / JSON-mode flag.  (3) Set <span class="mono">temperature=0</span>.  (4) Wrap with retry-and-validate logic so malformed outputs are auto-retried.',param:'T=0  \u00B7  JSON mode  \u00B7  schema'}
 ];
 function initFailures(){
 var g=document.getElementById('failure-grid');g.innerHTML='';
 for(var i=0;i<failures.length;i++){
 var f=failures[i];
-g.innerHTML+='<div class="expand-card" onclick="this.classList.toggle(\'expanded\')"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:20px">'+f.icon+'</span><b style="font-size:13px">'+f.name+'</b></div><div style="font-size:11px;color:var(--muted)">'+f.symptom+'</div><div class="ec"><div style="margin-top:10px;font-size:11px;line-height:1.6"><div style="color:var(--red);margin-bottom:4px"><b>Root cause:</b> '+f.cause+'</div><div style="color:var(--teal);margin-bottom:4px"><b>Fix:</b> '+f.fix+'</div><div style="color:var(--amber)"><b>Param:</b> '+f.param+'</div></div></div></div>';
+g.innerHTML+='<div class="expand-card" onclick="this.classList.toggle(\'expanded\')">'+
+'<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px"><span style="font-size:28px">'+f.icon+'</span><b style="font-size:18px;font-weight:700;color:#F0F4F8">'+f.name+'</b></div>'+
+'<div style="font-size:14.5px;color:#D6DEE8;line-height:1.6">'+f.symptom+'</div>'+
+'<div style="font-size:12px;color:var(--teal);margin-top:10px;font-weight:600;letter-spacing:0.4px">\u2192 Click to expand</div>'+
+'<div class="ec">'+
+'<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);font-size:14px;line-height:1.65">'+
+'<div style="margin-bottom:12px"><div style="color:var(--red);font-size:11.5px;text-transform:uppercase;letter-spacing:0.6px;font-weight:700;margin-bottom:6px">Root cause</div><div style="color:#D6DEE8">'+f.cause+'</div></div>'+
+'<div style="margin-bottom:12px"><div style="color:var(--teal);font-size:11.5px;text-transform:uppercase;letter-spacing:0.6px;font-weight:700;margin-bottom:6px">How to fix</div><div style="color:#D6DEE8">'+f.fix+'</div></div>'+
+'<div><div style="color:var(--amber);font-size:11.5px;text-transform:uppercase;letter-spacing:0.6px;font-weight:700;margin-bottom:6px">Quick lever</div><div style="color:var(--amber);font-family:\'JetBrains Mono\',monospace;font-size:13.5px">'+f.param+'</div></div>'+
+'</div></div></div>';
 }
 }
 
@@ -892,7 +1225,7 @@ function initWorkbench(){
 wbExamples=[];
 var cel=document.getElementById('wb-constraints');cel.innerHTML='';
 for(var i=0;i<defaultConstraints.length;i++){
-cel.innerHTML+='<label style="display:block;margin-bottom:4px;cursor:pointer"><input type="checkbox" onchange="buildPrompt()" value="'+defaultConstraints[i]+'" style="accent-color:var(--teal)"> '+defaultConstraints[i]+'</label>';
+cel.innerHTML+='<label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:#D6DEE8"><input type="checkbox" onchange="buildPrompt()" value="'+defaultConstraints[i]+'" style="accent-color:var(--teal);width:18px;height:18px"> '+defaultConstraints[i]+'</label>';
 }
 document.getElementById('wb-examples').innerHTML='';
 buildPrompt();
@@ -915,7 +1248,7 @@ wbExamples.push({input:'',output:''});renderExamples();
 function renderExamples(){
 var el=document.getElementById('wb-examples');el.innerHTML='';
 for(var i=0;i<wbExamples.length;i++){
-el.innerHTML+='<div style="margin-bottom:6px;font-size:11px"><div>Example '+(i+1)+':</div><input type="text" placeholder="Input" value="'+escHTML(wbExamples[i].input)+'" onchange="wbExamples['+i+'].input=this.value;buildPrompt()" style="width:100%;background:var(--navy);border:1px solid var(--border);border-radius:4px;padding:4px;color:var(--white);font-size:11px;margin-bottom:2px"><input type="text" placeholder="Expected output" value="'+escHTML(wbExamples[i].output)+'" onchange="wbExamples['+i+'].output=this.value;buildPrompt()" style="width:100%;background:var(--navy);border:1px solid var(--border);border-radius:4px;padding:4px;color:var(--white);font-size:11px"></div>';
+el.innerHTML+='<div style="margin-bottom:10px"><div style="font-size:13px;color:#94A6BA;font-weight:600;margin-bottom:6px">Example '+(i+1)+':</div><input type="text" placeholder="Input \u2026" value="'+escHTML(wbExamples[i].input)+'" onchange="wbExamples['+i+'].input=this.value;buildPrompt()" style="width:100%;background:var(--navy);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--white);font-size:13.5px;margin-bottom:5px"><input type="text" placeholder="Expected output \u2026" value="'+escHTML(wbExamples[i].output)+'" onchange="wbExamples['+i+'].output=this.value;buildPrompt()" style="width:100%;background:var(--navy);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--white);font-size:13.5px"></div>';
 }
 }
 function buildPrompt(){
@@ -937,7 +1270,7 @@ if(inst)prompt+='[INSTRUCTION]\n'+inst+'\n';
 if(cons.length)prompt+='\n[CONSTRAINTS]\n'+cons.join('\n')+'\n';
 document.getElementById('wb-output').textContent=prompt;
 var tokens=Math.ceil(prompt.length/4);
-document.getElementById('wb-tokens').textContent='~'+tokens+' tokens';
+document.getElementById('wb-tokens').innerHTML='~<b>'+tokens+'</b> tokens';
 }
 function copyPrompt(){
 var text=document.getElementById('wb-output').textContent;
@@ -981,15 +1314,26 @@ el.innerHTML+='<div class="card" style="border-left:3px solid '+c.color+'"><div 
 // Draw encoder bidirectional attention
 function drawEncAttn(){
 var cv=document.getElementById('enc-attn-canvas');if(!cv)return;
-var ctx=cv.getContext('2d');var sz=cv.width;var n=4;var cell=sz/n;
+var ctx=cv.getContext('2d');
+var W=cv.width,H=cv.height;
+var pad=42,n=4;var grid=Math.min(W,H)-pad-8;var cell=grid/n;var ox=pad,oy=8;
+ctx.clearRect(0,0,W,H);
 var tokens=['The','cat','sat','on'];
-ctx.clearRect(0,0,sz,sz);
 for(var i=0;i<n;i++)for(var j=0;j<n;j++){
-ctx.fillStyle='rgba(0,212,170,0.4)';
-ctx.fillRect(j*cell+1,i*cell+1,cell-2,cell-2);
+ctx.fillStyle=i===j?'rgba(0,212,170,0.85)':'rgba(0,212,170,0.45)';
+ctx.fillRect(ox+j*cell+1,oy+i*cell+1,cell-2,cell-2);
+ctx.fillStyle='#0D1B2A';ctx.font='bold 11px JetBrains Mono';ctx.textAlign='center';ctx.textBaseline='middle';
+ctx.fillText('\u2713',ox+j*cell+cell/2,oy+i*cell+cell/2);
 }
-ctx.fillStyle='#F0F4F8';ctx.font='10px JetBrains Mono';ctx.textAlign='center';
-for(var i=0;i<n;i++)ctx.fillText(tokens[i],i*cell+cell/2,sz+14);
+ctx.fillStyle='#F0F4F8';ctx.font='bold 11px JetBrains Mono';ctx.textAlign='center';ctx.textBaseline='alphabetic';
+for(var j=0;j<n;j++)ctx.fillText(tokens[j],ox+j*cell+cell/2,oy+grid+18);
+ctx.textAlign='right';ctx.textBaseline='middle';
+for(var i=0;i<n;i++)ctx.fillText(tokens[i],ox-6,oy+i*cell+cell/2);
+ctx.fillStyle='var(--muted)';ctx.fillStyle='#64748B';ctx.font='10px Space Grotesk';
+ctx.textAlign='center';ctx.textBaseline='alphabetic';
+ctx.fillText('to (key)',ox+grid/2,oy+grid+34);
+ctx.save();ctx.translate(10,oy+grid/2);ctx.rotate(-Math.PI/2);
+ctx.fillText('from (query)',0,0);ctx.restore();
 }
 
 // Slide lifecycle
@@ -1002,18 +1346,20 @@ case 3:drawCausalMask();break;
 case 4:drawTrans();break;
 case 5:initScenarios();break;
 case 6:initDist();break;
-case 7:drawTempChart(0.9);break;
-case 8:updateTopK();updateTopP();break;
-case 9:drawGreedy();drawBeam(3);break;
-case 10:updatePlayground();break;
-case 12:initPromptTabs();break;
-case 13:initAPI();break;
-case 14:countTokens();initEfficiency();break;
-case 15:initFlipCards();break;
-case 16:initFailures();break;
-case 17:initWorkbench();break;
-case 18:initAdvanced();break;
-case 19:initConcepts();break;
+case 8:drawTempChart(0.9);break;
+case 9:updateTopK();break;
+case 10:updateTopP();break;
+case 11:drawGreedy();break;
+case 12:drawBeam(3);break;
+case 13:updatePlayground();break;
+case 15:initPromptTabs();break;
+case 16:initAPI();break;
+case 17:countTokens();initEfficiency();break;
+case 18:initFlipCards();break;
+case 19:initFailures();break;
+case 20:initWorkbench();break;
+case 21:initAdvanced();break;
+case 22:initConcepts();break;
 }
 }
 function onSlideRevisit(n){
@@ -1021,9 +1367,11 @@ switch(n){
 case 0:break;
 case 1:drawPipeline();break;
 case 6:drawDistChart();break;
-case 7:updateTemp();break;
-case 8:updateTopK();updateTopP();break;
-case 9:drawGreedy();updateBeam();break;
+case 8:updateTemp();break;
+case 9:updateTopK();break;
+case 10:updateTopP();break;
+case 11:drawGreedy();break;
+case 12:updateBeam();break;
 }
 }
 
