@@ -510,7 +510,11 @@ var bar=document.getElementById('dot-bar');
 var html='';
 for(var i=0;i<total;i++)html+='<div class="dot" onclick="showSlide('+i+')"></div>';
 bar.innerHTML=html;
-showSlide(0);
+// Force a layout pass so the CSS transition from opacity:0 -> 1 actually runs
+// when we add .active. Without this, on first paint some browsers skip the
+// transition and the slide stays at opacity:0 until any class change forces a re-render.
+void document.body.offsetHeight;
+requestAnimationFrame(function(){showSlide(0)});
 }
 
 // S0 Title canvas animation
