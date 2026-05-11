@@ -72,7 +72,7 @@
 
   <!-- ============== LEFT SIDE: copy ============== -->
   <!-- eyebrow -->
-  <text x="80" y="135" font-family="'Helvetica Neue',Arial,sans-serif" font-size="20" font-weight="700" letter-spacing="6" fill="#00D4AA">WEEK 06 &#8226; CORE AI PRINCIPLES</text>
+  <text x="80" y="135" font-family="'Helvetica Neue',Arial,sans-serif" font-size="20" font-weight="700" letter-spacing="6" fill="#00D4AA">CORE AI PRINCIPLES</text>
 
   <!-- main title (two-line) -->
   <text x="80" y="225" font-family="Georgia,'Times New Roman',serif" font-size="78" font-weight="800" letter-spacing="-2" fill="#FFFFFF">The Rise of</text>
