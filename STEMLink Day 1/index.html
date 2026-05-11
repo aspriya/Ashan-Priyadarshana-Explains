@@ -1,0 +1,2108 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0f14" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fb" media="(prefers-color-scheme: light)">
+<meta name="description" content="AI Engineer 2.0 — Day 1. A four-hour interactive lecture deck on the 2025/26 AI coding-tool landscape: the SDLC map, the spectrum of teammates, MCP, and the markdown files that drive agents.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230b0f14'/><circle cx='32' cy='32' r='14' fill='%236ea8fe'/><circle cx='32' cy='32' r='22' fill='none' stroke='%236ea8fe' stroke-width='2' opacity='0.35'/></svg>">
+<title>AI Engineer 2.0 — Day 1</title>
+<style>
+/* ============================================================
+   Tokens & theming
+   ============================================================ */
+:root {
+  --bg:              #0b0f14;
+  --surface:         #121821;
+  --surface-2:       #1a2230;
+  --border:          #233142;
+  --text-primary:    #eef2f7;
+  --text-secondary:  #9aa7b8;
+  --text-muted:      #6b7889;
+  --accent-primary:  #6ea8fe;
+  --accent-warning:  #f5b461;
+  --accent-danger:   #ef6a6a;
+  --accent-success:  #5eead4;
+  --grid-line:       #1e2836;
+  --shadow-strong:   0 20px 60px rgba(0,0,0,0.55);
+  --ease:            cubic-bezier(.2,.7,.2,1);
+  --transition-fast: 180ms var(--ease);
+  --transition-mid:  320ms var(--ease);
+}
+html[data-theme="light"] {
+  --bg:              #f7f8fb;
+  --surface:         #ffffff;
+  --surface-2:       #eef2f7;
+  --border:          #d9e0ea;
+  --text-primary:    #0f172a;
+  --text-secondary:  #475569;
+  --text-muted:      #94a3b8;
+  --accent-primary:  #2563eb;
+  --accent-warning:  #b45309;
+  --accent-danger:   #b91c1c;
+  --accent-success:  #047857;
+  --grid-line:       #e6ecf3;
+  --shadow-strong:   0 20px 60px rgba(15,23,42,0.12);
+}
+
+/* ============================================================
+   Reset & base
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--bg); color: var(--text-primary); }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+               Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-size: 1.5rem;
+  line-height: 1.45;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3 { margin: 0 0 0.5em; letter-spacing: -0.01em; line-height: 1.1; font-weight: 700; }
+h1 { font-size: 4rem; }
+h2 { font-size: 3rem; }
+h3 { font-size: 2rem; font-weight: 600; color: var(--text-secondary); }
+p  { margin: 0 0 1em; color: var(--text-primary); }
+a  { color: var(--accent-primary); text-decoration: none; }
+kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   Layout: deck + slides
+   ============================================================ */
+.deck {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 4px 1fr 40px;
+}
+
+.progress {
+  position: relative;
+  background: transparent;
+  overflow: hidden;
+}
+.progress__bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-warning));
+  transition: width var(--transition-mid);
+}
+
+.stage {
+  position: relative;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6vh 8vw;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity var(--transition-mid), transform var(--transition-mid);
+  pointer-events: none;
+  visibility: hidden;
+  overflow: auto;
+}
+.slide[aria-current="true"] {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.slide__meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.slide__meta .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  opacity: 0.75;
+}
+.slide__vid {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-weight: 600;
+  color: var(--accent-primary);
+  font-size: 1rem;
+}
+.slide__block {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.slide__title {
+  max-width: 70ch;
+}
+
+.slide__placeholder {
+  margin-top: 1rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  color: var(--text-secondary);
+  background: var(--surface);
+  max-width: 70ch;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.slide__placeholder strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ============================================================
+   Chrome (bottom bar)
+   ============================================================ */
+.chrome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.chrome__left, .chrome__right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.chrome__title {
+  color: var(--text-primary);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.chrome__sep { color: var(--text-muted); }
+.chrome__counter {
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.chrome__hint { color: var(--text-muted); font-size: 0.8rem; }
+
+.icon-btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+}
+.icon-btn:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+.icon-btn:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+
+/* ============================================================
+   Help overlay
+   ============================================================ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.55);
+  z-index: 50;
+  padding: 2rem;
+}
+html[data-theme="light"] .overlay { background: rgba(15,23,42,0.35); }
+.overlay[aria-hidden="false"] { display: flex; }
+
+.overlay__card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-strong);
+  padding: 2rem 2.5rem;
+  max-width: 640px;
+  width: 100%;
+  color: var(--text-primary);
+}
+.overlay__card h2 {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+}
+.overlay__card p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+}
+.shortcuts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.6rem 1.25rem;
+  font-size: 1rem;
+}
+.shortcuts dt {
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.shortcuts dd {
+  margin: 0;
+  color: var(--text-secondary);
+}
+.overlay__close {
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   Phase 2 — per-slide layouts
+   ============================================================ */
+.slide--content { justify-content: flex-start; padding-top: 5vh; }
+.slide__body { margin-top: 1.25rem; max-width: 72rem; }
+
+/* Hero (title slide) */
+.hero { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100%; }
+.hero__eyebrow { font-size: 0.95rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent-primary); margin-bottom: 1.5rem; font-weight: 600; }
+.hero__title { font-size: clamp(3rem, 7.5vw, 6rem); margin-bottom: 1.25rem; letter-spacing: -0.02em; }
+.hero__title em { color: var(--accent-primary); font-style: italic; font-weight: 700; }
+.hero__sub { font-size: 1.5rem; color: var(--text-secondary); max-width: 48ch; margin-bottom: 2.5rem; }
+.hero__meta { display: flex; gap: 1rem; color: var(--text-muted); font-size: 0.95rem; letter-spacing: 0.15em; text-transform: uppercase; }
+.hero__meta span:nth-child(2n) { color: var(--text-muted); opacity: 0.5; }
+
+/* Three pillars (V03, V31) */
+.pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+.pillar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.pillar__num { font-family: ui-monospace, Menlo, monospace; font-size: 0.9rem; color: var(--accent-primary); letter-spacing: 0.15em; }
+.pillar__title { font-size: 1.5rem; font-weight: 600; line-height: 1.2; }
+.pillar__body { color: var(--text-secondary); font-size: 1.05rem; line-height: 1.55; }
+
+/* Stats row (V07, V02 static) */
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.stat { text-align: center; padding: 2rem 1rem; background: var(--surface); border-radius: 12px; border: 1px solid var(--border); }
+.stat__num { font-size: clamp(2.8rem, 6.5vw, 4.5rem); font-weight: 800; line-height: 1; color: var(--accent-primary); margin-bottom: 0.5rem; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.stat__num--warn { color: var(--accent-warning); }
+.stat__num--bad { color: var(--accent-danger); }
+.stat__label { color: var(--text-secondary); font-size: 0.95rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; }
+.stat__sub { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.35rem; }
+
+/* Roadmap (V04) */
+.roadmap { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+.roadmap__item { display: flex; align-items: baseline; gap: 1rem; padding: 1rem 1.25rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+.roadmap__num { font-family: ui-monospace, Menlo, monospace; font-size: 1.3rem; color: var(--accent-primary); font-weight: 700; min-width: 1.5ch; }
+.roadmap__name { font-size: 1.2rem; flex: 1; }
+.roadmap__dur { color: var(--text-muted); font-size: 0.9rem; font-family: ui-monospace, Menlo, monospace; }
+.roadmap__break { background: transparent; border: 1px dashed var(--border); color: var(--text-muted); font-style: italic; }
+
+/* Matrix table (V09–V13) */
+.matrix { width: 100%; border-collapse: collapse; font-size: 1.05rem; }
+.matrix th, .matrix td { text-align: left; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.matrix th { color: var(--text-muted); font-weight: 500; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.matrix td:first-child { font-weight: 700; color: var(--text-primary); white-space: nowrap; }
+.matrix td:nth-child(2) { color: var(--text-secondary); line-height: 1.45; }
+.matrix td:last-child { color: var(--text-muted); font-family: ui-monospace, Menlo, monospace; font-size: 0.9rem; white-space: nowrap; }
+.matrix__caption { margin-top: 1.25rem; color: var(--text-secondary); font-style: italic; font-size: 1.1rem; padding-left: 0.9rem; border-left: 3px solid var(--accent-primary); }
+
+/* Live-demo scaffolding (V14, V20, V28) */
+.demo-wrap { display: block; }
+.demo-card {
+  background: var(--surface);
+  border: 2px dashed var(--accent-warning);
+  border-radius: 14px;
+  padding: 1.5rem 1.75rem;
+  display: grid;
+  gap: 1rem;
+}
+.demo-card__head { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.demo-card__tag {
+  display: inline-block;
+  padding: 0.35rem 0.9rem;
+  background: var(--accent-warning);
+  color: var(--bg);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+.demo-card__title {
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text-primary);
+  margin: 0;
+  flex: 1;
+  min-width: 260px;
+}
+.demo-card__sub {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: -0.25rem 0 0 0;
+  max-width: 72ch;
+}
+.demo-card__sub em { color: var(--accent-primary); font-style: italic; }
+.demo-card__body {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+.demo-card__col-title {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 800;
+  margin-bottom: 0.6rem;
+}
+
+.demo-card__steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.55rem; }
+.demo-card__step {
+  display: grid;
+  grid-template-columns: 1.7rem 1fr;
+  gap: 0.7rem;
+  align-items: start;
+  color: var(--text-primary);
+  font-size: 0.93rem;
+  line-height: 1.45;
+}
+.demo-card__step-num {
+  background: rgba(110,168,254,0.15);
+  color: var(--accent-primary);
+  border-radius: 6px;
+  padding: 0.1rem 0;
+  text-align: center;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  height: 1.45rem;
+}
+.demo-card__step code { color: var(--text-secondary); font-size: 0.85rem; background: rgba(255,255,255,0.04); padding: 0.05rem 0.3rem; border-radius: 3px; }
+.demo-card__step em { color: var(--accent-primary); font-style: italic; }
+.demo-card__step strong { color: var(--accent-warning); }
+
+/* Stage (mock UI window) */
+.demo-card__stage {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+  font-family: ui-monospace, Menlo, monospace;
+}
+.demo-card__stage-bar {
+  background: rgba(255,255,255,0.025);
+  padding: 0.5rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.demo-card__dots { display: flex; gap: 0.3rem; }
+.demo-card__dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); }
+.demo-card__stage-body {
+  padding: 0.9rem 1rem;
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  line-height: 1.65;
+  flex: 1;
+  overflow: hidden;
+}
+.demo-card__stage-body .cmnt { color: var(--text-muted); }
+.demo-card__stage-body .you  { color: var(--accent-primary); font-weight: 600; }
+.demo-card__stage-body .tool { color: var(--accent-warning); font-weight: 600; }
+.demo-card__stage-body .ret  { color: var(--text-secondary); }
+.demo-card__stage-body .ok   { color: var(--accent-success); }
+.demo-card__stage-body .hdr  { color: var(--accent-primary); font-weight: 700; }
+
+/* V14 — three parallel agents variant */
+.demo-parallel { display: grid; gap: 0.5rem; }
+.demo-parallel__row {
+  display: grid;
+  grid-template-columns: 1.1rem 1fr auto;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.55rem 0.7rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+.demo-parallel__dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent-warning); animation: demo-pulse 1.2s ease-in-out infinite; }
+.demo-parallel__row--done .demo-parallel__dot { background: var(--accent-success); animation: none; }
+.demo-parallel__row--waiting .demo-parallel__dot { background: var(--text-muted); animation: none; opacity: 0.6; }
+.demo-parallel__label strong { color: var(--text-primary); font-weight: 700; margin-right: 0.35rem; }
+.demo-parallel__label code { color: var(--text-secondary); font-size: 0.72rem; background: transparent; padding: 0; }
+.demo-parallel__label { color: var(--text-secondary); }
+.demo-parallel__status { color: var(--text-muted); font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; }
+.demo-parallel__row--done .demo-parallel__status { color: var(--accent-success); }
+@keyframes demo-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50%      { opacity: 1;   transform: scale(1.15); }
+}
+
+/* V28 — file viewer variant */
+.demo-file { font-size: 0.77rem; line-height: 1.55; }
+.demo-file__line { display: grid; grid-template-columns: 2rem 1fr; color: var(--text-primary); }
+.demo-file__linum { color: var(--text-muted); opacity: 0.5; text-align: right; padding-right: 0.7rem; user-select: none; }
+.demo-file__line--h1 { color: var(--accent-primary); font-weight: 700; }
+.demo-file__line--h2 { color: var(--accent-primary); font-weight: 700; }
+.demo-file__line--dim { color: var(--text-muted); font-style: italic; }
+
+/* Recovery strip */
+.demo-card__recovery {
+  border-top: 1px solid var(--border);
+  padding-top: 0.85rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+.demo-card__recovery-label {
+  color: var(--accent-warning);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.demo-card__recovery-line { color: var(--text-secondary); font-size: 0.92rem; line-height: 1.45; font-style: italic; }
+.demo-card__recovery-line em { color: var(--text-primary); font-style: italic; }
+
+/* Stagger the steps individually when slide becomes current */
+.slide[aria-current="true"] .demo-card__steps > li {
+  animation: slide-rise-soft 0.4s cubic-bezier(0.2,0.7,0.3,1) both;
+}
+.slide[aria-current="true"] .demo-card__steps > li:nth-child(1) { animation-delay: 0.30s; }
+.slide[aria-current="true"] .demo-card__steps > li:nth-child(2) { animation-delay: 0.38s; }
+.slide[aria-current="true"] .demo-card__steps > li:nth-child(3) { animation-delay: 0.46s; }
+.slide[aria-current="true"] .demo-card__steps > li:nth-child(4) { animation-delay: 0.54s; }
+.slide[aria-current="true"] .demo-card__steps > li:nth-child(5) { animation-delay: 0.62s; }
+
+@media (max-width: 1000px) {
+  .demo-card__body { grid-template-columns: 1fr; }
+  .demo-card__stage { min-height: 220px; }
+}
+
+/* LSP analogy (V16) */
+.lsp { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1.5rem; align-items: stretch; }
+.lsp__block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+.lsp__block h3 { margin-bottom: 0.75rem; font-size: 0.85rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+.lsp__block p { font-size: 1.15rem; color: var(--text-primary); line-height: 1.5; margin: 0; }
+.lsp__arrow { align-self: center; font-size: 2.5rem; color: var(--accent-primary); }
+.lsp__punchline { margin-top: 1.5rem; text-align: center; font-size: 1.8rem; color: var(--text-primary); font-weight: 600; }
+.lsp__punchline em { color: var(--accent-primary); font-style: italic; }
+
+/* Ecosystem state (V18) */
+.ecosystem { display: grid; gap: 1.5rem; }
+.timeline-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+.timeline-pill { padding: 0.45rem 0.9rem; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; font-size: 0.95rem; color: var(--text-secondary); font-family: ui-monospace, Menlo, monospace; white-space: nowrap; }
+.timeline-arrow { color: var(--text-muted); font-family: ui-monospace, Menlo, monospace; }
+
+/* Shelf of 8 MCP servers (V19) */
+.shelf { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.9rem; }
+.shelf__card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.15rem; }
+.shelf__title { font-weight: 700; margin-bottom: 0.25rem; color: var(--text-primary); font-size: 1.05rem; }
+.shelf__sub { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.45; }
+
+/* Timeline (V21) */
+.timeline { display: grid; gap: 0.75rem; }
+.timeline__item { display: grid; grid-template-columns: 210px 1fr; gap: 1.25rem; padding: 1rem 1.25rem; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent-danger); border-radius: 8px; align-items: start; }
+.timeline__item--warn { border-left-color: var(--accent-warning); }
+.timeline__when { color: var(--accent-danger); font-weight: 700; font-family: ui-monospace, Menlo, monospace; font-size: 1rem; }
+.timeline__item--warn .timeline__when { color: var(--accent-warning); }
+.timeline__what { color: var(--text-primary); font-size: 1.05rem; line-height: 1.5; }
+.timeline__what strong { color: var(--text-primary); }
+
+/* Checklist (V22, V25) */
+.checklist { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.6rem; }
+.checklist li { position: relative; padding: 0.9rem 1.25rem 0.9rem 3rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 1.1rem; line-height: 1.5; }
+.checklist li::before { content: "✓"; position: absolute; left: 1.25rem; top: 0.9rem; color: var(--accent-primary); font-weight: 700; }
+.checklist--numbered { counter-reset: c; }
+.checklist--numbered li::before { content: counter(c); counter-increment: c; color: var(--accent-primary); font-variant-numeric: tabular-nums; font-family: ui-monospace, Menlo, monospace; }
+
+/* Karpathy story (V23) */
+.story { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center; }
+.story__big { font-size: clamp(3rem, 7vw, 5rem); font-weight: 800; color: var(--accent-primary); line-height: 1; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+.story__stats { display: grid; gap: 0.75rem; }
+.story__stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem 1.15rem; }
+.story__stat-label { font-size: 0.8rem; color: var(--text-muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.2rem; font-weight: 600; }
+.story__stat-val { font-size: 1.15rem; color: var(--text-primary); }
+
+/* Importance score table (V26) */
+.score-table { width: 100%; border-collapse: collapse; }
+.score-table th, .score-table td { padding: 0.55rem 0.9rem; text-align: left; border-bottom: 1px solid var(--border); font-size: 1rem; line-height: 1.4; }
+.score-table th { color: var(--text-muted); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.8rem; }
+.score-table td:first-child { width: 4rem; }
+.score-table td:nth-child(2) { color: var(--text-primary); font-weight: 600; }
+.score-table td:last-child { color: var(--text-secondary); }
+.score-badge { display: inline-block; width: 2.4rem; padding: 0.2rem 0; text-align: center; border-radius: 6px; font-family: ui-monospace, Menlo, monospace; font-weight: 700; font-variant-numeric: tabular-nums; font-size: 0.95rem; }
+.score-5 { background: rgba(94,234,212,0.14); color: #5eead4; }
+.score-4 { background: rgba(110,168,254,0.18); color: var(--accent-primary); }
+.score-3 { background: rgba(245,180,97,0.18); color: var(--accent-warning); }
+.score-2 { background: rgba(239,106,106,0.15); color: var(--accent-danger); }
+.score-1 { background: var(--surface-2); color: var(--text-muted); }
+
+/* File loading timing (V27) */
+.timing-rows { display: grid; gap: 0.6rem; }
+.timing-row { display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem; padding: 0.9rem 1.25rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; align-items: center; }
+.timing-label { font-weight: 700; color: var(--accent-primary); font-size: 0.9rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.timing-desc { color: var(--text-primary); font-size: 1.05rem; line-height: 1.5; }
+
+/* Principle single-focus slides (V29, V30a–f) */
+.principle { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100%; }
+.principle__num { font-family: ui-monospace, Menlo, monospace; font-size: 0.9rem; color: var(--accent-primary); letter-spacing: 0.3em; margin-bottom: 1.5rem; font-weight: 700; }
+.principle__headline { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 700; max-width: 28ch; margin-bottom: 1.5rem; line-height: 1.15; letter-spacing: -0.02em; }
+.principle__headline em { color: var(--accent-primary); font-style: italic; }
+.principle__body { color: var(--text-secondary); font-size: 1.25rem; max-width: 52ch; line-height: 1.55; }
+
+/* Karpathy 4 principles list */
+.principles-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.principles-list__item { padding: 1.25rem 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+.principles-list__num { font-family: ui-monospace, Menlo, monospace; font-size: 0.85rem; color: var(--accent-primary); letter-spacing: 0.2em; font-weight: 700; margin-bottom: 0.5rem; }
+.principles-list__title { font-size: 1.4rem; margin-bottom: 0.5rem; font-weight: 700; }
+.principles-list__body { color: var(--text-secondary); font-size: 1rem; line-height: 1.5; }
+
+/* Recommended stack columns (V33) */
+.stack { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+.stack__col { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.35rem; }
+.stack__col h3 { font-size: 1rem; color: var(--accent-primary); margin-bottom: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; }
+.stack__col dl { margin: 0; display: grid; gap: 0.5rem; }
+.stack__col dt { color: var(--text-muted); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
+.stack__col dd { margin: 0 0 0.25rem; color: var(--text-primary); font-size: 0.95rem; line-height: 1.45; }
+.stack__foot { margin-top: 1rem; text-align: center; color: var(--text-secondary); font-style: italic; font-size: 1.1rem; }
+
+/* Sober caveats slide (V32) — forced dark regardless of theme */
+.slide--sober { background: #05080f; color: #e6ebf4; }
+.slide--sober .slide__meta { color: #6d7a8e; }
+.slide--sober .slide__vid { color: #b3c1d4; }
+.slide--sober .slide__block { color: #7a8699; }
+.slide--sober h2 { color: #ffffff; }
+.caveats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; margin-top: 0.5rem; }
+.caveat { padding: 1rem 1.25rem; border: 1px solid #1a2232; border-radius: 8px; background: #0a0f1a; }
+.caveat__num { font-size: 1.8rem; font-weight: 800; color: #ff8a8a; font-variant-numeric: tabular-nums; line-height: 1; margin-bottom: 0.3rem; letter-spacing: -0.02em; }
+.caveat__what { color: #cdd6e4; font-size: 0.95rem; line-height: 1.5; }
+.caveats__foot { grid-column: 1 / -1; margin-top: 0.5rem; color: #8896ae; font-size: 1.05rem; font-style: italic; text-align: center; }
+
+/* Cliffhanger (V34) */
+.cliff { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 100%; gap: 1rem; }
+.cliff__title { font-size: clamp(2.8rem, 6.5vw, 5rem); max-width: 22ch; line-height: 1.1; }
+.cliff__title em { color: var(--accent-primary); font-style: italic; }
+.cliff__quote { font-size: 1.3rem; color: var(--text-secondary); max-width: 55ch; font-style: italic; line-height: 1.5; }
+.cliff__cta { font-size: 0.95rem; color: var(--accent-primary); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 1rem; font-weight: 700; }
+
+/* Seniority spectrum (V08) — static for Phase 2 */
+.spectrum { display: grid; gap: 1rem; margin-top: 1.5rem; }
+.spectrum__track { position: relative; height: 6px; background: var(--surface-2); border-radius: 3px; margin: 1.5rem 1rem 2.5rem; }
+.spectrum__fill { position: absolute; inset: 0; background: linear-gradient(90deg, var(--accent-primary), var(--accent-warning), var(--accent-danger)); border-radius: 3px; }
+.spectrum__nodes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.9rem; }
+.spectrum__node { text-align: center; padding: 1rem 0.75rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; position: relative; }
+.spectrum__node::before { content: ""; position: absolute; top: -1.7rem; left: 50%; width: 14px; height: 14px; background: var(--accent-primary); border-radius: 50%; transform: translateX(-50%); border: 3px solid var(--bg); }
+.spectrum__node:nth-child(2)::before { background: #8ec5ff; }
+.spectrum__node:nth-child(3)::before { background: var(--accent-warning); }
+.spectrum__node:nth-child(4)::before { background: var(--accent-danger); }
+.spectrum__label { font-weight: 700; font-size: 1.05rem; margin-bottom: 0.3rem; }
+.spectrum__tools { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.45; }
+.spectrum__axis { text-align: center; color: var(--text-muted); font-style: italic; font-size: 1.05rem; margin-top: 0.5rem; }
+
+/* Slide lede (secondary deck line under the h2) */
+.slide__lede { font-size: 1.15rem; color: var(--text-secondary); margin: -0.25rem 0 1.25rem; max-width: 72ch; line-height: 1.5; }
+.slide__kicker { font-size: 1rem; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem; }
+
+/* ============================================================
+   Phase 3 — Signature visuals
+   ============================================================ */
+
+/* V05 — SDLC loop (inline SVG) */
+.sdlc { display: grid; grid-template-columns: 1fr 320px; gap: 2rem; align-items: center; }
+.sdlc__svg { width: 100%; max-width: 700px; height: auto; display: block; }
+.sdlc__svg .sdlc-node-bg { fill: var(--surface); stroke: var(--accent-primary); stroke-width: 2; }
+.sdlc__svg .sdlc-node-num { fill: var(--text-muted); font-family: ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 700; letter-spacing: 2px; }
+.sdlc__svg .sdlc-node-label { fill: var(--text-primary); font-size: 15px; font-weight: 700; font-family: inherit; }
+.sdlc__svg .sdlc-ring { fill: none; stroke: var(--border); stroke-width: 1.5; stroke-dasharray: 4 7; }
+.sdlc__svg .sdlc-arrow { stroke: var(--accent-primary); stroke-width: 2.25; fill: none; opacity: 0.7; }
+.sdlc__svg .sdlc-arrow-head { fill: var(--accent-primary); opacity: 0.85; }
+.sdlc__svg .sdlc-center-kicker { fill: var(--text-muted); font-size: 11px; font-weight: 700; letter-spacing: 4px; }
+.sdlc__svg .sdlc-center-title { fill: var(--accent-primary); font-size: 30px; font-weight: 800; letter-spacing: 2px; }
+.sdlc__side { display: grid; gap: 0.75rem; }
+.sdlc__side-title { font-size: 1.1rem; color: var(--text-primary); font-weight: 700; margin-bottom: 0.25rem; }
+.sdlc__side-note { color: var(--text-secondary); font-size: 1rem; line-height: 1.5; }
+.sdlc__side-highlight { color: var(--accent-primary); font-weight: 700; font-style: italic; }
+
+/* V06 — Money grid */
+.money-grid-wrap { margin-top: 0.5rem; }
+.money-grid { display: grid; grid-template-columns: 150px repeat(7, 1fr); gap: 4px; font-size: 0.85rem; }
+.mg__col { padding: 0.55rem 0.3rem; color: var(--text-muted); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; text-align: center; border-bottom: 1px solid var(--border); }
+.mg__row { padding: 0.65rem 0.75rem; color: var(--text-primary); font-size: 0.85rem; font-weight: 600; text-align: right; display: flex; align-items: center; justify-content: flex-end; }
+.mg__cell { padding: 0.55rem 0.4rem; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text-secondary); font-size: 0.8rem; text-align: center; line-height: 1.35; display: flex; align-items: center; justify-content: center; min-height: 48px; }
+.mg__cell--strong { color: var(--text-primary); border-color: var(--accent-primary); background: rgba(110,168,254,0.08); font-weight: 600; }
+.mg__cell--muted { color: var(--text-muted); background: transparent; border-color: var(--border); border-style: dashed; opacity: 0.6; }
+.mg__row--highlight { color: var(--accent-primary); font-weight: 800; font-size: 0.9rem; letter-spacing: 0.02em; }
+.mg__cell--highlight { grid-column: span 7; background: linear-gradient(90deg, rgba(110,168,254,0.18), rgba(245,180,97,0.18)); border: 2px solid var(--accent-primary); color: var(--text-primary); font-weight: 600; font-size: 0.98rem; padding: 0.9rem 1rem; min-height: 54px; }
+.money-grid__foot { margin-top: 1rem; color: var(--text-secondary); font-style: italic; font-size: 1rem; text-align: center; }
+.money-grid__foot em { color: var(--accent-primary); font-style: italic; }
+
+/* V11 — Cloud autonomous horizontal-bar motif */
+.cloud-bar { margin-bottom: 1.5rem; }
+.cloud-bar__stations { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; margin-bottom: 0.5rem; }
+.cloud-bar__stations span { text-align: center; padding: 0.45rem 0.3rem; color: var(--text-muted); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; border-bottom: 2px solid var(--border); }
+.cloud-bar__bar { background: linear-gradient(90deg, rgba(110,168,254,0.18), rgba(245,180,97,0.18)); border: 2px solid var(--accent-primary); border-radius: 10px; padding: 1rem 1.5rem; text-align: center; }
+.cloud-bar__label { color: var(--accent-primary); font-size: 0.85rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 800; margin-bottom: 0.25rem; }
+.cloud-bar__tools { color: var(--text-primary); font-size: 1.05rem; font-weight: 600; }
+.cloud-bar__caption { text-align: center; margin-top: 0.5rem; color: var(--text-secondary); font-style: italic; font-size: 0.95rem; }
+
+/* V15 — N×M → N+M collapse */
+.mcp-collapse { display: grid; gap: 0.5rem; }
+.mcp-collapse__svg { width: 100%; max-width: 1000px; height: auto; display: block; margin: 0 auto; }
+.mcp-collapse__svg .mc-node { fill: var(--surface); stroke: var(--text-secondary); stroke-width: 1.5; }
+.mcp-collapse__svg .mc-node-hub { fill: var(--surface); stroke: var(--accent-primary); stroke-width: 2.25; }
+.mcp-collapse__svg .mc-line { stroke: var(--text-muted); stroke-width: 1.2; opacity: 0.55; fill: none; }
+.mcp-collapse__svg .mc-line-after { stroke: var(--accent-primary); stroke-width: 1.5; opacity: 0.75; fill: none; }
+.mcp-collapse__svg .mc-label { fill: var(--text-secondary); font-size: 12px; font-weight: 600; font-family: ui-monospace, Menlo, monospace; }
+.mcp-collapse__svg .mc-hub-label { fill: var(--accent-primary); font-size: 14px; font-weight: 800; letter-spacing: 1px; }
+.mcp-collapse__svg .mc-panel-label { fill: var(--text-muted); font-size: 10.5px; font-weight: 700; letter-spacing: 2px; }
+.mcp-collapse__svg .mc-tally { fill: var(--text-primary); font-size: 18px; font-weight: 800; }
+.mcp-collapse__svg .mc-tally--accent { fill: var(--accent-primary); }
+.mcp-collapse__svg .mc-arrow { fill: var(--accent-primary); }
+.mcp-collapse__foot { text-align: center; color: var(--text-secondary); font-size: 1.05rem; font-style: italic; margin-top: 0.25rem; }
+.mcp-collapse__foot em { color: var(--accent-primary); font-style: italic; }
+
+/* V24 — Three-layer markdown stack */
+.md-stack { display: grid; gap: 1rem; max-width: 820px; margin: 1rem auto 0; position: relative; padding: 0 0 0 3.5rem; }
+.md-stack__direction { position: absolute; left: 0; top: 0.5rem; bottom: 0.5rem; width: 3rem; display: flex; flex-direction: column; align-items: center; justify-content: space-between; color: var(--accent-primary); font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700; }
+.md-stack__direction span:first-child { writing-mode: vertical-rl; transform: rotate(180deg); }
+.md-stack__direction span:nth-child(2) { flex: 1; width: 2px; background: linear-gradient(to bottom, var(--border), var(--accent-primary)); margin: 0.5rem 0; }
+.md-stack__direction span:last-child { color: var(--accent-primary); font-size: 1.2rem; line-height: 1; }
+.md-stack__card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem 1.4rem; position: relative; display: grid; grid-template-columns: 140px 1fr; gap: 1rem; align-items: center; }
+.md-stack__card--global    { margin-left: 0;      opacity: 0.78; }
+.md-stack__card--project   { margin-left: 1.75rem; }
+.md-stack__card--subdir    { margin-left: 3.5rem;  border-color: var(--accent-primary); background: linear-gradient(90deg, rgba(110,168,254,0.08), var(--surface)); }
+.md-stack__scope { font-size: 0.78rem; color: var(--accent-primary); letter-spacing: 0.18em; text-transform: uppercase; font-weight: 800; }
+.md-stack__body { display: grid; gap: 0.25rem; }
+.md-stack__path { font-family: ui-monospace, Menlo, monospace; font-size: 1rem; color: var(--text-primary); }
+.md-stack__note { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.45; }
+.md-stack__foot { margin-top: 0.75rem; text-align: center; color: var(--text-secondary); font-style: italic; font-size: 1rem; }
+.md-stack__foot em { color: var(--accent-primary); font-style: italic; }
+
+/* Responsive fallback for signature visuals */
+@media (max-width: 1100px) {
+  .sdlc { grid-template-columns: 1fr; }
+  .sdlc__svg { max-width: 520px; margin: 0 auto; }
+}
+@media (max-width: 900px) {
+  .money-grid { grid-template-columns: 110px repeat(7, 1fr); font-size: 0.7rem; }
+  .mg__cell { font-size: 0.7rem; min-height: 40px; padding: 0.4rem 0.25rem; }
+  .md-stack__card { grid-template-columns: 1fr; gap: 0.3rem; }
+  .md-stack { padding-left: 2rem; }
+  .md-stack__card--project { margin-left: 1rem; }
+  .md-stack__card--subdir { margin-left: 2rem; }
+}
+
+/* Generic callout */
+.callout { margin-top: 1.5rem; padding: 1rem 1.5rem; background: var(--surface); border-left: 3px solid var(--accent-primary); border-radius: 6px; font-size: 1.1rem; color: var(--text-primary); line-height: 1.55; }
+.callout--warn { border-left-color: var(--accent-warning); }
+.callout em { color: var(--accent-primary); font-style: italic; }
+
+/* Compact scale-down for dense slides on smaller viewports */
+@media (max-width: 1200px) {
+  .shelf { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 900px) {
+  .pillars, .stats-row, .stack, .roadmap, .principles-list, .caveats, .story { grid-template-columns: 1fr; }
+  .shelf { grid-template-columns: repeat(2, 1fr); }
+  .spectrum__nodes { grid-template-columns: repeat(2, 1fr); }
+  .lsp { grid-template-columns: 1fr; }
+  .timeline__item, .timing-row { grid-template-columns: 1fr; gap: 0.4rem; }
+}
+
+/* ============================================================
+   Phase 4 — Entrance animations
+   ============================================================ */
+
+@keyframes slide-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes slide-rise-soft {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Standard layout: meta + title + body */
+.slide[aria-current="true"] .slide__meta  { animation: slide-rise 0.42s cubic-bezier(0.2, 0.7, 0.3, 1) both; animation-delay: 0s; }
+.slide[aria-current="true"] .slide__title { animation: slide-rise 0.42s cubic-bezier(0.2, 0.7, 0.3, 1) both; animation-delay: 0.07s; }
+.slide[aria-current="true"] .slide__body  { animation: slide-rise 0.5s  cubic-bezier(0.2, 0.7, 0.3, 1) both; animation-delay: 0.14s; }
+
+/* Full-takeover layouts */
+.slide[aria-current="true"] .hero,
+.slide[aria-current="true"] .principle,
+.slide[aria-current="true"] .cliff       { animation: slide-rise 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+
+/* Stagger high-value enumerated lists (pillars, stats, principles, caveats) */
+.slide[aria-current="true"] .pillars > *,
+.slide[aria-current="true"] .stats-row > *,
+.slide[aria-current="true"] .principles-list > *,
+.slide[aria-current="true"] .caveats > *,
+.slide[aria-current="true"] .roadmap > *,
+.slide[aria-current="true"] .timeline-pills > * {
+  animation: slide-rise-soft 0.42s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.slide[aria-current="true"] .pillars > *:nth-child(1),
+.slide[aria-current="true"] .stats-row > *:nth-child(1),
+.slide[aria-current="true"] .principles-list > *:nth-child(1),
+.slide[aria-current="true"] .caveats > *:nth-child(1),
+.slide[aria-current="true"] .roadmap > *:nth-child(1),
+.slide[aria-current="true"] .timeline-pills > *:nth-child(1) { animation-delay: 0.28s; }
+.slide[aria-current="true"] .pillars > *:nth-child(2),
+.slide[aria-current="true"] .stats-row > *:nth-child(2),
+.slide[aria-current="true"] .principles-list > *:nth-child(2),
+.slide[aria-current="true"] .caveats > *:nth-child(2),
+.slide[aria-current="true"] .roadmap > *:nth-child(2),
+.slide[aria-current="true"] .timeline-pills > *:nth-child(2) { animation-delay: 0.36s; }
+.slide[aria-current="true"] .pillars > *:nth-child(3),
+.slide[aria-current="true"] .stats-row > *:nth-child(3),
+.slide[aria-current="true"] .principles-list > *:nth-child(3),
+.slide[aria-current="true"] .caveats > *:nth-child(3),
+.slide[aria-current="true"] .roadmap > *:nth-child(3),
+.slide[aria-current="true"] .timeline-pills > *:nth-child(3) { animation-delay: 0.44s; }
+.slide[aria-current="true"] .principles-list > *:nth-child(4),
+.slide[aria-current="true"] .caveats > *:nth-child(4),
+.slide[aria-current="true"] .roadmap > *:nth-child(4),
+.slide[aria-current="true"] .timeline-pills > *:nth-child(4) { animation-delay: 0.52s; }
+.slide[aria-current="true"] .caveats > *:nth-child(5),
+.slide[aria-current="true"] .roadmap > *:nth-child(5),
+.slide[aria-current="true"] .timeline-pills > *:nth-child(5) { animation-delay: 0.60s; }
+.slide[aria-current="true"] .caveats > *:nth-child(6),
+.slide[aria-current="true"] .roadmap > *:nth-child(6),
+.slide[aria-current="true"] .timeline-pills > *:nth-child(6) { animation-delay: 0.68s; }
+.slide[aria-current="true"] .caveats > *:nth-child(7),
+.slide[aria-current="true"] .roadmap > *:nth-child(7),
+.slide[aria-current="true"] .timeline-pills > *:nth-child(7) { animation-delay: 0.76s; }
+
+/* V08 spectrum: fill sweep + node pop-ins */
+.spectrum__fill { transform-origin: left; }
+@keyframes spectrum-grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes spectrum-pop {
+  from { opacity: 0; transform: translateY(10px) scale(0.95); }
+  to   { opacity: 1; transform: none; }
+}
+.slide[aria-current="true"] .spectrum__fill {
+  animation: spectrum-grow 0.85s cubic-bezier(0.2, 0.85, 0.3, 1) both;
+  animation-delay: 0.25s;
+}
+.slide[aria-current="true"] .spectrum__node {
+  animation: spectrum-pop 0.45s cubic-bezier(0.2, 0.85, 0.3, 1) both;
+}
+.slide[aria-current="true"] .spectrum__node:nth-child(1) { animation-delay: 0.40s; }
+.slide[aria-current="true"] .spectrum__node:nth-child(2) { animation-delay: 0.58s; }
+.slide[aria-current="true"] .spectrum__node:nth-child(3) { animation-delay: 0.76s; }
+.slide[aria-current="true"] .spectrum__node:nth-child(4) { animation-delay: 0.94s; }
+
+/* Counter elements: hide raw text until JS animates (prevents flicker of final value) */
+.stat__num[data-count],
+.story__big[data-count] { font-variant-numeric: tabular-nums; }
+
+/* ============================================================
+   V17 — MCP three-component architecture
+   ============================================================ */
+.mcp-arch { display: grid; gap: 0.5rem; }
+.mcp-arch__svg { width: 100%; max-width: 1000px; height: auto; display: block; margin: 0 auto; }
+.mcp-arch__svg .ma-section-label { fill: var(--text-muted); font-size: 11px; font-weight: 700; letter-spacing: 2.5px; font-family: ui-monospace, Menlo, monospace; }
+.mcp-arch__svg .ma-host-rect { fill: rgba(110,168,254,0.04); stroke: var(--accent-primary); stroke-width: 2; stroke-dasharray: 6 6; }
+.mcp-arch__svg .ma-host-label { fill: var(--accent-primary); font-size: 26px; font-weight: 800; letter-spacing: 4px; }
+.mcp-arch__svg .ma-host-sub   { fill: var(--text-primary); font-size: 13px; font-weight: 600; }
+.mcp-arch__svg .ma-host-list  { fill: var(--text-secondary); font-size: 12px; }
+.mcp-arch__svg .ma-client     { fill: var(--surface); stroke: var(--accent-primary); stroke-width: 2; }
+.mcp-arch__svg .ma-client-label { fill: var(--text-primary); font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+.mcp-arch__svg .ma-server     { fill: var(--surface); stroke: var(--text-secondary); stroke-width: 1.75; }
+.mcp-arch__svg .ma-server-name { fill: var(--text-primary); font-size: 15px; font-weight: 700; }
+.mcp-arch__svg .ma-server-sub  { fill: var(--text-secondary); font-size: 12px; }
+.mcp-arch__svg .ma-link        { stroke: var(--accent-primary); stroke-width: 2.25; opacity: 0.75; fill: none; }
+.mcp-arch__svg .ma-link-tag    { fill: var(--text-muted); font-size: 10px; font-weight: 700; letter-spacing: 1.5px; font-family: ui-monospace, Menlo, monospace; }
+.mcp-arch__svg .ma-arrow-fill  { fill: var(--accent-primary); }
+.mcp-arch__primitives { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; max-width: 720px; margin-left: auto; margin-right: auto; }
+.mcp-arch__prim { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; text-align: center; }
+.mcp-arch__prim-name { color: var(--accent-primary); font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 800; margin-bottom: 0.2rem; }
+.mcp-arch__prim-note { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.4; }
+
+@media (max-width: 900px) {
+  .mcp-arch__primitives { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+  .slide { transform: none !important; }
+}
+
+/* ============================================================
+   Print stylesheet — one slide per page, light, no chrome
+   ============================================================ */
+@media print {
+  html, body {
+    background: #ffffff !important;
+    color: #111111 !important;
+    overflow: visible !important;
+    height: auto !important;
+    font-size: 11pt;
+  }
+  .deck {
+    position: static !important;
+    display: block !important;
+  }
+  .progress, .chrome, .overlay { display: none !important; }
+  .stage {
+    position: static !important;
+    overflow: visible !important;
+  }
+  .slide {
+    position: static !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    display: block !important;
+    page-break-after: always;
+    break-after: page;
+    padding: 1.2cm 1.4cm !important;
+    animation: none !important;
+  }
+  .slide:last-child { page-break-after: auto; break-after: auto; }
+  .slide *, .slide *::before, .slide *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  h1, h2, h3, p, li, dt, dd, td, th { color: #111111 !important; }
+  .slide__meta, .slide__vid, .slide__block, .slide__kicker { color: #555 !important; }
+  .slide__lede { color: #333 !important; }
+  /* Force surface elements to readable white-on-light */
+  .pillar, .stat, .roadmap__item, .shelf__card, .stack__col,
+  .principles-list__item, .timing-row, .timeline__item, .checklist li,
+  .story__stat, .demo-card, .lsp__block, .timeline-pill, .callout,
+  .md-stack__card, .matrix, .score-table {
+    background: #ffffff !important;
+    border-color: #cccccc !important;
+    color: #111111 !important;
+  }
+  .matrix th, .matrix td, .score-table th, .score-table td {
+    border-bottom-color: #cccccc !important;
+  }
+  /* Sober caveats slide — also light on paper */
+  .slide--sober { background: #ffffff !important; color: #111111 !important; }
+  .slide--sober h2, .slide--sober .slide__meta, .slide--sober .slide__vid,
+  .slide--sober .slide__block { color: #111111 !important; }
+  .caveat { background: #fafafa !important; border-color: #cccccc !important; }
+  .caveat__num { color: #a00000 !important; }
+  .caveat__what, .caveats__foot { color: #333333 !important; }
+  /* Accents stay readable on paper */
+  .accent, em, .hero__title em, .principle__headline em,
+  .cliff__title em, .matrix__caption, .lsp__punchline em {
+    color: #1d4ed8 !important;
+  }
+  /* Don't let SVGs blow past the page */
+  svg { max-width: 100% !important; height: auto !important; }
+}
+
+/* ============================================================
+   Responsive scaling
+   ============================================================ */
+@media (max-width: 900px) {
+  body { font-size: 1.1rem; }
+  h1 { font-size: 2.5rem; }
+  h2 { font-size: 1.9rem; }
+  h3 { font-size: 1.3rem; }
+  .slide { padding: 4vh 6vw; }
+}
+
+/* Focus styles for keyboard users */
+:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 3px; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<main class="deck" id="deck">
+  <div class="progress" aria-hidden="true">
+    <div class="progress__bar" id="progressBar"></div>
+  </div>
+
+  <section class="stage" id="stage" aria-live="polite">
+    <!-- Slides injected here by JS -->
+  </section>
+
+  <footer class="chrome">
+    <div class="chrome__left">
+      <span class="chrome__title">AI Engineer 2.0</span>
+      <span class="chrome__sep">·</span>
+      <span>Day 1</span>
+    </div>
+    <div class="chrome__right">
+      <span class="chrome__hint">Press <kbd>?</kbd> for shortcuts</span>
+      <button class="icon-btn" id="themeBtn" title="Toggle theme (T)" aria-label="Toggle theme">T</button>
+      <button class="icon-btn" id="fsBtn" title="Fullscreen (F)" aria-label="Toggle fullscreen">⛶</button>
+      <span class="chrome__counter" id="counter">1 / 39</span>
+    </div>
+  </footer>
+</main>
+
+<div class="overlay" id="helpOverlay" role="dialog" aria-modal="true" aria-labelledby="helpTitle" aria-hidden="true">
+  <div class="overlay__card">
+    <h2 id="helpTitle">Keyboard shortcuts</h2>
+    <p>Navigate the deck without a mouse.</p>
+    <dl class="shortcuts">
+      <dt><kbd>→</kbd> / <kbd>Space</kbd> / <kbd>PgDn</kbd></dt>
+      <dd>Next slide</dd>
+      <dt><kbd>←</kbd> / <kbd>PgUp</kbd></dt>
+      <dd>Previous slide</dd>
+      <dt><kbd>Home</kbd></dt>
+      <dd>Jump to first slide</dd>
+      <dt><kbd>End</kbd></dt>
+      <dd>Jump to last slide</dd>
+      <dt><kbd>F</kbd></dt>
+      <dd>Toggle fullscreen</dd>
+      <dt><kbd>T</kbd></dt>
+      <dd>Toggle dark / light theme</dd>
+      <dt><kbd>?</kbd></dt>
+      <dd>Show this help</dd>
+      <dt><kbd>Esc</kbd></dt>
+      <dd>Close overlay</dd>
+    </dl>
+    <p class="overlay__close">Press <kbd>?</kbd> or <kbd>Esc</kbd> to close.</p>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  /* ============================================================
+     Slide inventory — V01..V34 placeholder metadata.
+     Content comes in later phases.
+     ============================================================ */
+  const BLOCKS = {
+    1: "Block 1 — Hook + framing",
+    2: "Block 2 — The SDLC map",
+    3: "Block 3 — The tools landscape",
+    4: "Block 4 — MCP, the connective tissue",
+    5: "Block 5 — Special markdown files",
+    6: "Block 6 — Best practices + governance",
+  };
+
+  const SLIDES = [
+    // ---------- Block 1: Hook + framing ----------
+    { vid: "V01", block: 1, beat: "1.1", title: "Title slide", layout: "hero", body: `
+      <div class="hero">
+        <div class="hero__eyebrow">AI Engineer 2.0 · STEMLink · Day 1</div>
+        <h1 class="hero__title">The Spectrum of <em>Teammates</em></h1>
+        <p class="hero__sub">Working with AI coding agents in 2026 — and why most developers are getting this wrong.</p>
+        <div class="hero__meta"><span>4 hours</span><span>·</span><span>6 blocks</span><span>·</span><span>3 live demos</span></div>
+      </div>
+    ` },
+
+    { vid: "V02", block: 1, beat: "1.1", title: "Predicted. Felt. Measured.", layout: "default", body: `
+      <p class="slide__lede">METR, July 2025 — 16 experienced developers, 246 real tasks, randomized, Cursor with Claude Sonnet.</p>
+      <div class="stats-row">
+        <div class="stat"><div class="stat__num" data-count="24" data-suffix="%">24%</div><div class="stat__label">Predicted speed-up</div></div>
+        <div class="stat"><div class="stat__num" data-count="20" data-suffix="%">20%</div><div class="stat__label">Felt speed-up</div></div>
+        <div class="stat"><div class="stat__num stat__num--bad" data-count="19" data-prefix="−" data-suffix="%">−19%</div><div class="stat__label">Actual slowdown</div></div>
+      </div>
+      <div class="callout">Same year — Cognizant: <strong>30% of their code is AI-generated</strong>, targeting 50%. Infosys deployed Devin across financial services. So — <em>which is it?</em></div>
+    ` },
+
+    { vid: "V03", block: 1, beat: "1.3", title: "What changed in the last 18 months", layout: "default", body: `
+      <div class="pillars">
+        <div class="pillar"><div class="pillar__num">01</div><div class="pillar__title">Models crossed a capability line</div><div class="pillar__body">The bottleneck moved from <em>"can it write code"</em> to <em>"can you direct it well."</em></div></div>
+        <div class="pillar"><div class="pillar__num">02</div><div class="pillar__title">Agentic loops run unsupervised</div><div class="pillar__body">Minutes to hours of autonomous work. The 2026-defining feature.</div></div>
+        <div class="pillar"><div class="pillar__num">03</div><div class="pillar__title">MCP standardised the plumbing</div><div class="pillar__body">Tools can now reach beyond the chat window — systems, data, the whole stack.</div></div>
+      </div>
+      <div class="callout">If a teammate upgraded from <em>"can answer a question"</em> to <em>"can take a ticket and open a PR"</em> — your workflow has to change. This session is about what that change looks like.</div>
+    ` },
+
+    { vid: "V04", block: 1, beat: "1.4", title: "What the next four hours look like", layout: "default", body: `
+      <div class="roadmap">
+        <div class="roadmap__item"><div class="roadmap__num">1</div><div class="roadmap__name">Hook + framing</div><div class="roadmap__dur">15 min</div></div>
+        <div class="roadmap__item"><div class="roadmap__num">2</div><div class="roadmap__name">The SDLC map</div><div class="roadmap__dur">35 min</div></div>
+        <div class="roadmap__item"><div class="roadmap__num">3</div><div class="roadmap__name">The tools landscape</div><div class="roadmap__dur">60 min</div></div>
+        <div class="roadmap__item roadmap__break"><div class="roadmap__num">·</div><div class="roadmap__name">Break</div><div class="roadmap__dur">15 min</div></div>
+        <div class="roadmap__item"><div class="roadmap__num">4</div><div class="roadmap__name">MCP — the connective tissue</div><div class="roadmap__dur">45 min</div></div>
+        <div class="roadmap__item"><div class="roadmap__num">5</div><div class="roadmap__name">Special markdown files</div><div class="roadmap__dur">45 min</div></div>
+        <div class="roadmap__item"><div class="roadmap__num">6</div><div class="roadmap__name">Best practices + governance</div><div class="roadmap__dur">25 min</div></div>
+        <div class="roadmap__item roadmap__break"><div class="roadmap__num">→</div><div class="roadmap__name">Day 2 cliffhanger</div><div class="roadmap__dur">—</div></div>
+      </div>
+    ` },
+
+    // ---------- Block 2: The SDLC map ----------
+    { vid: "V05", block: 2, beat: "2.2", title: "The SDLC loop — where the money lives", layout: "default", body: `
+      <p class="slide__lede">Every dollar an engineering org spends lands somewhere on this loop. Map the tools to the stations and the landscape becomes legible.</p>
+      <div class="sdlc">
+        <svg class="sdlc__svg" viewBox="0 0 700 600" role="img" aria-label="Seven-station SDLC loop">
+          <circle class="sdlc-ring" cx="350" cy="300" r="200"/>
+          <defs>
+            <marker id="sdlc-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" class="sdlc-arrow-head"/>
+            </marker>
+          </defs>
+          <g stroke-linecap="round">
+            <line class="sdlc-arrow" x1="399.6" y1="123.8" x2="456.4" y2="151.2" marker-end="url(#sdlc-arrow)"/>
+            <line class="sdlc-arrow" x1="518.3" y1="228.6" x2="532.7" y2="291.4" marker-end="url(#sdlc-arrow)"/>
+            <line class="sdlc-arrow" x1="510.6" y1="387.9" x2="471.4" y2="437.1" marker-end="url(#sdlc-arrow)"/>
+            <line class="sdlc-arrow" x1="382"   y1="480"   x2="318"   y2="480"   marker-end="url(#sdlc-arrow)"/>
+            <line class="sdlc-arrow" x1="228.6" y1="437.1" x2="189.4" y2="387.9" marker-end="url(#sdlc-arrow)"/>
+            <line class="sdlc-arrow" x1="167.3" y1="291.4" x2="181.7" y2="228.6" marker-end="url(#sdlc-arrow)"/>
+            <line class="sdlc-arrow" x1="243.6" y1="151.2" x2="300.4" y2="123.8" marker-end="url(#sdlc-arrow)"/>
+          </g>
+          <g>
+            <circle class="sdlc-node-bg" cx="350" cy="100" r="46"/>
+            <text class="sdlc-node-num"   x="350" y="92"  text-anchor="middle">01</text>
+            <text class="sdlc-node-label" x="350" y="112" text-anchor="middle">Discover</text>
+          </g>
+          <g>
+            <circle class="sdlc-node-bg" cx="506" cy="175" r="46"/>
+            <text class="sdlc-node-num"   x="506" y="167" text-anchor="middle">02</text>
+            <text class="sdlc-node-label" x="506" y="187" text-anchor="middle">Plan &amp; Spec</text>
+          </g>
+          <g>
+            <circle class="sdlc-node-bg" cx="545" cy="345" r="46"/>
+            <text class="sdlc-node-num"   x="545" y="337" text-anchor="middle">03</text>
+            <text class="sdlc-node-label" x="545" y="357" text-anchor="middle">Code</text>
+          </g>
+          <g>
+            <circle class="sdlc-node-bg" cx="437" cy="480" r="46"/>
+            <text class="sdlc-node-num"   x="437" y="472" text-anchor="middle">04</text>
+            <text class="sdlc-node-label" x="437" y="492" text-anchor="middle">Review</text>
+          </g>
+          <g>
+            <circle class="sdlc-node-bg" cx="263" cy="480" r="46"/>
+            <text class="sdlc-node-num"   x="263" y="472" text-anchor="middle">05</text>
+            <text class="sdlc-node-label" x="263" y="492" text-anchor="middle">Test</text>
+          </g>
+          <g>
+            <circle class="sdlc-node-bg" cx="155" cy="345" r="46"/>
+            <text class="sdlc-node-num"   x="155" y="337" text-anchor="middle">06</text>
+            <text class="sdlc-node-label" x="155" y="357" text-anchor="middle">Deploy</text>
+          </g>
+          <g>
+            <circle class="sdlc-node-bg" cx="194" cy="175" r="46"/>
+            <text class="sdlc-node-num"   x="194" y="167" text-anchor="middle">07</text>
+            <text class="sdlc-node-label" x="194" y="187" text-anchor="middle">Operate</text>
+          </g>
+          <text class="sdlc-center-kicker" x="350" y="289" text-anchor="middle">THE LOOP</text>
+          <text class="sdlc-center-title"  x="350" y="320" text-anchor="middle">SDLC</text>
+        </svg>
+        <div class="sdlc__side">
+          <div class="sdlc__side-title">One loop. Seven stations. Every engineering dollar.</div>
+          <div class="sdlc__side-note">For the rest of the session, we'll name which station each tool plays at — and where it stops.</div>
+          <div class="sdlc__side-note sdlc__side-highlight">One category plays at all seven. We'll come back to it.</div>
+        </div>
+      </div>
+    ` },
+    { vid: "V06", block: 2, beat: "2.3", title: "The money grid — categories × stations", layout: "default", body: `
+      <p class="slide__lede">Five tool categories on the rows. Seven SDLC stations on the columns. Every tool you'll see today fits in one cell. <em>Except one row.</em></p>
+      <div class="money-grid-wrap">
+        <div class="money-grid">
+          <div class="mg__corner"></div>
+          <div class="mg__col">Discover</div>
+          <div class="mg__col">Plan &amp; Spec</div>
+          <div class="mg__col">Code</div>
+          <div class="mg__col">Review</div>
+          <div class="mg__col">Test</div>
+          <div class="mg__col">Deploy</div>
+          <div class="mg__col">Operate</div>
+
+          <div class="mg__row">IDE-native</div>
+          <div class="mg__cell mg__cell--muted">—</div>
+          <div class="mg__cell">chat · Composer</div>
+          <div class="mg__cell mg__cell--strong">Cursor · Copilot · Windsurf</div>
+          <div class="mg__cell">Bugbot (Cursor)</div>
+          <div class="mg__cell mg__cell--muted">—</div>
+          <div class="mg__cell mg__cell--muted">—</div>
+          <div class="mg__cell mg__cell--muted">—</div>
+
+          <div class="mg__row">Terminal / CLI</div>
+          <div class="mg__cell mg__cell--muted">—</div>
+          <div class="mg__cell">Claude Code</div>
+          <div class="mg__cell mg__cell--strong">Claude Code · Codex CLI · Gemini CLI</div>
+          <div class="mg__cell">via agents</div>
+          <div class="mg__cell">Claude Code</div>
+          <div class="mg__cell">via scripts</div>
+          <div class="mg__cell mg__cell--muted">—</div>
+
+          <div class="mg__row">Review</div>
+          <div class="mg__cell mg__cell--muted">—</div>
+          <div class="mg__cell mg__cell--muted">—</div>
+          <div class="mg__cell mg__cell--muted">—</div>
+          <div class="mg__cell mg__cell--strong">CodeRabbit · Greptile · Qodo · Bugbot · Macroscope</div>
+          <div class="mg__cell mg__cell--muted">—</div>
+          <div class="mg__cell mg__cell--muted">—</div>
+          <div class="mg__cell mg__cell--muted">—</div>
+
+          <div class="mg__row">Specialized</div>
+          <div class="mg__cell">Spec Kit</div>
+          <div class="mg__cell">Kiro · OpenSpec</div>
+          <div class="mg__cell mg__cell--muted">—</div>
+          <div class="mg__cell mg__cell--muted">—</div>
+          <div class="mg__cell">Qodo tests · Playwright MCP</div>
+          <div class="mg__cell">Browserbase</div>
+          <div class="mg__cell">Devin Wiki · Mintlify</div>
+
+          <div class="mg__row mg__row--highlight">Cloud autonomous</div>
+          <div class="mg__cell mg__cell--highlight">Devin · GitHub Coding Agent · Jules · Codex Cloud · Replit Agent · Cursor Cloud Agents</div>
+        </div>
+        <div class="money-grid__foot">Four categories stop somewhere. <em>One row traverses every station.</em></div>
+      </div>
+    ` },
+
+    { vid: "V07", block: 2, beat: "2.4", title: "Why the bottom row exists", layout: "default", body: `
+      <div class="stats-row">
+        <div class="stat"><div class="stat__num">30% → 50%</div><div class="stat__label">Cognizant</div><div class="stat__sub">AI-generated code today → target</div></div>
+        <div class="stat"><div class="stat__num">2×</div><div class="stat__label">Visma + Devin</div><div class="stat__sub">Productivity up · cost-per-feature halved</div></div>
+        <div class="stat"><div class="stat__num">55% → 81%</div><div class="stat__label">Qodo report</div><div class="stat__sub">AI review lifted quality</div></div>
+      </div>
+      <div class="callout"><em>The bottom row</em> — Devin, Jules, Codex Cloud, GitHub Coding Agent — is why those numbers exist.</div>
+    ` },
+
+    // ---------- Block 3: The tools landscape ----------
+    { vid: "V08", block: 3, beat: "3.1", title: "A spectrum of teammates", layout: "default", body: `
+      <p class="slide__lede">Four positions on a single axis — <em>how much trust per unit of supervision.</em></p>
+      <div class="spectrum">
+        <div class="spectrum__track"><div class="spectrum__fill"></div></div>
+        <div class="spectrum__nodes">
+          <div class="spectrum__node"><div class="spectrum__label">Intern at your shoulder</div><div class="spectrum__tools">Autocomplete · Copilot tab-suggest</div></div>
+          <div class="spectrum__node"><div class="spectrum__label">Peer pair-programmer</div><div class="spectrum__tools">Cursor agent · Windsurf Cascade · Claude Code interactive</div></div>
+          <div class="spectrum__node"><div class="spectrum__label">Colleague who works alone</div><div class="spectrum__tools">Devin · Jules · Codex Cloud · GitHub Coding Agent</div></div>
+          <div class="spectrum__node"><div class="spectrum__label">A swarm of colleagues</div><div class="spectrum__tools">Cursor 8-parallel · Claude Agent Teams · Antigravity multi-agent</div></div>
+        </div>
+        <div class="spectrum__axis">Same axis Day 2 will turn into the <em>"unlimited junior developer"</em> mindset.</div>
+      </div>
+    ` },
+
+    { vid: "V09", block: 3, beat: "3.2", title: "Category 1 — IDE-native AI assistants", layout: "default", body: `
+      <table class="matrix"><thead><tr><th>Tool</th><th>Niche</th><th>Price</th></tr></thead><tbody>
+        <tr><td>Cursor</td><td>Dominant · Composer model · 8 parallel agents · ~14M MAUs · $2B+ ARR</td><td>$20 / $40</td></tr>
+        <tr><td>Windsurf</td><td>Cognition-owned · Cascade agent · best price-to-capability</td><td>$15/mo</td></tr>
+        <tr><td>GitHub Copilot</td><td>Volume leader · 28M MAUs · 37% share · deepest GitHub</td><td>$10/mo</td></tr>
+        <tr><td>Zed</td><td>Rust-native · sub-50ms latency · BYO-agent</td><td>—</td></tr>
+        <tr><td>JetBrains AI + Junie</td><td>For the IntelliJ / PyCharm / Rider crowd</td><td>—</td></tr>
+        <tr><td>Google Antigravity</td><td>Built agent-first · multi-agent · Chromium built-in</td><td>Free preview</td></tr>
+        <tr><td>Kiro (AWS)</td><td>AWS-native · spec-driven · EARS syntax</td><td>—</td></tr>
+      </tbody></table>
+      <div class="matrix__caption">The thing you open to write code. The agent lives in the editor.</div>
+    ` },
+
+    { vid: "V10", block: 3, beat: "3.3", title: "Category 2 — Terminal / CLI agents", layout: "default", body: `
+      <table class="matrix"><thead><tr><th>Tool</th><th>Niche</th><th>Price</th></tr></thead><tbody>
+        <tr><td>Claude Code</td><td>Hardest problems · Skills / Hooks / Subagents / MCP · foundation for heavy agentic work</td><td>$20 / $100 / $200</td></tr>
+        <tr><td>Codex CLI</td><td>Open source · Rust · Terminal-Bench leader · sandboxed by default</td><td>ChatGPT+ bundle</td></tr>
+        <tr><td>Gemini CLI</td><td>Most generous free tier · 1M context · best for monorepos</td><td>Free</td></tr>
+        <tr><td>Aider, OpenCode, Cline, Hermes</td><td>Honourable mentions · BYOK, open source</td><td>—</td></tr>
+      </tbody></table>
+      <div class="matrix__caption">Most pros run two — one IDE-native, one terminal. <em>"Codex for keystrokes, Claude Code for commits."</em></div>
+    ` },
+
+    { vid: "V11", block: 3, beat: "3.4", title: "Category 3 — Cloud autonomous software engineers", layout: "default", body: `
+      <div class="cloud-bar">
+        <div class="cloud-bar__stations"><span>Discover</span><span>Plan &amp; Spec</span><span>Code</span><span>Review</span><span>Test</span><span>Deploy</span><span>Operate</span></div>
+        <div class="cloud-bar__bar">
+          <div class="cloud-bar__label">Cloud autonomous engineers</div>
+          <div class="cloud-bar__tools">Devin · GitHub Coding Agent · Jules · Codex Cloud · Replit Agent · Cursor Cloud Agents</div>
+        </div>
+        <div class="cloud-bar__caption">One row. Every station. This is <em>why</em> the category exists.</div>
+      </div>
+      <table class="matrix"><thead><tr><th>Tool</th><th>Niche</th><th>Price</th></tr></thead><tbody>
+        <tr><td>Devin</td><td>Plans · executes · opens the PR · Goldman, Santander, Nubank, Dell, Cisco, Infosys, Cognizant · ~$25B valuation talks</td><td>$20/mo + $2.25/ACU</td></tr>
+        <tr><td>GitHub Coding Agent</td><td>Lives on GitHub itself · assigned to issues</td><td>—</td></tr>
+        <tr><td>Codex Cloud</td><td>OpenAI's cloud-side agent · Chrome extension</td><td>—</td></tr>
+        <tr><td>Google Jules</td><td>Proactive · 15 free tasks/day · Gemini-powered</td><td>Free tier</td></tr>
+        <tr><td>Cursor Cloud Agents</td><td>Cursor's cloud-side companion</td><td>—</td></tr>
+        <tr><td>Replit Agent</td><td>Vertical stack: agent + IDE + hosting + DB</td><td>—</td></tr>
+      </tbody></table>
+      <div class="matrix__caption">Cognition's own framing: <em>"If you can do it in three hours, Devin can probably do it."</em></div>
+    ` },
+
+    { vid: "V12", block: 3, beat: "3.6", title: "Category 4 — AI code review", layout: "default", body: `
+      <p class="slide__lede">As generation accelerates, the bottleneck moves to review. Reviewers spend <strong>91% more time</strong> on AI-generated PRs.</p>
+      <table class="matrix"><thead><tr><th>Tool</th><th>Niche</th><th>Price</th></tr></thead><tbody>
+        <tr><td>CodeRabbit</td><td>Best signal-to-noise · all four Git platforms</td><td>$24/dev/mo</td></tr>
+        <tr><td>Greptile</td><td>Highest raw bug catch (82% vs 44%) · indexes full repo</td><td>—</td></tr>
+        <tr><td>Qodo</td><td>Multi-agent · air-gapped option · OSS PR-Agent base</td><td>—</td></tr>
+        <tr><td>Bugbot (Cursor)</td><td>2M+ PRs/month · auto-fix in sandbox VM</td><td>—</td></tr>
+        <tr><td>Macroscope</td><td>Most autonomous · can auto-approve low-risk PRs</td><td>—</td></tr>
+        <tr><td>Anthropic review</td><td>Multi-agent code review · launched March 2026</td><td>—</td></tr>
+      </tbody></table>
+    ` },
+
+    { vid: "V13", block: 3, beat: "3.7", title: "Category 5 — Specialized / adjacent", layout: "default", body: `
+      <table class="matrix"><thead><tr><th>Slot</th><th>Representative tools</th></tr></thead><tbody>
+        <tr><td>Test generators</td><td>Qodo tests · Codium-style</td></tr>
+        <tr><td>Doc generators</td><td>Mintlify · Devin Wiki (auto-indexes + writes architecture docs)</td></tr>
+        <tr><td>Browser / UI testing</td><td>Browserbase + Stagehand · Playwright MCP</td></tr>
+        <tr><td>Spec-driven development</td><td>GitHub Spec Kit (93K+★) · Kiro · OpenSpec · BMAD-METHOD</td></tr>
+        <tr><td>Context engineering</td><td>Augment Code · Intent's living-spec platform</td></tr>
+      </tbody></table>
+      <div class="matrix__caption">New names every month. Don't panic — they all sit somewhere on the grid you already learned.</div>
+    ` },
+
+    { vid: "V14", block: 3, beat: "3.5", title: "Live Demo #1 — Cursor parallel agents", layout: "demo", body: `
+      <div class="demo-card">
+        <div class="demo-card__head">
+          <span class="demo-card__tag">Live Demo · 1 of 3</span>
+          <h3 class="demo-card__title">Three agents, one repo, at the same time.</h3>
+        </div>
+        <p class="demo-card__sub">Cursor launches each agent in an <em>isolated git worktree</em> — so they can't stomp on each other's edits. This is the shape of 2026 workflow: <em>parallelism, not sequencing</em>.</p>
+        <div class="demo-card__body">
+          <div>
+            <div class="demo-card__col-title">What I'll do</div>
+            <ol class="demo-card__steps">
+              <li class="demo-card__step"><span class="demo-card__step-num">01</span><span>Open Cursor on the <code>VedicAstro</code> monorepo. Show <code>tasks.md</code> — three unrelated tickets.</span></li>
+              <li class="demo-card__step"><span class="demo-card__step-num">02</span><span>From the command palette: <em>Start N parallel agents</em> — set <strong>N = 3</strong>.</span></li>
+              <li class="demo-card__step"><span class="demo-card__step-num">03</span><span>Three agents spin up, each in its own <code>git worktree</code>. Watch the tiles populate.</span></li>
+              <li class="demo-card__step"><span class="demo-card__step-num">04</span><span>Two finish in ~90 seconds. One pauses with a clarifying question — <em>good</em> behaviour.</span></li>
+              <li class="demo-card__step"><span class="demo-card__step-num">05</span><span>Accept two diffs, send the third back with more context. Ship, unblock, move on.</span></li>
+            </ol>
+          </div>
+          <div>
+            <div class="demo-card__col-title">What you'll see</div>
+            <div class="demo-card__stage">
+              <div class="demo-card__stage-bar">
+                <div class="demo-card__dots"><span class="demo-card__dot"></span><span class="demo-card__dot"></span><span class="demo-card__dot"></span></div>
+                <span>Cursor · 3 agents running</span>
+              </div>
+              <div class="demo-card__stage-body">
+                <div class="demo-parallel">
+                  <div class="demo-parallel__row">
+                    <span class="demo-parallel__dot"></span>
+                    <span class="demo-parallel__label"><strong>Agent 1</strong> <code>feat/dasha-tests</code> — writing 18 test cases…</span>
+                    <span class="demo-parallel__status">Running</span>
+                  </div>
+                  <div class="demo-parallel__row">
+                    <span class="demo-parallel__dot"></span>
+                    <span class="demo-parallel__label"><strong>Agent 2</strong> <code>fix/timezone-transit</code> — patching <code>utils/tz.ts</code>…</span>
+                    <span class="demo-parallel__status">Running</span>
+                  </div>
+                  <div class="demo-parallel__row demo-parallel__row--done">
+                    <span class="demo-parallel__dot"></span>
+                    <span class="demo-parallel__label"><strong>Agent 3</strong> <code>docs/readme-update</code> — diff ready for review.</span>
+                    <span class="demo-parallel__status">Ready</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-card__recovery">
+          <span class="demo-card__recovery-label">If live fails</span>
+          <span class="demo-card__recovery-line">Point at the preview above — <em>"this is what three agents working in parallel looks like"</em> — describe the status labels, move to the next slide.</span>
+        </div>
+      </div>
+    ` },
+
+    // ---------- Block 4: MCP ----------
+    { vid: "V15", block: 4, beat: "4.1", title: "N × M → N + M — the MCP collapse", layout: "default", body: `
+      <p class="slide__lede">Every AI tool needs to reach every system. Without a standard, you get a combinatorial mess. MCP collapses the explosion.</p>
+      <div class="mcp-collapse">
+        <svg class="mcp-collapse__svg" viewBox="0 0 1000 460" role="img" aria-label="N by M integrations collapse to N plus M under MCP">
+          <text class="mc-panel-label" x="200" y="30" text-anchor="middle">BEFORE · N × M</text>
+          <text class="mc-panel-label" x="800" y="30" text-anchor="middle">AFTER · N + M</text>
+
+          <g class="mc-line-group">
+            <line class="mc-line" x1="95"  y1="95"  x2="305" y2="95"/>
+            <line class="mc-line" x1="95"  y1="95"  x2="305" y2="175"/>
+            <line class="mc-line" x1="95"  y1="95"  x2="305" y2="255"/>
+            <line class="mc-line" x1="95"  y1="95"  x2="305" y2="335"/>
+            <line class="mc-line" x1="95"  y1="175" x2="305" y2="95"/>
+            <line class="mc-line" x1="95"  y1="175" x2="305" y2="175"/>
+            <line class="mc-line" x1="95"  y1="175" x2="305" y2="255"/>
+            <line class="mc-line" x1="95"  y1="175" x2="305" y2="335"/>
+            <line class="mc-line" x1="95"  y1="255" x2="305" y2="95"/>
+            <line class="mc-line" x1="95"  y1="255" x2="305" y2="175"/>
+            <line class="mc-line" x1="95"  y1="255" x2="305" y2="255"/>
+            <line class="mc-line" x1="95"  y1="255" x2="305" y2="335"/>
+            <line class="mc-line" x1="95"  y1="335" x2="305" y2="95"/>
+            <line class="mc-line" x1="95"  y1="335" x2="305" y2="175"/>
+            <line class="mc-line" x1="95"  y1="335" x2="305" y2="255"/>
+            <line class="mc-line" x1="95"  y1="335" x2="305" y2="335"/>
+          </g>
+
+          <g>
+            <circle class="mc-node" cx="75"  cy="95"  r="22"/><text class="mc-label" x="42" y="100" text-anchor="end">Cursor</text>
+            <circle class="mc-node" cx="75"  cy="175" r="22"/><text class="mc-label" x="42" y="180" text-anchor="end">Copilot</text>
+            <circle class="mc-node" cx="75"  cy="255" r="22"/><text class="mc-label" x="42" y="260" text-anchor="end">Claude</text>
+            <circle class="mc-node" cx="75"  cy="335" r="22"/><text class="mc-label" x="42" y="340" text-anchor="end">Gemini</text>
+            <circle class="mc-node" cx="325" cy="95"  r="22"/><text class="mc-label" x="358" y="100">GitHub</text>
+            <circle class="mc-node" cx="325" cy="175" r="22"/><text class="mc-label" x="358" y="180">Postgres</text>
+            <circle class="mc-node" cx="325" cy="255" r="22"/><text class="mc-label" x="358" y="260">Linear</text>
+            <circle class="mc-node" cx="325" cy="335" r="22"/><text class="mc-label" x="358" y="340">Sentry</text>
+          </g>
+          <text class="mc-tally" x="200" y="420" text-anchor="middle">16 integrations · grows as N × M</text>
+
+          <g fill="none" stroke="var(--accent-primary)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 440 205 L 475 230 L 440 255"/>
+            <path d="M 475 205 L 510 230 L 475 255"/>
+          </g>
+
+          <g class="mc-line-group">
+            <line class="mc-line-after" x1="595" y1="95"  x2="745" y2="230"/>
+            <line class="mc-line-after" x1="595" y1="175" x2="745" y2="230"/>
+            <line class="mc-line-after" x1="595" y1="255" x2="745" y2="230"/>
+            <line class="mc-line-after" x1="595" y1="335" x2="745" y2="230"/>
+            <line class="mc-line-after" x1="805" y1="230" x2="955" y2="95"/>
+            <line class="mc-line-after" x1="805" y1="230" x2="955" y2="175"/>
+            <line class="mc-line-after" x1="805" y1="230" x2="955" y2="255"/>
+            <line class="mc-line-after" x1="805" y1="230" x2="955" y2="335"/>
+          </g>
+
+          <g>
+            <circle class="mc-node" cx="575" cy="95"  r="22"/><text class="mc-label" x="542" y="100" text-anchor="end">Cursor</text>
+            <circle class="mc-node" cx="575" cy="175" r="22"/><text class="mc-label" x="542" y="180" text-anchor="end">Copilot</text>
+            <circle class="mc-node" cx="575" cy="255" r="22"/><text class="mc-label" x="542" y="260" text-anchor="end">Claude</text>
+            <circle class="mc-node" cx="575" cy="335" r="22"/><text class="mc-label" x="542" y="340" text-anchor="end">Gemini</text>
+            <circle class="mc-node-hub" cx="775" cy="230" r="34"/>
+            <text class="mc-hub-label" x="775" y="236" text-anchor="middle">MCP</text>
+            <circle class="mc-node" cx="975" cy="95"  r="22"/><text class="mc-label" x="958" y="100" text-anchor="end">GitHub</text>
+            <circle class="mc-node" cx="975" cy="175" r="22"/><text class="mc-label" x="958" y="180" text-anchor="end">Postgres</text>
+            <circle class="mc-node" cx="975" cy="255" r="22"/><text class="mc-label" x="958" y="260" text-anchor="end">Linear</text>
+            <circle class="mc-node" cx="975" cy="335" r="22"/><text class="mc-label" x="958" y="340" text-anchor="end">Sentry</text>
+          </g>
+          <text class="mc-tally mc-tally--accent" x="775" y="420" text-anchor="middle">8 integrations · grows as N + M</text>
+        </svg>
+        <div class="mcp-collapse__foot">Same story as <em>LSP for editors, 2015</em>. This is the LSP moment for AI tools.</div>
+      </div>
+    ` },
+
+    { vid: "V16", block: 4, beat: "4.2", title: "LSP — the analogy that lands", layout: "default", body: `
+      <div class="lsp">
+        <div class="lsp__block"><h3>Before LSP (2015)</h3><p>Every editor wrote a plugin for every language. TypeScript, Python, Rust — N × M integrations. Everyone lost.</p></div>
+        <div class="lsp__arrow">→</div>
+        <div class="lsp__block"><h3>After LSP</h3><p>Languages build one server. Every editor benefits. N + M.</p></div>
+      </div>
+      <div class="lsp__punchline">MCP is the <em>LSP moment</em> for AI tools.</div>
+    ` },
+
+    { vid: "V17", block: 4, beat: "4.3", title: "Host · Client · Server — the three components", layout: "default", body: `
+      <p class="slide__lede">Three clean roles. The whole protocol fits in <em>one diagram</em>.</p>
+      <div class="mcp-arch">
+        <svg class="mcp-arch__svg" viewBox="0 0 1000 520" role="img" aria-label="MCP architecture: one Host contains multiple Clients; each Client connects 1:1 to an external Server">
+          <text class="ma-section-label" x="250" y="40" text-anchor="middle">YOUR MACHINE</text>
+          <text class="ma-section-label" x="780" y="40" text-anchor="middle">EXTERNAL PROCESSES</text>
+
+          <rect class="ma-host-rect" x="50" y="70" width="400" height="420" rx="22"/>
+          <text class="ma-host-label" x="70" y="110">HOST</text>
+          <text class="ma-host-sub"   x="70" y="136">The application you use</text>
+          <text class="ma-host-list"  x="70" y="156">Cursor · Claude Desktop · VS Code · Windsurf · Claude Code</text>
+
+          <g>
+            <circle class="ma-client" cx="400" cy="225" r="32"/>
+            <text class="ma-client-label" x="400" y="230" text-anchor="middle">CLIENT</text>
+            <circle class="ma-client" cx="400" cy="325" r="32"/>
+            <text class="ma-client-label" x="400" y="330" text-anchor="middle">CLIENT</text>
+            <circle class="ma-client" cx="400" cy="425" r="32"/>
+            <text class="ma-client-label" x="400" y="430" text-anchor="middle">CLIENT</text>
+          </g>
+
+          <defs>
+            <marker id="ma-arrow-right" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0,0 L10,5 L0,10 Z" class="ma-arrow-fill"/>
+            </marker>
+            <marker id="ma-arrow-left" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M10,0 L0,5 L10,10 Z" class="ma-arrow-fill"/>
+            </marker>
+          </defs>
+          <g>
+            <line class="ma-link" x1="435" y1="225" x2="610" y2="225" marker-start="url(#ma-arrow-left)" marker-end="url(#ma-arrow-right)"/>
+            <line class="ma-link" x1="435" y1="325" x2="610" y2="325" marker-start="url(#ma-arrow-left)" marker-end="url(#ma-arrow-right)"/>
+            <line class="ma-link" x1="435" y1="425" x2="610" y2="425" marker-start="url(#ma-arrow-left)" marker-end="url(#ma-arrow-right)"/>
+            <text class="ma-link-tag" x="522" y="215" text-anchor="middle">MCP · JSON-RPC</text>
+            <text class="ma-link-tag" x="522" y="315" text-anchor="middle">MCP · JSON-RPC</text>
+            <text class="ma-link-tag" x="522" y="415" text-anchor="middle">MCP · JSON-RPC</text>
+          </g>
+
+          <g>
+            <rect class="ma-server" x="620" y="192" width="330" height="66" rx="10"/>
+            <text class="ma-server-name" x="640" y="218">GitHub MCP server</text>
+            <text class="ma-server-sub"  x="640" y="240">issues · pull requests · code</text>
+
+            <rect class="ma-server" x="620" y="292" width="330" height="66" rx="10"/>
+            <text class="ma-server-name" x="640" y="318">Postgres MCP server</text>
+            <text class="ma-server-sub"  x="640" y="340">schema · query · data</text>
+
+            <rect class="ma-server" x="620" y="392" width="330" height="66" rx="10"/>
+            <text class="ma-server-name" x="640" y="418">Linear MCP server</text>
+            <text class="ma-server-sub"  x="640" y="440">tickets · cycles · projects</text>
+          </g>
+        </svg>
+        <div class="mcp-arch__primitives">
+          <div class="mcp-arch__prim"><div class="mcp-arch__prim-name">Tools</div><div class="mcp-arch__prim-note">Actions the agent can take</div></div>
+          <div class="mcp-arch__prim"><div class="mcp-arch__prim-name">Resources</div><div class="mcp-arch__prim-note">Data the agent can read</div></div>
+          <div class="mcp-arch__prim"><div class="mcp-arch__prim-name">Prompts</div><div class="mcp-arch__prim-note">Reusable instruction templates</div></div>
+        </div>
+      </div>
+    ` },
+
+    { vid: "V18", block: 4, beat: "4.4", title: "MCP — state of play", layout: "default", body: `
+      <div class="stats-row">
+        <div class="stat"><div class="stat__num">97M</div><div class="stat__label">Monthly SDK downloads</div></div>
+        <div class="stat"><div class="stat__num">10,000+</div><div class="stat__label">Live production servers</div></div>
+        <div class="stat"><div class="stat__num">28%</div><div class="stat__label">of Fortune 500 deploying MCP by early 2026</div></div>
+      </div>
+      <div class="slide__kicker">Adoption timeline</div>
+      <div class="timeline-pills">
+        <span class="timeline-pill">Anthropic · Nov 2024</span>
+        <span class="timeline-arrow">→</span>
+        <span class="timeline-pill">OpenAI · Mar 2025</span>
+        <span class="timeline-arrow">→</span>
+        <span class="timeline-pill">Google</span>
+        <span class="timeline-arrow">→</span>
+        <span class="timeline-pill">Spec · Nov 2025</span>
+        <span class="timeline-arrow">→</span>
+        <span class="timeline-pill">2026 roadmap</span>
+      </div>
+    ` },
+
+    { vid: "V19", block: 4, beat: "4.5", title: "Eight MCP servers worth knowing", layout: "default", body: `
+      <div class="shelf">
+        <div class="shelf__card"><div class="shelf__title">GitHub MCP</div><div class="shelf__sub">Issues, PRs, code</div></div>
+        <div class="shelf__card"><div class="shelf__title">Sentry MCP</div><div class="shelf__sub">Errors, traces</div></div>
+        <div class="shelf__card"><div class="shelf__title">Linear MCP</div><div class="shelf__sub">Tickets, cycles</div></div>
+        <div class="shelf__card"><div class="shelf__title">Postgres / Supabase</div><div class="shelf__sub">Schema, queries, data</div></div>
+        <div class="shelf__card"><div class="shelf__title">Playwright MCP</div><div class="shelf__sub">Browser automation, UI tests</div></div>
+        <div class="shelf__card"><div class="shelf__title">Filesystem MCP</div><div class="shelf__sub">Git-aware · .gitignore-respecting</div></div>
+        <div class="shelf__card"><div class="shelf__title">Memory / KG</div><div class="shelf__sub">Persistent context across sessions</div></div>
+        <div class="shelf__card"><div class="shelf__title">Cloudflare portals</div><div class="shelf__sub">Enterprise gateway pattern</div></div>
+      </div>
+    ` },
+
+    { vid: "V20", block: 4, beat: "4.6", title: "Live Demo #2 — Claude Code + GitHub MCP", layout: "demo", body: `
+      <div class="demo-card">
+        <div class="demo-card__head">
+          <span class="demo-card__tag">Live Demo · 2 of 3</span>
+          <h3 class="demo-card__title">A tool call, end-to-end, in front of you.</h3>
+        </div>
+        <p class="demo-card__sub">Every box on the V17 diagram, in motion: <em>request → plan → tool pick → JSON-RPC call → response → answer</em>. Sixty seconds of demo. The rest is narration.</p>
+        <div class="demo-card__body">
+          <div>
+            <div class="demo-card__col-title">What I'll do</div>
+            <ol class="demo-card__steps">
+              <li class="demo-card__step"><span class="demo-card__step-num">01</span><span>Claude Code running with <code>@modelcontextprotocol/server-github</code> wired in via <code>.mcp.json</code>.</span></li>
+              <li class="demo-card__step"><span class="demo-card__step-num">02</span><span>Prompt: <em>"list the three oldest open issues in <code>aspriya/VedicAstro</code>."</em></span></li>
+              <li class="demo-card__step"><span class="demo-card__step-num">03</span><span>Model plans, picks <code>github.list_issues</code>. I'll toggle the transcript to show the <strong>JSON tool schema</strong>.</span></li>
+              <li class="demo-card__step"><span class="demo-card__step-num">04</span><span>Tool returns 12 issues. Model filters by <code>created_at</code> client-side — doesn't re-query.</span></li>
+              <li class="demo-card__step"><span class="demo-card__step-num">05</span><span>Clean English answer. Point out: the model <em>never</em> saw the full repo, only the tool response.</span></li>
+            </ol>
+          </div>
+          <div>
+            <div class="demo-card__col-title">What you'll see</div>
+            <div class="demo-card__stage">
+              <div class="demo-card__stage-bar">
+                <div class="demo-card__dots"><span class="demo-card__dot"></span><span class="demo-card__dot"></span><span class="demo-card__dot"></span></div>
+                <span>~/VedicAstro · claude-code</span>
+              </div>
+              <div class="demo-card__stage-body">
+                <div><span class="you">› list the three oldest open issues in aspriya/VedicAstro</span></div>
+                <div><span class="cmnt">  planning…</span></div>
+                <div><span class="tool">⏺ github.list_issues</span> <span class="ret">{ owner: "aspriya", repo: "VedicAstro", state: "open", sort: "created", direction: "asc", per_page: 3 }</span></div>
+                <div><span class="ok">  ✓</span> <span class="ret">returned 3 issues in 340 ms</span></div>
+                <div><span class="cmnt">  synthesising…</span></div>
+                <div>&nbsp;</div>
+                <div><span class="hdr">Here are the three oldest open issues:</span></div>
+                <div>  <span class="ret">#12 · Ayanamsa defaults inconsistent between calc and chart</span></div>
+                <div>  <span class="ret">#19 · Dasha balance wrong for births before 1900</span></div>
+                <div>  <span class="ret">#24 · Timezone transitions lose minute-of-arc precision</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-card__recovery">
+          <span class="demo-card__recovery-label">If live fails</span>
+          <span class="demo-card__recovery-line">Read the transcript above as if it happened. The point is the <em>shape</em> of the exchange, not the specific issues.</span>
+        </div>
+      </div>
+    ` },
+
+    { vid: "V21", block: 4, beat: "4.7", title: "Security — adult honest", layout: "default", body: `
+      <p class="slide__lede">Prompt injection is OWASP #1 on the LLM Top 10. NIST: <em>"generative AI's greatest security flaw."</em></p>
+      <div class="timeline">
+        <div class="timeline__item"><div class="timeline__when">May 2025</div><div class="timeline__what"><strong>GitHub MCP incident</strong> (Invariant Labs). Attacker plants a malicious issue in a public repo. Developer asks agent to check issues. Agent follows it, leaks <em>private</em>-repo data on shared credentials.</div></div>
+        <div class="timeline__item"><div class="timeline__when">Early 2026</div><div class="timeline__what"><strong>OX Security MCP-SDK RCE</strong>. Architectural issue across Python / TS / Java / Rust SDKs — hits Cursor, VS Code, Windsurf, Claude Code, Gemini-CLI. One disclosed chain lets an MCP server achieve remote code execution with <em>zero user interaction</em>.</div></div>
+        <div class="timeline__item timeline__item--warn"><div class="timeline__when">Ongoing</div><div class="timeline__what"><strong>Tool poisoning</strong> — a malicious server rewrites its own tool descriptions to manipulate which tool the agent picks. Traditional input validation doesn't help, because the LLM <em>is</em> the validation layer.</div></div>
+      </div>
+    ` },
+
+    { vid: "V22", block: 4, beat: "4.8", title: "Practical defenses", layout: "default", body: `
+      <ul class="checklist">
+        <li>Run MCP servers <strong>least-privileged</strong> — not as root, scoped API keys, container-isolated.</li>
+        <li>Treat MCP tool results as <strong>untrusted user input</strong>, never as trusted system context.</li>
+        <li>Enterprise: put a gateway in front — <strong>Kong AI Gateway, Cloudflare MCP portals, Lasso Security</strong> — for auth, audit, scope.</li>
+        <li>Highest-risk pattern: one agent with <strong>both a public-content server and a private-data server</strong>. Avoid.</li>
+      </ul>
+    ` },
+
+    // ---------- Block 5: Markdown files ----------
+    { vid: "V23", block: 5, beat: "5.1", title: "A 65-line markdown file hits 110K stars", layout: "default", body: `
+      <div class="story">
+        <div>
+          <div class="story__big" data-count="110" data-suffix="K+" data-duration="1400">110K+</div>
+          <div class="slide__kicker">GitHub stars</div>
+          <p style="color:var(--text-secondary);line-height:1.55;margin-top:0.75rem;font-size:1.1rem;">Karpathy, 13 April 2026. 7.9K on day one. 28 consecutive days at #1 on GitHub Trending. Top 100 of all repos ever.</p>
+        </div>
+        <div class="story__stats">
+          <div class="story__stat"><div class="story__stat-label">One file</div><div class="story__stat-val">65 lines — plain text.</div></div>
+          <div class="story__stat"><div class="story__stat-label">No code</div><div class="story__stat-val">No framework, no install script.</div></div>
+          <div class="story__stat"><div class="story__stat-label">What it is</div><div class="story__stat-val">Four behavioral rules for an AI coding agent.</div></div>
+        </div>
+      </div>
+      <div class="callout">He didn't invent anything. He <em>named what everyone was feeling.</em></div>
+    ` },
+
+    { vid: "V24", block: 5, beat: "5.2", title: "Three layers of rules — global · project · subdirectory", layout: "default", body: `
+      <p class="slide__lede">Every major agent reads a layered stack of markdown. <em>Nearest file wins.</em></p>
+      <div class="md-stack">
+        <div class="md-stack__direction" aria-hidden="true"><span>Override priority</span><span></span><span>↑</span></div>
+        <div class="md-stack__card md-stack__card--global">
+          <div class="md-stack__scope">Global · You</div>
+          <div class="md-stack__body"><div class="md-stack__path">~/.claude/CLAUDE.md</div><div class="md-stack__note">Personal preferences. Applies to every project on your machine.</div></div>
+        </div>
+        <div class="md-stack__card md-stack__card--project">
+          <div class="md-stack__scope">Project · Team</div>
+          <div class="md-stack__body"><div class="md-stack__path">./CLAUDE.md · ./AGENTS.md</div><div class="md-stack__note">Committed to the repo. Shared conventions, build commands, don't-touch list.</div></div>
+        </div>
+        <div class="md-stack__card md-stack__card--subdir">
+          <div class="md-stack__scope">Subdirectory · Scoped</div>
+          <div class="md-stack__body"><div class="md-stack__path">./frontend/CLAUDE.md · ./services/api/AGENTS.md</div><div class="md-stack__note">Overrides parent rules for this folder only. Use for stack-specific quirks.</div></div>
+        </div>
+        <div class="md-stack__foot">Same shape in Cursor, Windsurf, Claude Code, Codex, Gemini CLI — <em>AGENTS.md</em> is the convergent name.</div>
+      </div>
+    ` },
+
+    { vid: "V25", block: 5, beat: "5.3", title: "The nine-section content checklist", layout: "default", body: `
+      <p class="slide__lede">From GitHub's analysis of 2,500+ agent files — effective rules files share these sections.</p>
+      <ol class="checklist checklist--numbered">
+        <li><strong>Project overview</strong> — what is this, who uses it, what business problem.</li>
+        <li><strong>Build / dev setup</strong> — exact commands, ports, env files.</li>
+        <li><strong>Test commands</strong> — how to run, what passing looks like.</li>
+        <li><strong>Code style</strong> — only things the linter can't enforce.</li>
+        <li><strong>Architecture overview</strong> — major modules, data flow.</li>
+        <li><strong>Conventions</strong> — naming, error handling, logging.</li>
+        <li><strong>Don't-touch list</strong> — files the agent shouldn't modify.</li>
+        <li><strong>Gotchas</strong> — non-obvious things that have bitten you.</li>
+        <li><strong>Release / deploy notes</strong> — branch model, commits, docs.</li>
+      </ol>
+    ` },
+
+    { vid: "V26", block: 5, beat: "5.4", title: "What earns its keep — the importance score", layout: "default", body: `
+      <p class="slide__lede">Axis: impact on agent quality per minute spent writing it. High score = high leverage.</p>
+      <table class="score-table"><thead><tr><th>Score</th><th>File / section</th><th>Why</th></tr></thead><tbody>
+        <tr><td><span class="score-badge score-5">5</span></td><td>Project overview (AGENTS.md / CLAUDE.md)</td><td>Without it, the agent guesses what your project even is.</td></tr>
+        <tr><td><span class="score-badge score-5">5</span></td><td>Build / test commands</td><td>Agents waste cycles figuring this out. Tell them once.</td></tr>
+        <tr><td><span class="score-badge score-5">5</span></td><td>Gotchas section</td><td>Anthropic engineers: the highest-signal content you can write.</td></tr>
+        <tr><td><span class="score-badge score-4">4</span></td><td>Don't-touch list</td><td>Cheap; prevents catastrophic edits.</td></tr>
+        <tr><td><span class="score-badge score-4">4</span></td><td>Architecture overview (high-level)</td><td>Hard for agents to infer; high payoff to state.</td></tr>
+        <tr><td><span class="score-badge score-4">4</span></td><td>SKILL.md for repeated workflows</td><td>High leverage when you have workflows worth automating.</td></tr>
+        <tr><td><span class="score-badge score-3">3</span></td><td>Slash commands (.claude/commands/)</td><td>Cheap wins for repeated workflows.</td></tr>
+        <tr><td><span class="score-badge score-3">3</span></td><td>Conventions / naming</td><td>Partially redundant with linter. Write only what it can't enforce.</td></tr>
+        <tr><td><span class="score-badge score-3">3</span></td><td>Subagents</td><td>High ceiling; requires investment. Skip day one.</td></tr>
+        <tr><td><span class="score-badge score-3">3</span></td><td>README / ARCHITECTURE.md</td><td>For humans first. Agents benefit incidentally.</td></tr>
+        <tr><td><span class="score-badge score-2">2</span></td><td>Hooks</td><td>Power-user feature. Worth knowing exists.</td></tr>
+        <tr><td><span class="score-badge score-1">1</span></td><td>Verbose "role-play" instructions</td><td>Mostly waste. Behavioral rules beat personality prompts.</td></tr>
+      </tbody></table>
+    ` },
+
+    { vid: "V27", block: 5, beat: "5.5", title: "When each file enters context", layout: "default", body: `
+      <p class="slide__lede">Not all files load all the time. Every token in the always-loaded file is a tax on every turn.</p>
+      <div class="timing-rows">
+        <div class="timing-row"><div class="timing-label">Always-loaded</div><div class="timing-desc">CLAUDE.md / AGENTS.md in project root — stays in context across all turns.</div></div>
+        <div class="timing-row"><div class="timing-label">Hierarchical</div><div class="timing-desc">Subdirectory rules override parent — <em>nearest file wins.</em></div></div>
+        <div class="timing-row"><div class="timing-label">On-demand</div><div class="timing-desc">SKILL.md frontmatter in context; body loads only on invocation. <em>Progressive disclosure.</em></div></div>
+        <div class="timing-row"><div class="timing-label">Event-triggered</div><div class="timing-desc">Hooks fire on specific lifecycle events — commit, pre-run, destructive ops.</div></div>
+        <div class="timing-row"><div class="timing-label">Subagent-isolated</div><div class="timing-desc">Subagent definitions load only when the parent delegates. Own context window.</div></div>
+      </div>
+    ` },
+
+    { vid: "V28", block: 5, beat: "5.6", title: "Live Demo #3 — real CLAUDE.md walkthrough", layout: "demo", body: `
+      <div class="demo-card">
+        <div class="demo-card__head">
+          <span class="demo-card__tag">Live Demo · 3 of 3</span>
+          <h3 class="demo-card__title">A real rules file from a real project.</h3>
+        </div>
+        <p class="demo-card__sub">Not a template, not a polished example — the actual <code>CLAUDE.md</code> that ships with my Vedic astrology project. <em>Every sin included.</em></p>
+        <div class="demo-card__body">
+          <div>
+            <div class="demo-card__col-title">What I'll do</div>
+            <ol class="demo-card__steps">
+              <li class="demo-card__step"><span class="demo-card__step-num">01</span><span>Open the file. Read the first three sections out loud — <em>overview, build, test</em>.</span></li>
+              <li class="demo-card__step"><span class="demo-card__step-num">02</span><span>Stop on <strong>Gotchas</strong>. Explain why each line is there — every one is a real bug I hit.</span></li>
+              <li class="demo-card__step"><span class="demo-card__step-num">03</span><span>Show the <strong>Don't-touch</strong> list. Two paths. That's it. Cheap; prevents catastrophic edits.</span></li>
+              <li class="demo-card__step"><span class="demo-card__step-num">04</span><span>Peek at <code>.claude/commands/</code> — two slash commands for repeat workflows.</span></li>
+              <li class="demo-card__step"><span class="demo-card__step-num">05</span><span>Point out what's <em>missing</em>: no role-play, no personality prompts, no tone instructions.</span></li>
+            </ol>
+          </div>
+          <div>
+            <div class="demo-card__col-title">What you'll see</div>
+            <div class="demo-card__stage">
+              <div class="demo-card__stage-bar">
+                <div class="demo-card__dots"><span class="demo-card__dot"></span><span class="demo-card__dot"></span><span class="demo-card__dot"></span></div>
+                <span>CLAUDE.md · 87 lines</span>
+              </div>
+              <div class="demo-card__stage-body">
+                <div class="demo-file">
+                  <div class="demo-file__line"><span class="demo-file__linum">1</span><span class="demo-file__line--h1"># VedicAstro · Agent Rules</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">2</span><span>&nbsp;</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">3</span><span class="demo-file__line--h2">## Project</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">4</span><span>Vedic astrology engine + Next.js frontend.</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">5</span><span>Charts, transits, dashas. TS + Python calc.</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">6</span><span>&nbsp;</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">7</span><span class="demo-file__line--h2">## Build &amp; test</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">8</span><span>pnpm install &amp;&amp; pnpm dev   # port 3000</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">9</span><span>pnpm test                  # once per PR</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">10</span><span>&nbsp;</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">11</span><span class="demo-file__line--h2">## Don't touch</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">12</span><span>- packages/kerykeion-core/**</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">13</span><span>- migrations/**</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">14</span><span>&nbsp;</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">15</span><span class="demo-file__line--h2">## Gotchas</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">16</span><span>- Dates &lt; 1900: Julian calendar path.</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">17</span><span>- Ayanamsa defaults to Lahiri — override…</span></div>
+                  <div class="demo-file__line"><span class="demo-file__linum">18</span><span class="demo-file__line--dim">⋮  (70 more lines)</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-card__recovery">
+          <span class="demo-card__recovery-label">If live fails</span>
+          <span class="demo-card__recovery-line">The preview above is the same file. Walk through sections inline, then move to V29 — Karpathy's four principles.</span>
+        </div>
+      </div>
+    ` },
+
+    { vid: "V29", block: 5, beat: "5.7", title: "Karpathy's four principles", layout: "default", body: `
+      <div class="principles-list">
+        <div class="principles-list__item"><div class="principles-list__num">01</div><div class="principles-list__title">No assumptions.</div><div class="principles-list__body">If it doesn't know, ask. Don't guess and write code on the guess.</div></div>
+        <div class="principles-list__item"><div class="principles-list__num">02</div><div class="principles-list__title">Surgical edits only.</div><div class="principles-list__body">Don't touch unrelated files. Don't sneak in improvements.</div></div>
+        <div class="principles-list__item"><div class="principles-list__num">03</div><div class="principles-list__title">Define success criteria.</div><div class="principles-list__body">State what "done" looks like <em>before</em> writing code.</div></div>
+        <div class="principles-list__item"><div class="principles-list__num">04</div><div class="principles-list__title">No over-engineering.</div><div class="principles-list__body">No uninvited abstraction, helpers, or error handling.</div></div>
+      </div>
+      <div class="callout">Four behavioural rules outperformed a hundred lines of instructions for most users. <em>Brevity is leverage.</em></div>
+    ` },
+
+    // ---------- Block 6: Best practices + governance ----------
+    { vid: "V30a", block: 6, beat: "6.1", title: "Principle 1 — teammates, not search engines", layout: "principle", body: `
+      <div class="principle">
+        <div class="principle__num">Principle 01 / 06</div>
+        <h2 class="principle__headline">Treat agents like <em>capable junior developers</em>, not search engines.</h2>
+        <p class="principle__body">METR: autocomplete-on-steroids users got slower; delegators got faster. The shift is <em>managerial</em>, not technical.</p>
+      </div>
+    ` },
+    { vid: "V30b", block: 6, beat: "6.1", title: "Principle 2 — context over prompting", layout: "principle", body: `
+      <div class="principle">
+        <div class="principle__num">Principle 02 / 06</div>
+        <h2 class="principle__headline">Context engineering has replaced <em>prompt engineering</em>.</h2>
+        <p class="principle__body">You're not crafting the perfect sentence anymore. You're building the environment — files, rules, tools, history. The most important skill shift of the year.</p>
+      </div>
+    ` },
+    { vid: "V30c", block: 6, beat: "6.1", title: "Principle 3 — spec before code", layout: "principle", body: `
+      <div class="principle">
+        <div class="principle__num">Principle 03 / 06</div>
+        <h2 class="principle__headline"><em>Spec before code.</em></h2>
+        <p class="principle__body">Vibe-coding works for prototypes, breaks on production. Spec Kit, Kiro, or even an informal <code>plan.md</code> — measurably better code, especially brownfield.</p>
+      </div>
+    ` },
+    { vid: "V30d", block: 6, beat: "6.1", title: "Principle 4 — review is the bottleneck", layout: "principle", body: `
+      <div class="principle">
+        <div class="principle__num">Principle 04 / 06</div>
+        <h2 class="principle__headline">Review is the <em>new bottleneck</em>.</h2>
+        <p class="principle__body">CodeRabbit: reviewers spend 91% more time on AI-generated code, 3× more readability problems. Measure PRs merged without regression — not PRs opened.</p>
+      </div>
+    ` },
+    { vid: "V30e", block: 6, beat: "6.1", title: "Principle 5 — evidence over narrative", layout: "principle", body: `
+      <div class="principle">
+        <div class="principle__num">Principle 05 / 06</div>
+        <h2 class="principle__headline">Verify with <em>evidence</em>, not narrative.</h2>
+        <p class="principle__body">Agents produce confident prose claiming success. Hallucinated packages, fake SHAs, invented APIs. Every claim needs evidence — test output, lint output, actual diff.</p>
+      </div>
+    ` },
+    { vid: "V30f", block: 6, beat: "6.1", title: "Principle 6 — the spec wins", layout: "principle", body: `
+      <div class="principle">
+        <div class="principle__num">Principle 06 / 06</div>
+        <h2 class="principle__headline">The agent is not the source of truth. <em>The spec is.</em></h2>
+        <p class="principle__body">If the agent and the spec disagree, the spec wins. Living artefacts under version control — not throwaway PRDs.</p>
+      </div>
+    ` },
+
+    { vid: "V31", block: 6, beat: "6.2", title: "Governance — the three pillars", layout: "default", body: `
+      <div class="pillars">
+        <div class="pillar"><div class="pillar__num">Pillar 01</div><div class="pillar__title">Access control</div><div class="pillar__body">Least-privilege MCP servers · scoped API keys · time-bound credentials · SSO-integrated auth.</div></div>
+        <div class="pillar"><div class="pillar__num">Pillar 02</div><div class="pillar__title">Audit trails</div><div class="pillar__body">Every agent action logged · every MCP tool call recorded · every PR traceable to agent + prompt.</div></div>
+        <div class="pillar"><div class="pillar__num">Pillar 03</div><div class="pillar__title">Guardrails</div><div class="pillar__body">Sandboxed execution · gateways (Kong AI Gateway · Cloudflare MCP portals · Lasso Security).</div></div>
+      </div>
+      <div class="callout"><strong>Monday morning:</strong> Inventory → Scope → Audit → Pilot. EU AI Act high-risk obligations start August 2026 — fines up to €15M or 3% of global turnover.</div>
+    ` },
+
+    { vid: "V32", block: 6, beat: "6.3", title: "Adult-honest caveats", layout: "sober", body: `
+      <p class="slide__lede" style="color:#97a4bd;">The productivity gains only show up when you've internalised the practices. Otherwise — slowdown without knowing it.</p>
+      <div class="caveats">
+        <div class="caveat"><div class="caveat__num">40–62%</div><div class="caveat__what">of AI-generated code contains some kind of security vulnerability (Yan et al., 2025).</div></div>
+        <div class="caveat"><div class="caveat__num">110,000+</div><div class="caveat__what">surviving AI-introduced issues in production repos by Feb 2026.</div></div>
+        <div class="caveat"><div class="caveat__num">~85%</div><div class="caveat__what">Devin failure rate on complex tasks. ~67% PR merge rate on <em>well-defined</em> tasks. Scoping is everything.</div></div>
+        <div class="caveat"><div class="caveat__num">−19%</div><div class="caveat__what">METR actual slowdown. Developers <em>felt</em> 20% faster. Your gut is unreliable.</div></div>
+        <div class="caveat"><div class="caveat__num">2 / 3</div><div class="caveat__what">of developers spend more time fixing AI code than they save (Stack Overflow, 2025).</div></div>
+        <div class="caveat"><div class="caveat__num">40% → 29%</div><div class="caveat__what">Trust in AI accuracy, year-over-year decline.</div></div>
+        <div class="caveats__foot">The numbers do the work.</div>
+      </div>
+    ` },
+
+    { vid: "V33", block: 6, beat: "6.4", title: "Recommended stack", layout: "default", body: `
+      <p class="slide__lede">One opinionated slide. Pick a row. Start there. Don't try to deploy all of this in a month.</p>
+      <div class="stack">
+        <div class="stack__col">
+          <h3>Individual</h3>
+          <dl>
+            <dt>IDE</dt><dd>Cursor Pro ($20) · or Copilot Pro ($10)</dd>
+            <dt>Terminal</dt><dd>Claude Code Pro ($20) · or Gemini CLI (free)</dd>
+            <dt>Cloud agent</dt><dd>Experiment with Devin ACUs as needed</dd>
+            <dt>Markdown</dt><dd>AGENTS.md + CLAUDE.md symlink</dd>
+            <dt>MCP</dt><dd>GitHub · Filesystem · Postgres (if relevant)</dd>
+          </dl>
+        </div>
+        <div class="stack__col">
+          <h3>Startup · 5–20 devs</h3>
+          <dl>
+            <dt>IDE + terminal</dt><dd>Same stack, team plans</dd>
+            <dt>Review</dt><dd>CodeRabbit or Qodo on every PR</dd>
+            <dt>Cloud agent</dt><dd>Devin for backlog grooming + well-defined tickets</dd>
+            <dt>Governance</dt><dd>Scoped MCP servers · basic audit logging</dd>
+          </dl>
+        </div>
+        <div class="stack__col">
+          <h3>Enterprise</h3>
+          <dl>
+            <dt>IDE</dt><dd>Cursor Business or Copilot Business — SSO + audit</dd>
+            <dt>MCP</dt><dd>Gateway (Kong AI Gateway · Cloudflare portals)</dd>
+            <dt>Ownership</dt><dd>Dedicated AI governance owner</dd>
+            <dt>On-prem</dt><dd>Where data sensitivity requires (Qodo · Tabnine · Codacy)</dd>
+          </dl>
+        </div>
+      </div>
+    ` },
+
+    { vid: "V34", block: 6, beat: "6.5", title: "Final cliffhanger", layout: "cliff", body: `
+      <div class="cliff">
+        <div class="slide__kicker">Where we started · where we go next</div>
+        <h2 class="cliff__title">Most tools occupy <em>one</em> station.<br>The bottom row occupies <em>all seven.</em></h2>
+        <p class="cliff__quote">We've covered everything else. Next week is about that one row — and the mental shift it forces.</p>
+        <div class="cliff__cta">Bring questions. See you Monday.</div>
+      </div>
+    ` },
+  ];
+
+  const TOTAL = SLIDES.length;
+
+  /* ============================================================
+     DOM build
+     ============================================================ */
+  const stage = document.getElementById("stage");
+
+  function renderMeta(s) {
+    return `
+      <div class="slide__meta">
+        <span class="dot" aria-hidden="true"></span>
+        <span class="slide__vid">${s.vid}</span>
+        <span class="slide__block">${BLOCKS[s.block]} · Beat ${s.beat}</span>
+      </div>
+      <h2 class="slide__title">${s.title}</h2>
+    `;
+  }
+
+  function renderPlaceholder(s) {
+    return `
+      <div class="slide__placeholder">
+        <strong>Reserved for a later phase.</strong>
+        This slide will be built as one of the signature or supporting visuals.
+        Reference: ${BLOCKS[s.block]}, Beat ${s.beat}.
+      </div>
+    `;
+  }
+
+  SLIDES.forEach((s, i) => {
+    const section = document.createElement("section");
+    section.className = "slide";
+    section.id = `slide-${i + 1}`;
+    section.dataset.vid = s.vid;
+    section.setAttribute("role", "group");
+    section.setAttribute("aria-roledescription", "slide");
+    section.setAttribute("aria-label", `${s.vid} — ${s.title}`);
+    section.setAttribute("aria-current", "false");
+
+    const layout = s.layout || "default";
+    const isFullTakeover = layout === "hero" || layout === "principle" || layout === "cliff";
+
+    if (layout === "sober") section.classList.add("slide--sober");
+    if (!isFullTakeover && layout !== "hero") section.classList.add("slide--content");
+
+    if (isFullTakeover) {
+      section.innerHTML = s.body;
+    } else if (layout === "placeholder" || !s.body) {
+      section.innerHTML = renderMeta(s) + renderPlaceholder(s);
+    } else if (layout === "demo") {
+      section.innerHTML = renderMeta(s) + `<div class="slide__body demo-wrap">${s.body}</div>`;
+    } else {
+      section.innerHTML = renderMeta(s) + `<div class="slide__body">${s.body}</div>`;
+    }
+
+    stage.appendChild(section);
+  });
+
+  const slideEls = Array.from(document.querySelectorAll(".slide"));
+  const progressBar = document.getElementById("progressBar");
+  const counter = document.getElementById("counter");
+  const themeBtn = document.getElementById("themeBtn");
+  const fsBtn = document.getElementById("fsBtn");
+  const helpOverlay = document.getElementById("helpOverlay");
+
+  /* ============================================================
+     Navigation
+     ============================================================ */
+  let currentIndex = 0;
+
+  function clamp(n) {
+    return Math.max(0, Math.min(TOTAL - 1, n));
+  }
+
+  /* ============================================================
+     Phase 4 — Per-slide animation hooks
+     ============================================================ */
+  const prefersReducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function formatCounterValue(v, prefix, suffix) {
+    return (prefix || "") + Math.round(v).toLocaleString() + (suffix || "");
+  }
+
+  function animateCounter(el) {
+    const target = parseFloat(el.dataset.count);
+    if (!Number.isFinite(target)) return;
+    const prefix = el.dataset.prefix || "";
+    const suffix = el.dataset.suffix || "";
+    const duration = parseFloat(el.dataset.duration) || 950;
+
+    if (prefersReducedMotion) {
+      el.textContent = formatCounterValue(target, prefix, suffix);
+      return;
+    }
+
+    const gen = (el._counterGen = (el._counterGen || 0) + 1);
+    el.textContent = formatCounterValue(0, prefix, suffix);
+    const start = performance.now();
+
+    function step(now) {
+      if (el._counterGen !== gen) return;
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = formatCounterValue(target * eased, prefix, suffix);
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function runCountersIn(el) {
+    el.querySelectorAll("[data-count]").forEach(animateCounter);
+  }
+
+  const SLIDE_HOOKS = {
+    V02: runCountersIn,
+    V23: runCountersIn,
+  };
+
+  function goTo(index, { pushHash = true } = {}) {
+    const next = clamp(index);
+    if (next === currentIndex && slideEls[next].getAttribute("aria-current") === "true") return;
+
+    slideEls.forEach((el, i) => {
+      el.setAttribute("aria-current", i === next ? "true" : "false");
+    });
+
+    currentIndex = next;
+    counter.textContent = `${next + 1} / ${TOTAL}`;
+    progressBar.style.width = `${((next + 1) / TOTAL) * 100}%`;
+
+    if (pushHash) {
+      const newHash = `#slide-${next + 1}`;
+      if (location.hash !== newHash) {
+        history.replaceState(null, "", newHash);
+      }
+    }
+
+    const activeSlide = slideEls[next];
+    const hook = SLIDE_HOOKS[activeSlide.dataset.vid];
+    if (hook) hook(activeSlide);
+  }
+
+  function next() { goTo(currentIndex + 1); }
+  function prev() { goTo(currentIndex - 1); }
+  function first() { goTo(0); }
+  function last() { goTo(TOTAL - 1); }
+
+  /* ============================================================
+     Theme
+     ============================================================ */
+  function toggleTheme() {
+    const root = document.documentElement;
+    const current = root.getAttribute("data-theme") || "dark";
+    const nextTheme = current === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", nextTheme);
+  }
+
+  /* ============================================================
+     Fullscreen
+     ============================================================ */
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    } else {
+      document.exitFullscreen?.();
+    }
+  }
+
+  /* ============================================================
+     Help overlay
+     ============================================================ */
+  let helpPrevFocus = null;
+  function toggleHelp(force) {
+    const isOpen = helpOverlay.getAttribute("aria-hidden") === "false";
+    const shouldOpen = typeof force === "boolean" ? force : !isOpen;
+    helpOverlay.setAttribute("aria-hidden", shouldOpen ? "false" : "true");
+    if (shouldOpen) {
+      helpPrevFocus = document.activeElement;
+      const card = helpOverlay.querySelector(".overlay__card");
+      if (card) {
+        card.setAttribute("tabindex", "-1");
+        card.focus({ preventScroll: true });
+      }
+    } else if (helpPrevFocus && typeof helpPrevFocus.focus === "function") {
+      helpPrevFocus.focus({ preventScroll: true });
+      helpPrevFocus = null;
+    }
+  }
+
+  /* ============================================================
+     Event wiring
+     ============================================================ */
+  function isTypingTarget(el) {
+    if (!el) return false;
+    const tag = el.tagName;
+    return tag === "INPUT" || tag === "TEXTAREA" || el.isContentEditable;
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (isTypingTarget(e.target)) return;
+
+    // Close help on Escape first
+    if (e.key === "Escape") {
+      if (helpOverlay.getAttribute("aria-hidden") === "false") {
+        e.preventDefault();
+        toggleHelp(false);
+        return;
+      }
+    }
+
+    switch (e.key) {
+      case "ArrowRight":
+      case "PageDown":
+      case " ":
+        e.preventDefault();
+        next();
+        break;
+      case "ArrowLeft":
+      case "PageUp":
+        e.preventDefault();
+        prev();
+        break;
+      case "Home":
+        e.preventDefault();
+        first();
+        break;
+      case "End":
+        e.preventDefault();
+        last();
+        break;
+      case "f":
+      case "F":
+        e.preventDefault();
+        toggleFullscreen();
+        break;
+      case "t":
+      case "T":
+        e.preventDefault();
+        toggleTheme();
+        break;
+      case "?":
+      case "/": // many keyboards need shift+/ for ?
+        if (e.key === "?" || (e.key === "/" && e.shiftKey)) {
+          e.preventDefault();
+          toggleHelp();
+        }
+        break;
+    }
+  });
+
+  // Click outside the help card to dismiss
+  helpOverlay.addEventListener("click", (e) => {
+    if (e.target === helpOverlay) toggleHelp(false);
+  });
+
+  themeBtn.addEventListener("click", toggleTheme);
+  fsBtn.addEventListener("click", toggleFullscreen);
+
+  // Hash-based resume
+  function indexFromHash() {
+    const m = /^#slide-(\d+)$/.exec(location.hash);
+    if (!m) return 0;
+    const n = parseInt(m[1], 10) - 1;
+    return Number.isFinite(n) ? clamp(n) : 0;
+  }
+
+  window.addEventListener("hashchange", () => {
+    goTo(indexFromHash(), { pushHash: false });
+  });
+
+  // Initial render
+  goTo(indexFromHash(), { pushHash: true });
+})();
+</script>
+</body>
+</html>
