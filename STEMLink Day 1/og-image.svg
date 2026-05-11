@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B0F14"/>
+      <stop offset="55%" stop-color="#121A26"/>
+      <stop offset="100%" stop-color="#0B0F14"/>
+    </linearGradient>
+    <linearGradient id="title" x1="0" y1="0" x2="1" y2="0.4">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="55%" stop-color="#C7DCFF"/>
+      <stop offset="100%" stop-color="#6EA8FE"/>
+    </linearGradient>
+    <linearGradient id="spectrumBar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"  stop-color="#6EA8FE"/>
+      <stop offset="55%" stop-color="#F5B461"/>
+      <stop offset="100%" stop-color="#EF6A6A"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.82" cy="0.32" r="0.5">
+      <stop offset="0%" stop-color="#6EA8FE" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#6EA8FE" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0.16" cy="0.85" r="0.4">
+      <stop offset="0%" stop-color="#F5B461" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#F5B461" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#FFFFFF" fill-opacity="0.035"/>
+    </pattern>
+  </defs>
+
+  <!-- background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <rect width="1200" height="630" fill="url(#glow2)"/>
+
+  <!-- left accent bar -->
+  <rect x="0" y="0" width="6" height="630" fill="#6EA8FE"/>
+
+  <!-- ============== RIGHT SIDE: Seniority spectrum diagram ============== -->
+  <g transform="translate(720,170)">
+    <!-- panel label -->
+    <text x="220" y="0" font-family="'Helvetica Neue',Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="3" fill="#94A6BA" text-anchor="middle">THE SPECTRUM</text>
+
+    <!-- gradient axis bar -->
+    <rect x="20" y="60" width="400" height="6" rx="3" fill="url(#spectrumBar)"/>
+
+    <!-- four node markers, evenly spaced along the axis -->
+    <circle cx="50"  cy="63" r="11" fill="#6EA8FE" stroke="#0B0F14" stroke-width="4"/>
+    <circle cx="170" cy="63" r="11" fill="#8EC5FF" stroke="#0B0F14" stroke-width="4"/>
+    <circle cx="290" cy="63" r="11" fill="#F5B461" stroke="#0B0F14" stroke-width="4"/>
+    <circle cx="395" cy="63" r="15" fill="#EF6A6A" stroke="#0B0F14" stroke-width="4"/>
+    <!-- emphasis ring on the rightmost node -->
+    <circle cx="395" cy="63" r="22" fill="none" stroke="#EF6A6A" stroke-width="1.5" stroke-opacity="0.4"/>
+
+    <!-- node labels -->
+    <g font-family="'Helvetica Neue',Arial,sans-serif" font-size="12.5" font-weight="700" letter-spacing="1.8" text-anchor="middle">
+      <text x="50"  y="105" fill="#9AA7B8">AUTOCOMPLETE</text>
+      <text x="170" y="105" fill="#9AA7B8">PAIR</text>
+      <text x="290" y="105" fill="#9AA7B8">DELEGATE</text>
+      <text x="395" y="105" fill="#EF6A6A">AUTONOMOUS</text>
+    </g>
+
+    <!-- node tool tags -->
+    <g font-family="'Helvetica Neue',Arial,sans-serif" font-size="11.5" font-weight="500" fill="#6B7889" text-anchor="middle">
+      <text x="50"  y="127">Copilot</text>
+      <text x="170" y="127">Cursor</text>
+      <text x="290" y="127">Claude Code</text>
+      <text x="395" y="127">Devin · Jules</text>
+    </g>
+
+    <!-- axis caption -->
+    <text x="220" y="170" font-family="'Helvetica Neue',Arial,sans-serif" font-style="italic" font-size="14" fill="#6B7889" text-anchor="middle">trust per unit of supervision</text>
+
+    <!-- ============ Mini SDLC bar (bottom right of the panel) ============ -->
+    <g transform="translate(20,205)">
+      <text x="0" y="0" font-family="'Helvetica Neue',Arial,sans-serif" font-size="12" font-weight="700" letter-spacing="2" fill="#94A6BA">SDLC · 7 STATIONS</text>
+      <!-- station ticks -->
+      <g font-family="'Helvetica Neue',Arial,sans-serif" font-size="9.5" font-weight="600" fill="#6B7889" text-anchor="middle">
+        <text x="29"  y="22">PLAN</text>
+        <text x="86"  y="22">DESIGN</text>
+        <text x="143" y="22">IMPL</text>
+        <text x="200" y="22">REVIEW</text>
+        <text x="257" y="22">TEST</text>
+        <text x="314" y="22">SHIP</text>
+        <text x="371" y="22">OPERATE</text>
+      </g>
+      <!-- horizontal bar spanning all seven stations -->
+      <rect x="0" y="32" width="400" height="32" rx="6" fill="rgba(110,168,254,0.14)" stroke="#6EA8FE" stroke-width="2"/>
+      <text x="200" y="53" font-family="'Helvetica Neue',Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="2" fill="#C7DCFF" text-anchor="middle">CLOUD AUTONOMOUS — ALL SEVEN</text>
+    </g>
+  </g>
+
+  <!-- ============== LEFT SIDE: copy ============== -->
+  <!-- eyebrow -->
+  <text x="70" y="130" font-family="'Helvetica Neue',Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="6" fill="#6EA8FE">AI ENGINEER 2.0  &#8226;  STEMLINK  &#8226;  DAY 1</text>
+
+  <!-- main title (two-line) -->
+  <text x="70" y="225" font-family="Georgia,'Times New Roman',serif" font-size="76" font-weight="800" letter-spacing="-2" fill="#FFFFFF">
+    <tspan x="70" dy="0">The Spectrum</tspan>
+    <tspan x="70" dy="86">of <tspan font-style="italic" fill="url(#title)">Teammates</tspan></tspan>
+  </text>
+
+  <!-- description -->
+  <text x="70" y="395" font-family="'Helvetica Neue',Arial,sans-serif" font-size="21" font-weight="400" fill="#D7DEE8">
+    <tspan x="70" dy="0">Working with AI coding agents in 2026 —</tspan>
+    <tspan x="70" dy="30">and why most developers are <tspan font-style="italic" fill="#F5B461">getting this wrong</tspan>.</tspan>
+  </text>
+
+  <!-- pill row -->
+  <g font-family="'Helvetica Neue',Arial,sans-serif" font-size="14" font-weight="600">
+    <g transform="translate(70,445)">
+      <rect width="92" height="30" rx="15" fill="rgba(110,168,254,0.14)" stroke="#6EA8FE" stroke-opacity="0.5"/>
+      <text x="46" y="20" text-anchor="middle" fill="#C7DCFF">SDLC Map</text>
+    </g>
+    <g transform="translate(173,445)">
+      <rect width="92" height="30" rx="15" fill="rgba(110,168,254,0.14)" stroke="#6EA8FE" stroke-opacity="0.5"/>
+      <text x="46" y="20" text-anchor="middle" fill="#C7DCFF">Spectrum</text>
+    </g>
+    <g transform="translate(276,445)">
+      <rect width="58" height="30" rx="15" fill="rgba(245,180,97,0.14)" stroke="#F5B461" stroke-opacity="0.5"/>
+      <text x="29" y="20" text-anchor="middle" fill="#FBD08D">MCP</text>
+    </g>
+    <g transform="translate(345,445)">
+      <rect width="146" height="30" rx="15" fill="rgba(245,180,97,0.14)" stroke="#F5B461" stroke-opacity="0.5"/>
+      <text x="73" y="20" text-anchor="middle" fill="#FBD08D">Markdown Rules</text>
+    </g>
+    <g transform="translate(502,445)">
+      <rect width="118" height="30" rx="15" fill="rgba(239,106,106,0.14)" stroke="#EF6A6A" stroke-opacity="0.5"/>
+      <text x="59" y="20" text-anchor="middle" fill="#F8A1A1">Governance</text>
+    </g>
+  </g>
+
+  <!-- divider -->
+  <line x1="70" y1="500" x2="1130" y2="500" stroke="#FFFFFF" stroke-opacity="0.08"/>
+
+  <!-- presented by -->
+  <text x="70" y="535" font-family="'Helvetica Neue',Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="4" fill="#6EA8FE">PRESENTED BY</text>
+  <text x="70" y="572" font-family="Georgia,'Times New Roman',serif" font-size="28" font-weight="700" fill="#FFFFFF">K.A. Ashan Priyadarshana</text>
+
+  <!-- channel branding (right) -->
+  <text x="1130" y="572" font-family="'Helvetica Neue',Arial,sans-serif" font-size="19" font-weight="600" font-style="italic" text-anchor="end" fill="#94A6BA">Ashan Priyadarshana Explains</text>
+</svg>
