@@ -3302,6 +3302,229 @@ html[data-theme="light"] .surface__toggle-option--active { color: #ffffff; }
 }
 
 /* ============================================================
+   Act 8 components — token-cost comparison bars, multi-agent
+   topology cards with inline SVG, final-row variant for the
+   decision-tree flowchart
+   ============================================================ */
+
+/* Token-cost comparison (Slide 42) */
+.cost-block {
+  margin-top: 4px;
+  padding: 28px 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.cost-row {
+  display: grid;
+  grid-template-columns: 200px 1fr 100px;
+  gap: 20px;
+  align-items: center;
+}
+.cost-row__label {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.cost-row__label small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+  font-style: italic;
+}
+.cost-row__track {
+  height: 28px;
+  background: var(--bg-elevated);
+  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+}
+.cost-row__fill {
+  height: 100%;
+  border-radius: 999px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 10px;
+}
+.cost-row__fill--single {
+  width: 6.67%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+}
+.cost-row__fill--multi {
+  width: 100%;
+  background: linear-gradient(90deg, var(--accent-strong), var(--danger));
+}
+.cost-row__value {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 28px;
+  color: var(--accent);
+  text-align: right;
+  line-height: 1;
+}
+.cost-row__value em {
+  font-style: normal;
+  color: var(--danger);
+}
+.cost-row__value small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+  font-weight: 400;
+}
+.cost-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 18px;
+}
+.cost-fact {
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+.cost-fact strong {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+/* Multi-agent topology cards (Slide 43) */
+.topology-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 4px;
+}
+.topology {
+  padding: 20px 22px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.topology__kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.topology__name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+.topology__svg {
+  width: 100%;
+  height: 140px;
+  margin: 6px 0;
+  background: var(--bg-elevated);
+  border-radius: 8px;
+}
+.topology__svg .stroke {
+  stroke: var(--text-tertiary);
+  fill: none;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+.topology__svg .stroke--accent {
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  fill: none;
+}
+.topology__svg .stroke--dash {
+  stroke: var(--accent);
+  stroke-width: 1.4;
+  fill: none;
+  stroke-dasharray: 4 3;
+}
+.topology__svg .node {
+  fill: var(--bg-card);
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+.topology__svg .node-hub {
+  fill: var(--accent);
+}
+.topology__svg .arrowhead {
+  fill: var(--accent);
+}
+.topology__svg .label {
+  fill: var(--text-primary);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+}
+.topology__svg .label-hub {
+  fill: var(--bg-primary);
+  font-family: 'Fraunces', serif;
+  font-size: 11px;
+  font-weight: 600;
+}
+html[data-theme="light"] .topology__svg .label-hub { fill: #ffffff; }
+.topology__what {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+.topology__when {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-tertiary);
+  padding-top: 10px;
+  border-top: 1px solid var(--border-soft);
+  margin-top: auto;
+}
+.topology__when strong { color: var(--accent); font-style: normal; font-weight: 600; }
+
+/* Decision-tree final row variant (Slide 45) */
+.flow-row--final .flow-row__q {
+  background: var(--accent-soft);
+  border-left-color: var(--accent);
+  color: var(--text-primary);
+}
+.flow-row--final .flow-row__a {
+  background: linear-gradient(135deg, var(--accent-soft), transparent 70%), var(--bg-card);
+  border-color: var(--accent);
+}
+.flow-row--final .flow-row__arrow {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ============================================================
    Overlays (help, jump, notes)
    ============================================================ */
 .overlay {
@@ -3590,6 +3813,10 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   .agent-row { grid-template-columns: 1fr; gap: 8px; padding: 12px 14px; }
   .agent-row__terminal { height: 56px; }
   .surface__split { grid-template-columns: 1fr; }
+  .cost-row { grid-template-columns: 1fr; gap: 8px; }
+  .cost-row__value { text-align: left; }
+  .cost-facts { grid-template-columns: 1fr; }
+  .topology-grid { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -6351,10 +6578,218 @@ gh pr create --title "Add login form"</code></pre>
     },
 
     /* ---------- Act 8 — Multi-Agent Orchestration, Honestly ---------- */
-    { n: 42, act: 8, title: "Multi-agent is not always the answer",                 notes: { beat: "The 2024 hype crashed. 15× token cost bar chart." } },
-    { n: 43, act: 8, title: "The patterns that survived",                           notes: { beat: "Agent-flow, orchestration, bounded collaboration — three topology diagrams." } },
-    { n: 44, act: 8, title: "The subagent contract (Anthropic's P2 prompt)",        notes: { beat: "Three rules: dedicated prompt, structured brief, return summary not transcript." } },
-    { n: 45, act: 8, title: "Decision tree — single agent or multi?",               notes: { beat: "Flowchart. 'When in doubt, single agent.'" } },
+    {
+      n: 42, act: 8,
+      title: "Multi-agent is not always the answer",
+      body: `
+        <p class="section-lead">The 2024 hype said more agents = more intelligence. <em>Production said the opposite.</em></p>
+        <div class="cost-block" aria-label="Token-cost comparison between single-agent and multi-agent systems">
+          <div class="cost-row">
+            <div class="cost-row__label">Single agent<small>chat / agent mode on one task</small></div>
+            <div class="cost-row__track">
+              <div class="cost-row__fill cost-row__fill--single"></div>
+            </div>
+            <div class="cost-row__value">1×<small>tokens per task</small></div>
+          </div>
+          <div class="cost-row">
+            <div class="cost-row__label">Multi-agent<small>orchestrator with subagent spawns</small></div>
+            <div class="cost-row__track">
+              <div class="cost-row__fill cost-row__fill--multi"></div>
+            </div>
+            <div class="cost-row__value"><em>15×</em><small>same task, same outcome</small></div>
+          </div>
+        </div>
+        <div class="cost-facts">
+          <div class="cost-fact"><strong>15× tokens</strong>Multi-agent runs burn fifteen times the tokens of a single-agent chat for the same task.</div>
+          <div class="cost-fact"><strong>80% of variance</strong>Token usage alone explains roughly four-fifths of performance variance across published multi-agent benchmarks.</div>
+          <div class="cost-fact"><strong>Convergent default</strong>Anthropic, OpenAI, AutoGen, Cognition, LangChain — five teams arrived at <em>orchestrator + isolated subagents</em> as the only durable shape.</div>
+        </div>
+        <blockquote class="pull-quote">
+          Single-agent systems consistently match or outperform multi-agent on multi-hop reasoning <em>when reasoning tokens are held constant</em>. The "win" was always paid for in compute.
+          <span class="pull-quote__source">— Production retros from five major agent platforms, 2025–2026</span>
+        </blockquote>
+      `,
+      notes: {
+        time: "~5 min",
+        beat: "Hold up the 15× bar. That's the number to remember. The three cost-facts give context but the bar IS the slide. End on the pull-quote — the elegant thing the 2024 hype missed was that 'more agents' was really 'more reasoning tokens', which any single agent gets for free with /effort xhigh.",
+        ask: "Has anyone in the room shipped a multi-agent system that survived a production incident? Honest answers only.",
+        bridge: "If multi-agent rarely wins, what's left? Three patterns survived. The rest didn't.",
+      },
+    },
+
+    {
+      n: 43, act: 8,
+      title: "The three patterns that survived",
+      body: `
+        <p class="section-lead">Multi-agent works when the work is genuinely parallel <em>and</em> the supervisor stays in charge.</p>
+        <div class="topology-grid">
+
+          <div class="topology">
+            <div class="topology__kicker">Pattern 1</div>
+            <h3 class="topology__name">Agent-flow<br><small style="font-family:var(--font-body);font-size:13px;font-weight:400;color:var(--text-tertiary);">sequential pipeline</small></h3>
+            <svg class="topology__svg" viewBox="0 0 320 140" aria-hidden="true">
+              <g class="stroke--accent">
+                <circle class="node" cx="40"  cy="70" r="18" />
+                <circle class="node" cx="120" cy="70" r="18" />
+                <circle class="node" cx="200" cy="70" r="18" />
+                <circle class="node" cx="280" cy="70" r="18" />
+              </g>
+              <text class="label" x="40"  y="73" text-anchor="middle">Plan</text>
+              <text class="label" x="120" y="73" text-anchor="middle">Code</text>
+              <text class="label" x="200" y="73" text-anchor="middle">Test</text>
+              <text class="label" x="280" y="73" text-anchor="middle">Review</text>
+              <path class="stroke--accent" d="M 58 70 L 100 70" />
+              <path class="stroke--accent" d="M 138 70 L 180 70" />
+              <path class="stroke--accent" d="M 218 70 L 260 70" />
+              <polygon class="arrowhead" points="100,66 100,74 108,70" />
+              <polygon class="arrowhead" points="180,66 180,74 188,70" />
+              <polygon class="arrowhead" points="260,66 260,74 268,70" />
+            </svg>
+            <p class="topology__what">Each agent passes output forward as the next's input. One direction, no replays.</p>
+            <p class="topology__when"><strong>Use for</strong> long pipelines where steps are well-defined and serial — code review, compliance pipelines, doc generation chains.</p>
+          </div>
+
+          <div class="topology">
+            <div class="topology__kicker">Pattern 2</div>
+            <h3 class="topology__name">Orchestration<br><small style="font-family:var(--font-body);font-size:13px;font-weight:400;color:var(--text-tertiary);">hub &amp; spoke</small></h3>
+            <svg class="topology__svg" viewBox="0 0 320 140" aria-hidden="true">
+              <path class="stroke--dash" d="M 160 70 L 60  35" />
+              <path class="stroke--dash" d="M 160 70 L 60  105" />
+              <path class="stroke--dash" d="M 160 70 L 260 35" />
+              <path class="stroke--dash" d="M 160 70 L 260 105" />
+              <circle class="node node-hub" cx="160" cy="70" r="26" />
+              <text class="label-hub" x="160" y="74" text-anchor="middle">Lead</text>
+              <circle class="node" cx="60"  cy="35"  r="14" />
+              <circle class="node" cx="60"  cy="105" r="14" />
+              <circle class="node" cx="260" cy="35"  r="14" />
+              <circle class="node" cx="260" cy="105" r="14" />
+              <text class="label" x="60"  y="38"  text-anchor="middle">A</text>
+              <text class="label" x="60"  y="108" text-anchor="middle">B</text>
+              <text class="label" x="260" y="38"  text-anchor="middle">C</text>
+              <text class="label" x="260" y="108" text-anchor="middle">D</text>
+            </svg>
+            <p class="topology__what">Supervisor decomposes the task, spawns isolated workers, collects summaries. <em>Workers don't talk to each other.</em></p>
+            <p class="topology__when"><strong>Use for</strong> parallelisable work with independent subtasks — multi-file refactors, batch research, fan-out lookups.</p>
+          </div>
+
+          <div class="topology">
+            <div class="topology__kicker">Pattern 3</div>
+            <h3 class="topology__name">Bounded collaboration<br><small style="font-family:var(--font-body);font-size:13px;font-weight:400;color:var(--text-tertiary);">controlled mesh</small></h3>
+            <svg class="topology__svg" viewBox="0 0 320 140" aria-hidden="true">
+              <path class="stroke--dash" d="M 80 100 L 240 100" />
+              <path class="stroke--dash" d="M 80 100 L 160 30" />
+              <path class="stroke--dash" d="M 240 100 L 160 30" />
+              <circle class="node" cx="160" cy="30"  r="18" />
+              <circle class="node" cx="80"  cy="100" r="18" />
+              <circle class="node" cx="240" cy="100" r="18" />
+              <text class="label" x="160" y="33"  text-anchor="middle">Author</text>
+              <text class="label" x="80"  y="103" text-anchor="middle">Critic</text>
+              <text class="label" x="240" y="103" text-anchor="middle">Judge</text>
+            </svg>
+            <p class="topology__what">Specialist agents critique each other under a fixed protocol — write, critique, judge — with strict round limits.</p>
+            <p class="topology__when"><strong>Use for</strong> high-stakes single artefacts — security review, contract drafting, scientific writing. Cap rounds or it diverges.</p>
+          </div>
+
+        </div>
+        <p class="slide__source">All three keep a single accountable head (the orchestrator / author). The patterns that died — open-ended swarms, "let the agents figure it out" — diverged in production and cost more than the answer was worth.</p>
+      `,
+      notes: {
+        time: "~5 min",
+        beat: "Three topologies, three use-cases. Walk left-to-right. The line about workers not talking to each other (Pattern 2) is the punchline of Anthropic's 'don't build multi-agents' post — say it out loud.",
+        ask: "Of the three, which one most resembles a workflow you've actually built? And of the three, which is the one you'd actually reach for again?",
+        bridge: "If you're going to build any of these, there's a contract for how the subagent should work. Three rules.",
+      },
+    },
+
+    {
+      n: 44, act: 8,
+      title: "The subagent contract — three rules",
+      body: `
+        <p class="section-lead">If you do spawn a subagent, treat it like a <em>contractor</em>, not a copy of yourself.</p>
+        <div class="research-cards">
+
+          <div class="research-card">
+            <p class="research-card__finding">Give it a dedicated system prompt. Never reuse the orchestrator's.</p>
+            <div class="research-card__source">— Validated across 2025–2026 production deployments</div>
+            <div class="research-card__takeaway">
+              <strong>Why it matters.</strong>
+              Subagents need role-scoped context: the orchestrator's prompt was written for a different task. Copy-pasting the system prompt is a documented failure mode that wastes context and bends the subagent toward the orchestrator's behaviour.
+            </div>
+          </div>
+
+          <div class="research-card">
+            <p class="research-card__finding">The first user message is the structured brief — objective, format, tools, boundaries.</p>
+            <div class="research-card__source">— Anthropic "P2 prompt" pattern · also Phil Schmid's subagent taxonomy</div>
+            <div class="research-card__takeaway">
+              <strong>Why it matters.</strong>
+              Free-form delegation (<em>"go figure it out"</em>) is the single most common reason subagent runs drift. A structured brief — what to return, in what shape, with which tools, and what's out of scope — is non-optional.
+            </div>
+          </div>
+
+          <div class="research-card">
+            <p class="research-card__finding">Return a summary string. Never inline the full transcript into the orchestrator's context.</p>
+            <div class="research-card__source">— Anthropic engineering blog · Cognition "Don't Build Multi-Agents"</div>
+            <div class="research-card__takeaway">
+              <strong>Why it matters.</strong>
+              Transcript inlining is where the <em>15× token cost</em> comes from. A 3-paragraph summary preserves the answer; the raw 12K-token transcript pollutes context for every subsequent turn.
+            </div>
+          </div>
+
+        </div>
+        <p class="slide__source">Anthropic, OpenAI, Cognition, AutoGen, LangChain — five teams, five blog posts, the same three rules.</p>
+      `,
+      notes: {
+        time: "~4 min",
+        beat: "Three rules. Spend equal time on each. Rule 3 — summary not transcript — is where the 15× cost from Slide 42 actually comes from; call back to that bar.",
+        ask: "Which of these three rules is the one you'd most likely violate by accident?",
+        bridge: "Three rules for if you build it. But should you build it? A four-question check.",
+      },
+    },
+
+    {
+      n: 45, act: 8,
+      title: "Decide before you spawn",
+      body: `
+        <p class="section-lead">Three "no" answers send you back to a single agent. <em>Three "yes" answers — and only then — earn the orchestrator pattern.</em></p>
+        <div class="flowchart" aria-label="Decision tree for choosing between single-agent and multi-agent">
+
+          <div class="flow-row">
+            <div class="flow-row__q">Can the task be decomposed into <em>truly</em> independent subtasks?</div>
+            <div class="flow-row__arrow">No →</div>
+            <div class="flow-row__a"><strong>Single agent.</strong> If the subtasks share state, the orchestrator becomes the bottleneck and you've added overhead for nothing.</div>
+          </div>
+
+          <div class="flow-row">
+            <div class="flow-row__q">Is the work parallel — would running it serially actually take long enough to matter?</div>
+            <div class="flow-row__arrow">No →</div>
+            <div class="flow-row__a"><strong>Single agent.</strong> If a single agent finishes in two minutes, you don't have a parallelism problem to solve.</div>
+          </div>
+
+          <div class="flow-row">
+            <div class="flow-row__q">Are the subtasks worth 15× the token cost?</div>
+            <div class="flow-row__arrow">No →</div>
+            <div class="flow-row__a"><strong>Single agent.</strong> Most production tasks are not. <code>/effort xhigh</code> on one agent is almost always cheaper than five subagents on default effort.</div>
+          </div>
+
+          <div class="flow-row flow-row--final">
+            <div class="flow-row__q">Yes to all three?</div>
+            <div class="flow-row__arrow">→</div>
+            <div class="flow-row__a"><strong>Multi-agent.</strong> Orchestrator + isolated subagents pattern from Slide 43. Use the contract from Slide 44. Cap rounds. Watch the token meter.</div>
+          </div>
+
+        </div>
+        <blockquote class="pull-quote">
+          When in doubt, single agent. Multi-agent is a tool you reach for — not a default.
+          <span class="pull-quote__source">— The take-home of Act 8</span>
+        </blockquote>
+      `,
+      notes: {
+        time: "~3 min",
+        beat: "Read each question. Pause for the answer. The three 'no → single agent' rows form a litany; the final 'yes to all' row is the surprise reveal. The pull-quote is the seven-word version every audience-member should walk out with.",
+        ask: "On your most recent multi-agent build — which of those three questions would have failed if you'd asked it honestly first?",
+        bridge: "Multi-agent settled. The other long-tail decision in 2026 — which model to actually pick, and what's coming next.",
+      },
+    },
 
     /* ---------- Act 9 — Models & Future Gossip ---------- */
     { n: 46, act: 9, title: "Pick the right model for the task",                    notes: { beat: "Matrix: hardest reasoning / daily / autocomplete / privacy. Cost vs intelligence 2x2." } },
