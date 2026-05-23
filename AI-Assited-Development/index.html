@@ -2732,6 +2732,576 @@ html[data-theme="light"] .mcp-svg .label-hub { fill: #ffffff; }
 }
 
 /* ============================================================
+   Act 7 components — chat vs kanban contrast, full kanban
+   anatomy, git worktree SVG diagram, parallel-agent demo
+   surface, manager surface vs editor view toggle
+   ============================================================ */
+
+/* Chat vs kanban contrast (Slide 37) */
+.chat-vs-kanban {
+  display: grid;
+  grid-template-columns: 0.85fr 1.3fr;
+  gap: 20px;
+  margin-top: 4px;
+  align-items: stretch;
+}
+.chat-vs-kanban__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.chat-vs-kanban__label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.chat-vs-kanban__label-tag {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+}
+.chat-vs-kanban__label--old .chat-vs-kanban__label-tag { color: var(--text-tertiary); border-color: var(--border); }
+.chat-vs-kanban__label--new .chat-vs-kanban__label-tag { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+
+.chat-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-height: 360px;
+}
+.chat-msg {
+  max-width: 88%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.chat-msg__author {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+}
+.chat-msg--user {
+  align-self: flex-end;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  color: var(--text-primary);
+  border-bottom-right-radius: 4px;
+}
+.chat-msg--user .chat-msg__author { color: var(--accent); }
+.chat-msg--agent {
+  align-self: flex-start;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  color: var(--text-secondary);
+  border-bottom-left-radius: 4px;
+}
+.chat-msg--typing {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+/* Full kanban (Slide 38) — extends .kanban-mini with richer cards */
+.kanban-full {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  padding: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-top: 4px;
+}
+.kanban-full__col {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 10px;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+}
+.kanban-full__col-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border);
+  display: flex;
+  justify-content: space-between;
+}
+.kanban-full__col-count { color: var(--accent); font-weight: 600; }
+.kanban-full__card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--text-primary);
+}
+.kanban-full__card-title {
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--text-primary);
+}
+.kanban-full__card-meta {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-tertiary);
+  margin-top: 5px;
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+.kanban-full__card--running {
+  border-left-color: var(--accent-strong);
+  background: linear-gradient(90deg, var(--accent-soft), transparent 70%), var(--bg-card);
+}
+.kanban-full__card--running .kanban-full__card-meta { color: var(--accent); }
+.kanban-full__card-progress {
+  margin-top: 6px;
+  height: 4px;
+  background: var(--border-soft);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.kanban-full__card-progress-fill {
+  height: 100%;
+  background: var(--accent-strong);
+  border-radius: 2px;
+}
+.kanban-full__card-diff {
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 4px 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+  gap: 6px;
+}
+.kanban-full__card-diff .add { color: var(--success); }
+.kanban-full__card-diff .del { color: var(--danger); }
+.kanban-full__card-diff .file { color: var(--text-tertiary); }
+.kanban-full__card-action {
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.kanban-full__card-dep {
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+.kanban-full__card-dep::before { content: "↳ "; color: var(--accent); }
+.kanban-full__card--done {
+  opacity: 0.55;
+  border-left-color: var(--success);
+}
+.kanban-full__card--done .kanban-full__card-title { text-decoration: line-through; }
+.kanban-anatomy-legend {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.kanban-anatomy-legend > div {
+  padding: 8px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  line-height: 1.4;
+}
+.kanban-anatomy-legend strong {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--accent);
+  margin-bottom: 2px;
+}
+
+/* Worktree diagram (Slide 39) */
+.worktrees {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 22px;
+  align-items: center;
+  margin-top: 4px;
+}
+.worktree-svg-wrap {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 18px 12px;
+}
+.worktree-svg {
+  width: 100%;
+  height: 260px;
+}
+.worktree-svg .branch-main {
+  stroke: var(--text-tertiary);
+  stroke-width: 3;
+  fill: none;
+}
+.worktree-svg .branch-tree {
+  stroke: var(--accent);
+  stroke-width: 2;
+  fill: none;
+}
+.worktree-svg .commit-main {
+  fill: var(--text-secondary);
+  stroke: var(--bg-elevated);
+  stroke-width: 2;
+}
+.worktree-svg .commit-tree {
+  fill: var(--accent);
+  stroke: var(--bg-elevated);
+  stroke-width: 2;
+}
+.worktree-svg .agent-node {
+  fill: var(--bg-card);
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+.worktree-svg .label-main {
+  fill: var(--text-tertiary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+.worktree-svg .label-tree {
+  fill: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+}
+.worktree-svg .label-agent {
+  fill: var(--text-primary);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+}
+.worktree-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.worktree-bullets li {
+  padding: 12px 14px 12px 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  position: relative;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+.worktree-bullets li::before {
+  content: "✓";
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+.worktree-bullets li strong {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Parallel-agent demo surface (Slide 40) */
+.demo-control {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-top: 4px;
+  margin-bottom: 14px;
+}
+.demo-control__btn {
+  padding: 9px 20px;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: pointer;
+}
+html[data-theme="light"] .demo-control__btn { color: #ffffff; }
+.demo-control__status {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.demo-control__status strong {
+  color: var(--accent);
+}
+.demo-control__phase4 {
+  margin-left: auto;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.agent-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.agent-row {
+  display: grid;
+  grid-template-columns: 220px 1fr 110px;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+}
+.agent-row--running { border-left: 3px solid var(--accent-strong); }
+.agent-row--done { border-left: 3px solid var(--success); opacity: 0.92; }
+.agent-row--queued { border-left: 3px solid var(--text-tertiary); }
+.agent-row__id { display: flex; flex-direction: column; gap: 4px; }
+.agent-row__task {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+.agent-row__branch {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+.agent-row__branch em {
+  color: var(--accent);
+  font-style: normal;
+  margin-right: 4px;
+}
+.agent-row__terminal {
+  background: #0d0d10;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.55;
+  color: rgba(245, 245, 240, 0.78);
+  height: 68px;
+  overflow: hidden;
+  position: relative;
+}
+.agent-row__terminal::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: linear-gradient(180deg, transparent, #0d0d10);
+  pointer-events: none;
+}
+.agent-row__terminal .prompt { color: #ff8a63; }
+.agent-row__terminal .ok { color: #6bd968; }
+.agent-row__status {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.agent-row__status--running { color: var(--accent); }
+.agent-row__status--done { color: var(--success); }
+.agent-row__status--queued { color: var(--text-tertiary); }
+.agent-row__status small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+/* Manager surface vs editor view (Slide 41) */
+.surface {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 4px;
+}
+.surface__toggle-wrap {
+  display: flex;
+  justify-content: center;
+}
+.surface__toggle {
+  display: inline-flex;
+  padding: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  gap: 4px;
+}
+.surface__toggle-option {
+  padding: 9px 22px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.surface__toggle-option--active {
+  background: var(--accent);
+  color: var(--bg-primary);
+  font-weight: 600;
+}
+html[data-theme="light"] .surface__toggle-option--active { color: #ffffff; }
+.surface__split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.surface__panel {
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.surface__panel--active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.surface__panel-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.surface__panel-name {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+.surface__panel-mock {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+  min-height: 160px;
+}
+.surface__panel-mock .mock-line { display: block; }
+.surface__panel-mock .mock-line--accent { color: var(--accent); }
+.surface__panel-mock .mock-board {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+.surface__panel-mock .mock-board-col {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 4px;
+  padding: 6px;
+}
+.surface__panel-mock .mock-board-title {
+  font-size: 8px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+.surface__panel-mock .mock-card {
+  background: var(--bg-elevated);
+  border-left: 2px solid var(--accent);
+  border-radius: 3px;
+  padding: 4px 6px;
+  font-size: 9px;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+}
+.surface__panel-when {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+/* ============================================================
    Overlays (help, jump, notes)
    ============================================================ */
 .overlay {
@@ -3013,6 +3583,13 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   .recipe { grid-template-columns: 1fr; gap: 10px; padding: 14px 16px; }
   .loop-cycle { grid-template-columns: 1fr; gap: 32px; }
   .loop-station + .loop-station::before { content: "↓"; left: 50%; top: -28px; transform: translateX(-50%); }
+  .chat-vs-kanban { grid-template-columns: 1fr; }
+  .kanban-full { grid-template-columns: repeat(2, 1fr); }
+  .kanban-anatomy-legend { grid-template-columns: 1fr 1fr; }
+  .worktrees { grid-template-columns: 1fr; }
+  .agent-row { grid-template-columns: 1fr; gap: 8px; padding: 12px 14px; }
+  .agent-row__terminal { height: 56px; }
+  .surface__split { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -5350,11 +5927,428 @@ Use \`pnpm\` (NOT npm, NOT yarn).
     },
 
     /* ---------- Act 7 — The Command Center ---------- */
-    { n: 37, act: 7, title: "Agents are async workers, not chatbots",               notes: { beat: "Mental model shift. Chat vs kanban contrast." } },
-    { n: 38, act: 7, title: "Anatomy of an agent kanban",                           notes: { beat: "Full kanban mockup — must-build illustration." } },
-    { n: 39, act: 7, title: "Git worktrees — the magic underneath",                 notes: { beat: "Branch tree visualisation + the worktree command block." } },
-    { n: 40, act: 7, title: "Live demo — running 3 agents in parallel",             notes: { beat: "Simulated kanban with streaming agent output. Must-build widget #4 (the big one)." } },
-    { n: 41, act: 7, title: "Manager surface vs editor view",                       notes: { beat: "Antigravity framing. Toggle UI. Same paradigm across tools." } },
+    {
+      n: 37, act: 7,
+      title: "Agents are async workers, not chatbots",
+      body: `
+        <p class="section-lead">Stop treating AI like a conversation. Start treating it like a <em>fleet</em>.</p>
+        <div class="chat-vs-kanban">
+
+          <div class="chat-vs-kanban__panel">
+            <div class="chat-vs-kanban__label chat-vs-kanban__label--old">
+              <span class="chat-vs-kanban__label-tag">Old</span>
+              <span>Chat thread · synchronous · one agent</span>
+            </div>
+            <div class="chat-panel">
+              <div class="chat-msg chat-msg--user">
+                <span class="chat-msg__author">You</span>
+                add a login form to the auth module
+              </div>
+              <div class="chat-msg chat-msg--agent">
+                <span class="chat-msg__author">Agent</span>
+                Sure! Let me look at your auth module. Could you share the file structure?
+              </div>
+              <div class="chat-msg chat-msg--user">
+                <span class="chat-msg__author">You</span>
+                src/auth/, see AGENTS.md
+              </div>
+              <div class="chat-msg chat-msg--agent">
+                <span class="chat-msg__author">Agent</span>
+                Got it. Functional React + Tailwind. Drafting LoginForm component now…
+              </div>
+              <div class="chat-msg chat-msg--typing">agent is typing · 47s elapsed · 1 task in flight…</div>
+            </div>
+          </div>
+
+          <div class="chat-vs-kanban__panel">
+            <div class="chat-vs-kanban__label chat-vs-kanban__label--new">
+              <span class="chat-vs-kanban__label-tag">New</span>
+              <span>Kanban board · asynchronous · many agents in parallel</span>
+            </div>
+            <div class="kanban-mini" style="margin-top: 0; flex: 1;">
+
+              <div class="kanban-mini__col">
+                <div class="kanban-mini__col-title"><span>To Do</span><span class="kanban-mini__col-count">2</span></div>
+                <div class="kanban-mini__card">
+                  <div class="kanban-mini__card-title">Update Stripe SDK to v18</div>
+                  <div class="kanban-mini__card-meta"><span>deps/stripe</span><span>—</span></div>
+                </div>
+                <div class="kanban-mini__card">
+                  <div class="kanban-mini__card-title">Add settings page</div>
+                  <div class="kanban-mini__card-meta"><span>feat/settings</span><span>—</span></div>
+                </div>
+              </div>
+
+              <div class="kanban-mini__col">
+                <div class="kanban-mini__col-title"><span>In progress</span><span class="kanban-mini__col-count">3</span></div>
+                <div class="kanban-mini__card kanban-mini__card--running">
+                  <div class="kanban-mini__card-title">Add login form to auth</div>
+                  <div class="kanban-mini__card-meta"><span>feat/login</span><span>● Claude Code</span></div>
+                </div>
+                <div class="kanban-mini__card kanban-mini__card--running">
+                  <div class="kanban-mini__card-title">Fix billing rounding</div>
+                  <div class="kanban-mini__card-meta"><span>fix/billing</span><span>● Codex</span></div>
+                </div>
+                <div class="kanban-mini__card kanban-mini__card--running">
+                  <div class="kanban-mini__card-title">Refactor user model</div>
+                  <div class="kanban-mini__card-meta"><span>refactor/user</span><span>● Cursor</span></div>
+                </div>
+              </div>
+
+              <div class="kanban-mini__col">
+                <div class="kanban-mini__col-title"><span>Review</span><span class="kanban-mini__col-count">2</span></div>
+                <div class="kanban-mini__card">
+                  <div class="kanban-mini__card-title">Migrate auth to passkeys</div>
+                  <div class="kanban-mini__card-meta"><span>feat/passkey</span><span>+312 −82</span></div>
+                </div>
+                <div class="kanban-mini__card">
+                  <div class="kanban-mini__card-title">Tighten error logging</div>
+                  <div class="kanban-mini__card-meta"><span>chore/log</span><span>+44 −12</span></div>
+                </div>
+              </div>
+
+              <div class="kanban-mini__col">
+                <div class="kanban-mini__col-title"><span>Done</span><span class="kanban-mini__col-count">2</span></div>
+                <div class="kanban-mini__card kanban-mini__card--done">
+                  <div class="kanban-mini__card-title">Bump Node to 22</div>
+                  <div class="kanban-mini__card-meta"><span>chore/node</span><span>merged</span></div>
+                </div>
+                <div class="kanban-mini__card kanban-mini__card--done">
+                  <div class="kanban-mini__card-title">Tidy README</div>
+                  <div class="kanban-mini__card-meta"><span>docs/readme</span><span>merged</span></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+        <blockquote class="pull-quote">
+          Stop treating AI agents like chatbots you talk to. Start treating them like asynchronous workers you manage.
+          <span class="pull-quote__source">— Vibe Kanban write-up, 2026</span>
+        </blockquote>
+      `,
+      notes: {
+        time: "~3 min",
+        beat: "Hold both panels up at once. The left is what most of the room does today; the right is what most of the room will do six months from now. Don't shame the chat panel — name it as a transitional artefact.",
+        ask: "How many agent-conversations are currently open in tabs on your laptop right now? Honest count.",
+        bridge: "Right side — kanban. Let's break the anatomy of one apart.",
+      },
+    },
+
+    {
+      n: 38, act: 7,
+      title: "Anatomy of an agent kanban",
+      body: `
+        <p class="section-lead">Five columns. Cards become PRs. Branches are auto-named. Diff previews live in the card. <em>The work and the review surface are the same surface.</em></p>
+        <div class="kanban-full" aria-label="Full agent kanban board with five columns: Backlog, To Do, In progress, Review, Done">
+
+          <div class="kanban-full__col">
+            <div class="kanban-full__col-title"><span>Backlog</span><span class="kanban-full__col-count">3</span></div>
+            <div class="kanban-full__card">
+              <div class="kanban-full__card-title">Add password reset email</div>
+              <div class="kanban-full__card-meta"><span>feat/reset</span><span>—</span></div>
+            </div>
+            <div class="kanban-full__card">
+              <div class="kanban-full__card-title">Migrate auth to passkeys</div>
+              <div class="kanban-full__card-meta"><span>feat/passkey</span><span>—</span></div>
+              <div class="kanban-full__card-dep">blocked on feat/login landing</div>
+            </div>
+            <div class="kanban-full__card">
+              <div class="kanban-full__card-title">Refactor billing webhooks</div>
+              <div class="kanban-full__card-meta"><span>refactor/wh</span><span>—</span></div>
+            </div>
+          </div>
+
+          <div class="kanban-full__col">
+            <div class="kanban-full__col-title"><span>To Do</span><span class="kanban-full__col-count">2</span></div>
+            <div class="kanban-full__card">
+              <div class="kanban-full__card-title">Update Stripe SDK to v18</div>
+              <div class="kanban-full__card-meta"><span>deps/stripe</span><span>queued</span></div>
+            </div>
+            <div class="kanban-full__card">
+              <div class="kanban-full__card-title">Tighten log levels</div>
+              <div class="kanban-full__card-meta"><span>chore/log</span><span>queued</span></div>
+            </div>
+          </div>
+
+          <div class="kanban-full__col">
+            <div class="kanban-full__col-title"><span>In progress</span><span class="kanban-full__col-count">2</span></div>
+            <div class="kanban-full__card kanban-full__card--running">
+              <div class="kanban-full__card-title">Add login form to auth</div>
+              <div class="kanban-full__card-meta"><span>feat/login</span><span>● Claude Code</span></div>
+              <div class="kanban-full__card-progress"><div class="kanban-full__card-progress-fill" style="width: 64%"></div></div>
+            </div>
+            <div class="kanban-full__card kanban-full__card--running">
+              <div class="kanban-full__card-title">Fix invoice rounding bug</div>
+              <div class="kanban-full__card-meta"><span>fix/billing</span><span>● Codex</span></div>
+              <div class="kanban-full__card-progress"><div class="kanban-full__card-progress-fill" style="width: 28%"></div></div>
+            </div>
+          </div>
+
+          <div class="kanban-full__col">
+            <div class="kanban-full__col-title"><span>Review</span><span class="kanban-full__col-count">2</span></div>
+            <div class="kanban-full__card">
+              <div class="kanban-full__card-title">Add settings page</div>
+              <div class="kanban-full__card-meta"><span>feat/settings</span><span>+412 −38</span></div>
+              <div class="kanban-full__card-diff"><span class="file">5 files</span><span class="add">+412</span><span class="del">−38</span></div>
+              <div class="kanban-full__card-action">Review diff →</div>
+            </div>
+            <div class="kanban-full__card">
+              <div class="kanban-full__card-title">Write tests for billing</div>
+              <div class="kanban-full__card-meta"><span>test/bill</span><span>+186 −0</span></div>
+              <div class="kanban-full__card-diff"><span class="file">3 files</span><span class="add">+186</span><span class="del">−0</span></div>
+              <div class="kanban-full__card-action">Review diff →</div>
+            </div>
+          </div>
+
+          <div class="kanban-full__col">
+            <div class="kanban-full__col-title"><span>Done</span><span class="kanban-full__col-count">4</span></div>
+            <div class="kanban-full__card kanban-full__card--done">
+              <div class="kanban-full__card-title">Bump Node to 22</div>
+              <div class="kanban-full__card-meta"><span>chore/node</span><span>merged</span></div>
+            </div>
+            <div class="kanban-full__card kanban-full__card--done">
+              <div class="kanban-full__card-title">Tidy README</div>
+              <div class="kanban-full__card-meta"><span>docs/readme</span><span>merged</span></div>
+            </div>
+            <div class="kanban-full__card kanban-full__card--done">
+              <div class="kanban-full__card-title">Fix lint config</div>
+              <div class="kanban-full__card-meta"><span>chore/lint</span><span>merged</span></div>
+            </div>
+          </div>
+
+        </div>
+        <div class="kanban-anatomy-legend" aria-label="Anatomy callouts">
+          <div><strong>Branch · auto-named</strong>The card title becomes the branch name. Each card lives in its own git worktree.</div>
+          <div><strong>Agent · per card</strong>Different cards can run on different models — Claude Code here, Codex there.</div>
+          <div><strong>Diff preview</strong>Files, lines added/removed, all in the card. Click to read the actual diff.</div>
+          <div><strong>Dependencies</strong>A card can block on another. Linked cards auto-start when their predecessor lands.</div>
+        </div>
+      `,
+      notes: {
+        time: "~5 min",
+        beat: "Walk left-to-right across the columns; then point to each callout. The 'blocked on feat/login landing' tag is the depency feature most rooms haven't seen — call it out.",
+        ask: "On a kanban you already use (Linear, Jira, GitHub Projects), what would change if every card was an agent worktree by default?",
+        bridge: "Cards become PRs because of one underlying primitive — git worktrees. The thing that makes zero-conflict parallel work possible.",
+      },
+    },
+
+    {
+      n: 39, act: 7,
+      title: "Git worktrees — the magic underneath",
+      body: `
+        <p class="section-lead">One repo. <em>Three working directories</em>. Three agents typing at once. Zero merge conflicts.</p>
+        <div class="worktrees">
+          <div class="worktree-svg-wrap">
+            <svg class="worktree-svg" viewBox="0 0 600 260" aria-label="Branch diagram: main with three worktree branches, each with an agent">
+              <!-- Main branch -->
+              <line class="branch-main" x1="40" y1="130" x2="560" y2="130" />
+              <circle class="commit-main" cx="60"  cy="130" r="7" />
+              <circle class="commit-main" cx="180" cy="130" r="7" />
+              <circle class="commit-main" cx="300" cy="130" r="7" />
+              <circle class="commit-main" cx="540" cy="130" r="7" />
+              <text class="label-main" x="40" y="160">main</text>
+              <text class="label-main" x="510" y="160">HEAD</text>
+
+              <!-- Worktree 1: feat/auth (up-left) -->
+              <path class="branch-tree" d="M 180 130 Q 200 90 250 70 T 340 50" />
+              <circle class="commit-tree" cx="280" cy="60" r="6" />
+              <circle class="commit-tree" cx="340" cy="50" r="6" />
+              <circle class="agent-node" cx="370" cy="50" r="14" />
+              <text class="label-agent" x="370" y="54" text-anchor="middle">A</text>
+              <text class="label-tree"  x="180" y="40">feat/login · Agent A</text>
+
+              <!-- Worktree 2: feat/billing (down) -->
+              <path class="branch-tree" d="M 300 130 Q 320 175 360 195 T 440 210" />
+              <circle class="commit-tree" cx="400" cy="205" r="6" />
+              <circle class="commit-tree" cx="440" cy="210" r="6" />
+              <circle class="agent-node" cx="470" cy="210" r="14" />
+              <text class="label-agent" x="470" y="214" text-anchor="middle">B</text>
+              <text class="label-tree"  x="300" y="240">fix/billing · Agent B</text>
+
+              <!-- Worktree 3: refactor/db (up-right) -->
+              <path class="branch-tree" d="M 540 130 Q 530 95 510 75 T 460 50" />
+              <circle class="commit-tree" cx="490" cy="65" r="6" />
+              <circle class="commit-tree" cx="460" cy="50" r="6" />
+              <circle class="agent-node" cx="430" cy="50" r="14" />
+              <text class="label-agent" x="430" y="54" text-anchor="middle">C</text>
+              <text class="label-tree"  x="430" y="30" text-anchor="middle">refactor/user · Agent C</text>
+            </svg>
+          </div>
+          <ul class="worktree-bullets">
+            <li><strong>One repo, many checkouts.</strong> Git worktrees give each branch its own directory on disk — same .git, different working tree.</li>
+            <li><strong>Zero conflicts in flight.</strong> Agent A can't see Agent B's file changes until both land. Independent state.</li>
+            <li><strong>Merges through PRs.</strong> Each worktree pushes to a branch. Human-reviewed merge into main is the only convergence point.</li>
+            <li><strong>One process per agent.</strong> Each terminal session lives in its own worktree directory. No <em>cd</em>-and-pray.</li>
+          </ul>
+        </div>
+        <div class="codeblock" data-lang="bash" style="margin-top: 18px;">
+          <span class="codeblock__lang">bash</span>
+<pre><code class="language-bash"># Make three worktrees off the same repo
+git worktree add ../proj-login    feat/login
+git worktree add ../proj-billing  fix/billing
+git worktree add ../proj-user     refactor/user
+
+# Each agent runs cd'd into its own directory
+cd ../proj-login    && claude    # Agent A
+cd ../proj-billing  && codex run # Agent B
+cd ../proj-user     && cursor .  # Agent C
+
+# When done — push the branch, open a PR, merge.
+git push -u origin feat/login
+gh pr create --title "Add login form"</code></pre>
+        </div>
+      `,
+      notes: {
+        time: "~5 min",
+        beat: "Lead with the diagram — the worktree shape lands faster than the commands. Then read the four bullets, then the code. Emphasise: each agent has no idea the others exist.",
+        ask: "Who's used `git worktree add` even once for non-AI work? It existed in Git 2.5 — 2015. Why are we only adopting it now?",
+        bridge: "Worktrees are the primitive. Now — what does it actually look like when three agents are working in them at the same time?",
+      },
+    },
+
+    {
+      n: 40, act: 7,
+      title: "Live demo — three agents in parallel",
+      body: `
+        <p class="section-lead">Three tasks. Three agents. Three worktrees. One review queue.</p>
+        <div class="demo-control">
+          <button class="demo-control__btn" type="button" aria-label="Start agents (Phase 4 will wire this up)">▶ Start agents</button>
+          <span class="demo-control__status">Status: <strong>3 agents · 1 done · 2 running</strong> · simulated elapsed <strong>00:42</strong></span>
+          <span class="demo-control__phase4">Phase 4 will make this live — buttons, streaming, the lot.</span>
+        </div>
+        <div class="agent-rows">
+
+          <div class="agent-row agent-row--done">
+            <div class="agent-row__id">
+              <div class="agent-row__task">Add login form to /auth</div>
+              <div class="agent-row__branch"><em>worktree</em>../proj-login · feat/login</div>
+            </div>
+            <div class="agent-row__terminal">
+              <span class="terminal__line"><span class="prompt">$</span> claude "implement .specs/features/001-login.md"</span>
+              <span class="terminal__line">Plan accepted · writing src/auth/LoginForm.tsx</span>
+              <span class="terminal__line">Wrote 8 files · pnpm test -- --run</span>
+              <span class="terminal__line"><span class="ok">✓ 12 tests pass · pnpm lint --fix clean</span></span>
+              <span class="terminal__line"><span class="ok">✓ git push -u origin feat/login</span></span>
+              <span class="terminal__line"><span class="ok">PR #482 opened · ready for review</span></span>
+            </div>
+            <div class="agent-row__status agent-row__status--done">Done<small>PR #482</small></div>
+          </div>
+
+          <div class="agent-row agent-row--running">
+            <div class="agent-row__id">
+              <div class="agent-row__task">Fix billing calculator bug</div>
+              <div class="agent-row__branch"><em>worktree</em>../proj-billing · fix/billing</div>
+            </div>
+            <div class="agent-row__terminal">
+              <span class="terminal__line"><span class="prompt">$</span> codex run "reproduce issue #371 then fix"</span>
+              <span class="terminal__line">Reading src/billing/invoice.py · src/billing/tax.py</span>
+              <span class="terminal__line">Found rounding error at invoice.py:148</span>
+              <span class="terminal__line">Writing tests/billing_rounding_test.py</span>
+              <span class="terminal__line">Running pnpm test -- --run --filter billing …</span>
+            </div>
+            <div class="agent-row__status agent-row__status--running">Running<small>+186 lines so far</small></div>
+          </div>
+
+          <div class="agent-row agent-row--running">
+            <div class="agent-row__id">
+              <div class="agent-row__task">Refactor user model</div>
+              <div class="agent-row__branch"><em>worktree</em>../proj-user · refactor/user</div>
+            </div>
+            <div class="agent-row__terminal">
+              <span class="terminal__line"><span class="prompt">$</span> cursor . --task ".specs/refactor-user.md"</span>
+              <span class="terminal__line">Composer 2 planning · 14 files touched</span>
+              <span class="terminal__line">Migrating fields to new schema · src/models/user.ts</span>
+              <span class="terminal__line">Updating consumers across src/api · 6 sites</span>
+              <span class="terminal__line">Generating prisma migration …</span>
+            </div>
+            <div class="agent-row__status agent-row__status--running">Running<small>+412 / −38</small></div>
+          </div>
+
+        </div>
+        <p class="slide__source">Three minutes of real time, three feature branches, three PRs in the review queue. Your job is the diffs — not the typing.</p>
+      `,
+      notes: {
+        time: "~5 min",
+        beat: "Don't read the terminal contents — point to them. The audience reads at their own pace. Spend the time on the demo-control bar at the top: 3 agents · 1 done · 2 running. That's the punchline.",
+        ask: "If three agents finish in 3 minutes — how long does your team currently take to review three PRs? That's the new bottleneck.",
+        bridge: "Demo surface for many agents. There's also a UI pattern for switching between this and the editor — Antigravity made it the headline.",
+      },
+    },
+
+    {
+      n: 41, act: 7,
+      title: "Manager surface vs editor view",
+      body: `
+        <p class="section-lead">Same tool, two stances. Hands-on when you mean it; oversight when you don't.</p>
+        <div class="surface">
+          <div class="surface__toggle-wrap">
+            <div class="surface__toggle" role="tablist" aria-label="Antigravity surface switcher">
+              <div class="surface__toggle-option" role="tab">Editor view</div>
+              <div class="surface__toggle-option surface__toggle-option--active" role="tab" aria-selected="true">Manager surface</div>
+            </div>
+          </div>
+          <div class="surface__split">
+
+            <div class="surface__panel">
+              <div class="surface__panel-label">Editor view</div>
+              <h3 class="surface__panel-name">Hands-on with the AI</h3>
+              <div class="surface__panel-mock" aria-hidden="true">
+                <span class="mock-line mock-line--accent">▾ src / auth /</span>
+                <span class="mock-line">  LoginForm.tsx</span>
+                <span class="mock-line">  session.ts</span>
+                <span class="mock-line">  ─────────────────</span>
+                <span class="mock-line">1 <span class="mock-line--accent">import</span> { z } from 'zod'</span>
+                <span class="mock-line">2 <span class="mock-line--accent">export const</span> Login = …</span>
+                <span class="mock-line">3 …</span>
+                <span class="mock-line">  ─────────────────</span>
+                <span class="mock-line mock-line--accent">// Composer 2 panel</span>
+                <span class="mock-line">→ apply this diff?</span>
+              </div>
+              <p class="surface__panel-when">For design decisions, novel domain logic, security-sensitive paths. Where you wanted to write it yourself anyway.</p>
+            </div>
+
+            <div class="surface__panel surface__panel--active">
+              <div class="surface__panel-label">Manager surface · active</div>
+              <h3 class="surface__panel-name">Oversight over many agents</h3>
+              <div class="surface__panel-mock" aria-hidden="true">
+                <div class="mock-board">
+                  <div class="mock-board-col">
+                    <div class="mock-board-title">Running</div>
+                    <div class="mock-card">feat/login · 64%</div>
+                    <div class="mock-card">fix/billing · 28%</div>
+                  </div>
+                  <div class="mock-board-col">
+                    <div class="mock-board-title">Review</div>
+                    <div class="mock-card">feat/settings · +412</div>
+                    <div class="mock-card">test/billing · +186</div>
+                  </div>
+                  <div class="mock-board-col">
+                    <div class="mock-board-title">Done</div>
+                    <div class="mock-card">chore/node · merged</div>
+                    <div class="mock-card">docs/readme · merged</div>
+                  </div>
+                </div>
+              </div>
+              <p class="surface__panel-when">For backlog drain, multi-feature sprints, anything you'd otherwise context-switch through. You spawn; you don't drive.</p>
+            </div>
+
+          </div>
+          <blockquote class="pull-quote">
+            You can be hands-on and get a state-of-the-art AI-powered IDE — or you can offload end-to-end tasks that previously required constant context switching.
+            <span class="pull-quote__source">— Google Antigravity launch, May 19, 2026</span>
+          </blockquote>
+        </div>
+        <p class="slide__source">Same paradigm in Cursor (Agents Window), Claude Code (agents view), Antigravity (Manager surface). Different vendors, one idea — you pick the posture per task.</p>
+      `,
+      notes: {
+        time: "~3 min",
+        beat: "Click the toggle visually with your finger. Editor view = hands-on; Manager = oversight. The point is the toggle, not either view alone. Antigravity is the cleanest implementation in May 2026 but every major tool now ships this distinction.",
+        ask: "Which view did you spend more minutes in yesterday — editor or manager? And which did you mean to spend more minutes in?",
+        bridge: "Multiple agents in parallel is the surface. The internal question — should you actually USE multiple agents on a task — is more complicated than 2024 hype suggested.",
+      },
+    },
 
     /* ---------- Act 8 — Multi-Agent Orchestration, Honestly ---------- */
     { n: 42, act: 8, title: "Multi-agent is not always the answer",                 notes: { beat: "The 2024 hype crashed. 15× token cost bar chart." } },
