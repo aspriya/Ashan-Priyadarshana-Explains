@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0b" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f5f5f0" media="(prefers-color-scheme: light)">
+<meta name="color-scheme" content="dark light">
+<meta name="description" content="Agentic Engineering — AI-assisted development, the current landscape, and where software is going. An interactive lecture deck by K.A. Ashan Priyadarshana.">
+<meta name="author" content="K.A. Ashan Priyadarshana">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230a0a0b'/><circle cx='32' cy='32' r='13' fill='%23ff6b3d'/><circle cx='32' cy='32' r='22' fill='none' stroke='%23ff6b3d' stroke-width='2' opacity='0.35'/></svg>">
+
+<!-- Open Graph / social previews (image to be regenerated in a later phase) -->
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ashan Priyadarshana Explains">
+<meta property="og:title" content="Agentic Engineering — AI-Assisted Development, May 2026">
+<meta property="og:description" content="Interactive lecture deck on the 2026 AI coding-tool landscape: the capability spectrum, the agent command centre, AGENTS.md, MCP, multi-agent honesty, and the future of software engineering.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Agentic Engineering — AI-Assisted Development, May 2026">
+<meta name="twitter:description" content="Interactive lecture deck on the 2026 AI coding-tool landscape, by K.A. Ashan Priyadarshana.">
+
+<title>Agentic Engineering | K.A. Ashan Priyadarshana</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   Design tokens — dark mode primary, light mode toggle
+   ============================================================ */
+:root {
+  --bg-primary:    #0a0a0b;
+  --bg-elevated:   #16161a;
+  --bg-card:       #1c1c22;
+  --text-primary:  #f5f5f0;
+  --text-secondary:#b0b0a8;
+  --text-tertiary: #6e6e68;
+  --accent:        #ff6b3d;
+  --accent-soft:   rgba(255, 107, 61, 0.13);
+  --accent-strong: #ff8a63;
+  --border:        #2a2a30;
+  --border-soft:   #1f1f25;
+  --success:       #6bd968;
+  --danger:        #ff5252;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body:    'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --ease:        cubic-bezier(.2, .7, .2, 1);
+  --t-fast:      180ms var(--ease);
+  --t-mid:       260ms var(--ease);
+  --t-slow:      420ms var(--ease);
+
+  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.45);
+  --shadow-pop:  0 24px 80px rgba(0, 0, 0, 0.55);
+}
+
+html[data-theme="light"] {
+  --bg-primary:    #faf9f5;
+  --bg-elevated:   #ffffff;
+  --bg-card:       #f1efe8;
+  --text-primary:  #18181a;
+  --text-secondary:#494941;
+  --text-tertiary: #82827a;
+  --accent:        #d94e1c;
+  --accent-soft:   rgba(217, 78, 28, 0.10);
+  --accent-strong: #c94217;
+  --border:        #e1ddd1;
+  --border-soft:   #ece9dd;
+  --shadow-card: 0 20px 60px rgba(20, 18, 12, 0.10);
+  --shadow-pop:  0 24px 80px rgba(20, 18, 12, 0.14);
+}
+
+/* ============================================================
+   Reset + base
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+html { background: var(--bg-primary); }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 20px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  margin: 0 0 0.4em;
+  letter-spacing: -0.012em;
+  line-height: 1.1;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+h1 { font-size: 72px; font-weight: 500; line-height: 1.04; letter-spacing: -0.02em; }
+h2 { font-size: 56px; }
+h3 { font-size: 36px; font-weight: 500; color: var(--text-primary); }
+h4 { font-size: 24px; font-weight: 600; }
+
+p  { margin: 0 0 1em; color: var(--text-primary); }
+em { font-style: italic; color: var(--text-primary); }
+a  { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code, kbd, pre {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+kbd {
+  font-size: 0.78em;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* ============================================================
+   Deck shell
+   ============================================================ */
+.deck {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+}
+
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--border-soft);
+  z-index: 50;
+}
+.progress__bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width var(--t-mid);
+}
+
+.stage {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ============================================================
+   Chrome footer
+   ============================================================ */
+.chrome {
+  position: relative;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 14px 32px;
+  border-top: 1px solid var(--border-soft);
+  background: linear-gradient(180deg, transparent, var(--bg-primary) 30%);
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+.chrome__left, .chrome__right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.chrome__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: -0.005em;
+}
+.chrome__sep { color: var(--text-tertiary); }
+.chrome__act {
+  font-family: var(--font-body);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.chrome__hint {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.chrome__counter {
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-elevated);
+}
+
+.icon-btn {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast), transform var(--t-fast);
+}
+.icon-btn:hover {
+  background: var(--bg-card);
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+.icon-btn:active { transform: translateY(1px); }
+
+/* ============================================================
+   Slides
+   ============================================================ */
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity var(--t-mid), transform var(--t-mid), visibility 0s linear var(--t-mid);
+}
+.slide.is-current {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity var(--t-mid), transform var(--t-mid), visibility 0s;
+}
+.slide.is-prev {
+  transform: translateY(-8px);
+}
+
+.slide__inner {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.slide__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 28px;
+  padding: 6px 14px 6px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+}
+.slide__meta .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: inline-block;
+}
+.slide__meta .slide__num { color: var(--text-secondary); }
+.slide__meta .slide__act { color: var(--text-tertiary); }
+
+.slide__title {
+  font-family: var(--font-display);
+  font-size: 56px;
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  color: var(--text-primary);
+  margin: 0 0 22px;
+}
+
+.slide__lede {
+  font-family: var(--font-body);
+  font-size: 28px;
+  line-height: 1.3;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin: 0 0 32px;
+  max-width: 880px;
+}
+
+.slide__body {
+  font-size: 20px;
+  line-height: 1.55;
+  color: var(--text-primary);
+}
+.slide__body > * + * { margin-top: 18px; }
+
+.slide__source {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text-tertiary);
+  margin-top: 28px;
+}
+
+/* ============================================================
+   Placeholder slide (Phase 1 default)
+   ============================================================ */
+.slide__placeholder {
+  margin-top: 36px;
+  padding: 28px 32px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.55;
+  max-width: 820px;
+}
+.slide__placeholder strong {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.slide__placeholder .placeholder-tag {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+/* ============================================================
+   Hero layout (Slide 1)
+   ============================================================ */
+.slide--hero {
+  padding: 0;
+}
+.hero {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 64px;
+}
+.hero__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 36px;
+}
+.hero__title {
+  font-family: var(--font-display);
+  font-size: 116px;
+  line-height: 0.98;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+  margin: 0 0 28px;
+}
+.hero__title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent);
+}
+.hero__sub {
+  font-family: var(--font-body);
+  font-size: 28px;
+  line-height: 1.35;
+  font-weight: 400;
+  color: var(--text-secondary);
+  max-width: 820px;
+  margin: 0 0 56px;
+}
+.hero__byline {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 56px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.hero__byline-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.hero__byline-name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.hero__byline-affiliation {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--text-tertiary);
+  margin-left: 4px;
+  letter-spacing: 0;
+}
+.hero__quote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+  max-width: 760px;
+}
+.hero__quote::before {
+  content: "“";
+  font-style: normal;
+  color: var(--accent);
+  margin-right: 4px;
+}
+.hero__quote::after {
+  content: "”";
+  font-style: normal;
+  color: var(--accent);
+  margin-left: 2px;
+}
+.hero__quote-source {
+  display: block;
+  font-family: var(--font-body);
+  font-style: normal;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  margin-top: 14px;
+}
+
+/* ============================================================
+   Act 1 components — timeline, tier staircase, will/won't duo,
+   pull-quote
+   ============================================================ */
+
+/* Vertical timeline rail (Slide 2) */
+.timeline {
+  position: relative;
+  padding-left: 32px;
+  margin-top: 8px;
+}
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--border) 100%);
+}
+.timeline__node {
+  position: relative;
+  padding: 0 0 26px 0;
+}
+.timeline__node:last-child { padding-bottom: 0; }
+.timeline__node::before {
+  content: "";
+  position: absolute;
+  left: -27px;
+  top: 7px;
+  width: 12px;
+  height: 12px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px var(--bg-primary);
+}
+.timeline__node--punchline::before {
+  background: var(--bg-primary);
+  border: 2px solid var(--accent);
+  width: 14px;
+  height: 14px;
+  left: -28px;
+  top: 6px;
+}
+.timeline__date {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.timeline__headline {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 21px;
+  color: var(--text-primary);
+  line-height: 1.25;
+  margin-bottom: 8px;
+}
+.timeline__quote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  max-width: 780px;
+  margin: 0;
+}
+.timeline__quote::before { content: "“"; color: var(--accent); margin-right: 2px; }
+.timeline__quote::after  { content: "”"; color: var(--accent); margin-left: 2px; }
+.timeline__gloss {
+  font-size: 15px;
+  color: var(--text-tertiary);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+.timeline__gloss em {
+  font-style: italic;
+  color: var(--text-primary);
+}
+
+/* Tier self-assessment staircase (Slide 3) */
+.tier-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+.tier {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  align-items: center;
+  gap: 22px;
+  padding: 16px 22px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  transition: transform var(--t-fast), border-color var(--t-fast);
+}
+.tier:hover {
+  transform: translateX(2px);
+  border-color: var(--accent);
+}
+.tier--lvl0 { margin-left:   0; opacity: 0.78; }
+.tier--lvl1 { margin-left:  16px; opacity: 0.86; }
+.tier--lvl2 { margin-left:  32px; opacity: 0.94; }
+.tier--lvl3 { margin-left:  48px; }
+.tier--lvl4 { margin-left:  64px; }
+.tier__num {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 38px;
+  line-height: 1;
+  color: var(--accent);
+}
+.tier__claim {
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+.tier__claim em {
+  font-style: normal;
+  color: var(--text-secondary);
+}
+.tier__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+/* Two-column will / won't (Slide 4) */
+.duo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 8px;
+}
+.duo__col {
+  padding: 26px 28px 24px;
+  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+}
+.duo__col--will {
+  background: linear-gradient(180deg, var(--accent-soft), transparent 80%), var(--bg-card);
+  border-color: var(--accent);
+}
+.duo__title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  color: var(--text-primary);
+}
+.duo__sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 14px;
+}
+.duo__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.duo__list li {
+  padding: 7px 0 7px 26px;
+  position: relative;
+  color: var(--text-primary);
+}
+.duo__list li::before {
+  position: absolute;
+  left: 0;
+  top: 7px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+.duo__list--will li::before { content: "+"; color: var(--accent); }
+.duo__list--wont li::before { content: "×"; color: var(--text-tertiary); }
+
+/* Pull-quote / aside (used across acts) */
+.pull-quote {
+  margin: 28px 0 0;
+  padding: 20px 26px;
+  border-left: 3px solid var(--accent);
+  background: var(--bg-elevated);
+  border-radius: 0 12px 12px 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+.pull-quote__source {
+  display: block;
+  font-style: normal;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-top: 8px;
+  letter-spacing: 0.04em;
+}
+
+/* Section lead — used to open content slides with a single big sentence */
+.section-lead {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 1.3;
+  color: var(--text-primary);
+  margin: 0 0 24px;
+  max-width: 880px;
+  letter-spacing: -0.005em;
+}
+.section-lead em { color: var(--accent); font-style: italic; }
+
+/* ============================================================
+   Overlays (help, jump, notes)
+   ============================================================ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 8, 10, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 32px;
+}
+html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
+.overlay[aria-hidden="false"] { display: flex; }
+
+.overlay__card {
+  width: 100%;
+  max-width: 720px;
+  max-height: 80vh;
+  overflow: auto;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-pop);
+  padding: 36px 40px;
+}
+.overlay__card h2 {
+  font-size: 32px;
+  margin: 0 0 6px;
+}
+.overlay__card .overlay__lede {
+  color: var(--text-secondary);
+  font-size: 16px;
+  margin: 0 0 24px;
+}
+.overlay__close {
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.shortcuts {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 12px 24px;
+  margin: 0;
+}
+.shortcuts dt {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.shortcuts dd {
+  margin: 0;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+/* Jump-to-slide menu */
+.jump__list {
+  margin-top: 8px;
+}
+.jump__act {
+  margin: 22px 0 8px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+}
+.jump__items {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+.jump__item {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+}
+.jump__item:hover {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+.jump__item.is-current {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.jump__item-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-tertiary);
+  min-width: 38px;
+  font-variant-numeric: tabular-nums;
+}
+.jump__item-title { flex: 1; }
+
+/* Speaker notes panel — slide-up from bottom */
+.notes {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 150;
+  background: var(--bg-elevated);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.45);
+  max-height: 48vh;
+  overflow: auto;
+  transform: translateY(100%);
+  transition: transform var(--t-slow);
+}
+.notes[aria-hidden="false"] { transform: translateY(0); }
+.notes__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 36px 36px;
+}
+.notes__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.notes__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--text-primary);
+}
+.notes__sub {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+.notes__body {
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--text-primary);
+}
+.notes__row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 12px 24px;
+  margin-bottom: 10px;
+}
+.notes__row dt {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+}
+.notes__row dd {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   Responsive tweaks (laptop projector ↔ smaller venue screen)
+   ============================================================ */
+@media (max-width: 1024px) {
+  body { font-size: 18px; }
+  h1 { font-size: 56px; }
+  h2 { font-size: 44px; }
+  .slide { padding: 48px; }
+  .slide__title { font-size: 44px; }
+  .slide__lede { font-size: 24px; }
+  .hero__title { font-size: 84px; }
+  .hero__sub { font-size: 24px; }
+  .chrome { padding: 12px 24px; }
+}
+
+@media (max-width: 720px) {
+  body { font-size: 16px; }
+  h1 { font-size: 44px; }
+  h2 { font-size: 34px; }
+  .slide { padding: 32px; }
+  .hero { padding: 32px; }
+  .slide__title { font-size: 34px; }
+  .slide__lede { font-size: 20px; }
+  .hero__title { font-size: 58px; }
+  .hero__sub { font-size: 20px; }
+  .chrome { padding: 10px 16px; font-size: 12px; }
+  .chrome__hint { display: none; }
+  .overlay__card { padding: 24px; }
+  .duo { grid-template-columns: 1fr; }
+  .tier { grid-template-columns: 48px 1fr; padding: 14px 16px; }
+  .tier__label { display: none; }
+  .tier--lvl0, .tier--lvl1, .tier--lvl2, .tier--lvl3, .tier--lvl4 { margin-left: 0; }
+  .section-lead { font-size: 22px; }
+  .timeline__headline { font-size: 18px; }
+  .timeline__quote { font-size: 15px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide, .progress__bar, .notes, .icon-btn { transition: none !important; }
+}
+
+/* Print fallback — basic, ungated by phase */
+@media print {
+  body { overflow: visible; background: #fff; color: #111; }
+  .chrome, .progress, .overlay, .notes { display: none !important; }
+  .stage { overflow: visible; height: auto; }
+  .slide {
+    position: relative;
+    inset: auto;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    page-break-after: always;
+    padding: 24px;
+    border-bottom: 1px solid #ccc;
+  }
+}
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<main class="deck" id="deck">
+  <div class="progress" aria-hidden="true">
+    <div class="progress__bar" id="progressBar"></div>
+  </div>
+
+  <section class="stage" id="stage" aria-live="polite">
+    <!-- Slides injected by JS -->
+  </section>
+
+  <footer class="chrome">
+    <div class="chrome__left">
+      <span class="chrome__title">Agentic Engineering</span>
+      <span class="chrome__sep">·</span>
+      <span class="chrome__act" id="actLabel">Act 1 — The Reset</span>
+    </div>
+    <div class="chrome__right">
+      <span class="chrome__hint">Press <kbd>?</kbd> for shortcuts</span>
+      <button class="icon-btn" id="notesBtn" title="Speaker notes (N)" aria-label="Toggle speaker notes">N</button>
+      <button class="icon-btn" id="jumpBtn"  title="Jump to slide (G)" aria-label="Open slide menu">G</button>
+      <button class="icon-btn" id="themeBtn" title="Toggle theme (T)"  aria-label="Toggle theme">T</button>
+      <button class="icon-btn" id="fsBtn"    title="Fullscreen (F)"    aria-label="Toggle fullscreen">⛶</button>
+      <span class="chrome__counter" id="counter">1 / 57</span>
+    </div>
+  </footer>
+</main>
+
+<!-- ============================================================
+     Help overlay
+     ============================================================ -->
+<div class="overlay" id="helpOverlay" role="dialog" aria-modal="true" aria-labelledby="helpTitle" aria-hidden="true">
+  <div class="overlay__card">
+    <h2 id="helpTitle">Keyboard shortcuts</h2>
+    <p class="overlay__lede">Drive the deck without a mouse.</p>
+    <dl class="shortcuts">
+      <dt><kbd>→</kbd> / <kbd>Space</kbd> / <kbd>PgDn</kbd></dt>
+      <dd>Next slide</dd>
+      <dt><kbd>←</kbd> / <kbd>PgUp</kbd></dt>
+      <dd>Previous slide</dd>
+      <dt><kbd>Home</kbd></dt>
+      <dd>Jump to first slide</dd>
+      <dt><kbd>End</kbd></dt>
+      <dd>Jump to last slide</dd>
+      <dt><kbd>G</kbd></dt>
+      <dd>Open slide-jump menu</dd>
+      <dt><kbd>N</kbd></dt>
+      <dd>Toggle speaker notes</dd>
+      <dt><kbd>F</kbd></dt>
+      <dd>Toggle fullscreen</dd>
+      <dt><kbd>T</kbd></dt>
+      <dd>Toggle dark / light theme</dd>
+      <dt><kbd>?</kbd></dt>
+      <dd>Show this help</dd>
+      <dt><kbd>Esc</kbd></dt>
+      <dd>Close any overlay</dd>
+    </dl>
+    <p class="overlay__close">Press <kbd>?</kbd> or <kbd>Esc</kbd> to close.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     Jump-to-slide overlay
+     ============================================================ -->
+<div class="overlay" id="jumpOverlay" role="dialog" aria-modal="true" aria-labelledby="jumpTitle" aria-hidden="true">
+  <div class="overlay__card">
+    <h2 id="jumpTitle">Jump to slide</h2>
+    <p class="overlay__lede">57 slides across 11 acts. Click any to navigate.</p>
+    <div class="jump__list" id="jumpList"></div>
+    <p class="overlay__close">Press <kbd>G</kbd> or <kbd>Esc</kbd> to close.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     Speaker notes panel
+     ============================================================ -->
+<aside class="notes" id="notesPanel" aria-hidden="true" aria-label="Speaker notes">
+  <div class="notes__inner">
+    <header class="notes__header">
+      <span class="notes__title" id="notesTitle">Speaker notes</span>
+      <span class="notes__sub"  id="notesSub">Press N to close</span>
+    </header>
+    <div class="notes__body" id="notesBody"></div>
+  </div>
+</aside>
+
+<script>
+(() => {
+  "use strict";
+
+  /* ============================================================
+     ACT MAP
+     ============================================================ */
+  const ACTS = {
+    1:  { name: "Act 1 — The Reset",                         range: [1, 4] },
+    2:  { name: "Act 2 — The Current Landscape",             range: [5, 10] },
+    3:  { name: "Act 3 — The Capability Spectrum",           range: [11, 15] },
+    4:  { name: "Act 4 — The Tool Stack",                    range: [16, 23] },
+    5:  { name: "Act 5 — Conventions Agents Understand",     range: [24, 30] },
+    6:  { name: "Act 6 — Starting a Project, Agent-Ready",   range: [31, 36] },
+    7:  { name: "Act 7 — The Command Center",                range: [37, 41] },
+    8:  { name: "Act 8 — Multi-Agent Orchestration, Honestly", range: [42, 45] },
+    9:  { name: "Act 9 — Models & Future Gossip",            range: [46, 49] },
+    10: { name: "Act 10 — Good, Bad, Dangerous, Honest",     range: [50, 54] },
+    11: { name: "Act 11 — Future of SWE & Wrap-up",          range: [55, 57] },
+  };
+
+  /* ============================================================
+     SLIDE INVENTORY
+     Phase 1: title + section marker. Content lands in Phase 2.
+     Slide 1 (hero) is built out as a design-system showcase.
+     ============================================================ */
+  const PLACEHOLDER_NOTE = "Speaker notes pending — populated in Phase 2 alongside slide content.";
+
+  const SLIDES = [
+    /* ---------- Act 1 — The Reset ---------- */
+    {
+      n: 1, act: 1,
+      title: "Title slide",
+      layout: "hero",
+      body: `
+        <div class="hero">
+          <div class="hero__eyebrow">Interactive Lecture · AI-Assisted Development · May 2026</div>
+          <h1 class="hero__title">Agentic <em>Engineering</em></h1>
+          <p class="hero__sub">AI-assisted development, the current landscape, and where software is going.</p>
+          <div class="hero__byline">
+            <span class="hero__byline-label">Presented by</span>
+            <span class="hero__byline-name">Ashan Priyadarshana, CoDev Labs <span class="hero__byline-affiliation">| Cognition Partner</span></span>
+          </div>
+          <p class="hero__quote">
+            You can outsource your thinking but you can't outsource your understanding.
+            <span class="hero__quote-source">— Andrej Karpathy · Sequoia AI Ascent · April 29, 2026</span>
+          </p>
+        </div>
+      `,
+      notes: {
+        time: "~3 min",
+        beat: "Set the tone. This is a 2026-current session, not generic AI hype. Let the Karpathy quote sit for a beat before clicking through.",
+        ask: "Show of hands — who's used Claude Code, Cursor, Copilot, or Windsurf this week? Calibrate the room before the timeline lands.",
+        bridge: "Fifteen months ago that quote couldn't have been written. Let me show you how we got there.",
+      },
+    },
+
+    {
+      n: 2, act: 1,
+      title: "The 15-month story",
+      body: `
+        <p class="section-lead">The same person <em>coined</em> vibe coding, then <em>killed</em> it, then joined the lab building Claude — in fifteen months.</p>
+        <ol class="timeline" aria-label="Karpathy timeline: Feb 2025 to May 2026">
+          <li class="timeline__node">
+            <div class="timeline__date">Feb 2, 2025</div>
+            <div class="timeline__headline">Karpathy coins “vibe coding.”</div>
+            <p class="timeline__quote">There's a new kind of coding I call vibe coding, where you fully give in to the vibes, embrace exponentials, and forget that the code even exists.</p>
+          </li>
+          <li class="timeline__node">
+            <div class="timeline__date">Mid-2025</div>
+            <div class="timeline__headline">Vibe coding goes mainstream.</div>
+            <p class="timeline__gloss">Cursor, Windsurf, Bolt, Lovable explode. Everyone is "vibe coding." Twitter is wall-to-wall AI-built apps.</p>
+          </li>
+          <li class="timeline__node">
+            <div class="timeline__date">Jan 26, 2026 · looking back at Nov–Dec 2025</div>
+            <div class="timeline__headline">His own workflow has inverted in a single month.</div>
+            <p class="timeline__quote">I rapidly went from about 80% manual + autocomplete coding in November to 80% agent coding and 20% edits + touchups in December. I'm mostly programming in English now — a bit sheepishly telling the LLM what code to write… in words.</p>
+            <p class="timeline__gloss">Same tweet, a few paragraphs later: <em>"I've already noticed that I am slowly starting to atrophy my ability to write code manually."</em></p>
+          </li>
+          <li class="timeline__node">
+            <div class="timeline__date">Feb 10, 2026</div>
+            <div class="timeline__headline">He declares vibe coding dead — renames it <em>agentic engineering</em>.</div>
+            <p class="timeline__quote">The new default is that you are not writing the code directly 99% of the time, you are orchestrating agents who do, and acting as oversight.</p>
+          </li>
+          <li class="timeline__node timeline__node--punchline">
+            <div class="timeline__date">May 19, 2026 · four days ago</div>
+            <div class="timeline__headline">Karpathy joins Anthropic.</div>
+            <p class="timeline__gloss">The person who named both eras now works at the lab building Claude.</p>
+          </li>
+        </ol>
+        <p class="slide__source">Phase 4 will replace this rail with a draggable scrubber — the static timeline is the readable fallback.</p>
+      `,
+      notes: {
+        time: "~5 min",
+        beat: "Make participants feel the velocity. Don't summarise — read each quote with a pause. On the Jan 26 node, point out both beats: the workflow inversion AND the atrophy observation come from the same tweet. The May 19 dot is the punchline.",
+        ask: "Who here read Karpathy's February 2025 'vibe coding' tweet at the time? And his January 26 'mostly programming in English now' post?",
+        bridge: "If the inventor of the term is calling it dead — and even his own coding muscle is atrophying — where does that leave the rest of us? Locate yourself.",
+      },
+    },
+
+    {
+      n: 3, act: 1,
+      title: "Reality check — where do you stand?",
+      body: `
+        <p class="section-lead">Before we go further, find your <em>own</em> step on the staircase. We'll meet you there.</p>
+        <div class="tier-grid" role="list" aria-label="Self-assessment tiers, level 0 to level 4">
+          <div class="tier tier--lvl0" role="listitem">
+            <div class="tier__num">0</div>
+            <div class="tier__claim">“I use AI for autocomplete and quick lookups.”</div>
+            <div class="tier__label">Bystander</div>
+          </div>
+          <div class="tier tier--lvl1" role="listitem">
+            <div class="tier__num">1</div>
+            <div class="tier__claim">“I use Cursor, Copilot, or Claude Code for active editing.”</div>
+            <div class="tier__label">Power user</div>
+          </div>
+          <div class="tier tier--lvl2" role="listitem">
+            <div class="tier__num">2</div>
+            <div class="tier__claim">“I write specs and let agents implement.”</div>
+            <div class="tier__label">Director</div>
+          </div>
+          <div class="tier tier--lvl3" role="listitem">
+            <div class="tier__num">3</div>
+            <div class="tier__claim">“I run multiple agents in parallel via a kanban board.”</div>
+            <div class="tier__label">Conductor</div>
+          </div>
+          <div class="tier tier--lvl4" role="listitem">
+            <div class="tier__num">4</div>
+            <div class="tier__claim">“I assign GitHub issues to cloud agents and review the PRs.”</div>
+            <div class="tier__label">Orchestrator</div>
+          </div>
+        </div>
+        <p class="slide__source">Most rooms cluster around levels 1–2 in May 2026. A small but growing minority are at 3–4. There is no right answer — only an honest one.</p>
+      `,
+      notes: {
+        time: "~4 min · audience interaction",
+        beat: "Force self-reflection. Don't tell — make them locate themselves. Pause and count hands at each step.",
+        ask: "Hands up by level — level 0? level 1? level 2? level 3? level 4? Count out loud. Name the centre of mass for the room.",
+        bridge: "Wherever you are on those five steps — here's what the next three to four hours will and won't do for you.",
+      },
+    },
+
+    {
+      n: 4, act: 1,
+      title: "What this session will and won't do",
+      body: `
+        <p class="section-lead">Honest scope, up front. <em>Then</em> we earn the rest.</p>
+        <div class="duo">
+          <div class="duo__col duo__col--will">
+            <h3 class="duo__title">This session will</h3>
+            <div class="duo__sub">Take-homes you'll leave with</div>
+            <ul class="duo__list duo__list--will">
+              <li>Reset your mental model — it isn't autocomplete anymore.</li>
+              <li>Walk the actual 2026 tool stack, four categories deep.</li>
+              <li>Show how to start a project that's <em>agent-ready</em> from minute one.</li>
+              <li>Give you the conventions that travel between tools — AGENTS.md, MCP, skills, specs.</li>
+              <li>Name the dangers honestly — security, slop, automation bias, Mythos.</li>
+            </ul>
+          </div>
+          <div class="duo__col duo__col--wont">
+            <h3 class="duo__title">It won't</h3>
+            <div class="duo__sub">Where it stops</div>
+            <ul class="duo__list duo__list--wont">
+              <li>Turn you into an expert in four hours.</li>
+              <li>Replace the hands-on weeks where the muscle actually forms.</li>
+              <li>Hand you a single “best tool” answer — there isn't one in May 2026.</li>
+              <li>Predict where the field lands in twelve months. Six months ago nobody had.</li>
+            </ul>
+          </div>
+        </div>
+        <blockquote class="pull-quote">
+          Pick one tool. Use it on real work for three to four weeks. Evaluate by what you actually shipped — not by what the demo looked like.
+          <span class="pull-quote__source">— Codegen, on choosing an AI coding stack in 2026</span>
+        </blockquote>
+      `,
+      notes: {
+        time: "~3 min",
+        beat: "Calibrate expectations. The Codegen quote is the lasting take-home — let it close the act.",
+        ask: "(Optional) Anything you'd add to either column before we start? Note it on the chat — I'll revisit at the end.",
+        bridge: "OK. Now — where is the field actually right now? May 2026 edition. Five months, four frontier model launches.",
+      },
+    },
+
+    /* ---------- Act 2 — The Current Landscape ---------- */
+    { n: 5,  act: 2, title: "The model wars — five months, four frontier launches", notes: { beat: "Release cadence has gone supernatural. Calendar tape." } },
+    { n: 6,  act: 2, title: "The current frontier — the Big Three + the gated one", notes: { beat: "Opus 4.7, GPT-5.5, Gemini 3.1 Pro, Mythos Preview (gated)." } },
+    { n: 7,  act: 2, title: "Cadence chart — model releases per quarter",           notes: { beat: "Curve goes exponential. Drives the 'model-agnostic infrastructure' takeaway." } },
+    { n: 8,  act: 2, title: "Industry-level moves — M&A and partnerships",          notes: { beat: "Five news bites: Cognition/Windsurf, Infosys, Mercedes, $25B raise, SpaceX-Anthropic." } },
+    { n: 9,  act: 2, title: "Karpathy joins Anthropic",                             notes: { beat: "Quiet typography slide. Bookend to Slide 2's timeline." } },
+    { n: 10, act: 2, title: "Where we are right now",                               notes: { beat: "Four stat cards, count-up. End with: 'the question is no longer should I — it's how do I orchestrate.'" } },
+
+    /* ---------- Act 3 — The Capability Spectrum ---------- */
+    { n: 11, act: 3, title: "From autocomplete to autonomy",                        notes: { beat: "Single sentence — there is no 'AI coding tool', only a spectrum." } },
+    { n: 12, act: 3, title: "The seven-tier capability spectrum",                   notes: { beat: "Interactive slider — drag through tiers 1–7. Must-build widget #2." } },
+    { n: 13, act: 3, title: "The Addy Osmani three-tier framing",                   notes: { beat: "Compress seven into three. Conductor / parallel / cloud." } },
+    { n: 14, act: 3, title: "The orchestra metaphor",                               notes: { beat: "Conductor vs orchestrator. Lead with the analogy, then abstract." } },
+    { n: 15, act: 3, title: "Where each big tool sits on the spectrum",             notes: { beat: "Tool placements on the axis. Bars not points — many tools span tiers." } },
+
+    /* ---------- Act 4 — The Tool Stack ---------- */
+    { n: 16, act: 4, title: "The four tool categories",                             notes: { beat: "IDEs / CLIs / Cloud SWEs / Orchestration. Plus mention IDE extensions and prompt-to-app." } },
+    { n: 17, act: 4, title: "Agentic IDEs — Cursor, Windsurf, Antigravity",         notes: { beat: "Head-to-head, three columns. No marketing." } },
+    { n: 18, act: 4, title: "Agentic CLIs — terminal is back",                      notes: { beat: "Five terminal mockups. Note Gemini CLI shutdown June 18, 2026." } },
+    { n: 19, act: 4, title: "Cloud autonomous engineers",                           notes: { beat: "Devin 2.2, Claude Code Web, Copilot Coding Agent, Jules, Codex Web, Genie." } },
+    { n: 20, act: 4, title: "Orchestration / Command Center tools",                 notes: { beat: "Vibe Kanban, Cline Kanban, Conductor family, Agent Teams. Sets up Act 7." } },
+    { n: 21, act: 4, title: "IDE extensions and prompt-to-app builders",            notes: { beat: "Two compact columns. Brief, don't deep-dive." } },
+    { n: 22, act: 4, title: "How to pick a stack — decision tree",                  notes: { beat: "Interactive flowchart. Must-build widget #5." } },
+    { n: 23, act: 4, title: "The minimum daily-driver stack (Ashan's recommendation)", notes: { beat: "Four pillars: Claude Code, Cursor/Windsurf, Vibe Kanban, Copilot Coding Agent." } },
+
+    /* ---------- Act 5 — Conventions Agents Understand ---------- */
+    { n: 24, act: 5, title: "Why agents need conventions",                          notes: { beat: "Open with the Particula.tech story — same pattern surfaces in 10 minutes." } },
+    { n: 25, act: 5, title: "AGENTS.md — the unified standard",                     notes: { beat: "The most important slide in the session. Real example code block." } },
+    { n: 26, act: 5, title: "The counterintuitive AGENTS.md research",              notes: { beat: "ETH Zurich 3%/20%/2–4 finding. GitHub 2,500 repos finding. Three-tier boundaries." } },
+    { n: 27, act: 5, title: "AGENTS.md before/after — live demo",                   notes: { beat: "Two simulated terminals streaming. Must-build widget #3." } },
+    { n: 28, act: 5, title: "Skills — Anthropic's progressive disclosure model",    notes: { beat: "Three-level loading funnel. Cross-tool note about Cursor/Windsurf rules dirs." } },
+    { n: 29, act: 5, title: "MCP — the universal connector",                        notes: { beat: "USB-C for AI analogy. 97M installs. 2026-07-28 spec RC." } },
+    { n: 30, act: 5, title: "Spec-driven development",                              notes: { beat: "Specify → Plan → Code → Verify. Spec Kit, OpenSpec, Kiro." } },
+
+    /* ---------- Act 6 — Starting a Project, Agent-Ready ---------- */
+    { n: 31, act: 6, title: "The five must-do practices",                           notes: { beat: "Five numbered cards. Checklist before the walkthroughs." } },
+    { n: 32, act: 6, title: "New project — 10-minute setup walkthrough",            notes: { beat: "Numbered code-block walkthrough. Copy-pasteable commands." } },
+    { n: 33, act: 6, title: "Existing codebase — onboarding the agent",             notes: { beat: "Treat /init output as a draft. Strip what the agent can discover. Keep tribal knowledge." } },
+    { n: 34, act: 6, title: "What to delegate vs keep",                             notes: { beat: "Two columns. The 'wrong-but-plausible would land in prod' rule." } },
+    { n: 35, act: 6, title: "Workflow patterns by task type",                       notes: { beat: "Five mini-recipes: greenfield, feature, bug, migration, backlog." } },
+    { n: 36, act: 6, title: "The Explore → Plan → Code → Verify loop",              notes: { beat: "Circular diagram. 'Skip Plan and you've gone back to vibe coding.'" } },
+
+    /* ---------- Act 7 — The Command Center ---------- */
+    { n: 37, act: 7, title: "Agents are async workers, not chatbots",               notes: { beat: "Mental model shift. Chat vs kanban contrast." } },
+    { n: 38, act: 7, title: "Anatomy of an agent kanban",                           notes: { beat: "Full kanban mockup — must-build illustration." } },
+    { n: 39, act: 7, title: "Git worktrees — the magic underneath",                 notes: { beat: "Branch tree visualisation + the worktree command block." } },
+    { n: 40, act: 7, title: "Live demo — running 3 agents in parallel",             notes: { beat: "Simulated kanban with streaming agent output. Must-build widget #4 (the big one)." } },
+    { n: 41, act: 7, title: "Manager surface vs editor view",                       notes: { beat: "Antigravity framing. Toggle UI. Same paradigm across tools." } },
+
+    /* ---------- Act 8 — Multi-Agent Orchestration, Honestly ---------- */
+    { n: 42, act: 8, title: "Multi-agent is not always the answer",                 notes: { beat: "The 2024 hype crashed. 15× token cost bar chart." } },
+    { n: 43, act: 8, title: "The patterns that survived",                           notes: { beat: "Agent-flow, orchestration, bounded collaboration — three topology diagrams." } },
+    { n: 44, act: 8, title: "The subagent contract (Anthropic's P2 prompt)",        notes: { beat: "Three rules: dedicated prompt, structured brief, return summary not transcript." } },
+    { n: 45, act: 8, title: "Decision tree — single agent or multi?",               notes: { beat: "Flowchart. 'When in doubt, single agent.'" } },
+
+    /* ---------- Act 9 — Models & Future Gossip ---------- */
+    { n: 46, act: 9, title: "Pick the right model for the task",                    notes: { beat: "Matrix: hardest reasoning / daily / autocomplete / privacy. Cost vs intelligence 2x2." } },
+    { n: 47, act: 9, title: "Specialized coding models",                            notes: { beat: "Composer 2, SWE-1.5, GPT-5.3-Codex. The new training-for-coding trend." } },
+    { n: 48, act: 9, title: "What's coming — the gossip slide",                     notes: { beat: "GPT-6, Claude 5 (Fennec), Llama 4, Gemini 3.5 Pro. Confidence-indicator cards." } },
+    { n: 49, act: 9, title: "The Mythos moment — the gated model",                  notes: { beat: "Project Glasswing story. 'DO NOT RELEASE' stamp. Dark and somber, not sensational." } },
+
+    /* ---------- Act 10 — Good, Bad, Dangerous, Honest ---------- */
+    { n: 50, act: 10, title: "The good — what's actually working",                  notes: { beat: "Four stat cards: +35% productivity, +66% epics, 27% AI-authored, 50% onboarding cut." } },
+    { n: 51, act: 10, title: "The bad — the verification bottleneck",               notes: { beat: "96% don't trust, 95% review, +10% instability, 40–62% security flaws, 35 CVEs in March." } },
+    { n: 52, act: 10, title: "The dangerous — Moltbook and AI slop",                notes: { beat: "Hour-by-hour incident timeline. 'Speed without verification is the engineering failure of 2026.'" } },
+    { n: 53, act: 10, title: "The automation bias trap",                            notes: { beat: "Hallucinated packages, phantom deps, false confidence. Mirror illustration." } },
+    { n: 54, act: 10, title: "The honest framing",                                  notes: { beat: "Big quote: craft of coding vs discipline of software engineering. Two-half illustration." } },
+
+    /* ---------- Act 11 — Future of SWE & Wrap-up ---------- */
+    { n: 55, act: 11, title: "The jobs picture, honestly",                          notes: { beat: "Entry-level postings down 28%. AI skills in 42% of postings. 2.3× faster hiring with AI fluency." } },
+    { n: 56, act: 11, title: "Career advice — what to actually do",                 notes: { beat: "Five concrete recommendations. End: 'compete on what AI can't do.'" } },
+    { n: 57, act: 11, title: "The Karpathy frame — closing the loop",               notes: { beat: "Bookend with the opening quote. Network graph fully resolved. Now go build." } },
+  ];
+
+  const TOTAL = SLIDES.length;
+
+  /* ============================================================
+     DOM build
+     ============================================================ */
+  const stage      = document.getElementById("stage");
+  const progressBar= document.getElementById("progressBar");
+  const counter    = document.getElementById("counter");
+  const actLabel   = document.getElementById("actLabel");
+  const themeBtn   = document.getElementById("themeBtn");
+  const fsBtn      = document.getElementById("fsBtn");
+  const notesBtn   = document.getElementById("notesBtn");
+  const jumpBtn    = document.getElementById("jumpBtn");
+  const helpOverlay= document.getElementById("helpOverlay");
+  const jumpOverlay= document.getElementById("jumpOverlay");
+  const jumpList   = document.getElementById("jumpList");
+  const notesPanel = document.getElementById("notesPanel");
+  const notesTitle = document.getElementById("notesTitle");
+  const notesSub   = document.getElementById("notesSub");
+  const notesBody  = document.getElementById("notesBody");
+
+  function actName(actId)  { return ACTS[actId]?.name || ""; }
+
+  function renderMeta(s) {
+    return `
+      <div class="slide__meta">
+        <span class="slide__num">Slide ${s.n}</span>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="slide__act">${actName(s.act)}</span>
+      </div>
+      <h2 class="slide__title">${s.title}</h2>
+    `;
+  }
+
+  function renderPlaceholder(s) {
+    return `
+      <div class="slide__placeholder">
+        <strong>Content lands in Phase 2.</strong>
+        Phase 1 verifies the deck shell, navigation, design system, and act/slide structure.
+        This slide will carry the detail described in <em>lesson_structure_brief.md §2 · Slide ${s.n}</em>.
+        <div><span class="placeholder-tag">PHASE 1 PLACEHOLDER</span></div>
+      </div>
+    `;
+  }
+
+  function renderSlide(s) {
+    const section = document.createElement("section");
+    section.className = "slide";
+    section.id = `slide-${s.n}`;
+    section.dataset.slideNumber = String(s.n);
+    section.dataset.act = String(s.act);
+    section.setAttribute("role", "group");
+    section.setAttribute("aria-roledescription", "slide");
+    section.setAttribute("aria-label", `Slide ${s.n} of ${TOTAL} — ${s.title}`);
+    section.setAttribute("aria-current", "false");
+
+    const layout = s.layout || "default";
+    if (layout === "hero") {
+      section.classList.add("slide--hero");
+      section.innerHTML = s.body;
+    } else if (s.body) {
+      section.innerHTML = `<div class="slide__inner">${renderMeta(s)}<div class="slide__body">${s.body}</div></div>`;
+    } else {
+      section.innerHTML = `<div class="slide__inner">${renderMeta(s)}${renderPlaceholder(s)}</div>`;
+    }
+
+    return section;
+  }
+
+  SLIDES.forEach(s => stage.appendChild(renderSlide(s)));
+
+  const slideEls = Array.from(document.querySelectorAll(".slide"));
+
+  /* ============================================================
+     Navigation
+     ============================================================ */
+  let currentIndex = 0;
+
+  function clamp(n) { return Math.max(0, Math.min(TOTAL - 1, n)); }
+
+  function updateChrome(i) {
+    const s = SLIDES[i];
+    counter.textContent = `${i + 1} / ${TOTAL}`;
+    actLabel.textContent = actName(s.act);
+    progressBar.style.width = `${((i + 1) / TOTAL) * 100}%`;
+  }
+
+  function goTo(i, { pushHash = true } = {}) {
+    const next = clamp(i);
+    slideEls.forEach((el, idx) => {
+      el.classList.remove("is-current", "is-prev");
+      el.setAttribute("aria-current", "false");
+      if (idx === next) {
+        el.classList.add("is-current");
+        el.setAttribute("aria-current", "true");
+      } else if (idx < next) {
+        el.classList.add("is-prev");
+      }
+    });
+    currentIndex = next;
+    updateChrome(next);
+    updateNotesBody(next);
+    updateJumpHighlight(next);
+
+    if (pushHash) {
+      const hash = `#slide-${next + 1}`;
+      if (location.hash !== hash) history.replaceState(null, "", hash);
+    }
+  }
+
+  function next() { goTo(currentIndex + 1); }
+  function prev() { goTo(currentIndex - 1); }
+  function first(){ goTo(0); }
+  function last() { goTo(TOTAL - 1); }
+
+  /* ============================================================
+     Theme toggle
+     ============================================================ */
+  const THEME_KEY = "agentic-engineering-theme";
+  function applyTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    try { localStorage.setItem(THEME_KEY, t); } catch (e) { /* ignore */ }
+  }
+  function toggleTheme() {
+    const cur = document.documentElement.getAttribute("data-theme") || "dark";
+    applyTheme(cur === "dark" ? "light" : "dark");
+  }
+  (function initTheme() {
+    let t = null;
+    try { t = localStorage.getItem(THEME_KEY); } catch (e) { /* ignore */ }
+    if (t === "dark" || t === "light") applyTheme(t);
+  })();
+
+  /* ============================================================
+     Fullscreen toggle
+     ============================================================ */
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    } else {
+      document.exitFullscreen?.().catch(() => {});
+    }
+  }
+
+  /* ============================================================
+     Help overlay
+     ============================================================ */
+  let helpPrevFocus = null;
+  function toggleHelp(force) {
+    const open = force !== undefined ? force : helpOverlay.getAttribute("aria-hidden") === "true";
+    helpOverlay.setAttribute("aria-hidden", open ? "false" : "true");
+    if (open) {
+      helpPrevFocus = document.activeElement;
+      helpOverlay.querySelector(".overlay__card")?.focus({ preventScroll: true });
+    } else if (helpPrevFocus?.focus) {
+      helpPrevFocus.focus({ preventScroll: true });
+      helpPrevFocus = null;
+    }
+  }
+
+  /* ============================================================
+     Jump-to-slide overlay
+     ============================================================ */
+  function buildJumpMenu() {
+    const frag = document.createDocumentFragment();
+    Object.entries(ACTS).forEach(([actId, act]) => {
+      const header = document.createElement("div");
+      header.className = "jump__act";
+      header.textContent = act.name;
+      frag.appendChild(header);
+
+      const list = document.createElement("div");
+      list.className = "jump__items";
+
+      SLIDES
+        .filter(s => String(s.act) === actId)
+        .forEach(s => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "jump__item";
+          btn.dataset.slide = String(s.n);
+          btn.innerHTML = `
+            <span class="jump__item-num">${String(s.n).padStart(2, "0")}</span>
+            <span class="jump__item-title">${s.title}</span>
+          `;
+          btn.addEventListener("click", () => {
+            goTo(s.n - 1);
+            toggleJump(false);
+          });
+          list.appendChild(btn);
+        });
+
+      frag.appendChild(list);
+    });
+    jumpList.innerHTML = "";
+    jumpList.appendChild(frag);
+  }
+  buildJumpMenu();
+
+  function updateJumpHighlight(i) {
+    jumpList.querySelectorAll(".jump__item").forEach(el => {
+      el.classList.toggle("is-current", Number(el.dataset.slide) === i + 1);
+    });
+  }
+
+  let jumpPrevFocus = null;
+  function toggleJump(force) {
+    const open = force !== undefined ? force : jumpOverlay.getAttribute("aria-hidden") === "true";
+    jumpOverlay.setAttribute("aria-hidden", open ? "false" : "true");
+    if (open) {
+      jumpPrevFocus = document.activeElement;
+      const currentBtn = jumpList.querySelector(".jump__item.is-current") || jumpList.querySelector(".jump__item");
+      currentBtn?.focus({ preventScroll: true });
+    } else if (jumpPrevFocus?.focus) {
+      jumpPrevFocus.focus({ preventScroll: true });
+      jumpPrevFocus = null;
+    }
+  }
+
+  /* ============================================================
+     Speaker notes panel
+     ============================================================ */
+  function escapeHTML(str) {
+    return String(str).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  }
+
+  function updateNotesBody(i) {
+    const s = SLIDES[i];
+    notesTitle.textContent = `Slide ${s.n} — ${s.title}`;
+    notesSub.textContent = `${actName(s.act)} · press N to close`;
+
+    const notes = s.notes || {};
+    const time  = notes.time   || "—";
+    const beat  = notes.beat   || PLACEHOLDER_NOTE;
+    const ask   = notes.ask    || "";
+    const bridge= notes.bridge || "";
+
+    const rows = [
+      `<div class="notes__row"><dt>Time budget</dt><dd>${escapeHTML(time)}</dd></div>`,
+      `<div class="notes__row"><dt>Key beat</dt><dd>${escapeHTML(beat)}</dd></div>`,
+    ];
+    if (ask)    rows.push(`<div class="notes__row"><dt>Ask the room</dt><dd>${escapeHTML(ask)}</dd></div>`);
+    if (bridge) rows.push(`<div class="notes__row"><dt>Transition</dt><dd>${escapeHTML(bridge)}</dd></div>`);
+
+    notesBody.innerHTML = rows.join("");
+  }
+
+  function toggleNotes(force) {
+    const open = force !== undefined ? force : notesPanel.getAttribute("aria-hidden") === "true";
+    notesPanel.setAttribute("aria-hidden", open ? "false" : "true");
+  }
+
+  /* ============================================================
+     Keyboard
+     ============================================================ */
+  function isTypingTarget(el) {
+    if (!el) return false;
+    const tag = el.tagName;
+    return tag === "INPUT" || tag === "TEXTAREA" || el.isContentEditable;
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (isTypingTarget(e.target)) return;
+
+    if (e.key === "Escape") {
+      if (helpOverlay.getAttribute("aria-hidden") === "false") { e.preventDefault(); toggleHelp(false); return; }
+      if (jumpOverlay.getAttribute("aria-hidden") === "false") { e.preventDefault(); toggleJump(false); return; }
+      if (notesPanel.getAttribute("aria-hidden") === "false")  { e.preventDefault(); toggleNotes(false); return; }
+    }
+
+    switch (e.key) {
+      case "ArrowRight":
+      case "PageDown":
+      case " ":
+        e.preventDefault(); next(); break;
+      case "ArrowLeft":
+      case "PageUp":
+        e.preventDefault(); prev(); break;
+      case "Home": e.preventDefault(); first(); break;
+      case "End":  e.preventDefault(); last();  break;
+      case "f": case "F": e.preventDefault(); toggleFullscreen(); break;
+      case "t": case "T": e.preventDefault(); toggleTheme();      break;
+      case "n": case "N": e.preventDefault(); toggleNotes();      break;
+      case "g": case "G": e.preventDefault(); toggleJump();       break;
+      case "?":
+      case "/":
+        if (e.key === "?" || (e.key === "/" && e.shiftKey)) {
+          e.preventDefault();
+          toggleHelp();
+        }
+        break;
+    }
+  });
+
+  /* ============================================================
+     Button wiring
+     ============================================================ */
+  themeBtn.addEventListener("click", toggleTheme);
+  fsBtn.addEventListener("click", toggleFullscreen);
+  notesBtn.addEventListener("click", () => toggleNotes());
+  jumpBtn.addEventListener("click", () => toggleJump());
+
+  helpOverlay.addEventListener("click", (e) => { if (e.target === helpOverlay) toggleHelp(false); });
+  jumpOverlay.addEventListener("click", (e) => { if (e.target === jumpOverlay) toggleJump(false); });
+
+  /* ============================================================
+     Hash-based deep linking
+     ============================================================ */
+  function indexFromHash() {
+    const m = /^#slide-(\d+)$/.exec(location.hash);
+    if (!m) return 0;
+    const n = parseInt(m[1], 10) - 1;
+    return Number.isFinite(n) ? clamp(n) : 0;
+  }
+  window.addEventListener("hashchange", () => goTo(indexFromHash(), { pushHash: false }));
+
+  /* ============================================================
+     Boot
+     ============================================================ */
+  goTo(indexFromHash(), { pushHash: true });
+})();
+</script>
+</body>
+</html>
