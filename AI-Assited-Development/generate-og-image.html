@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Generate OG image — Agentic Engineering</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #0a0a0b; }
+  body { width: 1200px; height: 630px; overflow: hidden; }
+  svg { display: block; width: 1200px; height: 630px; }
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <!-- Diagonal background gradient — darker at corners, slightly lighter through the centre -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#0a0a0b"/>
+      <stop offset="55%" stop-color="#161618"/>
+      <stop offset="100%" stop-color="#0a0a0b"/>
+    </linearGradient>
+    <!-- Coral glow top-right (where the spectrum lives) -->
+    <radialGradient id="glowCoral" cx="0.82" cy="0.30" r="0.55">
+      <stop offset="0%"   stop-color="#ff6b3d" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#ff6b3d" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Warm secondary glow bottom-left (under the title) -->
+    <radialGradient id="glowWarm" cx="0.16" cy="0.85" r="0.45">
+      <stop offset="0%"   stop-color="#ff8a63" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#ff8a63" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Subtle dot-grain texture for editorial feel -->
+    <pattern id="grain" x="0" y="0" width="36" height="36" patternUnits="userSpaceOnUse">
+      <circle cx="2"  cy="2"  r="0.9" fill="#f5f5f0" fill-opacity="0.025"/>
+      <circle cx="20" cy="14" r="0.6" fill="#f5f5f0" fill-opacity="0.018"/>
+    </pattern>
+    <!-- Coral-into-warmer-coral gradient for the italic title word -->
+    <linearGradient id="titleGrad" x1="0" y1="0" x2="1" y2="0.3">
+      <stop offset="0%"   stop-color="#ff8a63"/>
+      <stop offset="100%" stop-color="#ff6b3d"/>
+    </linearGradient>
+    <!-- Tier dot gradient — muted at tier 1, vivid at tier 7 -->
+    <linearGradient id="spectrumGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#3a3a40"/>
+      <stop offset="50%"  stop-color="#ff8a63"/>
+      <stop offset="100%" stop-color="#ff6b3d"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background layers -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grain)"/>
+  <rect width="1200" height="630" fill="url(#glowCoral)"/>
+  <rect width="1200" height="630" fill="url(#glowWarm)"/>
+
+  <!-- Left spine accent bar -->
+  <rect x="0" y="0" width="5" height="630" fill="#ff6b3d"/>
+
+  <!-- ===================== RIGHT SIDE: capability spectrum + multi-agent fanout ===================== -->
+  <g transform="translate(720,160)">
+    <!-- Section eyebrow above the visual -->
+    <text x="0" y="0" class="mono" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600" letter-spacing="2.4" fill="#6e6e68">THE SPECTRUM · 7 TIERS · ONE LESSON</text>
+
+    <!-- Horizontal spectrum line (gradient stroke) -->
+    <line x1="20" y1="170" x2="430" y2="170" stroke="url(#spectrumGrad)" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Seven tier dots, ascending in size, fixed at y=170 -->
+    <!-- Tier 1 -->
+    <circle cx="20"  cy="170" r="16" fill="#0a0a0b" stroke="#3a3a40" stroke-width="2.5"/>
+    <text x="20"  y="174" font-family="'Fraunces', serif" font-size="13" font-weight="500" text-anchor="middle" fill="#6e6e68">1</text>
+    <!-- Tier 2 -->
+    <circle cx="88"  cy="170" r="17" fill="#0a0a0b" stroke="#55525a" stroke-width="2.5"/>
+    <text x="88"  y="175" font-family="'Fraunces', serif" font-size="14" font-weight="500" text-anchor="middle" fill="#82828a">2</text>
+    <!-- Tier 3 -->
+    <circle cx="156" cy="170" r="18" fill="#0a0a0b" stroke="#7a6b65" stroke-width="2.5"/>
+    <text x="156" y="175" font-family="'Fraunces', serif" font-size="14" font-weight="500" text-anchor="middle" fill="#9a8a82">3</text>
+    <!-- Tier 4 — "you are here" indicator: dashed ring around tier 4-5 -->
+    <circle cx="224" cy="170" r="19" fill="#0a0a0b" stroke="#b67a52" stroke-width="2.5"/>
+    <text x="224" y="175" font-family="'Fraunces', serif" font-size="15" font-weight="500" text-anchor="middle" fill="#c89472">4</text>
+    <!-- Tier 5 -->
+    <circle cx="292" cy="170" r="21" fill="#0a0a0b" stroke="#ff8a63" stroke-width="2.5"/>
+    <text x="292" y="176" font-family="'Fraunces', serif" font-size="16" font-weight="500" text-anchor="middle" fill="#ff8a63">5</text>
+    <!-- Tier 6 -->
+    <circle cx="360" cy="170" r="23" fill="#0a0a0b" stroke="#ff6b3d" stroke-width="2.5"/>
+    <text x="360" y="176" font-family="'Fraunces', serif" font-size="17" font-weight="500" text-anchor="middle" fill="#ff6b3d">6</text>
+    <!-- Tier 7 — the orchestrator -->
+    <circle cx="430" cy="170" r="28" fill="#ff6b3d" stroke="#0a0a0b" stroke-width="3"/>
+    <text x="430" y="177" font-family="'Fraunces', serif" font-size="19" font-weight="600" text-anchor="middle" fill="#0a0a0b">7</text>
+
+    <!-- "you are here" indicator around T4-T5 (May 2026 modal developer) -->
+    <circle cx="258" cy="170" r="38" fill="none" stroke="#ff6b3d" stroke-opacity="0.35" stroke-width="1.5" stroke-dasharray="3,4"/>
+    <text x="258" y="234" class="mono" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="600" letter-spacing="1.4" text-anchor="middle" fill="#ff6b3d">YOU ARE HERE · MAY 2026</text>
+
+    <!-- Multi-agent fanout above tier 7 — three worker dots connected by dashed lines -->
+    <g stroke="#ff6b3d" stroke-opacity="0.55" stroke-width="1.4" stroke-dasharray="3,4" fill="none">
+      <line x1="430" y1="148" x2="395" y2="80"/>
+      <line x1="430" y1="148" x2="430" y2="60"/>
+      <line x1="430" y1="148" x2="465" y2="80"/>
+    </g>
+    <circle cx="395" cy="80" r="11" fill="#0a0a0b" stroke="#ff6b3d" stroke-width="2"/>
+    <circle cx="430" cy="60" r="11" fill="#0a0a0b" stroke="#ff6b3d" stroke-width="2"/>
+    <circle cx="465" cy="80" r="11" fill="#0a0a0b" stroke="#ff6b3d" stroke-width="2"/>
+
+    <!-- Spectrum endpoints labels (above and below) -->
+    <text x="20"  y="138" font-family="'Space Grotesk', sans-serif" font-size="13" font-weight="500" text-anchor="middle" fill="#82828a">Autocomplete</text>
+    <text x="20"  y="206" class="mono" font-family="'JetBrains Mono', monospace" font-size="10" letter-spacing="1.2" text-anchor="middle" fill="#6e6e68">tab · inline</text>
+
+    <text x="430" y="138" font-family="'Space Grotesk', sans-serif" font-size="13" font-weight="600" text-anchor="middle" fill="#ff6b3d">Orchestration</text>
+    <text x="430" y="206" class="mono" font-family="'JetBrains Mono', monospace" font-size="10" letter-spacing="1.2" text-anchor="middle" fill="#ff6b3d" font-style="italic">multi-agent</text>
+
+    <!-- Arrow under the spectrum — autonomy direction -->
+    <g transform="translate(0,275)">
+      <line x1="20" y1="0" x2="410" y2="0" stroke="#3a3a40" stroke-width="1.5"/>
+      <polygon points="410,-5 425,0 410,5" fill="#ff6b3d"/>
+      <text x="222" y="22" class="mono" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600" letter-spacing="2.2" text-anchor="middle" fill="#6e6e68">AUTONOMY  →</text>
+    </g>
+  </g>
+
+  <!-- ===================== LEFT SIDE: copy ===================== -->
+
+  <!-- Eyebrow -->
+  <text x="62" y="115" class="mono" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" letter-spacing="3" fill="#ff6b3d">CODEV LABS  ·  INTERACTIVE LECTURE  ·  MAY 2026</text>
+
+  <!-- Title — two-line, italic accent on second line matching Slide 1 -->
+  <text font-family="'Fraunces', serif" fill="#f5f5f0">
+    <tspan x="60" y="215" font-size="94" font-weight="400" letter-spacing="-2.5">Agentic</tspan>
+    <tspan x="60" y="310" font-size="94" font-weight="400" font-style="italic" letter-spacing="-2.5" fill="url(#titleGrad)">Engineering.</tspan>
+  </text>
+
+  <!-- Description -->
+  <text x="60" y="370" font-family="'Fraunces', serif" font-size="22" font-weight="400" fill="#b0b0a8">
+    <tspan x="60" dy="0">AI-assisted development in <tspan font-weight="600" fill="#f5f5f0">May 2026</tspan> —</tspan>
+    <tspan x="60" dy="32" font-style="italic">the tools, the conventions, the dangers, and the new craft.</tspan>
+  </text>
+
+  <!-- Pills — four key concepts the audience will see in the deck -->
+  <g font-family="'JetBrains Mono', monospace" font-size="13" font-weight="600">
+    <g transform="translate(60,460)">
+      <rect width="118" height="32" rx="16" fill="rgba(255,107,61,0.13)" stroke="#ff6b3d" stroke-opacity="0.55"/>
+      <text x="59" y="21" text-anchor="middle" fill="#ff6b3d">AGENTS.md</text>
+    </g>
+    <g transform="translate(186,460)">
+      <rect width="60" height="32" rx="16" fill="rgba(255,138,99,0.13)" stroke="#ff8a63" stroke-opacity="0.55"/>
+      <text x="30" y="21" text-anchor="middle" fill="#ff8a63">MCP</text>
+    </g>
+    <g transform="translate(254,460)">
+      <rect width="106" height="32" rx="16" fill="rgba(176,176,168,0.10)" stroke="#82828a" stroke-opacity="0.55"/>
+      <text x="53" y="21" text-anchor="middle" fill="#b0b0a8">Worktrees</text>
+    </g>
+    <g transform="translate(368,460)">
+      <rect width="138" height="32" rx="16" fill="rgba(255,107,61,0.13)" stroke="#ff6b3d" stroke-opacity="0.55"/>
+      <text x="69" y="21" text-anchor="middle" fill="#ff6b3d">Orchestration</text>
+    </g>
+  </g>
+
+  <!-- Divider line -->
+  <line x1="60" y1="540" x2="700" y2="540" stroke="#f5f5f0" stroke-opacity="0.08"/>
+
+  <!-- Presented by -->
+  <text x="60" y="572" class="mono" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" letter-spacing="3" fill="#ff6b3d">PRESENTED BY</text>
+  <text x="60" y="606" font-family="'Fraunces', serif" font-size="26" font-weight="600" fill="#f5f5f0">Ashan Priyadarshana<tspan font-family="'Space Grotesk', sans-serif" font-weight="400" font-size="18" fill="#b0b0a8">  ·  CoDev Labs  |  Cognition Partner</tspan></text>
+
+  <!-- Channel branding bottom-right -->
+  <text x="1140" y="606" class="mono" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="500" font-style="italic" text-anchor="end" fill="#b0b0a8">Ashan Priyadarshana Explains</text>
+</svg>
+</body>
+</html>
