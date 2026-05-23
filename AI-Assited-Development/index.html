@@ -4021,6 +4021,138 @@ html[data-theme="light"] .topology__svg .label-hub { fill: #ffffff; }
 }
 
 /* ============================================================
+   Act 11 components — jobs reframe (roles strip), closing CTA,
+   quiet-layout punchline emphasis for the bookend slide
+   ============================================================ */
+
+/* Jobs reframe + emerging roles (Slide 55) */
+.reframe-line {
+  margin-top: 24px;
+  padding: 18px 24px;
+  background: var(--bg-elevated);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+.reframe-line strong {
+  font-weight: 600;
+  color: var(--accent);
+  font-style: italic;
+}
+.reframe-line .strike {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+.roles-strip {
+  margin-top: 20px;
+  padding: 22px 26px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.roles-strip__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.roles-strip__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.role {
+  padding: 12px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-left: 2px solid var(--accent);
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+.role strong {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+/* Quiet punchline + closing CTA (Slide 57) */
+.quiet__punchline {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-primary);
+  letter-spacing: -0.012em;
+  margin: 8px 0 28px;
+  padding-left: 18px;
+  border-left: 3px solid var(--accent);
+}
+.quiet__punchline em {
+  color: var(--accent);
+  font-style: italic;
+  font-weight: 500;
+}
+.closing-cta {
+  margin-top: 36px;
+  padding: 26px 30px 28px;
+  background: linear-gradient(135deg, var(--accent-soft) 0%, transparent 75%), var(--bg-card);
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.closing-cta__body {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.45;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.005em;
+  max-width: 720px;
+}
+.closing-cta__body strong {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--accent);
+}
+.closing-cta__questions {
+  display: inline-block;
+  padding: 9px 22px;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: -0.005em;
+}
+html[data-theme="light"] .closing-cta__questions { color: #ffffff; }
+.closing-cta__footer {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+/* ============================================================
    Overlays (help, jump, notes)
    ============================================================ */
 .overlay {
@@ -4325,6 +4457,11 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   .cd-half { padding: 22px 20px; }
   .cd-half--craft { border-right: none; border-bottom: 1px solid var(--border-soft); }
   .honest-quote__body { font-size: 20px; }
+  .reframe-line { font-size: 17px; padding: 14px 18px; }
+  .roles-strip__grid { grid-template-columns: 1fr 1fr; }
+  .quiet__punchline { font-size: 22px; padding-left: 14px; }
+  .closing-cta__body { font-size: 17px; }
+  .closing-cta { padding: 22px 20px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -7700,9 +7837,131 @@ gh pr create --title "Add login form"</code></pre>
     },
 
     /* ---------- Act 11 — Future of SWE & Wrap-up ---------- */
-    { n: 55, act: 11, title: "The jobs picture, honestly",                          notes: { beat: "Entry-level postings down 28%. AI skills in 42% of postings. 2.3× faster hiring with AI fluency." } },
-    { n: 56, act: 11, title: "Career advice — what to actually do",                 notes: { beat: "Five concrete recommendations. End: 'compete on what AI can't do.'" } },
-    { n: 57, act: 11, title: "The Karpathy frame — closing the loop",               notes: { beat: "Bookend with the opening quote. Network graph fully resolved. Now go build." } },
+    {
+      n: 55, act: 11,
+      title: "The jobs picture, honestly",
+      body: `
+        <p class="section-lead">Three numbers that say everything about the labour market in May 2026.</p>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-card__num">−28<span class="stat-card__unit">%</span></div>
+            <div class="stat-card__label">entry-level software-engineering job postings vs the 2022 peak. Have not recovered.</div>
+            <div class="stat-card__delta">Junior pipeline at risk · cross-platform 2026 hiring data</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__num">42<span class="stat-card__unit">%</span></div>
+            <div class="stat-card__label">of software job descriptions now mention AI tool proficiency · up from 8% in 2022.</div>
+            <div class="stat-card__delta">5.25× growth in four years</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__num">2.3<span class="stat-card__unit">×</span></div>
+            <div class="stat-card__label">faster time-to-offer for candidates with documented agent / AGENTS.md / MCP fluency.</div>
+            <div class="stat-card__delta">Vs candidates with same years-of-experience but no AI fluency</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__num">+0<span class="stat-card__unit">% sr</span></div>
+            <div class="stat-card__label">senior engineering postings are <em>up</em>, not down. Cleaning up AI slop and directing agents is now the asset.</div>
+            <div class="stat-card__delta">Inverse of the entry-level squeeze</div>
+          </div>
+        </div>
+        <p class="reframe-line">It isn't <span class="strike">replacement</span> — it's a <strong>role shift</strong>. The work didn't disappear; it climbed up the seniority stack.</p>
+        <div class="roles-strip">
+          <div class="roles-strip__label">New roles emerging in 2026 job descriptions</div>
+          <div class="roles-strip__grid">
+            <div class="role"><strong>Context engineer</strong>Curates AGENTS.md / skills / specs so agents land in a known state.</div>
+            <div class="role"><strong>Agent orchestrator</strong>Runs the kanban — assigns tasks, watches for drift, merges PRs.</div>
+            <div class="role"><strong>AI quality reviewer</strong>Reads diffs faster than the agent writes them. Owns the merge gate.</div>
+            <div class="role"><strong>Prompt / spec author</strong>Translates business intent into spec markdown the agent can execute.</div>
+          </div>
+        </div>
+      `,
+      notes: {
+        time: "~5 min",
+        beat: "Read the three numbers calmly. The −28% is the hard truth; the 42% and 2.3× are the upside for the room. End on the reframe line — 'role shift, not replacement' — and walk through the four emerging roles slowly.",
+        ask: "Which of those four emerging roles best describes what your job is becoming — whether it's in your job title or not?",
+        bridge: "Three numbers and four roles. One concrete take-home — what to actually do, in order.",
+      },
+    },
+
+    {
+      n: 56, act: 11,
+      title: "Career advice — what to actually do",
+      body: `
+        <p class="section-lead">Five concrete recommendations. <em>In order.</em> Don't try to do them all this month — do them in sequence.</p>
+        <div class="must-do" role="list">
+          <div class="must-do-row" role="listitem">
+            <div class="must-do-row__num">1</div>
+            <div class="must-do-row__text">
+              <div class="must-do-row__head">Learn to read diffs fast.</div>
+              <div class="must-do-row__why">This is your new core skill. The agent writes faster than you'll ever type; the bottleneck moved to <em>review</em>. Practise on real PRs — yours, your colleagues', open source. Aim for 200 lines per minute with intent caught.</div>
+            </div>
+          </div>
+          <div class="must-do-row" role="listitem">
+            <div class="must-do-row__num">2</div>
+            <div class="must-do-row__text">
+              <div class="must-do-row__head">Lean into architecture.</div>
+              <div class="must-do-row__why">Type-fast is commoditised; <em>design isn't</em>. Spend your reading time on system-design writing — the engineers shipping interesting work in 2026 are the ones who can draw the right boxes before any agent gets involved.</div>
+            </div>
+          </div>
+          <div class="must-do-row" role="listitem">
+            <div class="must-do-row__num">3</div>
+            <div class="must-do-row__text">
+              <div class="must-do-row__head">Build agent fluency.</div>
+              <div class="must-do-row__why">AGENTS.md, MCP, skills, orchestration tools — the conventions from Act 5 and the surfaces from Act 7. <em>Pick one tool, ship something real with it within 30 days</em> per the Codegen rule from Slide 4.</div>
+            </div>
+          </div>
+          <div class="must-do-row" role="listitem">
+            <div class="must-do-row__num">4</div>
+            <div class="must-do-row__text">
+              <div class="must-do-row__head">Stay close to verifiable outputs.</div>
+              <div class="must-do-row__why">Code and math are where AI accelerates fastest <em>because the answers are checkable</em>. Be the human in that loop. Anything where the truth is squishy is where the agent is least reliable — and where your judgment is worth the most.</div>
+            </div>
+          </div>
+          <div class="must-do-row" role="listitem">
+            <div class="must-do-row__num">5</div>
+            <div class="must-do-row__text">
+              <div class="must-do-row__head">Pick a hard domain.</div>
+              <div class="must-do-row__why">Taste and judgment win in markets where the answer isn't obvious. Pick a problem space — robotics, biology, infrastructure, regulated industries — where domain expertise + agent fluency compounds. Generalists with strong domain stakes are the rarest profile in 2026.</div>
+            </div>
+          </div>
+        </div>
+        <blockquote class="pull-quote">
+          Don't try to compete with AI on speed of typing. <em>Compete on what it can't do</em> — taste, judgment, system design, knowing what's worth building.
+          <span class="pull-quote__source">— The take-home for the rest of 2026</span>
+        </blockquote>
+      `,
+      notes: {
+        time: "~4 min",
+        beat: "Five practices, in order. Read each headline, then the body in your own words — the why matters more than the what. The pull-quote at the bottom is the seven-word version everyone should walk out with.",
+        ask: "Which one do you have least of today? Which one will you start on next week?",
+        bridge: "And finally — back to where we started. Sequoia, April 29, 2026. The same person who coined vibe coding gave us the closing line.",
+      },
+    },
+
+    {
+      n: 57, act: 11,
+      title: "Understanding is still the bottleneck",
+      layout: "quiet",
+      body: `
+        <div class="quiet">
+          <div class="quiet__kicker">Closing · Sequoia AI Ascent · April 29, 2026</div>
+          <p class="quiet__quote">You can outsource your thinking but you can't outsource your understanding. The agents do the work — they write the code, they draft the spec, they build the knowledge base. But something still has to direct all of that. Something has to know what's worth building, why it matters, and whether the agent's output actually makes sense.</p>
+          <p class="quiet__punchline">Understanding is still the <em>bottleneck</em>.</p>
+          <div class="quiet__source">— Andrej Karpathy · the same line we opened on, four hours ago</div>
+        </div>
+        <div class="closing-cta">
+          <p class="closing-cta__body">Now go build something. <strong>Slowly</strong>, with specs, in worktrees, with AGENTS.md, and review every diff.</p>
+          <div class="closing-cta__questions">Questions?</div>
+          <div class="closing-cta__footer">Agentic Engineering · K.A. Ashan Priyadarshana · CoDev Labs · May 2026</div>
+        </div>
+      `,
+      notes: {
+        time: "~3 min · then Q&A",
+        beat: "Close calmly. Read the quote in full — don't summarise. Pause after 'Understanding is still the bottleneck.' Let it land. Then the CTA — the call to action is real, not a slogan. Hand to the room for questions.",
+        ask: "Pick one thing you're going to do differently on Monday — not three, not five — one. Share it with the person next to you, then we'll open the floor.",
+        bridge: "Thank the audience. Hand contact details (or QR code in Phase 3). End.",
+      },
+    },
   ];
 
   const TOTAL = SLIDES.length;
