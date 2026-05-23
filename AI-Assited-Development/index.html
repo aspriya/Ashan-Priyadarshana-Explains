@@ -1442,6 +1442,577 @@ html[data-theme="light"] .spectrum__bar { color: var(--bg-elevated); }
 }
 
 /* ============================================================
+   Act 4 components — category grid, IDE mockups, terminals,
+   cloud sequence flow, mini kanban, decision flowchart, stack
+   pillars
+   ============================================================ */
+
+/* Category grid (Slide 16) */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 4px;
+}
+.category-card {
+  padding: 22px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  position: relative;
+}
+.category-card__icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 600;
+}
+.category-card__body { flex: 1; }
+.category-card__name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+.category-card__def {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  margin: 0 0 8px;
+}
+.category-card__samples {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--text-tertiary);
+}
+.category-aside {
+  margin-top: 14px;
+  padding: 14px 18px;
+  background: var(--bg-elevated);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: baseline;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+.category-aside__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-right: 6px;
+}
+.category-aside__item strong {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-family: var(--font-display);
+}
+
+/* IDE mockups (Slide 17) */
+.ide-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 4px;
+}
+.ide-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ide-mockup {
+  height: 180px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-card);
+}
+.ide-mockup__bar {
+  height: 22px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.ide-mockup__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+}
+.ide-mockup__bar-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-tertiary);
+  margin-left: 10px;
+}
+.ide-mockup__body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 60px 1fr 110px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1.45;
+  color: var(--text-tertiary);
+}
+.ide-mockup__pane {
+  padding: 8px 8px;
+  overflow: hidden;
+}
+.ide-mockup__pane--tree {
+  background: var(--bg-card);
+  border-right: 1px solid var(--border-soft);
+}
+.ide-mockup__pane--editor {
+  background: var(--bg-elevated);
+}
+.ide-mockup__pane--agent {
+  background: var(--bg-card);
+  border-left: 1px solid var(--border-soft);
+}
+.ide-mockup__pane--agent .agent-line {
+  display: block;
+  padding: 4px 6px;
+  margin-bottom: 4px;
+  background: var(--bg-elevated);
+  border-left: 2px solid var(--accent);
+  border-radius: 3px;
+  color: var(--text-secondary);
+  font-size: 9px;
+}
+.ide-mockup__line { display: block; white-space: nowrap; overflow: hidden; }
+.ide-mockup__line--accent { color: var(--accent); }
+.ide-mockup__line--green  { color: var(--success); }
+.ide-mockup__line--folder { color: var(--text-secondary); }
+
+.ide-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.ide-card__name {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+.ide-card__vendor {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.ide-card__sig {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.ide-card__sig strong { color: var(--text-primary); font-weight: 600; }
+.ide-card__footer {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-soft);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+/* Terminal mockups (Slide 18) */
+.terminals-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-top: 4px;
+}
+.terminal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.terminal {
+  background: #0d0d10;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-card);
+}
+html[data-theme="light"] .terminal { background: #1a1a1e; }
+.terminal__bar {
+  height: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.terminal__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+}
+.terminal__bar-title {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: rgba(245, 245, 240, 0.42);
+  margin-left: 6px;
+}
+.terminal__body {
+  padding: 10px 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.55;
+  color: rgba(245, 245, 240, 0.72);
+  flex: 1;
+  overflow: hidden;
+}
+.terminal__line { display: block; white-space: nowrap; overflow: hidden; }
+.terminal__prompt { color: #ff8a63; }
+.terminal__cmd    { color: rgba(245, 245, 240, 0.95); }
+.terminal__out    { color: rgba(245, 245, 240, 0.62); }
+.terminal__ok     { color: #6bd968; }
+.terminal__dim    { color: rgba(245, 245, 240, 0.35); }
+.terminal__cursor {
+  display: inline-block;
+  background: rgba(255, 138, 99, 0.85);
+  color: rgba(255, 138, 99, 0.85);
+  margin-left: 1px;
+}
+.terminal-card__name {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+.terminal-card__meta {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-tertiary);
+  line-height: 1.45;
+}
+.callout {
+  margin-top: 18px;
+  padding: 14px 18px;
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+.callout strong { color: var(--accent); font-weight: 600; }
+
+/* Cloud sequence flow (Slide 19) */
+.cloud-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 4px;
+}
+.flow-diagram {
+  display: grid;
+  grid-template-columns: 1fr 24px 1fr 24px 1fr 24px 1fr;
+  gap: 8px;
+  padding: 22px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  align-items: center;
+}
+.flow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+.flow-step__icon {
+  width: 56px;
+  height: 56px;
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
+}
+.flow-step__label {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.flow-step__detail {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-tertiary);
+  line-height: 1.4;
+  max-width: 180px;
+}
+.flow-arrow {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  color: var(--accent);
+  text-align: center;
+}
+.cloud-tools {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.cloud-tool {
+  padding: 12px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+}
+.cloud-tool__name {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 2px;
+}
+.cloud-tool__detail {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-tertiary);
+  line-height: 1.4;
+}
+
+/* Mini kanban (Slide 20) */
+.kanban-mini {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-top: 4px;
+}
+.kanban-mini__col {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 10px 10px 4px;
+  min-height: 200px;
+}
+.kanban-mini__col-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border);
+  display: flex;
+  justify-content: space-between;
+}
+.kanban-mini__col-count {
+  color: var(--accent);
+  font-weight: 600;
+}
+.kanban-mini__card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text-primary);
+}
+.kanban-mini__card-meta {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-tertiary);
+  margin-top: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+.kanban-mini__card--running {
+  border-left-color: var(--accent-strong);
+  background: linear-gradient(90deg, var(--accent-soft), transparent 70%), var(--bg-card);
+}
+.kanban-mini__card--running .kanban-mini__card-meta { color: var(--accent); }
+.kanban-mini__card--done {
+  opacity: 0.55;
+  border-left-color: var(--success);
+}
+.kanban-mini__card--done .kanban-mini__card-title { text-decoration: line-through; }
+.orchestration-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 18px;
+}
+.orchestration-tool {
+  padding: 10px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.orchestration-tool strong {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-right: 6px;
+}
+
+/* Decision flowchart (Slide 22) */
+.flowchart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+.flow-row {
+  display: grid;
+  grid-template-columns: 1.1fr 28px 1.6fr;
+  gap: 12px;
+  align-items: stretch;
+}
+.flow-row__q {
+  padding: 14px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+}
+.flow-row__arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 18px;
+}
+.flow-row__a {
+  padding: 14px 18px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.flow-row__a strong {
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+/* Stack pillars (Slide 23) */
+.stack {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 4px;
+}
+.stack-pillar {
+  padding: 22px 22px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 220px;
+}
+.stack-pillar__tier {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.stack-pillar__name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+.stack-pillar__role {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+.stack-pillar__why {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: auto 0 0;
+}
+.stack-pillar__why strong {
+  font-style: normal;
+  color: var(--text-primary);
+}
+
+/* ============================================================
    Overlays (help, jump, notes)
    ============================================================ */
 .overlay {
@@ -1686,6 +2257,23 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   .tier-row { grid-template-columns: 48px 1.1fr 1.3fr 1fr; gap: 14px; }
   .spectrum__row { grid-template-columns: 130px repeat(7, 1fr); }
   .spectrum__tool { font-size: 15px; }
+  .terminals-grid { grid-template-columns: repeat(3, 1fr); }
+  .ide-mockup__body { grid-template-columns: 50px 1fr 90px; }
+  .stack { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 880px) {
+  .category-grid { grid-template-columns: 1fr; }
+  .ide-grid { grid-template-columns: 1fr; }
+  .terminals-grid { grid-template-columns: repeat(2, 1fr); }
+  .flow-diagram { grid-template-columns: 1fr; }
+  .flow-arrow { transform: rotate(90deg); padding: 4px 0; }
+  .cloud-tools { grid-template-columns: 1fr; }
+  .kanban-mini { grid-template-columns: repeat(2, 1fr); }
+  .orchestration-list { grid-template-columns: 1fr; }
+  .flow-row { grid-template-columns: 1fr; }
+  .flow-row__arrow { transform: rotate(90deg); padding: 4px 0; }
+  .stack { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2622,14 +3210,592 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
     },
 
     /* ---------- Act 4 — The Tool Stack ---------- */
-    { n: 16, act: 4, title: "The four tool categories",                             notes: { beat: "IDEs / CLIs / Cloud SWEs / Orchestration. Plus mention IDE extensions and prompt-to-app." } },
-    { n: 17, act: 4, title: "Agentic IDEs — Cursor, Windsurf, Antigravity",         notes: { beat: "Head-to-head, three columns. No marketing." } },
-    { n: 18, act: 4, title: "Agentic CLIs — terminal is back",                      notes: { beat: "Five terminal mockups. Note Gemini CLI shutdown June 18, 2026." } },
-    { n: 19, act: 4, title: "Cloud autonomous engineers",                           notes: { beat: "Devin 2.2, Claude Code Web, Copilot Coding Agent, Jules, Codex Web, Genie." } },
-    { n: 20, act: 4, title: "Orchestration / Command Center tools",                 notes: { beat: "Vibe Kanban, Cline Kanban, Conductor family, Agent Teams. Sets up Act 7." } },
-    { n: 21, act: 4, title: "IDE extensions and prompt-to-app builders",            notes: { beat: "Two compact columns. Brief, don't deep-dive." } },
-    { n: 22, act: 4, title: "How to pick a stack — decision tree",                  notes: { beat: "Interactive flowchart. Must-build widget #5." } },
-    { n: 23, act: 4, title: "The minimum daily-driver stack (Ashan's recommendation)", notes: { beat: "Four pillars: Claude Code, Cursor/Windsurf, Vibe Kanban, Copilot Coding Agent." } },
+    {
+      n: 16, act: 4,
+      title: "Four categories, plus two you'll meet in passing",
+      body: `
+        <p class="section-lead">Every agentic tool fits into one of four buckets — by <em>where the agent lives</em>.</p>
+        <div class="category-grid">
+
+          <div class="category-card">
+            <div class="category-card__icon">&lt;/&gt;</div>
+            <div class="category-card__body">
+              <h3 class="category-card__name">Agentic IDEs</h3>
+              <p class="category-card__def">A full editor with the agent built in. Editor on the left, agent in a panel on the right, both share the file tree.</p>
+              <div class="category-card__samples">Cursor 3 · Windsurf · Antigravity 2.0 · Zed · Kiro</div>
+            </div>
+          </div>
+
+          <div class="category-card">
+            <div class="category-card__icon">&gt;_</div>
+            <div class="category-card__body">
+              <h3 class="category-card__name">Agentic CLIs</h3>
+              <p class="category-card__def">Terminal-first. Scriptable. Composes with everything else you already run. The "headless agent" tier.</p>
+              <div class="category-card__samples">Claude Code · OpenAI Codex · OpenCode · Aider · Antigravity CLI</div>
+            </div>
+          </div>
+
+          <div class="category-card">
+            <div class="category-card__icon">☁</div>
+            <div class="category-card__body">
+              <h3 class="category-card__name">Cloud autonomous engineers</h3>
+              <p class="category-card__def">Assign a ticket and close your laptop. Plans, codes, opens a PR — runs entirely on someone else's machine.</p>
+              <div class="category-card__samples">Devin 2.2 · Claude Code Web · Copilot Coding Agent · Jules · Codex Web</div>
+            </div>
+          </div>
+
+          <div class="category-card">
+            <div class="category-card__icon">▦</div>
+            <div class="category-card__body">
+              <h3 class="category-card__name">Orchestration / Command Centre</h3>
+              <p class="category-card__def">A kanban board for fleets of agents. Each card spawns its own worktree. Treat AI like async workers, not chatbots.</p>
+              <div class="category-card__samples">Vibe Kanban · Cline Kanban · Conductor · Claude Squad · Agent Teams</div>
+            </div>
+          </div>
+
+        </div>
+        <div class="category-aside">
+          <span class="category-aside__label">Also</span>
+          <span class="category-aside__item"><strong>IDE extensions</strong> — agent bolt-ons inside an existing editor (Copilot, Cline, Continue, Amazon Q).</span>
+          <span class="category-aside__item"><strong>Prompt-to-app builders</strong> — lowest barrier (Bolt, Lovable, v0, Replit Agent, AI Studio).</span>
+        </div>
+        <p class="slide__source">We'll deep-dive the four primary categories. The two "also" categories appear briefly on Slide 21 — they're real but not where most engineering happens.</p>
+      `,
+      notes: {
+        time: "~3 min",
+        beat: "Don't sell the categories — locate them. Point to the icon, name it, give the one-liner. The 'also' row is intentional: it acknowledges Copilot-as-extension and prompt-to-app without making them headline categories.",
+        ask: "Which of the four buckets are you most invested in already? Which of the four have you never touched?",
+        bridge: "Three IDEs dominate the first bucket. Let's see them side by side.",
+      },
+    },
+
+    {
+      n: 17, act: 4,
+      title: "Agentic IDEs — three takes on the same idea",
+      body: `
+        <p class="section-lead">Editor with an agent panel built in. Same architecture, very different bets.</p>
+        <div class="ide-grid">
+
+          <div class="ide-card">
+            <div class="ide-mockup" aria-hidden="true">
+              <div class="ide-mockup__bar">
+                <span class="ide-mockup__dot"></span><span class="ide-mockup__dot"></span><span class="ide-mockup__dot"></span>
+                <span class="ide-mockup__bar-title">cursor — auth.ts</span>
+              </div>
+              <div class="ide-mockup__body">
+                <div class="ide-mockup__pane ide-mockup__pane--tree">
+                  <span class="ide-mockup__line ide-mockup__line--folder">▾ src</span>
+                  <span class="ide-mockup__line">  auth.ts</span>
+                  <span class="ide-mockup__line">  api.ts</span>
+                  <span class="ide-mockup__line ide-mockup__line--folder">▸ ui</span>
+                  <span class="ide-mockup__line ide-mockup__line--folder">▸ tests</span>
+                </div>
+                <div class="ide-mockup__pane ide-mockup__pane--editor">
+                  <span class="ide-mockup__line">1  <span class="ide-mockup__line--accent">import</span> { z }</span>
+                  <span class="ide-mockup__line">2  <span class="ide-mockup__line--accent">from</span> "zod"</span>
+                  <span class="ide-mockup__line">3</span>
+                  <span class="ide-mockup__line">4  <span class="ide-mockup__line--accent">export const</span></span>
+                  <span class="ide-mockup__line">5    session = ...</span>
+                  <span class="ide-mockup__line ide-mockup__line--green">6  ✓ + 14 lines</span>
+                </div>
+                <div class="ide-mockup__pane ide-mockup__pane--agent">
+                  <span class="agent-line">Composer 2: planning</span>
+                  <span class="agent-line">Read 8 files</span>
+                  <span class="agent-line">Apply diff?</span>
+                </div>
+              </div>
+            </div>
+            <div class="ide-card__head">
+              <h3 class="ide-card__name">Cursor 3</h3>
+              <span class="ide-card__vendor">Anysphere · Apr 2026</span>
+            </div>
+            <p class="ide-card__sig"><strong>Composer 2 in-house model</strong> (200+ tok/s, 86% cheaper than 1.5). Dedicated Agents Window, cloud-to-local handoff, Design Mode for UI iteration.</p>
+            <div class="ide-card__footer">$20 – $200 / mo · $60B valuation, $2B ARR</div>
+          </div>
+
+          <div class="ide-card">
+            <div class="ide-mockup" aria-hidden="true">
+              <div class="ide-mockup__bar">
+                <span class="ide-mockup__dot"></span><span class="ide-mockup__dot"></span><span class="ide-mockup__dot"></span>
+                <span class="ide-mockup__bar-title">windsurf — billing.py</span>
+              </div>
+              <div class="ide-mockup__body">
+                <div class="ide-mockup__pane ide-mockup__pane--tree">
+                  <span class="ide-mockup__line ide-mockup__line--folder">▾ billing</span>
+                  <span class="ide-mockup__line">  invoice.py</span>
+                  <span class="ide-mockup__line">  stripe.py</span>
+                  <span class="ide-mockup__line">  webhook.py</span>
+                  <span class="ide-mockup__line ide-mockup__line--folder">▸ tests</span>
+                </div>
+                <div class="ide-mockup__pane ide-mockup__pane--editor">
+                  <span class="ide-mockup__line">12 <span class="ide-mockup__line--accent">def</span> charge(</span>
+                  <span class="ide-mockup__line">13   user_id: int,</span>
+                  <span class="ide-mockup__line">14   amount: Decimal,</span>
+                  <span class="ide-mockup__line">15 ) -&gt; Receipt:</span>
+                  <span class="ide-mockup__line ide-mockup__line--green">16   ✓ Cascade pass</span>
+                </div>
+                <div class="ide-mockup__pane ide-mockup__pane--agent">
+                  <span class="agent-line">Cascade · SWE-1.5</span>
+                  <span class="agent-line">3 files staged</span>
+                  <span class="agent-line">Codemap ready</span>
+                </div>
+              </div>
+            </div>
+            <div class="ide-card__head">
+              <h3 class="ide-card__name">Windsurf</h3>
+              <span class="ide-card__vendor">Cognition · Apr 2026</span>
+            </div>
+            <p class="ide-card__sig"><strong>SWE-1.5 in-house model</strong> — Cognition reports ~13× faster than Sonnet 4.5 on agentic edits. Cascade agent + Codemaps visual navigation.</p>
+            <div class="ide-card__footer">$15 / mo Pro · Devin integration shipping</div>
+          </div>
+
+          <div class="ide-card">
+            <div class="ide-mockup" aria-hidden="true">
+              <div class="ide-mockup__bar">
+                <span class="ide-mockup__dot"></span><span class="ide-mockup__dot"></span><span class="ide-mockup__dot"></span>
+                <span class="ide-mockup__bar-title">antigravity — manager</span>
+              </div>
+              <div class="ide-mockup__body">
+                <div class="ide-mockup__pane ide-mockup__pane--tree">
+                  <span class="ide-mockup__line ide-mockup__line--folder">Agents</span>
+                  <span class="ide-mockup__line">  ◍ auth-rewrite</span>
+                  <span class="ide-mockup__line">  ◍ docs-pass</span>
+                  <span class="ide-mockup__line ide-mockup__line--green">  ✓ migrations</span>
+                  <span class="ide-mockup__line">  ◍ payments</span>
+                </div>
+                <div class="ide-mockup__pane ide-mockup__pane--editor">
+                  <span class="ide-mockup__line ide-mockup__line--accent">manager surface</span>
+                  <span class="ide-mockup__line">┌───────────────┐</span>
+                  <span class="ide-mockup__line">│ 4 agents      │</span>
+                  <span class="ide-mockup__line">│ 1 needs review│</span>
+                  <span class="ide-mockup__line">└───────────────┘</span>
+                </div>
+                <div class="ide-mockup__pane ide-mockup__pane--agent">
+                  <span class="agent-line">Gemini 3.5 Flash</span>
+                  <span class="agent-line">Managed Agents API</span>
+                  <span class="agent-line">Editor / Manager</span>
+                </div>
+              </div>
+            </div>
+            <div class="ide-card__head">
+              <h3 class="ide-card__name">Antigravity 2.0</h3>
+              <span class="ide-card__vendor">Google · May 19, 2026</span>
+            </div>
+            <p class="ide-card__sig"><strong>Manager surface ↔ Editor view</strong>. Standalone desktop + CLI + SDK + Managed Agents API. <em>Kills Gemini CLI on June 18.</em></p>
+            <div class="ide-card__footer">Free preview at I/O 2026 · enterprise pricing TBD</div>
+          </div>
+
+        </div>
+        <p class="slide__source">Three different bets: Cursor on raw speed, Windsurf on a coding-specific model, Antigravity on multi-agent orchestration as a first-class surface. Pick one — don't pick all three.</p>
+      `,
+      notes: {
+        time: "~5 min",
+        beat: "Walk left-to-right. The three sets of stats matter less than the three bets — say each company's thesis out loud. Antigravity is the surprise card: a desktop app launched four days ago that kills Gemini CLI in three weeks.",
+        ask: "If you had to commit to one of these for the next six months, which one — and what would you give up?",
+        bridge: "IDEs are the surface most engineers see. The terminal is where the action moved.",
+      },
+    },
+
+    {
+      n: 18, act: 4,
+      title: "Agentic CLIs — the terminal is back",
+      body: `
+        <p class="section-lead">Five terminals, five philosophies. Same job: keep your hands on the keyboard.</p>
+        <div class="terminals-grid">
+
+          <div class="terminal-card">
+            <div class="terminal" aria-hidden="true">
+              <div class="terminal__bar">
+                <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
+                <span class="terminal__bar-title">~/project</span>
+              </div>
+              <div class="terminal__body">
+                <span class="terminal__line"><span class="terminal__prompt">$</span> <span class="terminal__cmd">claude</span></span>
+                <span class="terminal__line"><span class="terminal__dim">plan mode on · /effort high</span></span>
+                <span class="terminal__line"><span class="terminal__out">Read CLAUDE.md</span></span>
+                <span class="terminal__line"><span class="terminal__out">Sub-agents: 3 idle</span></span>
+                <span class="terminal__line"><span class="terminal__ok">✓ Plan draft ready</span><span class="terminal__cursor">▌</span></span>
+              </div>
+            </div>
+            <h3 class="terminal-card__name">Claude Code</h3>
+            <p class="terminal-card__meta">Anthropic. The consensus default. CLAUDE.md, sub-agents, Agent Teams, plan mode, plugins, Ultraplan.</p>
+          </div>
+
+          <div class="terminal-card">
+            <div class="terminal" aria-hidden="true">
+              <div class="terminal__bar">
+                <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
+                <span class="terminal__bar-title">codex</span>
+              </div>
+              <div class="terminal__body">
+                <span class="terminal__line"><span class="terminal__prompt">$</span> <span class="terminal__cmd">codex run "add OAuth"</span></span>
+                <span class="terminal__line"><span class="terminal__dim">model: gpt-5.5</span></span>
+                <span class="terminal__line"><span class="terminal__out">Cloud session opened</span></span>
+                <span class="terminal__line"><span class="terminal__out">Local sandbox attached</span></span>
+                <span class="terminal__line"><span class="terminal__ok">→ ChatGPT handoff</span><span class="terminal__cursor">▌</span></span>
+              </div>
+            </div>
+            <h3 class="terminal-card__name">OpenAI Codex</h3>
+            <p class="terminal-card__meta">GPT-5.5-backed. Multi-surface: app + cloud + open-source CLI + IDE ext + ChatGPT. 4M+ active users.</p>
+          </div>
+
+          <div class="terminal-card">
+            <div class="terminal" aria-hidden="true">
+              <div class="terminal__bar">
+                <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
+                <span class="terminal__bar-title">opencode</span>
+              </div>
+              <div class="terminal__body">
+                <span class="terminal__line"><span class="terminal__prompt">$</span> <span class="terminal__cmd">oc --model opus-4.7</span></span>
+                <span class="terminal__line"><span class="terminal__dim">--swap gpt-5.5 (A/B)</span></span>
+                <span class="terminal__line"><span class="terminal__out">BYO key · provider agnostic</span></span>
+                <span class="terminal__line"><span class="terminal__out">147k stars</span></span>
+                <span class="terminal__line"><span class="terminal__ok">A/B routing on</span><span class="terminal__cursor">▌</span></span>
+              </div>
+            </div>
+            <h3 class="terminal-card__name">OpenCode</h3>
+            <p class="terminal-card__meta">Open-source. 6.5M monthly devs, growing 4.5× faster than Claude Code in star velocity. The best multi-model A/B tester.</p>
+          </div>
+
+          <div class="terminal-card">
+            <div class="terminal" aria-hidden="true">
+              <div class="terminal__bar">
+                <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
+                <span class="terminal__bar-title">aider</span>
+              </div>
+              <div class="terminal__body">
+                <span class="terminal__line"><span class="terminal__prompt">$</span> <span class="terminal__cmd">aider --map-tokens 1024</span></span>
+                <span class="terminal__line"><span class="terminal__dim">repomap loaded</span></span>
+                <span class="terminal__line"><span class="terminal__out">Auto-commit on edit</span></span>
+                <span class="terminal__line"><span class="terminal__out">Git diff before apply</span></span>
+                <span class="terminal__line"><span class="terminal__ok">→ commit a3f2b1c</span><span class="terminal__cursor">▌</span></span>
+              </div>
+            </div>
+            <h3 class="terminal-card__name">Aider</h3>
+            <p class="terminal-card__meta">Git-native, repomap-driven, automatic commits per change. The solid free default for individual developers.</p>
+          </div>
+
+          <div class="terminal-card">
+            <div class="terminal" aria-hidden="true">
+              <div class="terminal__bar">
+                <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
+                <span class="terminal__bar-title">agy</span>
+              </div>
+              <div class="terminal__body">
+                <span class="terminal__line"><span class="terminal__prompt">$</span> <span class="terminal__cmd">agy manage</span></span>
+                <span class="terminal__line"><span class="terminal__dim">3 agents · 1 queued</span></span>
+                <span class="terminal__line"><span class="terminal__out">Managed Agents API</span></span>
+                <span class="terminal__line"><span class="terminal__out">Gemini 3.5 Flash</span></span>
+                <span class="terminal__line"><span class="terminal__ok">Antigravity Cloud</span><span class="terminal__cursor">▌</span></span>
+              </div>
+            </div>
+            <h3 class="terminal-card__name">Antigravity CLI (<code>agy</code>)</h3>
+            <p class="terminal-card__meta">Google's replacement for Gemini CLI. Mirror of the Antigravity desktop manager — same agents, same Managed Agents API.</p>
+          </div>
+
+        </div>
+        <div class="callout">
+          <strong>Heads-up:</strong> Gemini CLI shuts down <strong>June 18, 2026</strong> — about four weeks from this session. If your build still depends on it, migrate to <code>agy</code> or OpenCode before the cut-off.
+        </div>
+      `,
+      notes: {
+        time: "~5 min",
+        beat: "Five terminals is a lot — don't dwell on each. Hit Claude Code (default), OpenAI Codex (most users), and Antigravity CLI (newest). The Gemini CLI shutdown callout is the one urgent item the audience can act on tomorrow morning.",
+        ask: "Who here still runs Gemini CLI as part of a CI pipeline? Hand on the eject button.",
+        bridge: "Terminals you drive. Cloud agents you assign. Different posture entirely.",
+      },
+    },
+
+    {
+      n: 19, act: 4,
+      title: "Cloud autonomous engineers — assign and walk away",
+      body: `
+        <p class="section-lead">A flow you don't watch. You file the ticket; a PR lands on your phone.</p>
+        <div class="cloud-flow">
+          <div class="flow-diagram" aria-label="Cloud agent flow: developer files a ticket, cloud sandbox spins up, agent works, PR appears for review">
+            <div class="flow-step">
+              <div class="flow-step__icon">👤</div>
+              <div class="flow-step__label">Developer</div>
+              <div class="flow-step__detail">files a ticket in GitHub, Linear, or Slack</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-step__icon">☁</div>
+              <div class="flow-step__label">Cloud sandbox</div>
+              <div class="flow-step__detail">isolated VM spins up, repo cloned, agent boots</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-step__icon">⚙</div>
+              <div class="flow-step__label">Agent works</div>
+              <div class="flow-step__detail">plans, edits, runs tests, self-reviews, commits</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-step__icon">PR</div>
+              <div class="flow-step__label">PR in your inbox</div>
+              <div class="flow-step__detail">push notification on phone · you review the diff</div>
+            </div>
+          </div>
+          <div class="cloud-tools">
+            <div class="cloud-tool">
+              <h4 class="cloud-tool__name">Devin 2.2</h4>
+              <p class="cloud-tool__detail">Cognition · Feb 24, 2026. Plans, codes, self-reviews, opens PR. 3× faster startup. Devin Search · Devin Wiki. $20 entry, ACU-based.</p>
+            </div>
+            <div class="cloud-tool">
+              <h4 class="cloud-tool__name">Claude Code Web</h4>
+              <p class="cloud-tool__detail">Parallel cloud sessions, push notifications, auto-fix CI failures, auto-respond to PR comments.</p>
+            </div>
+            <div class="cloud-tool">
+              <h4 class="cloud-tool__name">Copilot Coding Agent</h4>
+              <p class="cloud-tool__detail">Assign a GitHub Issue → autonomous PR in a GitHub Actions sandbox. GA since Sept 2025.</p>
+            </div>
+            <div class="cloud-tool">
+              <h4 class="cloud-tool__name">Jules</h4>
+              <p class="cloud-tool__detail">Google's cloud agent on GitHub. Tight integration with the Antigravity ecosystem.</p>
+            </div>
+            <div class="cloud-tool">
+              <h4 class="cloud-tool__name">Codex Web</h4>
+              <p class="cloud-tool__detail">OpenAI's issue-to-PR companion to the Codex platform. ChatGPT handoff on every action.</p>
+            </div>
+            <div class="cloud-tool">
+              <h4 class="cloud-tool__name">Genie</h4>
+              <p class="cloud-tool__detail">Cosine's autonomous SWE. Strong on long-running refactors with persistent context across PRs.</p>
+            </div>
+          </div>
+        </div>
+        <p class="slide__source">All six work the same way at the architecture level. The difference is in how aggressively they self-review and how well they replan when CI fails.</p>
+      `,
+      notes: {
+        time: "~5 min",
+        beat: "The four-step flow is the most important thing on this slide — get it across first. The list of six is a survey, not a memorisation. Devin and Copilot Coding Agent are the two most likely to land in the audience's company.",
+        ask: "Anyone in the room currently has a cloud agent open a PR for them at least weekly? Hands up.",
+        bridge: "One agent in the cloud is easy. Many agents at once is harder. Welcome to the orchestration tier.",
+      },
+    },
+
+    {
+      n: 20, act: 4,
+      title: "Orchestration / Command Centre — agents as async workers",
+      body: `
+        <p class="section-lead">Stop treating AI like a chatbot. Treat it like a <em>fleet</em>. A board, columns, cards, a review queue.</p>
+        <div class="kanban-mini" aria-label="Preview of an agent kanban board with four columns: Backlog, In progress, Review, Done">
+
+          <div class="kanban-mini__col">
+            <div class="kanban-mini__col-title"><span>Backlog</span><span class="kanban-mini__col-count">3</span></div>
+            <div class="kanban-mini__card">
+              <div class="kanban-mini__card-title">Add password reset flow</div>
+              <div class="kanban-mini__card-meta"><span>feat/reset</span><span>—</span></div>
+            </div>
+            <div class="kanban-mini__card">
+              <div class="kanban-mini__card-title">Migrate auth to passkeys</div>
+              <div class="kanban-mini__card-meta"><span>feat/passkey</span><span>—</span></div>
+            </div>
+            <div class="kanban-mini__card">
+              <div class="kanban-mini__card-title">Refactor billing webhooks</div>
+              <div class="kanban-mini__card-meta"><span>refactor/wh</span><span>—</span></div>
+            </div>
+          </div>
+
+          <div class="kanban-mini__col">
+            <div class="kanban-mini__col-title"><span>In progress</span><span class="kanban-mini__col-count">2</span></div>
+            <div class="kanban-mini__card kanban-mini__card--running">
+              <div class="kanban-mini__card-title">Fix invoice rounding bug</div>
+              <div class="kanban-mini__card-meta"><span>fix/round</span><span>● Claude Code</span></div>
+            </div>
+            <div class="kanban-mini__card kanban-mini__card--running">
+              <div class="kanban-mini__card-title">Update Stripe SDK to v18</div>
+              <div class="kanban-mini__card-meta"><span>deps/stripe</span><span>● Codex</span></div>
+            </div>
+          </div>
+
+          <div class="kanban-mini__col">
+            <div class="kanban-mini__col-title"><span>Review</span><span class="kanban-mini__col-count">2</span></div>
+            <div class="kanban-mini__card">
+              <div class="kanban-mini__card-title">Add settings page</div>
+              <div class="kanban-mini__card-meta"><span>feat/settings</span><span>+412 −38</span></div>
+            </div>
+            <div class="kanban-mini__card">
+              <div class="kanban-mini__card-title">Write tests for billing</div>
+              <div class="kanban-mini__card-meta"><span>test/bill</span><span>+186 −0</span></div>
+            </div>
+          </div>
+
+          <div class="kanban-mini__col">
+            <div class="kanban-mini__col-title"><span>Done</span><span class="kanban-mini__col-count">4</span></div>
+            <div class="kanban-mini__card kanban-mini__card--done">
+              <div class="kanban-mini__card-title">Bump Node to 22</div>
+              <div class="kanban-mini__card-meta"><span>chore/node</span><span>merged</span></div>
+            </div>
+            <div class="kanban-mini__card kanban-mini__card--done">
+              <div class="kanban-mini__card-title">Tidy README</div>
+              <div class="kanban-mini__card-meta"><span>docs/readme</span><span>merged</span></div>
+            </div>
+          </div>
+
+        </div>
+        <div class="orchestration-list">
+          <div class="orchestration-tool"><strong>Vibe Kanban</strong> BloopAI · Rust · each card runs in its own git worktree, zero conflicts.</div>
+          <div class="orchestration-tool"><strong>Cline Kanban</strong> Mixed-fleet (Claude Code + Codex), linked cards auto-start on landing.</div>
+          <div class="orchestration-tool"><strong>Conductor family</strong> conductor.build, Code Conductor, Microsoft Conductor.</div>
+          <div class="orchestration-tool"><strong>Claude Squad · Crystal · Nimbalyst</strong> Session managers across multiple Claude instances.</div>
+          <div class="orchestration-tool"><strong>Agent Kanban · Bernstein</strong> Generic boards that speak any CLI agent.</div>
+          <div class="orchestration-tool"><strong>Anthropic Agent Teams</strong> Built into Claude Code v2.1.32+. Shared task list, peer-to-peer messaging.</div>
+        </div>
+        <p class="slide__source">Act 7 turns this into the centre-piece. This slide is the trailer — remember the columns.</p>
+      `,
+      notes: {
+        time: "~4 min",
+        beat: "Walk the board left-to-right. The two 'in progress' running cards are the moment of recognition — that's the new mental model. Don't drill on the tool list; the audience will see this again in Act 7.",
+        ask: "Who's currently coordinating more than one AI agent in a single afternoon — even informally?",
+        bridge: "We've covered four categories. There are two more you'll meet, briefly.",
+      },
+    },
+
+    {
+      n: 21, act: 4,
+      title: "Plus: IDE extensions and prompt-to-app builders",
+      body: `
+        <p class="section-lead">Real, useful, not where we'll spend our time. Know they exist; pick the right slot.</p>
+        <div class="duo">
+
+          <div class="duo__col">
+            <h3 class="duo__title">IDE extensions</h3>
+            <div class="duo__sub">Agents bolted into your existing editor</div>
+            <ul class="duo__list duo__list--will">
+              <li><strong>GitHub Copilot</strong> — ~15M devs. Agent mode now GA in VS Code + JetBrains, custom agents, global <code>.agent.md</code> support, CLI agent in JetBrains since May 2026.</li>
+              <li><strong>Cline / Roo Code</strong> — OSS, BYOK. The "I want my own model behind the wheel" lane.</li>
+              <li><strong>Continue</strong> — open source, multi-IDE.</li>
+              <li><strong>Amazon Q Developer</strong> — AWS-flavoured, deepest with their own tooling.</li>
+              <li><strong>Gemini Code Assist</strong> — retiring with Gemini CLI on June 18, 2026.</li>
+            </ul>
+          </div>
+
+          <div class="duo__col">
+            <h3 class="duo__title">Prompt-to-app builders</h3>
+            <div class="duo__sub">Lowest barrier — zero to a deployed prototype</div>
+            <ul class="duo__list duo__list--will">
+              <li><strong>Bolt.new</strong> — full-stack web apps from a prompt, in-browser sandbox.</li>
+              <li><strong>Lovable</strong> — designer-friendly app builder, strong UI polish.</li>
+              <li><strong>v0</strong> — Vercel's prompt-to-component, deploys to Next.js by default.</li>
+              <li><strong>Replit Agent</strong> — full IDE + agent + deploy, all in the browser.</li>
+              <li><strong>Firebase Studio · AI Studio</strong> — Google's new Android app + Antigravity export pipeline (May 2026).</li>
+            </ul>
+          </div>
+
+        </div>
+        <p class="slide__source">Both columns matter for prototyping and onboarding non-engineers. Neither replaces the four primary categories for real production work.</p>
+      `,
+      notes: {
+        time: "~3 min",
+        beat: "Fast survey, not a deep dive. Name each tool's distinctive niche in one sentence. The Gemini Code Assist retirement is worth flagging — same date as Gemini CLI.",
+        ask: "Who's shipped a real Bolt / Lovable / v0 app in the last 60 days? What did it become?",
+        bridge: "Six categories. Now — how do you actually pick the stack?",
+      },
+    },
+
+    {
+      n: 22, act: 4,
+      title: "How to pick a stack — decide by your next task",
+      body: `
+        <p class="section-lead">Not by vendor. Not by hype. By <em>what's in front of you tomorrow</em>.</p>
+        <div class="flowchart" aria-label="Decision tree mapping a task type to a recommended tool">
+
+          <div class="flow-row">
+            <div class="flow-row__q">Focused, interactive work — design + write together?</div>
+            <div class="flow-row__arrow">→</div>
+            <div class="flow-row__a"><strong>Claude Code</strong> in a terminal — or <strong>Cursor 3</strong> if you want the editor surface.</div>
+          </div>
+
+          <div class="flow-row">
+            <div class="flow-row__q">A backlog of well-specified tickets?</div>
+            <div class="flow-row__arrow">→</div>
+            <div class="flow-row__a"><strong>Devin 2.2</strong> for harder work, <strong>Copilot Coding Agent</strong> for cheaper / GitHub-native.</div>
+          </div>
+
+          <div class="flow-row">
+            <div class="flow-row__q">Multiple parallel features in flight at once?</div>
+            <div class="flow-row__arrow">→</div>
+            <div class="flow-row__a"><strong>Vibe Kanban</strong> or <strong>Cline Kanban</strong> — each card in its own worktree, zero conflicts.</div>
+          </div>
+
+          <div class="flow-row">
+            <div class="flow-row__q">Building from a designer's spec or Figma?</div>
+            <div class="flow-row__arrow">→</div>
+            <div class="flow-row__a"><strong>Cursor 3 Design Mode</strong> for in-editor iteration, or <strong>Lovable</strong> for full prompt-to-UI.</div>
+          </div>
+
+          <div class="flow-row">
+            <div class="flow-row__q">Free / open source / privacy-sensitive?</div>
+            <div class="flow-row__arrow">→</div>
+            <div class="flow-row__a"><strong>OpenCode</strong> + <strong>Aider</strong>, with a local Llama 4 or DeepSeek V4 model behind the wheel.</div>
+          </div>
+
+          <div class="flow-row">
+            <div class="flow-row__q">Just here to ship a weekend prototype?</div>
+            <div class="flow-row__arrow">→</div>
+            <div class="flow-row__a"><strong>Bolt</strong> or <strong>v0</strong> for the frontend, then port to Cursor / Claude Code when it survives Monday.</div>
+          </div>
+
+        </div>
+        <p class="slide__source">Phase 4 turns this into a clickable widget. For Phase 2 / your reading, the static rows answer the same six questions.</p>
+      `,
+      notes: {
+        time: "~4 min",
+        beat: "Read each question, pause, then the answer. The audience will catch one row that maps to a real task on their plate this week — that's the win. Don't pretend it's exhaustive; it's six common cases.",
+        ask: "What was the most recent coding task you started? Which row in this tree would have been the right tool?",
+        bridge: "If you only adopt one stack — here's the four-pillar minimum.",
+      },
+    },
+
+    {
+      n: 23, act: 4,
+      title: "The minimum daily-driver stack",
+      body: `
+        <p class="section-lead">One tool per tier. Cover all four categories. Don't try to learn them on the same day.</p>
+        <div class="stack">
+
+          <div class="stack-pillar">
+            <div class="stack-pillar__tier">CLI tier</div>
+            <h3 class="stack-pillar__name">Claude Code</h3>
+            <div class="stack-pillar__role">your daily driver</div>
+            <p class="stack-pillar__why">Best plan-mode and sub-agent ergonomics in May 2026. <strong>CLAUDE.md + AGENTS.md</strong> means it travels well between projects. Start here.</p>
+          </div>
+
+          <div class="stack-pillar">
+            <div class="stack-pillar__tier">IDE tier</div>
+            <h3 class="stack-pillar__name">Cursor 3 or Windsurf</h3>
+            <div class="stack-pillar__role">visual / design / focused edits</div>
+            <p class="stack-pillar__why">Cursor for speed (Composer 2 at 200+ tok/s); Windsurf if SWE-1.5 + Codemaps fit your codebase better. <strong>Pick one</strong>.</p>
+          </div>
+
+          <div class="stack-pillar">
+            <div class="stack-pillar__tier">Orchestration tier</div>
+            <h3 class="stack-pillar__name">Vibe Kanban</h3>
+            <div class="stack-pillar__role">parallel sprints</div>
+            <p class="stack-pillar__why">When three things need to happen in parallel, open a board. <strong>Worktrees</strong> mean you don't have to choose between threads.</p>
+          </div>
+
+          <div class="stack-pillar">
+            <div class="stack-pillar__tier">Cloud tier</div>
+            <h3 class="stack-pillar__name">Copilot Coding Agent</h3>
+            <div class="stack-pillar__role">overnight backlog drain</div>
+            <p class="stack-pillar__why">Cheap, GitHub-native, GA. Assign issues Friday afternoon, review draft PRs Monday morning. Devin once you outgrow Copilot's scope.</p>
+          </div>
+
+        </div>
+        <blockquote class="pull-quote">
+          Start with one. Add the next within 30 days. Don't try to learn all four at once.
+          <span class="pull-quote__source">— Take-home for the rest of Q2 2026</span>
+        </blockquote>
+      `,
+      notes: {
+        time: "~3 min",
+        beat: "This is the one slide most of the audience will photograph. Read the four pillars in order, name the role, give the why. The pull-quote at the bottom is the discipline take-home.",
+        ask: "Which pillar do you have today — and which will you add first?",
+        bridge: "Tools are settled. Now — the conventions that make any of these tools actually work on your codebase.",
+      },
+    },
 
     /* ---------- Act 5 — Conventions Agents Understand ---------- */
     { n: 24, act: 5, title: "Why agents need conventions",                          notes: { beat: "Open with the Particula.tech story — same pattern surfaces in 10 minutes." } },
