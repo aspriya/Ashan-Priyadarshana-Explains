@@ -28,6 +28,9 @@
 <!-- Chart.js (used from Slide 7 onwards) -->
 <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.5/dist/chart.umd.min.js"></script>
 
+<!-- highlight.js (used from Act 5 onwards for code blocks; single browser bundle with common languages built in. Custom theme defined inline below) -->
+<script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.10.0/build/highlight.min.js"></script>
+
 <style>
 /* ============================================================
    Design tokens — dark mode primary, light mode toggle
@@ -2013,6 +2016,415 @@ html[data-theme="light"] .terminal { background: #1a1a1e; }
 }
 
 /* ============================================================
+   Act 5 components — compare panels, code blocks (highlight.js
+   custom theme), compat strip, research cards, before/after demo,
+   skills funnel, MCP hub-and-spoke, spec-driven cycle
+   ============================================================ */
+
+/* Compare panels (Slide 24) */
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 4px;
+}
+.compare__col {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.compare__col-head {
+  padding: 10px 16px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-soft);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.compare__col--bad  .compare__col-head { color: var(--danger); }
+.compare__col--good .compare__col-head { color: var(--success); }
+.compare__col-body {
+  padding: 14px 18px 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+.compare__col-body .line { display: block; white-space: pre-wrap; }
+.compare__col-body .line--prompt { color: var(--accent); }
+.compare__col-body .line--bad    { color: var(--danger); }
+.compare__col-body .line--good   { color: var(--success); }
+.compare__col-body .line--dim    { color: var(--text-tertiary); font-style: italic; }
+
+/* Code blocks (used from Slide 25 onwards) */
+.codeblock {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 22px 24px 18px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-primary);
+  overflow-x: auto;
+  position: relative;
+  margin: 4px 0 0;
+}
+.codeblock__lang {
+  position: absolute;
+  top: 8px;
+  right: 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.codeblock pre,
+.codeblock code {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  white-space: pre;
+  display: block;
+  font-family: var(--font-mono);
+}
+
+/* highlight.js custom theme — matches the deck palette */
+.codeblock .hljs { background: transparent; color: var(--text-primary); }
+.codeblock .hljs-comment,
+.codeblock .hljs-quote { color: var(--text-tertiary); font-style: italic; }
+.codeblock .hljs-keyword,
+.codeblock .hljs-selector-tag,
+.codeblock .hljs-meta { color: var(--accent); font-weight: 600; }
+.codeblock .hljs-section,
+.codeblock .hljs-title,
+.codeblock .hljs-title.class_,
+.codeblock .hljs-title.function_ { color: var(--accent); font-weight: 600; }
+.codeblock .hljs-bullet,
+.codeblock .hljs-symbol { color: var(--accent); }
+.codeblock .hljs-string,
+.codeblock .hljs-regexp,
+.codeblock .hljs-meta .hljs-string { color: var(--success); }
+.codeblock .hljs-number,
+.codeblock .hljs-literal { color: var(--accent-strong); }
+.codeblock .hljs-attr,
+.codeblock .hljs-attribute { color: var(--accent-strong); font-weight: 500; }
+.codeblock .hljs-built_in,
+.codeblock .hljs-name { color: var(--text-primary); font-weight: 500; }
+.codeblock .hljs-emphasis { font-style: italic; }
+.codeblock .hljs-strong { font-weight: 600; }
+.codeblock .hljs-link { color: var(--accent); text-decoration: underline; }
+.codeblock .hljs-code {
+  background: var(--bg-card);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 0.92em;
+  color: var(--text-primary);
+}
+.codeblock .hljs-variable,
+.codeblock .hljs-template-variable,
+.codeblock .hljs-template-tag { color: var(--accent-strong); }
+.codeblock .hljs-params { color: var(--text-secondary); }
+.codeblock .hljs-tag { color: var(--text-secondary); }
+
+/* Compat strip (Slide 25) */
+.compat-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+.compat-strip__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-right: 4px;
+}
+.compat-strip__item {
+  padding: 4px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.compat-strip__item--note {
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+/* Research cards (Slide 26) */
+.research-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 4px;
+}
+.research-card {
+  padding: 22px 22px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.research-card__finding {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--text-primary);
+  margin: 0;
+}
+.research-card__finding::before { content: "“"; color: var(--accent); margin-right: 2px; }
+.research-card__finding::after  { content: "”"; color: var(--accent); margin-left: 2px; }
+.research-card__source {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-tertiary);
+}
+.research-card__takeaway {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  padding-top: 10px;
+  border-top: 1px solid var(--border-soft);
+  margin-top: auto;
+}
+.research-card__takeaway strong {
+  display: block;
+  font-family: var(--font-display);
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+/* Before / After demo (Slide 27) — reuses .terminal from Act 4 */
+.before-after {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 4px;
+}
+.before-after__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.before-after__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.before-after__label--bad  { color: var(--danger); }
+.before-after__label--good { color: var(--success); }
+.before-after .terminal { min-height: 280px; }
+.before-after .terminal__body { font-size: 11px; line-height: 1.6; }
+.before-after .terminal__err  { color: #ff7e7e; }
+.before-after .terminal__warn { color: #f5b461; }
+
+/* Skills funnel (Slide 28) */
+.funnel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+.funnel__level {
+  width: 100%;
+  padding: 14px 22px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: 48px 1fr 160px;
+  gap: 18px;
+  align-items: center;
+}
+.funnel__level--1 { max-width: 100%; border-left: 3px solid var(--accent); }
+.funnel__level--2 { max-width: 76%;  border-left: 3px solid var(--accent-strong); opacity: 0.95; }
+.funnel__level--3 { max-width: 50%;  border-left: 3px solid var(--text-secondary); opacity: 0.9; }
+.funnel__num {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.funnel__desc {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+.funnel__desc strong {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+.funnel__cost {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  text-align: right;
+}
+.funnel__cost strong {
+  display: block;
+  color: var(--accent);
+  font-size: 14px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+/* MCP diagram (Slide 29) */
+.mcp-block {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+  align-items: center;
+  margin-top: 4px;
+}
+.mcp-svg-wrap {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 12px;
+}
+.mcp-svg {
+  width: 100%;
+  height: 280px;
+}
+.mcp-svg .stroke   { stroke: var(--text-tertiary); fill: none; stroke-width: 1.6; stroke-linecap: round; }
+.mcp-svg .spoke    { stroke: var(--accent); fill: none; stroke-width: 1.4; stroke-dasharray: 4 3; }
+.mcp-svg .node     { fill: var(--bg-card); stroke: var(--accent); stroke-width: 1.6; }
+.mcp-svg .node-hub { fill: var(--accent); stroke: var(--accent); }
+.mcp-svg .label    { fill: var(--text-primary); font-family: 'Space Grotesk', sans-serif; font-size: 11px; }
+.mcp-svg .label-hub{ fill: var(--bg-primary); font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600; }
+html[data-theme="light"] .mcp-svg .label-hub { fill: #ffffff; }
+.mcp-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.mcp-stat {
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+}
+.mcp-stat__num {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+.mcp-stat__num em {
+  color: var(--accent);
+  font-style: normal;
+}
+.mcp-stat__label {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+  line-height: 1.35;
+}
+
+/* Spec cycle (Slide 30) */
+.spec-cycle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.spec-step {
+  padding: 14px 22px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 170px;
+}
+.spec-step__num {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.spec-step__name {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.spec-arrow {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 20px;
+}
+.spec-loop {
+  width: 100%;
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-align: center;
+  font-style: italic;
+}
+
+/* ============================================================
    Overlays (help, jump, notes)
    ============================================================ */
 .overlay {
@@ -2260,6 +2672,9 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   .terminals-grid { grid-template-columns: repeat(3, 1fr); }
   .ide-mockup__body { grid-template-columns: 50px 1fr 90px; }
   .stack { grid-template-columns: repeat(2, 1fr); }
+  .research-cards { grid-template-columns: repeat(3, 1fr); }
+  .mcp-block { grid-template-columns: 1fr; }
+  .codeblock { font-size: 12px; padding: 18px 18px 14px; }
 }
 
 @media (max-width: 880px) {
@@ -2274,6 +2689,15 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   .flow-row { grid-template-columns: 1fr; }
   .flow-row__arrow { transform: rotate(90deg); padding: 4px 0; }
   .stack { grid-template-columns: 1fr; }
+  .compare { grid-template-columns: 1fr; }
+  .research-cards { grid-template-columns: 1fr; }
+  .before-after { grid-template-columns: 1fr; }
+  .funnel__level--1, .funnel__level--2, .funnel__level--3 { max-width: 100%; }
+  .funnel__level { grid-template-columns: 40px 1fr; }
+  .funnel__cost { display: none; }
+  .mcp-stats { grid-template-columns: 1fr 1fr; }
+  .spec-cycle { flex-direction: column; }
+  .spec-arrow { transform: rotate(90deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3798,13 +4222,424 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
     },
 
     /* ---------- Act 5 — Conventions Agents Understand ---------- */
-    { n: 24, act: 5, title: "Why agents need conventions",                          notes: { beat: "Open with the Particula.tech story — same pattern surfaces in 10 minutes." } },
-    { n: 25, act: 5, title: "AGENTS.md — the unified standard",                     notes: { beat: "The most important slide in the session. Real example code block." } },
-    { n: 26, act: 5, title: "The counterintuitive AGENTS.md research",              notes: { beat: "ETH Zurich 3%/20%/2–4 finding. GitHub 2,500 repos finding. Three-tier boundaries." } },
-    { n: 27, act: 5, title: "AGENTS.md before/after — live demo",                   notes: { beat: "Two simulated terminals streaming. Must-build widget #3." } },
-    { n: 28, act: 5, title: "Skills — Anthropic's progressive disclosure model",    notes: { beat: "Three-level loading funnel. Cross-tool note about Cursor/Windsurf rules dirs." } },
-    { n: 29, act: 5, title: "MCP — the universal connector",                        notes: { beat: "USB-C for AI analogy. 97M installs. 2026-07-28 spec RC." } },
-    { n: 30, act: 5, title: "Spec-driven development",                              notes: { beat: "Specify → Plan → Code → Verify. Spec Kit, OpenSpec, Kiro." } },
+    {
+      n: 24, act: 5,
+      title: "Why agents need conventions",
+      body: `
+        <p class="section-lead">Drop a senior developer into an unfamiliar codebase with an agent — and the <em>same pattern</em> surfaces within ten minutes.</p>
+        <div class="compare">
+
+          <div class="compare__col compare__col--bad">
+            <div class="compare__col-head">× Agent without conventions</div>
+            <div class="compare__col-body">
+              <span class="line line--prompt">&gt; add a login form to the auth module</span>
+              <span class="line">writing class LoginForm extends React.Component …</span>
+              <span class="line line--bad">→ codebase uses functional components only</span>
+              <span class="line">running <code>npm test</code> …</span>
+              <span class="line line--bad">→ this project uses pnpm; package.json &amp; lockfile mismatch</span>
+              <span class="line">declaring <code>var session = …</code></span>
+              <span class="line line--bad">→ project banned <code>var</code> three releases ago</span>
+              <span class="line line--dim">… four more prompts to course-correct …</span>
+            </div>
+          </div>
+
+          <div class="compare__col compare__col--good">
+            <div class="compare__col-head">✓ Agent with AGENTS.md present</div>
+            <div class="compare__col-body">
+              <span class="line line--prompt">&gt; add a login form to the auth module</span>
+              <span class="line">reading <code>AGENTS.md</code>: pnpm, functional React, const-only</span>
+              <span class="line">running <code>pnpm install</code> …</span>
+              <span class="line">writing <code>const LoginForm = (props) =&gt; …</code></span>
+              <span class="line">running <code>pnpm test -- --run</code></span>
+              <span class="line line--good">✓ 8 tests pass on first try</span>
+              <span class="line">running <code>pnpm lint --fix</code></span>
+              <span class="line line--good">✓ ready for review</span>
+            </div>
+          </div>
+
+        </div>
+        <blockquote class="pull-quote">
+          Every fix requires another prompt. Every prompt burns another context window. This is what conventions fix.
+          <span class="pull-quote__source">— Particula.tech on agent-onboarding failure modes</span>
+        </blockquote>
+      `,
+      notes: {
+        time: "~3 min",
+        beat: "Lead with the painful concrete example, then name what conventions are FOR. Don't define AGENTS.md yet — that's Slide 25.",
+        ask: "Who in the room has watched an agent run `npm test` on a `pnpm` project this week? Hands.",
+        bridge: "If conventions are the cure, what does the prescription look like? It's one file at the root of your repo.",
+      },
+    },
+
+    {
+      n: 25, act: 5,
+      title: "AGENTS.md — the unified standard",
+      body: `
+        <p class="section-lead">A <em>README for agents</em>. One file at your repo root. Plain markdown. Every major coding agent reads it.</p>
+        <div class="codeblock" data-lang="markdown">
+          <span class="codeblock__lang">AGENTS.md</span>
+<pre><code class="language-markdown"># Project: TaskManager Web App
+
+## Setup
+- Use \`pnpm install\` (NOT npm, NOT yarn)
+- Node 20.x required
+- Copy \`.env.example\` to \`.env.local\` before first run
+
+## Build &amp; Test
+- \`pnpm dev\` to run dev server
+- \`pnpm test -- --run\` for one-shot tests (NOT \`pnpm test\`, which is watch mode)
+- \`pnpm lint --fix\` before any commit
+
+## Code style
+- Functional React components only. No classes.
+- Types in same file as component, not separate \`.types.ts\`
+- Tailwind classes; no inline styles
+
+## Boundaries
+- Never commit \`.env.local\` or any file in \`secrets/\`
+- Never modify migrations in \`prisma/migrations/\` — generate new ones
+- Ask before adding a new top-level dependency
+</code></pre>
+        </div>
+        <div class="compat-strip">
+          <span class="compat-strip__label">Compatible</span>
+          <span class="compat-strip__item">Claude Code</span>
+          <span class="compat-strip__item">OpenAI Codex</span>
+          <span class="compat-strip__item">Cursor</span>
+          <span class="compat-strip__item">Windsurf</span>
+          <span class="compat-strip__item">Copilot</span>
+          <span class="compat-strip__item">Aider <em>(--read)</em></span>
+          <span class="compat-strip__item">Antigravity</span>
+          <span class="compat-strip__item">Amp</span>
+          <span class="compat-strip__item">Factory</span>
+          <span class="compat-strip__item compat-strip__item--note">jointly launched by Google, OpenAI, Factory, Sourcegraph, Cursor — agents.md</span>
+        </div>
+      `,
+      notes: {
+        time: "~6 min · the most important slide in the session",
+        beat: "Slow down here. Read each section out loud. Point out the parentheses — they're the part most engineers skip. The 'NOT npm, NOT yarn' and 'NOT pnpm test, which is watch mode' lines are the type of detail that saves hours of agent confusion.",
+        ask: "Show of hands — who already has an AGENTS.md in their main repo? Who has heard the name? Who is hearing it for the first time?",
+        bridge: "Now — the part most people get wrong. There's a counterintuitive research finding about how to write this file.",
+      },
+    },
+
+    {
+      n: 26, act: 5,
+      title: "Three counterintuitive findings",
+      body: `
+        <p class="section-lead">More words isn't more help. The 2026 research is clear on three points.</p>
+        <div class="research-cards">
+
+          <div class="research-card">
+            <p class="research-card__finding">LLM-generated context files reduced task success rates by approximately 3% on average, increased inference costs by over 20%, and required 2–4 additional reasoning steps.</p>
+            <div class="research-card__source">— Gloaguen et al., ETH Zurich (2026), 138 repos studied</div>
+            <div class="research-card__takeaway">
+              <strong>Don't auto-generate.</strong>
+              The <code>/init</code> command is a draft, not a finished file. Strip its output to what the agent can't discover by reading the repo itself.
+            </div>
+          </div>
+
+          <div class="research-card">
+            <p class="research-card__finding">One real code snippet beats three paragraphs of style description.</p>
+            <div class="research-card__source">— GitHub, analysis of 2,500+ public AGENTS.md / CLAUDE.md files</div>
+            <div class="research-card__takeaway">
+              <strong>Show, don't tell.</strong>
+              Paste a one-line example of a function the way you want it written. The agent generalises from concrete shapes, not adjectives.
+            </div>
+          </div>
+
+          <div class="research-card">
+            <p class="research-card__finding">"Never commit secrets" was the single most common constraint across every repo analysed.</p>
+            <div class="research-card__source">— Same GitHub corpus, top boundary across 2,500 files</div>
+            <div class="research-card__takeaway">
+              <strong>Three-tier boundaries.</strong>
+              Must-do · must-not-do · ask-first. Make the must-not-do list short, specific, and at the top.
+            </div>
+          </div>
+
+        </div>
+        <p class="slide__source">Three lessons, one slide. Most AGENTS.md files in the wild break at least one of these — usually all three.</p>
+      `,
+      notes: {
+        time: "~5 min",
+        beat: "Walk left-to-right. Each card has its own takeaway in the bottom strip — read those out loud. The ETH 3% / 20% / 2–4 numbers are the most surprising; let them sit.",
+        ask: "Who's used `/init` in Claude Code or Cursor in the last week? Did you ship its output as-is, or strip it down?",
+        bridge: "OK — does this actually move the needle? Same prompt, same model. With and without AGENTS.md.",
+      },
+    },
+
+    {
+      n: 27, act: 5,
+      title: "AGENTS.md before / after — same prompt, same model",
+      body: `
+        <p class="section-lead">Two terminals. Identical prompt. The only difference is whether <em>AGENTS.md</em> sits at the repo root.</p>
+        <div class="before-after">
+
+          <div class="before-after__panel">
+            <div class="before-after__label before-after__label--bad">× without AGENTS.md</div>
+            <div class="terminal" aria-hidden="true">
+              <div class="terminal__bar">
+                <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
+                <span class="terminal__bar-title">~/project</span>
+              </div>
+              <div class="terminal__body">
+                <span class="terminal__line"><span class="terminal__prompt">$</span> <span class="terminal__cmd">claude "add a billing endpoint"</span></span>
+                <span class="terminal__line"><span class="terminal__dim">→ scanning repo …</span></span>
+                <span class="terminal__line"><span class="terminal__out">writing src/billing/route.js</span></span>
+                <span class="terminal__line"><span class="terminal__out">$ npm install stripe</span></span>
+                <span class="terminal__line"><span class="terminal__err">! workspace error — pnpm.lock detected</span></span>
+                <span class="terminal__line"><span class="terminal__out">retry: $ pnpm add stripe</span></span>
+                <span class="terminal__line"><span class="terminal__out">writing tests/billing.test.js</span></span>
+                <span class="terminal__line"><span class="terminal__out">$ npm test</span></span>
+                <span class="terminal__line"><span class="terminal__err">! command not found in package scripts</span></span>
+                <span class="terminal__line"><span class="terminal__warn">~ assuming watch mode …</span></span>
+                <span class="terminal__line"><span class="terminal__out">$ pnpm test</span></span>
+                <span class="terminal__line"><span class="terminal__err">! hangs in watch mode for 60s</span></span>
+                <span class="terminal__line"><span class="terminal__out">retry: $ pnpm test -- --run</span></span>
+                <span class="terminal__line"><span class="terminal__err">! 2 lint errors: no-var, inline-styles</span></span>
+                <span class="terminal__line"><span class="terminal__warn">~ rewriting class component …</span></span>
+                <span class="terminal__line"><span class="terminal__warn">4 retries, 1 still failing</span><span class="terminal__cursor">▌</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="before-after__panel">
+            <div class="before-after__label before-after__label--good">✓ with AGENTS.md present</div>
+            <div class="terminal" aria-hidden="true">
+              <div class="terminal__bar">
+                <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
+                <span class="terminal__bar-title">~/project</span>
+              </div>
+              <div class="terminal__body">
+                <span class="terminal__line"><span class="terminal__prompt">$</span> <span class="terminal__cmd">claude "add a billing endpoint"</span></span>
+                <span class="terminal__line"><span class="terminal__dim">→ reading AGENTS.md …</span></span>
+                <span class="terminal__line"><span class="terminal__out">pnpm · functional · const-only · pnpm test -- --run</span></span>
+                <span class="terminal__line"><span class="terminal__out">writing src/billing/route.ts</span></span>
+                <span class="terminal__line"><span class="terminal__out">$ pnpm add stripe</span></span>
+                <span class="terminal__line"><span class="terminal__ok">✓ added stripe@18.0.2</span></span>
+                <span class="terminal__line"><span class="terminal__out">writing tests/billing.test.ts</span></span>
+                <span class="terminal__line"><span class="terminal__out">$ pnpm test -- --run</span></span>
+                <span class="terminal__line"><span class="terminal__ok">✓ 8 tests passed (1.2s)</span></span>
+                <span class="terminal__line"><span class="terminal__out">$ pnpm lint --fix</span></span>
+                <span class="terminal__line"><span class="terminal__ok">✓ clean</span></span>
+                <span class="terminal__line"><span class="terminal__dim">→ ready for review</span></span>
+                <span class="terminal__line"><span class="terminal__ok">no retries · one shot · 38s</span><span class="terminal__cursor">▌</span></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <p class="slide__source">Phase 4 turns this into a real-time simulated demo. Until then, the static panels carry the same lesson: one file at the repo root saves four context windows.</p>
+      `,
+      notes: {
+        time: "~4 min",
+        beat: "Don't read every line. Compare the totals: 'four retries, one still failing' vs 'no retries, one shot, 38 seconds'. That's the whole slide. Phase 4 makes this a live race.",
+        ask: "Imagine multiplying this by 50 agent sessions a week. How much of your team's review time is currently spent fixing the left column?",
+        bridge: "AGENTS.md is the convention. There's a richer one on top — Skills.",
+      },
+    },
+
+    {
+      n: 28, act: 5,
+      title: "Skills — Anthropic's progressive disclosure model",
+      body: `
+        <p class="section-lead">A skill is a folder. The agent loads <em>only what it needs</em>, when it needs it. Three levels, each with its own token cost.</p>
+        <div class="funnel" aria-label="Skills progressive disclosure model, three levels of loading">
+          <div class="funnel__level funnel__level--1">
+            <div class="funnel__num">1</div>
+            <div class="funnel__desc">
+              <strong>Metadata · always loaded</strong>
+              Name + description from each installed skill's YAML frontmatter. Pre-loaded into the system prompt at startup.
+            </div>
+            <div class="funnel__cost">
+              <strong>~50–100 tokens</strong>per skill installed
+            </div>
+          </div>
+          <div class="funnel__level funnel__level--2">
+            <div class="funnel__num">2</div>
+            <div class="funnel__desc">
+              <strong>SKILL.md body · when triggered</strong>
+              The full instruction file (typically 150–400 lines) loads only when the description matches the user's intent.
+            </div>
+            <div class="funnel__cost">
+              <strong>~1–3K tokens</strong>per triggered skill
+            </div>
+          </div>
+          <div class="funnel__level funnel__level--3">
+            <div class="funnel__num">3</div>
+            <div class="funnel__desc">
+              <strong>References &amp; scripts · only when used</strong>
+              Files inside <code>scripts/</code>, <code>references/</code>, <code>assets/</code> — read on demand by tool calls.
+            </div>
+            <div class="funnel__cost">
+              <strong>0 tokens</strong>until referenced
+            </div>
+          </div>
+        </div>
+        <div class="codeblock" data-lang="markdown" style="margin-top: 20px;">
+          <span class="codeblock__lang">SKILL.md</span>
+<pre><code class="language-markdown">---
+name: pr-review
+description: Reviews pull requests for security, style, and architectural fit. Use when reviewing PRs before merge.
+---
+
+# PR Review
+
+Process:
+1. Check for hardcoded secrets (\`grep -r "sk-\\|API_KEY=" .\`)
+2. Verify tests cover new logic
+3. Check style matches existing patterns in same directory
+4. Read \`references/security-checklist.md\` for full audit
+</code></pre>
+        </div>
+        <p class="slide__source">Same idea, different filenames across vendors — Cursor uses <code>.cursor/rules/</code>, Windsurf uses <code>.windsurf/rules/</code>, all converging on the progressive-disclosure pattern.</p>
+      `,
+      notes: {
+        time: "~5 min",
+        beat: "Walk the funnel top-to-bottom. The token costs are the punchline — 50 tokens per skill at level 1 means you can install hundreds without bleeding context. Skill metadata is free; skill bodies are not.",
+        ask: "Anyone in the room already shipped a real skill in production? Or pulled in a community skill pack (gstack, Superpowers, TurboDocx)?",
+        bridge: "AGENTS.md and Skills cover what the agent knows about your repo. MCP is how the agent reaches everything else.",
+      },
+    },
+
+    {
+      n: 29, act: 5,
+      title: "MCP — the universal connector",
+      body: `
+        <p class="section-lead">Think of it as <em>USB-C for AI</em>. One protocol, any tool plugs into any model.</p>
+        <div class="mcp-block">
+          <div class="mcp-svg-wrap">
+            <svg class="mcp-svg" viewBox="0 0 480 280" aria-label="Hub-and-spoke diagram with a central LLM node connected to seven external tool nodes via MCP">
+              <!-- spokes -->
+              <line class="spoke" x1="240" y1="140" x2="80"  y2="60" />
+              <line class="spoke" x1="240" y1="140" x2="240" y2="40" />
+              <line class="spoke" x1="240" y1="140" x2="400" y2="60" />
+              <line class="spoke" x1="240" y1="140" x2="60"  y2="180" />
+              <line class="spoke" x1="240" y1="140" x2="420" y2="180" />
+              <line class="spoke" x1="240" y1="140" x2="130" y2="240" />
+              <line class="spoke" x1="240" y1="140" x2="350" y2="240" />
+              <!-- hub -->
+              <circle class="node node-hub" cx="240" cy="140" r="42" />
+              <text class="label-hub" x="240" y="138" text-anchor="middle">LLM</text>
+              <text class="label-hub" x="240" y="156" text-anchor="middle" style="font-size:10px; font-weight:400;">via MCP</text>
+              <!-- spokes endpoints -->
+              <g>
+                <circle class="node" cx="80"  cy="60"  r="22" />
+                <text class="label" x="80"  y="64"  text-anchor="middle">GitHub</text>
+              </g>
+              <g>
+                <circle class="node" cx="240" cy="40"  r="22" />
+                <text class="label" x="240" y="44"  text-anchor="middle">Postgres</text>
+              </g>
+              <g>
+                <circle class="node" cx="400" cy="60"  r="22" />
+                <text class="label" x="400" y="64"  text-anchor="middle">Figma</text>
+              </g>
+              <g>
+                <circle class="node" cx="60"  cy="180" r="22" />
+                <text class="label" x="60"  y="184" text-anchor="middle">Playwright</text>
+              </g>
+              <g>
+                <circle class="node" cx="420" cy="180" r="22" />
+                <text class="label" x="420" y="184" text-anchor="middle">Vercel</text>
+              </g>
+              <g>
+                <circle class="node" cx="130" cy="240" r="22" />
+                <text class="label" x="130" y="244" text-anchor="middle">Stripe</text>
+              </g>
+              <g>
+                <circle class="node" cx="350" cy="240" r="22" />
+                <text class="label" x="350" y="244" text-anchor="middle">Slack</text>
+              </g>
+            </svg>
+          </div>
+          <div>
+            <div class="mcp-stats">
+              <div class="mcp-stat">
+                <div class="mcp-stat__num"><em>97M</em> installs</div>
+                <div class="mcp-stat__label">community-tracked, March 2026</div>
+              </div>
+              <div class="mcp-stat">
+                <div class="mcp-stat__num"><em>3,000+</em> servers</div>
+                <div class="mcp-stat__label">19,700+ on mcp.so · 7,000+ on Smithery</div>
+              </div>
+              <div class="mcp-stat">
+                <div class="mcp-stat__num"><em>Nov '24</em></div>
+                <div class="mcp-stat__label">created by Anthropic</div>
+              </div>
+              <div class="mcp-stat">
+                <div class="mcp-stat__num"><em>Dec '25</em></div>
+                <div class="mcp-stat__label">governance handed to Linux Foundation</div>
+              </div>
+            </div>
+            <div class="callout" style="margin-top: 16px;">
+              <strong>Coming soon:</strong> <strong>MCP 2026-07-28 RC</strong> (announced May 21). Stateless core, Extensions framework, Tasks, MCP Apps (server-rendered UIs), OAuth/OIDC alignment, formal deprecation policy.
+            </div>
+          </div>
+        </div>
+        <p class="slide__source">Without MCP, every tool needs a bespoke integration with every model — N × M combinations. With it: N + M. That's the whole pitch.</p>
+      `,
+      notes: {
+        time: "~5 min",
+        beat: "Lead with the USB-C analogy — it lands in two seconds. Then show the diagram and let the audience count the spokes. 97M installs is the 'this is real' number; let it sit.",
+        ask: "Who's running any MCP server in production today — Playwright, GitHub, Postgres, anything?",
+        bridge: "AGENTS.md is repo memory. Skills are task memory. MCP is reach. The fourth convention is how you actually frame the work.",
+      },
+    },
+
+    {
+      n: 30, act: 5,
+      title: "Spec-driven development — the rhythm",
+      body: `
+        <p class="section-lead">The post-vibe-coding loop. Write the spec; the agent writes the code; you verify it actually does what you wrote.</p>
+        <div class="spec-cycle" role="list" aria-label="Spec-driven development cycle: Specify, Plan, Code, Verify">
+          <div class="spec-step" role="listitem">
+            <div class="spec-step__num">1</div>
+            <div class="spec-step__name">Specify</div>
+          </div>
+          <span class="spec-arrow" aria-hidden="true">→</span>
+          <div class="spec-step" role="listitem">
+            <div class="spec-step__num">2</div>
+            <div class="spec-step__name">Plan</div>
+          </div>
+          <span class="spec-arrow" aria-hidden="true">→</span>
+          <div class="spec-step" role="listitem">
+            <div class="spec-step__num">3</div>
+            <div class="spec-step__name">Code</div>
+          </div>
+          <span class="spec-arrow" aria-hidden="true">→</span>
+          <div class="spec-step" role="listitem">
+            <div class="spec-step__num">4</div>
+            <div class="spec-step__name">Verify</div>
+          </div>
+          <div class="spec-loop">↺ &nbsp; loop — your spec is the diff target, not the chat history</div>
+        </div>
+        <div class="research-cards" style="grid-template-columns: repeat(3, 1fr); margin-top: 28px;">
+          <div class="research-card">
+            <div class="research-card__source" style="font-style: normal; color: var(--accent); font-family: var(--font-display); font-weight: 600;">GitHub Spec Kit</div>
+            <p class="research-card__finding" style="font-size: 14px;">Open source. Splits work into a project <em>constitution</em> + per-feature spec files. Most adopted in 2026.</p>
+          </div>
+          <div class="research-card">
+            <div class="research-card__source" style="font-style: normal; color: var(--accent); font-family: var(--font-display); font-weight: 600;">OpenSpec</div>
+            <p class="research-card__finding" style="font-size: 14px;">Lighter-weight. Markdown specs with optional YAML metadata. Travels well across agents.</p>
+          </div>
+          <div class="research-card">
+            <div class="research-card__source" style="font-style: normal; color: var(--accent); font-family: var(--font-display); font-weight: 600;">Kiro</div>
+            <p class="research-card__finding" style="font-size: 14px;">Spec-first IDE. Specs first-class; code is treated as a generated artefact.</p>
+          </div>
+        </div>
+        <blockquote class="pull-quote">
+          We are entering the age of agentic engineering — orchestrating agents against detailed specifications with human oversight.
+          <span class="pull-quote__source">— Andrej Karpathy</span>
+        </blockquote>
+      `,
+      notes: {
+        time: "~3 min",
+        beat: "Four words, one loop. Don't over-explain. The Karpathy quote at the end re-anchors the whole arc — same person we opened with.",
+        ask: "Who's written a real one-page spec for the last feature they shipped? Not the PR description — the spec before the PR.",
+        bridge: "Conventions are settled. Now — how do you actually start a project that's ready for all of this from day one?",
+      },
+    },
 
     /* ---------- Act 6 — Starting a Project, Agent-Ready ---------- */
     { n: 31, act: 6, title: "The five must-do practices",                           notes: { beat: "Five numbered cards. Checklist before the walkthroughs." } },
@@ -4250,18 +5085,31 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
     });
   });
 
-  /* Chart.js may load after the deck boots. If we land directly on
-     slide 7 via #slide-7, retry the hook once the script signals
-     ready. */
+  /* Chart.js / highlight.js load deferred. If we land directly on a
+     slide that needs them (e.g. #slide-7), retry the hook once the
+     scripts signal ready. Also run highlight.js across all rendered
+     code blocks once the language packs are available. */
+  function highlightAllCodeblocks() {
+    if (!window.hljs) return;
+    document.querySelectorAll(".codeblock code:not([data-hl-done])").forEach(el => {
+      try { window.hljs.highlightElement(el); } catch (e) { /* ignore individual block errors */ }
+      el.setAttribute("data-hl-done", "1");
+    });
+  }
+
   document.addEventListener("readystatechange", () => {
-    if (document.readyState === "complete" && SLIDES[currentIndex] && SLIDES[currentIndex].n === 7) {
-      runSlideHooks(7, slideEls[currentIndex]);
+    if (document.readyState === "complete") {
+      if (SLIDES[currentIndex] && SLIDES[currentIndex].n === 7) {
+        runSlideHooks(7, slideEls[currentIndex]);
+      }
+      highlightAllCodeblocks();
     }
   });
   window.addEventListener("load", () => {
     if (SLIDES[currentIndex] && SLIDES[currentIndex].n === 7) {
       runSlideHooks(7, slideEls[currentIndex]);
     }
+    highlightAllCodeblocks();
   });
 
   /* ============================================================
