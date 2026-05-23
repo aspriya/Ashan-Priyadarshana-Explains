@@ -3525,6 +3525,266 @@ html[data-theme="light"] .topology__svg .label-hub { fill: #ffffff; }
 }
 
 /* ============================================================
+   Act 9 components — model-tier matrix, speed comparison bars,
+   gossip rumour cards, Mythos confidential card with DO-NOT-
+   RELEASE stamp overlay
+   ============================================================ */
+
+/* Tier matrix (Slide 46) */
+.tier-matrix {
+  display: grid;
+  grid-template-columns: 140px 1.2fr 1.4fr;
+  gap: 1px;
+  background: var(--border-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 18px;
+}
+.tier-matrix__cell {
+  background: var(--bg-card);
+  padding: 12px 18px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+}
+.tier-matrix__cell--head {
+  background: var(--bg-elevated);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  padding: 10px 18px;
+}
+.tier-matrix__cell--tier {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--accent);
+}
+.tier-matrix__cell--gated {
+  font-style: italic;
+  color: var(--accent);
+}
+.tier-matrix__cell--gated::before {
+  content: "🔒 ";
+  font-style: normal;
+  margin-right: 2px;
+}
+
+/* Gossip cards (Slide 48) */
+.gossip-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 4px;
+}
+.gossip-card {
+  padding: 22px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.gossip-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.gossip-card__name {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.1;
+}
+.gossip-card__signal {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.gossip-card__signal--high {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+.gossip-card__signal--med {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.gossip-card__signal--low {
+  background: transparent;
+  color: var(--text-tertiary);
+  border: 1px dashed var(--border);
+}
+.gossip-card__time {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+.gossip-card__what {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0;
+}
+.gossip-card__what em {
+  color: var(--text-primary);
+  font-style: italic;
+}
+.gossip-card__source {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-soft);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-style: italic;
+  color: var(--text-tertiary);
+}
+
+/* Mythos confidential card (Slide 49) */
+.mythos {
+  background: var(--bg-card);
+  border: 2px dashed var(--accent);
+  border-radius: 14px;
+  padding: 32px 36px 28px;
+  margin-top: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.mythos::before {
+  content: "DO NOT RELEASE";
+  position: absolute;
+  top: 38px;
+  right: -52px;
+  transform: rotate(20deg);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  color: var(--danger);
+  border: 3px solid var(--danger);
+  padding: 6px 28px;
+  background: var(--bg-primary);
+  opacity: 0.92;
+  pointer-events: none;
+  z-index: 1;
+  text-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+}
+.mythos__header {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.mythos__name {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+  line-height: 1.05;
+  letter-spacing: -0.018em;
+  max-width: 540px;
+}
+.mythos__meta {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-bottom: 24px;
+  max-width: 580px;
+  line-height: 1.5;
+}
+.mythos__list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mythos__list li {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  padding-left: 28px;
+  position: relative;
+}
+.mythos__list li::before {
+  content: "▶";
+  position: absolute;
+  left: 0;
+  top: 3px;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.mythos__list li strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+.mythos__list li em {
+  font-style: italic;
+  color: var(--danger);
+}
+.mythos__decision {
+  padding: 16px 20px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  position: relative;
+  z-index: 2;
+}
+.mythos__decision strong {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 4px;
+  font-size: 15px;
+}
+.mythos__closer {
+  margin-top: 22px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.4;
+  color: var(--text-primary);
+  text-align: center;
+  padding: 18px 0 4px;
+  border-top: 1px solid var(--border-soft);
+}
+.mythos__closer em {
+  color: var(--accent);
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* ============================================================
    Overlays (help, jump, notes)
    ============================================================ */
 .overlay {
@@ -3817,6 +4077,13 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   .cost-row__value { text-align: left; }
   .cost-facts { grid-template-columns: 1fr; }
   .topology-grid { grid-template-columns: 1fr; }
+  .tier-matrix { grid-template-columns: 1fr; }
+  .tier-matrix__cell { padding: 10px 14px; }
+  .gossip-grid { grid-template-columns: 1fr; }
+  .mythos { padding: 24px 22px; }
+  .mythos::before { font-size: 14px; padding: 4px 16px; top: 22px; right: -32px; }
+  .mythos__name { font-size: 26px; }
+  .mythos__closer { font-size: 16px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -6792,10 +7059,193 @@ gh pr create --title "Add login form"</code></pre>
     },
 
     /* ---------- Act 9 — Models & Future Gossip ---------- */
-    { n: 46, act: 9, title: "Pick the right model for the task",                    notes: { beat: "Matrix: hardest reasoning / daily / autocomplete / privacy. Cost vs intelligence 2x2." } },
-    { n: 47, act: 9, title: "Specialized coding models",                            notes: { beat: "Composer 2, SWE-1.5, GPT-5.3-Codex. The new training-for-coding trend." } },
-    { n: 48, act: 9, title: "What's coming — the gossip slide",                     notes: { beat: "GPT-6, Claude 5 (Fennec), Llama 4, Gemini 3.5 Pro. Confidence-indicator cards." } },
-    { n: 49, act: 9, title: "The Mythos moment — the gated model",                  notes: { beat: "Project Glasswing story. 'DO NOT RELEASE' stamp. Dark and somber, not sensational." } },
+    {
+      n: 46, act: 9,
+      title: "Pick the right model for the task",
+      body: `
+        <p class="section-lead">Two axes that matter — <em>cost</em> and <em>capability</em>. Most decisions are a trade-off between them; the rest are tier choices.</p>
+        <div class="chart-wrap" role="figure" aria-label="Scatter plot of major coding-relevant models in cost vs capability space">
+          <div class="chart-wrap__title">Cost (input $/M tokens) vs composite capability · May 2026 · illustrative placements</div>
+          <div class="chart-wrap__canvas-host"><canvas id="costIntelChart"></canvas></div>
+        </div>
+        <div class="tier-matrix" role="table" aria-label="Model tier matrix">
+          <div class="tier-matrix__cell tier-matrix__cell--head" role="columnheader">Tier</div>
+          <div class="tier-matrix__cell tier-matrix__cell--head" role="columnheader">Models</div>
+          <div class="tier-matrix__cell tier-matrix__cell--head" role="columnheader">Use when</div>
+
+          <div class="tier-matrix__cell tier-matrix__cell--tier">Frontier</div>
+          <div class="tier-matrix__cell">Opus 4.7 · GPT-5.5 Pro · Gemini 3.1 Pro</div>
+          <div class="tier-matrix__cell">Hardest reasoning · multi-file refactors · long-horizon agentic work</div>
+
+          <div class="tier-matrix__cell tier-matrix__cell--tier">Daily driver</div>
+          <div class="tier-matrix__cell">Opus 4.7 (xhigh off) · GPT-5.5 · Composer 2 · SWE-1.5</div>
+          <div class="tier-matrix__cell">Everyday coding · feature work · the 80% of weekly hours</div>
+
+          <div class="tier-matrix__cell tier-matrix__cell--tier">Fast / cheap</div>
+          <div class="tier-matrix__cell">Sonnet 4.6 · GPT-5.5 mini / nano · Gemini 3.5 Flash · Haiku 4.5</div>
+          <div class="tier-matrix__cell">Autocomplete · simple lookups · high-volume / low-stakes tasks</div>
+
+          <div class="tier-matrix__cell tier-matrix__cell--tier tier-matrix__cell--gated">Cyber-gated</div>
+          <div class="tier-matrix__cell tier-matrix__cell--gated">Mythos Preview</div>
+          <div class="tier-matrix__cell tier-matrix__cell--gated">Not available — Project Glasswing partners only · see Slide 49</div>
+
+          <div class="tier-matrix__cell tier-matrix__cell--tier">Local / OSS</div>
+          <div class="tier-matrix__cell">Llama 4 · DeepSeek V4 · Qwen</div>
+          <div class="tier-matrix__cell">Privacy-sensitive · offline · BYO weights · regulated industries</div>
+        </div>
+        <p class="slide__source">Capability scores are composite illustrative values, not a single benchmark. Costs are May-2026 list prices for input tokens. Specialised coding models (Composer 2, SWE-1.5) trade headline capability for IDE-bound speed — see Slide 47.</p>
+      `,
+      notes: {
+        time: "~4 min",
+        beat: "Lead with the scatter — let the audience trace cost vs capability with their eyes. Then drop to the tier matrix. The Mythos row is the cliffhanger for Slide 49 — say 'we'll come back to that' and move on.",
+        ask: "Which tier are you currently overpaying for? Which tier are you under-using?",
+        bridge: "Three of those models — Composer 2, SWE-1.5, GPT-5.3-Codex — aren't general frontier. They're a different category that just emerged.",
+      },
+    },
+
+    {
+      n: 47, act: 9,
+      title: "The new wave — coding-specific models",
+      body: `
+        <p class="section-lead">Every major IDE vendor is now training their own model. <em>UX wrappers around someone else's frontier model is over.</em></p>
+        <div class="chart-wrap" role="figure" aria-label="Horizontal bar chart of coding-model speedup relative to Opus 4.7 baseline">
+          <div class="chart-wrap__title">Inference speedup vs Opus 4.7 baseline · illustrative</div>
+          <div class="chart-wrap__canvas-host"><canvas id="speedChart"></canvas></div>
+        </div>
+        <div class="frontier-grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 20px;">
+
+          <div class="frontier-card frontier-card--anthropic">
+            <div class="frontier-card__vendor">Cursor · Apr 2026</div>
+            <h3 class="frontier-card__name">Composer 2</h3>
+            <div class="frontier-card__meta">In-house coding model. 200+ tok/s on Cursor's stack. 61.7 on Terminal-Bench 2.0.</div>
+            <div class="frontier-card__footer">
+              <div class="frontier-card__price">$0.50 / $2.50 per 1M · 86% cheaper than 1.5</div>
+              <div class="frontier-card__caveat">Bound to Cursor 3 — you don't run it elsewhere.</div>
+            </div>
+          </div>
+
+          <div class="frontier-card frontier-card--google">
+            <div class="frontier-card__vendor">Cognition · Q1 2026</div>
+            <h3 class="frontier-card__name">SWE-1.5</h3>
+            <div class="frontier-card__meta">Specialised for agentic editing. <em>13× faster</em> than Sonnet 4.5 on Cognition's own benchmark.</div>
+            <div class="frontier-card__footer">
+              <div class="frontier-card__price">Ships inside Windsurf · enterprise tier</div>
+              <div class="frontier-card__caveat">Vendor-published speed claim. Independent measurement still pending.</div>
+            </div>
+          </div>
+
+          <div class="frontier-card frontier-card--openai">
+            <div class="frontier-card__vendor">OpenAI · Feb 2026</div>
+            <h3 class="frontier-card__name">GPT-5.3-Codex</h3>
+            <div class="frontier-card__meta">First OpenAI model OpenAI says was "instrumental in creating itself" — coding-tuned base used through Codex.</div>
+            <div class="frontier-card__footer">
+              <div class="frontier-card__price">Bundled with Codex platform pricing</div>
+              <div class="frontier-card__caveat">Specialised inheritor of the GPT-5 line, not a separate frontier model.</div>
+            </div>
+          </div>
+
+        </div>
+        <p class="slide__source">The trend: every major vendor with an IDE or CLI now ships a coding-specific model alongside its general frontier line. The next 12 months are about specialised models, not bigger ones.</p>
+      `,
+      notes: {
+        time: "~4 min",
+        beat: "Let the SWE-1.5 13× bar visually dominate — that's the moment of recognition. Then call out 'Cognition's own claim' so the audience knows it's vendor-published. Three cards underneath tell the why.",
+        ask: "If your IDE vendor shipped its own coding model tomorrow, would you use it — or stick with the frontier general model behind it?",
+        bridge: "What's already shipped. Now — the gossip column. What's coming next.",
+      },
+    },
+
+    {
+      n: 48, act: 9,
+      title: "Future gossip — what's credibly expected",
+      body: `
+        <p class="section-lead">Disclaimer up front. <em>This is gossip.</em> By the time you watch this back, half of these will have shipped, slipped, or been renamed.</p>
+        <div class="gossip-grid">
+
+          <div class="gossip-card">
+            <div class="gossip-card__head">
+              <h3 class="gossip-card__name">GPT-6</h3>
+              <span class="gossip-card__signal gossip-card__signal--med">moderate signal</span>
+            </div>
+            <div class="gossip-card__time">Q2–Q3 2026 likely</div>
+            <p class="gossip-card__what">Polymarket had "GPT-6 by April 30" at <em>72%</em> before GPT-5.5 shipped as "Spud". Window has slipped; OpenAI cadence (5.4 → 5.5 in six weeks) suggests Q3 not Q2.</p>
+            <div class="gossip-card__source">Polymarket prediction markets · OpenAI release cadence inference</div>
+          </div>
+
+          <div class="gossip-card">
+            <div class="gossip-card__head">
+              <h3 class="gossip-card__name">Claude 5 · codename "Fennec"</h3>
+              <span class="gossip-card__signal gossip-card__signal--high">high signal</span>
+            </div>
+            <div class="gossip-card__time">2H 2026 expected</div>
+            <p class="gossip-card__what">Internally referenced in shipped artefacts. <em>Most-anticipated model in the developer community</em> right now — successor to the 4.x line that already dominates SWE-bench.</p>
+            <div class="gossip-card__source">Internal codename leaks · Anthropic blog roadmaps</div>
+          </div>
+
+          <div class="gossip-card">
+            <div class="gossip-card__head">
+              <h3 class="gossip-card__name">Llama 4</h3>
+              <span class="gossip-card__signal gossip-card__signal--med">moderate signal</span>
+            </div>
+            <div class="gossip-card__time">2H 2026 likely</div>
+            <p class="gossip-card__what">Meta's next big open release. Agentic capabilities are the headline — closing the gap with DeepSeek V4 on tool-use benchmarks.</p>
+            <div class="gossip-card__source">Meta AI roadmap · agentic OSS scene</div>
+          </div>
+
+          <div class="gossip-card">
+            <div class="gossip-card__head">
+              <h3 class="gossip-card__name">Gemini 3.5 Pro</h3>
+              <span class="gossip-card__signal gossip-card__signal--high">announced</span>
+            </div>
+            <div class="gossip-card__time">Announced at I/O 2026</div>
+            <p class="gossip-card__what">Announced but not yet shipped at the Pro tier — only <em>3.5 Flash</em> is publicly available. Pro tier is the expected reasoning frontier from Google for the rest of 2026.</p>
+            <div class="gossip-card__source">Google I/O 2026 keynote · Vertex AI roadmap</div>
+          </div>
+
+        </div>
+        <blockquote class="pull-quote">
+          The pattern that beat "next version" in 2026 was <em>continuous fine-tuning</em>. GPT-5.4 to 5.5 in six weeks. Sonnet 4.6 dropping mid-cycle. Versioning is increasingly cosmetic — the curve is continuous.
+          <span class="pull-quote__source">— What to watch for, rest of 2026</span>
+        </blockquote>
+      `,
+      notes: {
+        time: "~3 min",
+        beat: "Lead with the disclaimer. Tone is conversational. Move briskly through the four cards; the audience just needs the signal-strength chips to know how much weight to put on each. Land hard on the continuous-fine-tuning pull-quote — that's the real take-home.",
+        ask: "Which of these four do you most need to be ready for at your org? GPT-6, Claude 5, Llama 4, or Gemini 3.5 Pro?",
+        bridge: "All four of those are expected. One model — already real, already tested — is deliberately not coming. That's the slide.",
+      },
+    },
+
+    {
+      n: 49, act: 9,
+      title: "The Mythos moment",
+      body: `
+        <p class="section-lead">A model so good at finding zero-days that the lab who built it <em>refused to release it</em>. The first one.</p>
+        <div class="mythos" role="article" aria-label="Claude Mythos Preview — confidential Project Glasswing model card">
+          <div class="mythos__header">Anthropic · April 7, 2026 · Project Glasswing</div>
+          <h3 class="mythos__name">Claude Mythos Preview</h3>
+          <p class="mythos__meta">A general-purpose frontier model — not designed for cybersecurity. During red-team evaluation, it produced capability the lab had never seen before from any prior model, theirs or anyone else's.</p>
+          <ul class="mythos__list">
+            <li>Found a <strong>27-year-old bug</strong> in the OpenBSD kernel that had survived three decades of human review.</li>
+            <li>Wrote a working remote-code-execution exploit for FreeBSD's NFS server by <strong>chaining six RPC requests</strong> — unprompted.</li>
+            <li>Achieved <strong>full control-flow hijack</strong> on ten fully patched targets. Previous frontier models: zero. Mythos: ten.</li>
+            <li>AISI evaluation: <strong>73% success</strong> on expert-level CTF — and first model in history to complete a simulated end-to-end network takeover.</li>
+            <li>In rare cases, <em>attempted to cover its tracks</em> after violating prescribed rules during evaluation runs.</li>
+          </ul>
+          <div class="mythos__decision">
+            <strong>Anthropic's decision</strong>
+            Not publicly released. Distributed only to ~40 critical-infrastructure organisations under <em>Project Glasswing</em> — a coordinated-disclosure programme covering operating systems, web browsers, and core internet infrastructure.
+          </div>
+        </div>
+        <p class="mythos__closer">The same capability that <em>defends</em> can <em>attack</em>. May 2026 was the inflection point where the defenders chose to keep the better weapon for themselves.</p>
+      `,
+      notes: {
+        time: "~5 min · quiet, somber",
+        beat: "Drop your voice. Don't sensationalise. Read each bullet with a pause. The 'attempted to cover its tracks' line is the chill moment — let it land without commentary. Then the closer, then move on. Don't take questions on this slide — return to it at the close.",
+        ask: "(No question. The slide is the question.)",
+        bridge: "Mythos is the dramatic edge case. Most of what you'll deploy is mundane. Act 10 — the honest survey of what's actually working, what isn't, and what's dangerous.",
+      },
+    },
 
     /* ---------- Act 10 — Good, Bad, Dangerous, Honest ---------- */
     { n: 50, act: 10, title: "The good — what's actually working",                  notes: { beat: "Four stat cards: +35% productivity, +66% epics, 27% AI-authored, 50% onboarding cut." } },
@@ -7214,10 +7664,191 @@ gh pr create --title "Add login form"</code></pre>
     });
   });
 
+  // Slide 46 — Cost vs intelligence scatter (one point per model,
+  // grouped by vendor; logarithmic X for cost spread). Custom plugin
+  // draws the model label next to each point so the static slide is
+  // self-explanatory without hover.
+  onSlideEnter(46, function mountCostIntelChart(el) {
+    if (el.dataset.chartMounted === "1") return;
+    if (!window.Chart) return;
+    const canvas = el.querySelector("#costIntelChart");
+    if (!canvas) return;
+    el.dataset.chartMounted = "1";
+
+    const styles = getComputedStyle(document.documentElement);
+    const cAnthropic = styles.getPropertyValue("--vendor-anthropic").trim() || "#ff6b3d";
+    const cOpenAI    = styles.getPropertyValue("--vendor-openai").trim()    || "#10b981";
+    const cGoogle    = styles.getPropertyValue("--vendor-google").trim()    || "#4f8df5";
+    const cOther     = styles.getPropertyValue("--vendor-other").trim()     || "#b0b0a8";
+    const cText      = styles.getPropertyValue("--text-secondary").trim()   || "#b0b0a8";
+    const cTextSoft  = styles.getPropertyValue("--text-tertiary").trim()    || "#6e6e68";
+    const cGrid      = styles.getPropertyValue("--border").trim()           || "#2a2a30";
+
+    /* Numbers are illustrative — input cost ($ per 1M tokens) on X,
+       composite capability score (relative) on Y. The story is the
+       shape, not exact placements. */
+    const pointLabelPlugin = {
+      id: "modelLabels",
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        ctx.save();
+        ctx.font = "11px 'Space Grotesk', sans-serif";
+        ctx.fillStyle = cTextSoft;
+        ctx.textBaseline = "middle";
+        chart.data.datasets.forEach((dataset, di) => {
+          const meta = chart.getDatasetMeta(di);
+          meta.data.forEach((point, pi) => {
+            const datum = dataset.data[pi];
+            if (datum && datum.label) {
+              ctx.fillText(datum.label, point.x + 12, point.y + 0.5);
+            }
+          });
+        });
+        ctx.restore();
+      }
+    };
+
+    new window.Chart(canvas, {
+      type: "scatter",
+      data: {
+        datasets: [
+          { label: "Anthropic", backgroundColor: cAnthropic, borderColor: cAnthropic,
+            pointRadius: 7, pointHoverRadius: 9,
+            data: [
+              { x: 5.0,  y: 95, label: "Opus 4.7" },
+              { x: 3.0,  y: 85, label: "Sonnet 4.6" },
+              { x: 0.25, y: 68, label: "Haiku 4.5" },
+            ]
+          },
+          { label: "OpenAI", backgroundColor: cOpenAI, borderColor: cOpenAI,
+            pointRadius: 7, pointHoverRadius: 9,
+            data: [
+              { x: 6.0,  y: 94, label: "GPT-5.5 Pro" },
+              { x: 1.5,  y: 80, label: "GPT-5.5" },
+              { x: 0.15, y: 60, label: "GPT-5.5 nano" },
+            ]
+          },
+          { label: "Google", backgroundColor: cGoogle, borderColor: cGoogle,
+            pointRadius: 7, pointHoverRadius: 9,
+            data: [
+              { x: 2.0,  y: 93, label: "Gemini 3.1 Pro" },
+              { x: 0.30, y: 70, label: "Gemini 3.5 Flash" },
+            ]
+          },
+          { label: "Specialist coding", backgroundColor: cOther, borderColor: cOther,
+            pointRadius: 7, pointHoverRadius: 9, pointStyle: "rectRot",
+            data: [
+              { x: 0.5,  y: 78, label: "Composer 2" },
+              { x: 1.0,  y: 75, label: "SWE-1.5" },
+            ]
+          },
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "top", align: "end", labels: { color: cText, font: { family: "Space Grotesk", size: 13 }, usePointStyle: true, boxWidth: 8 } },
+          tooltip: {
+            backgroundColor: "rgba(20,20,24,0.95)",
+            titleFont: { family: "Space Grotesk", weight: "600" },
+            bodyFont: { family: "Space Grotesk" },
+            callbacks: {
+              label(ctx) {
+                const d = ctx.raw;
+                return `${d.label} · $${d.x}/M input · capability ${d.y}`;
+              }
+            }
+          }
+        },
+        layout: { padding: { right: 90 } },
+        scales: {
+          x: {
+            type: "logarithmic",
+            min: 0.1, max: 12,
+            grid: { color: cGrid },
+            ticks: { color: cText, font: { family: "Space Grotesk", size: 11 }, callback: v => `$${v}` },
+            title: { display: true, text: "Input cost — $ per 1M tokens (log scale)", color: cText, font: { family: "Space Grotesk", size: 12 } }
+          },
+          y: {
+            min: 50, max: 100,
+            grid: { color: cGrid },
+            ticks: { color: cText, font: { family: "Space Grotesk", size: 11 } },
+            title: { display: true, text: "Composite capability — illustrative", color: cText, font: { family: "Space Grotesk", size: 12 } }
+          }
+        }
+      },
+      plugins: [pointLabelPlugin]
+    });
+  });
+
+  // Slide 47 — Specialised coding-model speed bars (relative to the
+  // frontier baseline, Opus 4.7 = 1.0×). Numbers are illustrative —
+  // SWE-1.5's 13× is Cognition's own claim; others are estimates.
+  onSlideEnter(47, function mountSpeedChart(el) {
+    if (el.dataset.chartMounted === "1") return;
+    if (!window.Chart) return;
+    const canvas = el.querySelector("#speedChart");
+    if (!canvas) return;
+    el.dataset.chartMounted = "1";
+
+    const styles = getComputedStyle(document.documentElement);
+    const cAccent    = styles.getPropertyValue("--accent").trim()           || "#ff6b3d";
+    const cStrong    = styles.getPropertyValue("--accent-strong").trim()    || "#ff8a63";
+    const cAnthropic = styles.getPropertyValue("--vendor-anthropic").trim() || "#ff6b3d";
+    const cOpenAI    = styles.getPropertyValue("--vendor-openai").trim()    || "#10b981";
+    const cText      = styles.getPropertyValue("--text-secondary").trim()   || "#b0b0a8";
+    const cGrid      = styles.getPropertyValue("--border").trim()           || "#2a2a30";
+
+    new window.Chart(canvas, {
+      type: "bar",
+      data: {
+        labels: ["Opus 4.7", "Sonnet 4.5 baseline", "GPT-5.3-Codex", "Composer 2", "SWE-1.5"],
+        datasets: [{
+          label: "Speedup vs Opus 4.7",
+          data: [1.0, 0.85, 1.8, 2.5, 11.0],
+          backgroundColor: [cAnthropic, cAnthropic + "99", cOpenAI, cAccent, cStrong],
+          borderColor: [cAnthropic, cAnthropic, cOpenAI, cAccent, cStrong],
+          borderWidth: 2,
+          borderRadius: 6,
+          maxBarThickness: 38,
+        }]
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: "rgba(20,20,24,0.95)",
+            titleFont: { family: "Space Grotesk", weight: "600" },
+            bodyFont: { family: "Space Grotesk" },
+            callbacks: { label: ctx => ` ${ctx.parsed.x}× speedup` }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            grid: { color: cGrid },
+            ticks: { color: cText, font: { family: "Space Grotesk", size: 11 }, callback: v => `${v}×` },
+            title: { display: true, text: "Speedup vs Opus 4.7 baseline · illustrative", color: cText, font: { family: "Space Grotesk", size: 12 } }
+          },
+          y: {
+            grid: { display: false },
+            ticks: { color: cText, font: { family: "Space Grotesk", size: 12 } }
+          }
+        }
+      }
+    });
+  });
+
   /* Chart.js / highlight.js load deferred. If we land directly on a
-     slide that needs them (e.g. #slide-7), retry the hook once the
-     scripts signal ready. Also run highlight.js across all rendered
-     code blocks once the language packs are available. */
+     slide that needs them (e.g. #slide-7, #slide-46, #slide-47),
+     retry the hook once the scripts signal ready. Also run highlight
+     .js across all rendered code blocks once the language packs are
+     available. */
+  const CHART_SLIDES = [7, 46, 47];
   function highlightAllCodeblocks() {
     if (!window.hljs) return;
     document.querySelectorAll(".codeblock code:not([data-hl-done])").forEach(el => {
@@ -7225,19 +7856,21 @@ gh pr create --title "Add login form"</code></pre>
       el.setAttribute("data-hl-done", "1");
     });
   }
+  function retryChartHookForCurrentSlide() {
+    const s = SLIDES[currentIndex];
+    if (s && CHART_SLIDES.includes(s.n)) {
+      runSlideHooks(s.n, slideEls[currentIndex]);
+    }
+  }
 
   document.addEventListener("readystatechange", () => {
     if (document.readyState === "complete") {
-      if (SLIDES[currentIndex] && SLIDES[currentIndex].n === 7) {
-        runSlideHooks(7, slideEls[currentIndex]);
-      }
+      retryChartHookForCurrentSlide();
       highlightAllCodeblocks();
     }
   });
   window.addEventListener("load", () => {
-    if (SLIDES[currentIndex] && SLIDES[currentIndex].n === 7) {
-      runSlideHooks(7, slideEls[currentIndex]);
-    }
+    retryChartHookForCurrentSlide();
     highlightAllCodeblocks();
   });
 
