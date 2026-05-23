@@ -1114,6 +1114,334 @@ html[data-theme="light"] {
 .stat-closer .strike { text-decoration: line-through; color: var(--text-tertiary); }
 
 /* ============================================================
+   Act 3 components — autonomy axis, tier list, three-lane,
+   orchestra metaphor SVG, tool spectrum bars
+   ============================================================ */
+
+/* Autonomy axis (Slide 11) */
+.autonomy {
+  margin-top: 36px;
+  padding: 56px 24px 32px;
+  position: relative;
+}
+.autonomy__line {
+  position: relative;
+  height: 2px;
+  background: linear-gradient(90deg, var(--border) 0%, var(--accent) 50%, var(--accent) 100%);
+  border-radius: 2px;
+}
+.autonomy__dot {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.autonomy__dot--filled {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+.autonomy__labels {
+  margin-top: 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.autonomy__labels .autonomy__arrow {
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.autonomy__caption {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-tertiary);
+  font-style: italic;
+  margin-top: 24px;
+  text-align: center;
+}
+
+/* Tier list (Slide 12) */
+.tier-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+.tier-row {
+  display: grid;
+  grid-template-columns: 56px 1.2fr 1.6fr 1fr;
+  gap: 20px;
+  align-items: center;
+  padding: 12px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+}
+.tier-row__num {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--accent);
+}
+.tier-row__name {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+.tier-row__name small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+  letter-spacing: 0.02em;
+}
+.tier-row__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.tier-row__tool {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.tier-row__when {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-style: italic;
+  line-height: 1.35;
+}
+
+/* Three-lane (Slide 13) */
+.lanes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 4px;
+}
+.lane {
+  padding: 22px 22px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+.lane__num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.lane__name {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.1;
+  margin: -4px 0 0;
+  color: var(--text-primary);
+}
+.lane__headline {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+.lane__example {
+  margin-top: auto;
+  padding: 14px 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+}
+.lane__example-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
+}
+.lane__example-task {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+/* Orchestra metaphor (Slide 14) */
+.orchestra {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 4px;
+}
+.orchestra__panel {
+  padding: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+.orchestra__svg {
+  width: 100%;
+  max-width: 420px;
+  height: 200px;
+  margin-bottom: 8px;
+}
+.orchestra__svg .stroke {
+  stroke: var(--text-secondary);
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.orchestra__svg .stroke--accent  { stroke: var(--accent); stroke-width: 2; }
+.orchestra__svg .accent-fill { fill: var(--accent); }
+.orchestra__svg .stage {
+  stroke: var(--border);
+  stroke-dasharray: 3 4;
+  stroke-width: 1;
+}
+.orchestra__kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.orchestra__title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+.orchestra__body {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 320px;
+}
+
+/* Tool spectrum bars (Slide 15) */
+.spectrum {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.spectrum__row {
+  display: grid;
+  grid-template-columns: 160px repeat(7, 1fr);
+  gap: 6px;
+  align-items: center;
+  padding: 8px 16px;
+  background: var(--bg-card);
+}
+.spectrum__row + .spectrum__row { border-top: 1px solid var(--border-soft); }
+.spectrum__row--axis {
+  background: var(--bg-elevated);
+  padding: 10px 16px;
+}
+.spectrum__tool {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.spectrum__tool small {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+.spectrum__axis-cell {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  text-align: center;
+  line-height: 1.2;
+}
+.spectrum__axis-cell strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--accent);
+  font-weight: 600;
+}
+.spectrum__bar {
+  height: 28px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bg-primary);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+}
+html[data-theme="light"] .spectrum__bar { color: var(--bg-elevated); }
+.spectrum__bar--soft {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+/* ============================================================
    Overlays (help, jump, notes)
    ============================================================ */
 .overlay {
@@ -1341,12 +1669,23 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   .stat-card__num { font-size: 48px; }
   .stat-card__num .stat-card__unit { font-size: 24px; }
   .stat-closer { font-size: 20px; }
+  .tier-row { grid-template-columns: 40px 1fr; gap: 12px; padding: 10px 14px; }
+  .tier-row__tools, .tier-row__when { display: none; }
+  .lanes { grid-template-columns: 1fr; }
+  .orchestra { grid-template-columns: 1fr; }
+  .spectrum__row { grid-template-columns: 100px repeat(7, 1fr); padding: 6px 10px; }
+  .spectrum__tool { font-size: 14px; }
+  .spectrum__bar { font-size: 9px; padding: 0 6px; }
+  .autonomy__dot { width: 28px; height: 28px; font-size: 13px; }
 }
 
 @media (max-width: 1024px) {
   .tape { grid-template-columns: 96px repeat(6, 1fr); }
   .frontier-card__name { font-size: 22px; }
   .quiet__quote { font-size: 32px; }
+  .tier-row { grid-template-columns: 48px 1.1fr 1.3fr 1fr; gap: 14px; }
+  .spectrum__row { grid-template-columns: 130px repeat(7, 1fr); }
+  .spectrum__tool { font-size: 15px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1948,11 +2287,339 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
     },
 
     /* ---------- Act 3 — The Capability Spectrum ---------- */
-    { n: 11, act: 3, title: "From autocomplete to autonomy",                        notes: { beat: "Single sentence — there is no 'AI coding tool', only a spectrum." } },
-    { n: 12, act: 3, title: "The seven-tier capability spectrum",                   notes: { beat: "Interactive slider — drag through tiers 1–7. Must-build widget #2." } },
-    { n: 13, act: 3, title: "The Addy Osmani three-tier framing",                   notes: { beat: "Compress seven into three. Conductor / parallel / cloud." } },
-    { n: 14, act: 3, title: "The orchestra metaphor",                               notes: { beat: "Conductor vs orchestrator. Lead with the analogy, then abstract." } },
-    { n: 15, act: 3, title: "Where each big tool sits on the spectrum",             notes: { beat: "Tool placements on the axis. Bars not points — many tools span tiers." } },
+    {
+      n: 11, act: 3,
+      title: "From autocomplete to autonomy",
+      body: `
+        <p class="section-lead">There is no "AI coding tool" anymore. There is a <em>spectrum</em> — from autocomplete to autonomous engineering — and every tool sits somewhere on it.</p>
+        <div class="autonomy" aria-label="Autonomy axis with seven anonymous tiers, to be named on the next slide">
+          <div class="autonomy__line">
+            <span class="autonomy__dot autonomy__dot--filled" style="left: 0%;">1</span>
+            <span class="autonomy__dot" style="left: 16.66%;">2</span>
+            <span class="autonomy__dot" style="left: 33.33%;">3</span>
+            <span class="autonomy__dot" style="left: 50%;">4</span>
+            <span class="autonomy__dot" style="left: 66.66%;">5</span>
+            <span class="autonomy__dot" style="left: 83.33%;">6</span>
+            <span class="autonomy__dot autonomy__dot--filled" style="left: 100%;">7</span>
+          </div>
+          <div class="autonomy__labels">
+            <span>Autocomplete</span>
+            <span class="autonomy__arrow">→ Autonomy →</span>
+            <span>Autonomous engineering</span>
+          </div>
+          <p class="autonomy__caption">Seven steps. We'll name them on the next slide.</p>
+        </div>
+      `,
+      notes: {
+        time: "~2 min",
+        beat: "Single-sentence opener. Read the lead, let the axis sit. Don't name the tiers yet — that's the next slide's job. Tease.",
+        ask: "(No question. Hand off to Slide 12.)",
+        bridge: "Seven steps. From the thing every editor has had since 2021 to the thing that didn't exist eighteen months ago.",
+      },
+    },
+
+    {
+      n: 12, act: 3,
+      title: "The seven-tier capability spectrum",
+      body: `
+        <p class="section-lead">Each tier is a different <em>kind</em> of help — different cadence, different supervision, different failure mode.</p>
+        <div class="tier-list">
+
+          <div class="tier-row">
+            <div class="tier-row__num">1</div>
+            <div class="tier-row__name">Tab autocomplete<small>Inline single-token / single-line suggestions</small></div>
+            <div class="tier-row__tools">
+              <span class="tier-row__tool">Copilot classic</span>
+              <span class="tier-row__tool">Tabnine</span>
+              <span class="tier-row__tool">Amazon Q inline</span>
+            </div>
+            <div class="tier-row__when">Typing speed. ~92% of devs still use it daily.</div>
+          </div>
+
+          <div class="tier-row">
+            <div class="tier-row__num">2</div>
+            <div class="tier-row__name">Inline edit<small>Focused multi-line refactor on a selection</small></div>
+            <div class="tier-row__tools">
+              <span class="tier-row__tool">Cursor Cmd+K</span>
+              <span class="tier-row__tool">Copilot Edits</span>
+              <span class="tier-row__tool">Windsurf inline</span>
+            </div>
+            <div class="tier-row__when">Renaming. Type-fixing. Small refactors.</div>
+          </div>
+
+          <div class="tier-row">
+            <div class="tier-row__num">3</div>
+            <div class="tier-row__name">Multi-file agent<small>Edits across files in one shot, scoped to a task</small></div>
+            <div class="tier-row__tools">
+              <span class="tier-row__tool">Cursor Composer</span>
+              <span class="tier-row__tool">Copilot Edits multi-file</span>
+              <span class="tier-row__tool">Windsurf Cascade</span>
+            </div>
+            <div class="tier-row__when">"Add a settings page." Scoped feature work.</div>
+          </div>
+
+          <div class="tier-row">
+            <div class="tier-row__num">4</div>
+            <div class="tier-row__name">Agent mode<small>Plans, edits, runs commands, iterates against feedback</small></div>
+            <div class="tier-row__tools">
+              <span class="tier-row__tool">Claude Code</span>
+              <span class="tier-row__tool">Copilot Agent Mode</span>
+              <span class="tier-row__tool">Codex CLI</span>
+            </div>
+            <div class="tier-row__when">Most daily work. You watch; you don't type.</div>
+          </div>
+
+          <div class="tier-row">
+            <div class="tier-row__num">5</div>
+            <div class="tier-row__name">Parallel local agents<small>3–10 agents in isolated git worktrees on your machine</small></div>
+            <div class="tier-row__tools">
+              <span class="tier-row__tool">Claude Squad</span>
+              <span class="tier-row__tool">Vibe Kanban</span>
+              <span class="tier-row__tool">Cline Kanban</span>
+              <span class="tier-row__tool">Conductor</span>
+            </div>
+            <div class="tier-row__when">Parallel sprints. Many features at once.</div>
+          </div>
+
+          <div class="tier-row">
+            <div class="tier-row__num">6</div>
+            <div class="tier-row__name">Cloud agents<small>Assign a ticket, walk away, review a PR</small></div>
+            <div class="tier-row__tools">
+              <span class="tier-row__tool">Devin 2.2</span>
+              <span class="tier-row__tool">Claude Code Web</span>
+              <span class="tier-row__tool">Copilot Coding Agent</span>
+              <span class="tier-row__tool">Jules</span>
+              <span class="tier-row__tool">Codex Web</span>
+            </div>
+            <div class="tier-row__when">Backlog drain. Overnight work.</div>
+          </div>
+
+          <div class="tier-row">
+            <div class="tier-row__num">7</div>
+            <div class="tier-row__name">Multi-agent orchestration<small>Agents that spawn and coordinate other agents</small></div>
+            <div class="tier-row__tools">
+              <span class="tier-row__tool">Anthropic Agent Teams</span>
+              <span class="tier-row__tool">Antigravity Manager</span>
+              <span class="tier-row__tool">Composio Orchestrator</span>
+            </div>
+            <div class="tier-row__when">Pipelines &amp; large refactors. Use sparingly — Act 8.</div>
+          </div>
+
+        </div>
+        <p class="slide__source">Phase 4 will turn this list into a draggable slider where each tier expands inline. For Phase 2, the stacked view is the readable fallback.</p>
+      `,
+      notes: {
+        time: "~8 min",
+        beat: "This is the scaffolding for the rest of the session. Don't rush. Walk top-to-bottom; ask the room which tier they're at as you go. Tier 4 (agent mode) is where 'most daily work' lives in May 2026 — emphasise this.",
+        ask: "Which tier do you spend the most time at this week? Not your job title — your actual hours.",
+        bridge: "Seven is too many to hold in your head. Addy Osmani compressed it to three — the lens we'll use for the rest of the deck.",
+      },
+    },
+
+    {
+      n: 13, act: 3,
+      title: "Three tiers, not seven — the working lens",
+      body: `
+        <p class="section-lead">Seven tiers describe the <em>map</em>. Three tiers describe how the day actually splits.</p>
+        <div class="lanes">
+
+          <div class="lane">
+            <div class="lane__num">Tier 1</div>
+            <h3 class="lane__name">Conductor</h3>
+            <p class="lane__headline">One terminal, one agent. You set the score, the agent plays. Tight synchronous loop — you watch every move.</p>
+            <div class="lane__example">
+              <div class="lane__example-label">Sample task</div>
+              <div class="lane__example-task">Sit in Claude Code, design a new authentication flow, review every diff before commit.</div>
+            </div>
+          </div>
+
+          <div class="lane">
+            <div class="lane__num">Tier 2</div>
+            <h3 class="lane__name">Parallel local</h3>
+            <p class="lane__headline">Three to ten agents, each in its own git worktree on your laptop. You become an air-traffic controller, not a coder.</p>
+            <div class="lane__example">
+              <div class="lane__example-label">Sample task</div>
+              <div class="lane__example-task">Vibe Kanban board with five cards: add auth, fix billing bug, update dependencies, write tests, refactor models. All running.</div>
+            </div>
+          </div>
+
+          <div class="lane">
+            <div class="lane__num">Tier 3</div>
+            <h3 class="lane__name">Cloud delegation</h3>
+            <p class="lane__headline">Assign and close the laptop. The work happens overnight on someone else's machine. You return to PRs and a Slack ping.</p>
+            <div class="lane__example">
+              <div class="lane__example-label">Sample task</div>
+              <div class="lane__example-task">Friday afternoon: assign twelve Linear tickets to Devin and Copilot Coding Agent. Monday morning: review twelve draft PRs.</div>
+            </div>
+          </div>
+
+        </div>
+        <blockquote class="pull-quote">
+          Most developers in 2026 will use all three tiers — Tier 1 for interactive work, Tier 2 for parallel sprints, Tier 3 to drain the backlog overnight.
+          <span class="pull-quote__source">— Addy Osmani, "The Code Agent Orchestra"</span>
+        </blockquote>
+      `,
+      notes: {
+        time: "~4 min",
+        beat: "The three-tier lens is the working memory model — you'll see it again in Acts 6, 7, 8. Frame this as 'pick your tier for the next hour', not 'pick a tier forever'.",
+        ask: "Which tier are you most underused at — Conductor, Parallel local, or Cloud delegation?",
+        bridge: "Three tiers compresses well. So does the analogy.",
+      },
+    },
+
+    {
+      n: 14, act: 3,
+      title: "Conductor or orchestrator — pick your shift",
+      body: `
+        <p class="section-lead">Same person. Two completely different jobs. One you do <em>with</em> the AI; one you do <em>around</em> it.</p>
+        <div class="orchestra">
+
+          <div class="orchestra__panel">
+            <svg class="orchestra__svg" viewBox="0 0 420 200" aria-hidden="true">
+              <line class="stage" x1="20" y1="180" x2="400" y2="180" />
+              <!-- conductor -->
+              <g transform="translate(80,80)">
+                <circle class="stroke stroke--accent" cx="0" cy="0" r="11" />
+                <line class="stroke stroke--accent" x1="0" y1="11" x2="0" y2="56" />
+                <line class="stroke stroke--accent" x1="0" y1="22" x2="-18" y2="40" />
+                <line class="stroke stroke--accent" x1="0" y1="22" x2="22" y2="6" />
+                <line class="stroke stroke--accent" x1="0" y1="56" x2="-12" y2="98" />
+                <line class="stroke stroke--accent" x1="0" y1="56" x2="14" y2="98" />
+                <!-- baton -->
+                <line class="stroke stroke--accent" x1="22" y1="6" x2="56" y2="-20" />
+              </g>
+              <!-- single violinist -->
+              <g transform="translate(290,80)">
+                <circle class="stroke" cx="0" cy="0" r="10" />
+                <line class="stroke" x1="0" y1="10" x2="0" y2="50" />
+                <line class="stroke" x1="0" y1="20" x2="-22" y2="32" />
+                <line class="stroke" x1="0" y1="20" x2="18" y2="40" />
+                <line class="stroke" x1="0" y1="50" x2="-10" y2="98" />
+                <line class="stroke" x1="0" y1="50" x2="12" y2="98" />
+                <!-- violin held under chin -->
+                <rect x="-28" y="22" width="22" height="8" rx="1.5" class="stroke" />
+                <!-- bow -->
+                <line class="stroke" x1="-30" y1="38" x2="-2" y2="50" />
+              </g>
+              <!-- focus dotted lines from conductor to violinist -->
+              <path d="M 110 70 Q 200 40 270 70" class="stroke" stroke-dasharray="3 5" />
+            </svg>
+            <div class="orchestra__kicker">Synchronous · one agent</div>
+            <h3 class="orchestra__title">Conductor</h3>
+            <p class="orchestra__body">A duet. Every note watched. Six months ago this was the only mode anyone had.</p>
+          </div>
+
+          <div class="orchestra__panel">
+            <svg class="orchestra__svg" viewBox="0 0 420 200" aria-hidden="true">
+              <line class="stage" x1="20" y1="180" x2="400" y2="180" />
+              <!-- conductor in front, smaller -->
+              <g transform="translate(210,140)">
+                <circle class="stroke stroke--accent" cx="0" cy="0" r="8" />
+                <line class="stroke stroke--accent" x1="0" y1="8" x2="0" y2="38" />
+                <line class="stroke stroke--accent" x1="0" y1="16" x2="-14" y2="6" />
+                <line class="stroke stroke--accent" x1="0" y1="16" x2="14" y2="6" />
+              </g>
+              <!-- five musicians arranged in arc -->
+              <g class="stroke" transform="translate(60,80)">
+                <circle cx="0" cy="0" r="9" /><line x1="0" y1="9" x2="0" y2="44" /><line x1="0" y1="18" x2="-18" y2="32" /><line x1="0" y1="18" x2="14" y2="38" />
+                <rect x="-22" y="22" width="18" height="6" rx="1.5" />
+              </g>
+              <g class="stroke" transform="translate(140,55)">
+                <circle cx="0" cy="0" r="9" /><line x1="0" y1="9" x2="0" y2="44" /><line x1="0" y1="18" x2="-18" y2="32" /><line x1="0" y1="18" x2="14" y2="38" />
+                <rect x="-22" y="22" width="18" height="6" rx="1.5" />
+              </g>
+              <g class="stroke" transform="translate(220,48)">
+                <circle cx="0" cy="0" r="9" /><line x1="0" y1="9" x2="0" y2="44" /><line x1="0" y1="18" x2="-18" y2="32" /><line x1="0" y1="18" x2="14" y2="38" />
+                <rect x="-22" y="22" width="18" height="6" rx="1.5" />
+              </g>
+              <g class="stroke" transform="translate(300,55)">
+                <circle cx="0" cy="0" r="9" /><line x1="0" y1="9" x2="0" y2="44" /><line x1="0" y1="18" x2="-18" y2="32" /><line x1="0" y1="18" x2="14" y2="38" />
+                <rect x="-22" y="22" width="18" height="6" rx="1.5" />
+              </g>
+              <g class="stroke" transform="translate(380,80)">
+                <circle cx="0" cy="0" r="9" /><line x1="0" y1="9" x2="0" y2="44" /><line x1="0" y1="18" x2="-18" y2="32" /><line x1="0" y1="18" x2="14" y2="38" />
+                <rect x="-22" y="22" width="18" height="6" rx="1.5" />
+              </g>
+              <!-- arc connecting conductor to musicians -->
+              <path d="M 60 80 Q 210 0 380 80" class="stroke" stroke-dasharray="3 5" />
+            </svg>
+            <div class="orchestra__kicker">Asynchronous · many agents</div>
+            <h3 class="orchestra__title">Orchestrator</h3>
+            <p class="orchestra__body">An ensemble. You set the score, the sections play. You review the recording, not every note.</p>
+          </div>
+
+        </div>
+        <blockquote class="pull-quote">
+          The codebase becomes your canvas, not a conversation thread.
+          <span class="pull-quote__source">— htdocs.dev on the agentic-engineering shift</span>
+        </blockquote>
+      `,
+      notes: {
+        time: "~3 min",
+        beat: "Lead with the picture — let the audience see the analogy before you name it. Then point: 'most of you live on the left right now. By next year, half your hours will be on the right.'",
+        ask: "How many of you have ever been the conductor for more than one agent at once?",
+        bridge: "OK — names. Where does each tool sit on the seven-tier spectrum?",
+      },
+    },
+
+    {
+      n: 15, act: 3,
+      title: "Where each big tool sits on the spectrum",
+      body: `
+        <p class="section-lead">Most tools cover a <em>range</em>, not a point. The job is to know which range you're paying for.</p>
+        <div class="spectrum" aria-label="Where six major tools sit on the seven-tier spectrum">
+
+          <div class="spectrum__row spectrum__row--axis">
+            <div class="spectrum__tool"></div>
+            <div class="spectrum__axis-cell"><strong>1</strong>Autocomplete</div>
+            <div class="spectrum__axis-cell"><strong>2</strong>Inline edit</div>
+            <div class="spectrum__axis-cell"><strong>3</strong>Multi-file</div>
+            <div class="spectrum__axis-cell"><strong>4</strong>Agent mode</div>
+            <div class="spectrum__axis-cell"><strong>5</strong>Parallel local</div>
+            <div class="spectrum__axis-cell"><strong>6</strong>Cloud</div>
+            <div class="spectrum__axis-cell"><strong>7</strong>Multi-agent</div>
+          </div>
+
+          <div class="spectrum__row">
+            <div class="spectrum__tool">GitHub Copilot <small>~15M devs</small></div>
+            <div class="spectrum__bar" style="grid-column: 2 / span 4;">Tiers 1 – 4</div>
+          </div>
+
+          <div class="spectrum__row">
+            <div class="spectrum__tool">Cursor 3 <small>$60B valuation</small></div>
+            <div class="spectrum__bar" style="grid-column: 3 / span 4;">Tiers 2 – 5</div>
+          </div>
+
+          <div class="spectrum__row">
+            <div class="spectrum__tool">Windsurf <small>Cognition</small></div>
+            <div class="spectrum__bar" style="grid-column: 3 / span 4;">Tiers 2 – 5</div>
+          </div>
+
+          <div class="spectrum__row">
+            <div class="spectrum__tool">Claude Code <small>Anthropic</small></div>
+            <div class="spectrum__bar" style="grid-column: 5 / span 4;">Tiers 4 – 7</div>
+          </div>
+
+          <div class="spectrum__row">
+            <div class="spectrum__tool">Vibe Kanban <small>BloopAI · Rust</small></div>
+            <div class="spectrum__bar spectrum__bar--soft" style="grid-column: 6 / span 1;">Tier 5</div>
+          </div>
+
+          <div class="spectrum__row">
+            <div class="spectrum__tool">Devin 2.2 <small>Cognition</small></div>
+            <div class="spectrum__bar" style="grid-column: 7 / span 2;">Tiers 6 – 7</div>
+          </div>
+
+        </div>
+        <p class="slide__source">No tool sits at a single point any more — even Copilot now spans inline autocomplete to a full agent. Where you actually <em>spend time</em> in a tool matters more than where it could in principle take you.</p>
+      `,
+      notes: {
+        time: "~4 min",
+        beat: "Walk top-to-bottom. Point out the overlap between Cursor and Windsurf (same range), and the jump from Copilot/Cursor land into Claude Code / Devin land. Vibe Kanban as the 'tiny but unique' tool.",
+        ask: "What tier is the tool you used most this morning sitting at? Now: what tier did you actually use it at?",
+        bridge: "Ranges on an axis are abstract. Act 4 is the concrete tour — what each of these tools actually feels like in 2026.",
+      },
+    },
 
     /* ---------- Act 4 — The Tool Stack ---------- */
     { n: 16, act: 4, title: "The four tool categories",                             notes: { beat: "IDEs / CLIs / Cloud SWEs / Orchestration. Plus mention IDE extensions and prompt-to-app." } },
