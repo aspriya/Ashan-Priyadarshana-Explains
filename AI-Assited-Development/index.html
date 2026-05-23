@@ -25,6 +25,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
+<!-- Chart.js (used from Slide 7 onwards) -->
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.5/dist/chart.umd.min.js"></script>
+
 <style>
 /* ============================================================
    Design tokens — dark mode primary, light mode toggle
@@ -691,6 +694,426 @@ kbd {
 .section-lead em { color: var(--accent); font-style: italic; }
 
 /* ============================================================
+   Act 2 components — release tape, frontier cards, cadence chart,
+   newspaper clippings, quiet-quote slide, stat grid
+   ============================================================ */
+
+/* Vendor color mapping (used across S5, S6, S7) */
+:root {
+  --vendor-anthropic: var(--accent);
+  --vendor-openai:    #10b981;
+  --vendor-google:    #4f8df5;
+  --vendor-other:     #b0b0a8;
+}
+html[data-theme="light"] {
+  --vendor-openai:    #0c8f6c;
+  --vendor-google:    #1d6cdb;
+  --vendor-other:     #82827a;
+}
+
+/* Release tape (Slide 5) */
+.tape {
+  display: grid;
+  grid-template-columns: 112px repeat(6, 1fr);
+  gap: 1px;
+  background: var(--border-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.tape__cell {
+  background: var(--bg-elevated);
+  padding: 12px 12px;
+  min-height: 84px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tape__header {
+  background: var(--bg-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  justify-content: center;
+  min-height: 36px;
+}
+.tape__vendor {
+  background: var(--bg-card);
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+.tape__vendor-anthropic { color: var(--vendor-anthropic); }
+.tape__vendor-openai    { color: var(--vendor-openai); }
+.tape__vendor-google    { color: var(--vendor-google); }
+.tape__vendor-other     { color: var(--vendor-other); }
+
+.pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.pill--anthropic { background: rgba(255,107,61,0.10); border-color: var(--vendor-anthropic); color: var(--vendor-anthropic); }
+.pill--openai    { background: rgba(16,185,129,0.10); border-color: var(--vendor-openai);    color: var(--vendor-openai); }
+.pill--google    { background: rgba(79,141,245,0.10); border-color: var(--vendor-google);    color: var(--vendor-google); }
+.pill--other     { background: rgba(176,176,168,0.10); border-color: var(--vendor-other);   color: var(--text-secondary); }
+.pill--gated {
+  background: var(--bg-primary);
+  border: 1px dashed var(--vendor-anthropic);
+  color: var(--vendor-anthropic);
+  font-style: italic;
+}
+.pill--gated::before { content: "🔒 "; font-style: normal; }
+
+.tape__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 18px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-tertiary);
+  align-items: center;
+}
+.tape__legend-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* Frontier cards (Slide 6) */
+.frontier-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin-top: 4px;
+}
+.frontier-card {
+  position: relative;
+  padding: 24px 26px 22px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+.frontier-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--card-color, var(--accent));
+}
+.frontier-card--anthropic { --card-color: var(--vendor-anthropic); }
+.frontier-card--openai    { --card-color: var(--vendor-openai); }
+.frontier-card--google    { --card-color: var(--vendor-google); }
+.frontier-card--gated {
+  border-style: dashed;
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-elevated));
+}
+.frontier-card--gated::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(255,107,61,0.04) 70%, rgba(255,107,61,0.10) 100%);
+  pointer-events: none;
+}
+.frontier-card__lock {
+  position: absolute;
+  top: 18px; right: 18px;
+  width: 30px; height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  border: 1px solid var(--vendor-anthropic);
+  border-radius: 6px;
+  color: var(--vendor-anthropic);
+  font-size: 14px;
+}
+.frontier-card__vendor {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--card-color, var(--accent));
+}
+.frontier-card__name {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--text-primary);
+  margin: -4px 0 -2px;
+}
+.frontier-card__meta {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+.frontier-card__bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 2px;
+}
+.bar {
+  display: grid;
+  grid-template-columns: 130px 1fr 56px;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.bar__track {
+  height: 8px;
+  background: var(--border-soft);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+.bar__fill {
+  height: 100%;
+  background: var(--card-color, var(--accent));
+  border-radius: 4px;
+}
+.bar__value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-align: right;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.frontier-card__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-soft);
+}
+.frontier-card__price {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-primary);
+}
+.frontier-card__caveat {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-tertiary);
+}
+.frontier-card--gated .frontier-card__caveat { color: var(--vendor-anthropic); }
+
+/* Cadence chart (Slide 7) */
+.chart-wrap {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 16px 12px;
+  margin-top: 4px;
+}
+.chart-wrap__title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+.chart-wrap__canvas-host {
+  position: relative;
+  width: 100%;
+  height: calc(100% - 28px);
+}
+
+/* Newspaper clippings (Slide 8) */
+.news-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+.news {
+  display: grid;
+  grid-template-columns: 152px 1fr;
+  gap: 22px;
+  align-items: flex-start;
+  padding: 18px 22px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  transition: transform var(--t-fast), border-color var(--t-fast);
+}
+.news:nth-child(even) { transform: rotate(-0.25deg); }
+.news:nth-child(odd)  { transform: rotate(0.2deg); }
+.news:hover {
+  transform: rotate(0deg);
+  border-color: var(--accent);
+}
+.news__date {
+  display: flex;
+  flex-direction: column;
+}
+.news__date-day {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1;
+}
+.news__date-detail {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-top: 6px;
+}
+.news__headline {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+.news__body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Quiet quote slide (Slide 9) */
+.slide--quiet {
+  padding: 64px;
+}
+.quiet {
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+}
+.quiet__kicker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 32px;
+}
+.quiet__quote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 38px;
+  line-height: 1.35;
+  color: var(--text-primary);
+  letter-spacing: -0.012em;
+  margin: 0 0 28px;
+}
+.quiet__quote::before { content: "“"; color: var(--accent); margin-right: 4px; }
+.quiet__quote::after  { content: "”"; color: var(--accent); margin-left: 2px; }
+.quiet__source {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--text-tertiary);
+  margin-bottom: 36px;
+  letter-spacing: 0.04em;
+}
+.quiet__gloss {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  max-width: 780px;
+  padding-left: 18px;
+  border-left: 2px solid var(--border);
+}
+.quiet__gloss em { color: var(--accent); }
+
+/* Stat grid (Slide 10) */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin-top: 4px;
+}
+.stat-card {
+  padding: 26px 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  border-left: 3px solid var(--accent);
+}
+.stat-card__num {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 64px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.stat-card__num .stat-card__unit {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--accent);
+  margin-left: 2px;
+}
+.stat-card__label {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--text-primary);
+  margin-top: 12px;
+}
+.stat-card__delta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  margin-top: 6px;
+}
+.stat-closer {
+  margin-top: 32px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 1.3;
+  color: var(--text-primary);
+  letter-spacing: -0.005em;
+  max-width: 920px;
+}
+.stat-closer em { color: var(--accent); font-style: italic; }
+.stat-closer .strike { text-decoration: line-through; color: var(--text-tertiary); }
+
+/* ============================================================
    Overlays (help, jump, notes)
    ============================================================ */
 .overlay {
@@ -907,6 +1330,23 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   .section-lead { font-size: 22px; }
   .timeline__headline { font-size: 18px; }
   .timeline__quote { font-size: 15px; }
+  .frontier-grid { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: 1fr; }
+  .news { grid-template-columns: 1fr; gap: 8px; }
+  .tape { grid-template-columns: 80px repeat(6, 1fr); font-size: 11px; }
+  .tape__cell { padding: 8px; min-height: 64px; }
+  .pill { font-size: 10px; padding: 3px 7px; }
+  .chart-wrap { height: 280px; }
+  .quiet__quote { font-size: 26px; }
+  .stat-card__num { font-size: 48px; }
+  .stat-card__num .stat-card__unit { font-size: 24px; }
+  .stat-closer { font-size: 20px; }
+}
+
+@media (max-width: 1024px) {
+  .tape { grid-template-columns: 96px repeat(6, 1fr); }
+  .frontier-card__name { font-size: 22px; }
+  .quiet__quote { font-size: 32px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1203,12 +1643,309 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
     },
 
     /* ---------- Act 2 — The Current Landscape ---------- */
-    { n: 5,  act: 2, title: "The model wars — five months, four frontier launches", notes: { beat: "Release cadence has gone supernatural. Calendar tape." } },
-    { n: 6,  act: 2, title: "The current frontier — the Big Three + the gated one", notes: { beat: "Opus 4.7, GPT-5.5, Gemini 3.1 Pro, Mythos Preview (gated)." } },
-    { n: 7,  act: 2, title: "Cadence chart — model releases per quarter",           notes: { beat: "Curve goes exponential. Drives the 'model-agnostic infrastructure' takeaway." } },
-    { n: 8,  act: 2, title: "Industry-level moves — M&A and partnerships",          notes: { beat: "Five news bites: Cognition/Windsurf, Infosys, Mercedes, $25B raise, SpaceX-Anthropic." } },
-    { n: 9,  act: 2, title: "Karpathy joins Anthropic",                             notes: { beat: "Quiet typography slide. Bookend to Slide 2's timeline." } },
-    { n: 10, act: 2, title: "Where we are right now",                               notes: { beat: "Four stat cards, count-up. End with: 'the question is no longer should I — it's how do I orchestrate.'" } },
+    {
+      n: 5, act: 2,
+      title: "The model wars — five months, four frontier launches",
+      body: `
+        <p class="section-lead">December 2025 to May 2026. Every <em>major</em> lab shipped a frontier model. Most shipped more than one.</p>
+        <div class="tape" role="table" aria-label="Model release calendar, December 2025 to May 2026, by vendor">
+          <div class="tape__cell tape__header" role="columnheader"></div>
+          <div class="tape__cell tape__header" role="columnheader">Dec '25</div>
+          <div class="tape__cell tape__header" role="columnheader">Jan '26</div>
+          <div class="tape__cell tape__header" role="columnheader">Feb '26</div>
+          <div class="tape__cell tape__header" role="columnheader">Mar '26</div>
+          <div class="tape__cell tape__header" role="columnheader">Apr '26</div>
+          <div class="tape__cell tape__header" role="columnheader">May '26</div>
+
+          <div class="tape__cell tape__vendor tape__vendor-anthropic">Anthropic</div>
+          <div class="tape__cell"><span class="pill pill--anthropic">Opus 4.6</span></div>
+          <div class="tape__cell"><span class="pill pill--anthropic">Skills v1 playbook</span></div>
+          <div class="tape__cell"><span class="pill pill--anthropic">Sonnet 4.6</span></div>
+          <div class="tape__cell"></div>
+          <div class="tape__cell">
+            <span class="pill pill--anthropic">Opus 4.7</span>
+            <span class="pill pill--gated">Mythos Preview</span>
+          </div>
+          <div class="tape__cell">
+            <span class="pill pill--anthropic">Code with Claude</span>
+            <span class="pill pill--anthropic">Managed Agents</span>
+          </div>
+
+          <div class="tape__cell tape__vendor tape__vendor-openai">OpenAI</div>
+          <div class="tape__cell"><span class="pill pill--openai">GPT-5.2</span></div>
+          <div class="tape__cell"></div>
+          <div class="tape__cell"><span class="pill pill--openai">GPT-5.3-Codex</span></div>
+          <div class="tape__cell"><span class="pill pill--openai">GPT-5.4</span></div>
+          <div class="tape__cell"><span class="pill pill--openai">GPT-5.5 (“Spud”)</span></div>
+          <div class="tape__cell"><span class="pill pill--openai">GPT-5.5 Instant</span></div>
+
+          <div class="tape__cell tape__vendor tape__vendor-google">Google</div>
+          <div class="tape__cell"><span class="pill pill--google">Gemini 3 Pro</span></div>
+          <div class="tape__cell"></div>
+          <div class="tape__cell"><span class="pill pill--google">Gemini 3.1 Pro</span></div>
+          <div class="tape__cell"></div>
+          <div class="tape__cell"></div>
+          <div class="tape__cell">
+            <span class="pill pill--google">Antigravity 2.0</span>
+            <span class="pill pill--google">Gemini 3.5 Flash</span>
+          </div>
+
+          <div class="tape__cell tape__vendor tape__vendor-other">Others</div>
+          <div class="tape__cell"></div>
+          <div class="tape__cell"></div>
+          <div class="tape__cell"></div>
+          <div class="tape__cell"></div>
+          <div class="tape__cell"><span class="pill pill--other">Grok 4.20</span></div>
+          <div class="tape__cell"><span class="pill pill--other">MCP 2026-07-28 RC</span></div>
+        </div>
+        <div class="tape__legend">
+          <span><span class="tape__legend-dot" style="background: var(--vendor-anthropic);"></span>Anthropic</span>
+          <span><span class="tape__legend-dot" style="background: var(--vendor-openai);"></span>OpenAI</span>
+          <span><span class="tape__legend-dot" style="background: var(--vendor-google);"></span>Google</span>
+          <span><span class="tape__legend-dot" style="background: var(--vendor-other);"></span>Others</span>
+          <span style="margin-left:auto;">🔒 = announced, <em>not publicly released</em></span>
+        </div>
+        <p class="slide__source">Six months. Four "frontier-class" launches (Sonnet 4.6, Gemini 3.1 Pro, Opus 4.7, GPT-5.5). One refused (Mythos — see Slide 49). Plus mid-tier, specialised, and tool releases at a clip every major lab calls "exhausting" in private.</p>
+      `,
+      notes: {
+        time: "~5 min",
+        beat: "Release cadence has gone supernatural. Don't read every cell — pan the eye left-to-right across each row and let density speak. The Mythos lock pill is a deliberate cliff-hanger.",
+        ask: "Who's actually upgraded their model in the last 30 days? In the last 90?",
+        bridge: "Three of these dominate everyone's workflow right now — and a fourth is being held back. Let me show you the four cards.",
+      },
+    },
+
+    {
+      n: 6, act: 2,
+      title: "The current frontier — three you can use, one you can't",
+      body: `
+        <p class="section-lead">As of May 23, 2026 — these are the four cards on the table.</p>
+        <div class="frontier-grid">
+
+          <div class="frontier-card frontier-card--anthropic">
+            <div class="frontier-card__vendor">Anthropic · April 16, 2026</div>
+            <h3 class="frontier-card__name">Claude Opus 4.7</h3>
+            <div class="frontier-card__meta">Daily-driver agentic coder. New <code>xhigh</code> effort tier, task-budget API.</div>
+            <div class="frontier-card__bars">
+              <div class="bar"><span>SWE-bench Verified</span><span class="bar__track"><span class="bar__fill" style="width:87.6%"></span></span><span class="bar__value">87.6%</span></div>
+              <div class="bar"><span>CursorBench</span><span class="bar__track"><span class="bar__fill" style="width:70%"></span></span><span class="bar__value">70%</span></div>
+              <div class="bar"><span>MCP-Atlas</span><span class="bar__track"><span class="bar__fill" style="width:77.3%"></span></span><span class="bar__value">77.3%</span></div>
+            </div>
+            <div class="frontier-card__footer">
+              <div class="frontier-card__price">$5 / $25 per 1M tokens (in / out)</div>
+              <div class="frontier-card__caveat">New tokenizer — same text is now up to 35% more tokens. Budget for it.</div>
+            </div>
+          </div>
+
+          <div class="frontier-card frontier-card--openai">
+            <div class="frontier-card__vendor">OpenAI · April 23, 2026</div>
+            <h3 class="frontier-card__name">GPT-5.5 (“Spud”)</h3>
+            <div class="frontier-card__meta">Ships as Thinking and Pro. 4M+ active Codex users on this model.</div>
+            <div class="frontier-card__bars">
+              <div class="bar"><span>Terminal-Bench 2.0</span><span class="bar__track"><span class="bar__fill" style="width:82.7%"></span></span><span class="bar__value">82.7%</span></div>
+              <div class="bar"><span>FrontierMath</span><span class="bar__track"><span class="bar__fill" style="width:74%"></span></span><span class="bar__value">74%</span></div>
+              <div class="bar"><span>Multi-step agentic</span><span class="bar__track"><span class="bar__fill" style="width:81%"></span></span><span class="bar__value">81%</span></div>
+            </div>
+            <div class="frontier-card__footer">
+              <div class="frontier-card__price">Pitched as "smartest, most intuitive model yet"</div>
+              <div class="frontier-card__caveat">Six weeks after GPT-5.4. The cadence is the story.</div>
+            </div>
+          </div>
+
+          <div class="frontier-card frontier-card--google">
+            <div class="frontier-card__vendor">Google · Feb–Mar 2026</div>
+            <h3 class="frontier-card__name">Gemini 3.1 Pro</h3>
+            <div class="frontier-card__meta">2×+ reasoning boost over 3 Pro. #1 on 12 of 18 tracked benchmarks.</div>
+            <div class="frontier-card__bars">
+              <div class="bar"><span>GPQA Diamond</span><span class="bar__track"><span class="bar__fill" style="width:94.3%"></span></span><span class="bar__value">94.3%</span></div>
+              <div class="bar"><span>1M token context</span><span class="bar__track"><span class="bar__fill" style="width:100%"></span></span><span class="bar__value">1M</span></div>
+              <div class="bar"><span>Output cap</span><span class="bar__track"><span class="bar__fill" style="width:65%"></span></span><span class="bar__value">65K</span></div>
+            </div>
+            <div class="frontier-card__footer">
+              <div class="frontier-card__price">$2 / $12 per 1M tokens (in / out)</div>
+              <div class="frontier-card__caveat">Cheapest of the three. Three thinking levels exposed in API.</div>
+            </div>
+          </div>
+
+          <div class="frontier-card frontier-card--gated">
+            <div class="frontier-card__lock" aria-hidden="true">🔒</div>
+            <div class="frontier-card__vendor">Anthropic · April 7, 2026 · <em>Project Glasswing</em></div>
+            <h3 class="frontier-card__name">Claude Mythos Preview</h3>
+            <div class="frontier-card__meta">General-purpose frontier model. Repeatedly found zero-days in every major operating system and web browser during testing.</div>
+            <div class="frontier-card__bars">
+              <div class="bar"><span>Expert-level CTF</span><span class="bar__track"><span class="bar__fill" style="width:73%"></span></span><span class="bar__value">73%</span></div>
+              <div class="bar"><span>OS / browser zero-days</span><span class="bar__track"><span class="bar__fill" style="width:96%"></span></span><span class="bar__value">∞</span></div>
+              <div class="bar"><span>Public access</span><span class="bar__track"><span class="bar__fill" style="width:0%"></span></span><span class="bar__value">—</span></div>
+            </div>
+            <div class="frontier-card__footer">
+              <div class="frontier-card__price">Not publicly released.</div>
+              <div class="frontier-card__caveat">Distributed only to ~40 critical-infrastructure orgs under coordinated disclosure. We'll come back to this on Slide 49.</div>
+            </div>
+          </div>
+
+        </div>
+      `,
+      notes: {
+        time: "~5 min",
+        beat: "Walk left-to-right across the three usable cards. Save the Mythos card for last — say less, let it sit. The padlock is the foreshadow for Slide 49.",
+        ask: "If you had one model budget tomorrow, which card would you pick? Cost, context, or capability?",
+        bridge: "The cards are a snapshot. The cadence is the actual story — and it's a chart, not a list.",
+      },
+    },
+
+    {
+      n: 7, act: 2,
+      title: "The cadence has gone supernatural",
+      body: `
+        <p class="section-lead">Releases per quarter, per vendor — 2023 onwards. The curve speaks for itself.</p>
+        <div class="chart-wrap" role="figure" aria-label="Line chart: frontier-class model releases per quarter, by vendor, Q1 2023 through Q2 2026.">
+          <div class="chart-wrap__title">Frontier-class releases per quarter · Anthropic / OpenAI / Google · illustrative</div>
+          <div class="chart-wrap__canvas-host">
+            <canvas id="cadenceChart"></canvas>
+          </div>
+        </div>
+        <blockquote class="pull-quote">
+          GPT-5.4 to GPT-5.5 in six weeks. Build model-agnostic infrastructure now, or schedule a recurring migration project every quarter.
+          <span class="pull-quote__source">Take-home from this slide</span>
+        </blockquote>
+        <p class="slide__source">Counts are illustrative — exact frontier definitions differ vendor-to-vendor. The point is the slope, not the absolute heights.</p>
+      `,
+      notes: {
+        time: "~4 min",
+        beat: "Don't recite the numbers. Trace the slope with your hand: flat in 2023, climbing through 2024, near-vertical by late 2025. The six-week GPT-5.4→5.5 fact is the hammer.",
+        ask: "How often does your team retest its prompts against a new model? Monthly? Quarterly? Never?",
+        bridge: "Cadence has consequences. Most of those consequences land in the M&A column, not the model column.",
+      },
+    },
+
+    {
+      n: 8, act: 2,
+      title: "It isn't just models — it's industries restructuring",
+      body: `
+        <p class="section-lead">Five headlines from the last six months. Each one would have been a year's worth of news in 2023.</p>
+        <div class="news-grid">
+
+          <article class="news">
+            <div class="news__date">
+              <span class="news__date-day">Dec 2025</span>
+              <span class="news__date-detail">M&amp;A</span>
+            </div>
+            <div>
+              <h3 class="news__headline">Cognition acquires Windsurf for ≈$250M.</h3>
+              <p class="news__body">After OpenAI's reported $3B bid collapsed, Google poached the Windsurf founders separately. Cognition picks up the IDE and the agentic engineering team in one move.</p>
+            </div>
+          </article>
+
+          <article class="news">
+            <div class="news__date">
+              <span class="news__date-day">Jan 2026</span>
+              <span class="news__date-detail">Partnership</span>
+            </div>
+            <div>
+              <h3 class="news__headline">Infosys + Cognition: Devin goes global enterprise.</h3>
+              <p class="news__body">Strategic collaboration to deploy Devin across Infosys's global delivery footprint. The first major SI to bet a unit on a single cloud SWE.</p>
+            </div>
+          </article>
+
+          <article class="news">
+            <div class="news__date">
+              <span class="news__date-day">Q1 2026</span>
+              <span class="news__date-detail">Deployment</span>
+            </div>
+            <div>
+              <h3 class="news__headline">Mercedes-Benz rolls Devin + Windsurf across its engineering org.</h3>
+              <p class="news__body">First Fortune-50 manufacturer to publicly standardise on agentic coding tools at scale. Sets the template the rest of the auto industry is now studying.</p>
+            </div>
+          </article>
+
+          <article class="news">
+            <div class="news__date">
+              <span class="news__date-day">Apr 23, 2026</span>
+              <span class="news__date-detail">Funding</span>
+            </div>
+            <div>
+              <h3 class="news__headline">Cognition reportedly in talks at a $25B valuation.</h3>
+              <p class="news__body">Hundreds of millions in fresh capital, less than two years after Devin's launch. Anthropic's Q1 2026 revenue also grew 80× year-over-year against a planned 10× — the entire layer is mispriced.</p>
+            </div>
+          </article>
+
+          <article class="news">
+            <div class="news__date">
+              <span class="news__date-day">May 6, 2026</span>
+              <span class="news__date-detail">Compute</span>
+            </div>
+            <div>
+              <h3 class="news__headline">SpaceX–Anthropic compute deal: 300+ MW, 220,000+ GPUs.</h3>
+              <p class="news__body">Announced at Code with Claude 2026. Compute via the Colossus datacenter in Memphis. Foundation-model training is now an infrastructure deal at industrial scale.</p>
+            </div>
+          </article>
+
+        </div>
+      `,
+      notes: {
+        time: "~4 min",
+        beat: "Skim the headlines — don't read each body verbatim. The 80× Anthropic-revenue line and the SpaceX 220K GPU number are the lines worth pausing on. The deals are pricing in the cadence.",
+        ask: "Who here works at a company that's already piloting Devin / Cursor / Windsurf at org level — not just developer level?",
+        bridge: "Money and compute follow people. And four days ago, one specific person moved.",
+      },
+    },
+
+    {
+      n: 9, act: 2,
+      title: "Karpathy joins Anthropic",
+      layout: "quiet",
+      body: `
+        <div class="quiet">
+          <div class="quiet__kicker">May 19, 2026 · personal update</div>
+          <p class="quiet__quote">Personal update: I've joined Anthropic. I think the next few years at the frontier of LLMs will be especially formative. I am very excited to join the team here and get back to R&amp;D.</p>
+          <div class="quiet__source">— Andrej Karpathy</div>
+          <p class="quiet__gloss">The same person who coined <em>vibe coding</em> fifteen months ago — and renamed it <em>agentic engineering</em> three months ago — now works at the lab building Claude.</p>
+        </div>
+      `,
+      notes: {
+        time: "~2 min · quiet slide",
+        beat: "Don't talk over this slide. Let it breathe. Read the quote, pause, then read the gloss line. Move on.",
+        ask: "(No question. The slide is the question.)",
+        bridge: "Where does that leave the field? Numerically — these are the four lines.",
+      },
+    },
+
+    {
+      n: 10, act: 2,
+      title: "Where we are right now",
+      body: `
+        <p class="section-lead">Four numbers that compress May 2026 into a single slide.</p>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-card__num">27<span class="stat-card__unit">%</span></div>
+            <div class="stat-card__label">of all production code is now AI-authored.</div>
+            <div class="stat-card__delta">↑ from 22% one quarter ago.</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__num">≈30<span class="stat-card__unit">%</span></div>
+            <div class="stat-card__label">of all merged code, by daily AI users.</div>
+            <div class="stat-card__delta">Sample of teams with full agent adoption.</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__num">92<span class="stat-card__unit">%</span></div>
+            <div class="stat-card__label">of developers use AI tools somewhere in their workflow.</div>
+            <div class="stat-card__delta">SonarSource State of Code 2026.</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__num">96<span class="stat-card__unit">%</span></div>
+            <div class="stat-card__label">of developers don't fully trust AI-generated code.</div>
+            <div class="stat-card__delta">Same survey. Adoption is not endorsement.</div>
+          </div>
+        </div>
+        <p class="stat-closer">The question is no longer <span class="strike">should I use AI for code?</span> — it's <em>how do I orchestrate it without breaking things?</em></p>
+      `,
+      notes: {
+        time: "~3 min",
+        beat: "Read the four numbers as one paragraph: 27, 30, 92, 96. Then linger on the closer — the strike-through is the whole point of Act 2.",
+        ask: "Which of those four numbers surprises you most?",
+        bridge: "Orchestration is the verb of the rest of this session. Act 3 — the seven-tier spectrum that names what we're orchestrating across.",
+      },
+    },
 
     /* ---------- Act 3 — The Capability Spectrum ---------- */
     { n: 11, act: 3, title: "From autocomplete to autonomy",                        notes: { beat: "Single sentence — there is no 'AI coding tool', only a spectrum." } },
@@ -1336,6 +2073,9 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
     if (layout === "hero") {
       section.classList.add("slide--hero");
       section.innerHTML = s.body;
+    } else if (layout === "quiet") {
+      section.classList.add("slide--quiet");
+      section.innerHTML = `<div class="slide__inner">${s.body}</div>`;
     } else if (s.body) {
       section.innerHTML = `<div class="slide__inner">${renderMeta(s)}<div class="slide__body">${s.body}</div></div>`;
     } else {
@@ -1348,6 +2088,22 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   SLIDES.forEach(s => stage.appendChild(renderSlide(s)));
 
   const slideEls = Array.from(document.querySelectorAll(".slide"));
+
+  /* ============================================================
+     Slide-enter hooks — used by content slides that need to mount
+     dynamic content (e.g. Chart.js charts on Slide 7). Hooks fire
+     once each time the slide becomes current; idempotency is the
+     hook's own responsibility (typically via dataset flags).
+     ============================================================ */
+  const SLIDE_HOOKS = {};
+  function onSlideEnter(slideNumber, fn) {
+    if (!SLIDE_HOOKS[slideNumber]) SLIDE_HOOKS[slideNumber] = [];
+    SLIDE_HOOKS[slideNumber].push(fn);
+  }
+  function runSlideHooks(slideNumber, el) {
+    const hooks = SLIDE_HOOKS[slideNumber] || [];
+    hooks.forEach(fn => { try { fn(el); } catch (e) { console.error(`Slide ${slideNumber} hook error`, e); } });
+  }
 
   /* ============================================================
      Navigation
@@ -1379,6 +2135,7 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
     updateChrome(next);
     updateNotesBody(next);
     updateJumpHighlight(next);
+    runSlideHooks(SLIDES[next].n, slideEls[next]);
 
     if (pushHash) {
       const hash = `#slide-${next + 1}`;
@@ -1591,6 +2348,88 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
     return Number.isFinite(n) ? clamp(n) : 0;
   }
   window.addEventListener("hashchange", () => goTo(indexFromHash(), { pushHash: false }));
+
+  /* ============================================================
+     Slide-specific hooks
+     ============================================================ */
+
+  // Slide 7 — Cadence chart (Chart.js line series, one per vendor)
+  onSlideEnter(7, function mountCadenceChart(el) {
+    if (el.dataset.chartMounted === "1") return;
+    if (!window.Chart) return; // Chart.js still loading; will retry on next entry
+    const canvas = el.querySelector("#cadenceChart");
+    if (!canvas) return;
+    el.dataset.chartMounted = "1";
+
+    const styles = getComputedStyle(document.documentElement);
+    const cAnthropic = styles.getPropertyValue("--vendor-anthropic").trim() || "#ff6b3d";
+    const cOpenAI    = styles.getPropertyValue("--vendor-openai").trim()    || "#10b981";
+    const cGoogle    = styles.getPropertyValue("--vendor-google").trim()    || "#4f8df5";
+    const cText      = styles.getPropertyValue("--text-secondary").trim()   || "#b0b0a8";
+    const cGrid      = styles.getPropertyValue("--border").trim()           || "#2a2a30";
+
+    const labels = [
+      "Q1 '23","Q2 '23","Q3 '23","Q4 '23",
+      "Q1 '24","Q2 '24","Q3 '24","Q4 '24",
+      "Q1 '25","Q2 '25","Q3 '25","Q4 '25",
+      "Q1 '26","Q2 '26*"
+    ];
+
+    /* Roughly-faithful illustrative counts of frontier-class
+       releases per vendor per quarter. The point is the curve, not
+       the precision; cite as "illustrative" in the slide source. */
+    const openaiData    = [1,1,1,1, 1,1,1,2, 2,2,1,2, 3,2];
+    const anthropicData = [0,1,1,0, 1,0,1,2, 1,1,2,2, 1,2];
+    const googleData    = [0,0,0,1, 1,1,1,1, 1,1,1,1, 1,1];
+
+    new window.Chart(canvas, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          { label: "OpenAI",    data: openaiData,    borderColor: cOpenAI,    backgroundColor: cOpenAI + "22",    tension: 0.32, borderWidth: 2.5, pointRadius: 3, pointBackgroundColor: cOpenAI },
+          { label: "Anthropic", data: anthropicData, borderColor: cAnthropic, backgroundColor: cAnthropic + "22", tension: 0.32, borderWidth: 2.5, pointRadius: 3, pointBackgroundColor: cAnthropic },
+          { label: "Google",    data: googleData,    borderColor: cGoogle,    backgroundColor: cGoogle + "22",    tension: 0.32, borderWidth: 2.5, pointRadius: 3, pointBackgroundColor: cGoogle },
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { intersect: false, mode: "index" },
+        plugins: {
+          legend: {
+            position: "top",
+            align: "end",
+            labels: { color: cText, font: { family: "Space Grotesk", size: 13 }, usePointStyle: true, pointStyle: "circle", boxWidth: 8 }
+          },
+          tooltip: {
+            backgroundColor: "rgba(20,20,24,0.95)",
+            titleFont: { family: "Space Grotesk", weight: "600" },
+            bodyFont:  { family: "Space Grotesk" },
+            borderColor: cGrid, borderWidth: 1, padding: 10, cornerRadius: 6
+          }
+        },
+        scales: {
+          x: { grid: { color: cGrid, drawTicks: false }, ticks: { color: cText, font: { family: "Space Grotesk", size: 11 }, maxRotation: 0 } },
+          y: { grid: { color: cGrid }, ticks: { color: cText, stepSize: 1, font: { family: "Space Grotesk", size: 11 } }, beginAtZero: true, title: { display: true, text: "Frontier releases per quarter", color: cText, font: { family: "Space Grotesk", size: 12 } } }
+        }
+      }
+    });
+  });
+
+  /* Chart.js may load after the deck boots. If we land directly on
+     slide 7 via #slide-7, retry the hook once the script signals
+     ready. */
+  document.addEventListener("readystatechange", () => {
+    if (document.readyState === "complete" && SLIDES[currentIndex] && SLIDES[currentIndex].n === 7) {
+      runSlideHooks(7, slideEls[currentIndex]);
+    }
+  });
+  window.addEventListener("load", () => {
+    if (SLIDES[currentIndex] && SLIDES[currentIndex].n === 7) {
+      runSlideHooks(7, slideEls[currentIndex]);
+    }
+  });
 
   /* ============================================================
      Boot
