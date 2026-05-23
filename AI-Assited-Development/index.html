@@ -2425,6 +2425,313 @@ html[data-theme="light"] .mcp-svg .label-hub { fill: #ffffff; }
 }
 
 /* ============================================================
+   Act 6 components — must-do checklist, project walkthrough,
+   bloated-vs-lean comparison, workflow recipes, EPCV loop
+   ============================================================ */
+
+/* Must-do checklist (Slide 31) */
+.must-do {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+.must-do-row {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 22px;
+  align-items: center;
+  padding: 16px 22px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  transition: transform var(--t-fast), border-color var(--t-fast);
+}
+.must-do-row:hover {
+  transform: translateX(2px);
+  border-color: var(--accent);
+}
+.must-do-row__num {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 40px;
+  color: var(--accent);
+  line-height: 1;
+}
+.must-do-row__text { display: flex; flex-direction: column; gap: 4px; }
+.must-do-row__head {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+.must-do-row__why {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+.must-do-row__why em { color: var(--accent); font-style: italic; }
+
+/* Project walkthrough (Slide 32) */
+.walkthrough {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+.walk-step {
+  display: grid;
+  grid-template-columns: 42px 1.25fr 1.55fr;
+  gap: 18px;
+  align-items: center;
+  padding: 10px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+}
+.walk-step__num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+}
+.walk-step__what {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+.walk-step__what strong {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.walk-step__cmd {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-left: 2px solid var(--accent);
+  border-radius: 5px;
+  padding: 8px 12px;
+  color: var(--text-primary);
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.walk-step__cmd--dim {
+  background: transparent;
+  border-left: 2px dashed var(--border);
+  color: var(--text-tertiary);
+  font-style: italic;
+  white-space: normal;
+}
+.walk-step__cmd .arg { color: var(--accent-strong); }
+.walk-step__cmd .kw  { color: var(--accent); }
+
+/* Bloated vs lean (Slide 33) */
+.bloated-lean {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 4px;
+}
+.bloated-lean__label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.bloated-lean__label--bad  { color: var(--danger); }
+.bloated-lean__label--good { color: var(--success); }
+.bloated-lean__label-detail {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-style: italic;
+  color: var(--text-tertiary);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.bloated-lean .codeblock {
+  font-size: 11px;
+  line-height: 1.5;
+  padding: 14px 16px 12px;
+  max-height: 360px;
+  overflow: auto;
+}
+.bloated-lean__steps {
+  margin-top: 16px;
+  padding: 14px 18px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.bloated-lean__steps span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.bloated-lean__steps em {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--accent);
+  font-style: normal;
+  margin-right: 2px;
+}
+
+/* Workflow recipes (Slide 35) */
+.recipes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+.recipe {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 24px;
+  align-items: center;
+  padding: 14px 22px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+}
+.recipe__name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+.recipe__name small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+  font-style: italic;
+}
+.recipe__chain {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.recipe__step {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 12px;
+}
+.recipe__step--accent {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.recipe__arrow {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
+
+/* Explore-Plan-Code-Verify loop (Slide 36) */
+.loop-cycle {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: 8px;
+  position: relative;
+}
+.loop-station {
+  padding: 20px 22px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: 10px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.loop-station__num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.loop-station__name {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+.loop-station__action {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+.loop-station__action strong {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-right: 4px;
+}
+.loop-station + .loop-station::before {
+  content: "→";
+  position: absolute;
+  left: -22px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 22px;
+  z-index: 1;
+}
+.loop-back {
+  margin-top: 18px;
+  padding: 12px 20px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  font-style: italic;
+  border-top: 2px dashed var(--accent);
+  position: relative;
+}
+.loop-back::before {
+  content: "↺";
+  font-style: normal;
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+/* ============================================================
    Overlays (help, jump, notes)
    ============================================================ */
 .overlay {
@@ -2698,6 +3005,14 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   .mcp-stats { grid-template-columns: 1fr 1fr; }
   .spec-cycle { flex-direction: column; }
   .spec-arrow { transform: rotate(90deg); }
+  .must-do-row { grid-template-columns: 44px 1fr; gap: 14px; padding: 12px 14px; }
+  .must-do-row__num { font-size: 30px; }
+  .walk-step { grid-template-columns: 36px 1fr; gap: 12px; padding: 10px 12px; }
+  .walk-step__cmd { grid-column: 1 / -1; }
+  .bloated-lean { grid-template-columns: 1fr; }
+  .recipe { grid-template-columns: 1fr; gap: 10px; padding: 14px 16px; }
+  .loop-cycle { grid-template-columns: 1fr; gap: 32px; }
+  .loop-station + .loop-station::before { content: "↓"; left: 50%; top: -28px; transform: translateX(-50%); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4642,12 +4957,397 @@ Process:
     },
 
     /* ---------- Act 6 — Starting a Project, Agent-Ready ---------- */
-    { n: 31, act: 6, title: "The five must-do practices",                           notes: { beat: "Five numbered cards. Checklist before the walkthroughs." } },
-    { n: 32, act: 6, title: "New project — 10-minute setup walkthrough",            notes: { beat: "Numbered code-block walkthrough. Copy-pasteable commands." } },
-    { n: 33, act: 6, title: "Existing codebase — onboarding the agent",             notes: { beat: "Treat /init output as a draft. Strip what the agent can discover. Keep tribal knowledge." } },
-    { n: 34, act: 6, title: "What to delegate vs keep",                             notes: { beat: "Two columns. The 'wrong-but-plausible would land in prod' rule." } },
-    { n: 35, act: 6, title: "Workflow patterns by task type",                       notes: { beat: "Five mini-recipes: greenfield, feature, bug, migration, backlog." } },
-    { n: 36, act: 6, title: "The Explore → Plan → Code → Verify loop",              notes: { beat: "Circular diagram. 'Skip Plan and you've gone back to vibe coding.'" } },
+    {
+      n: 31, act: 6,
+      title: "Five practices that travel with you",
+      body: `
+        <p class="section-lead">Tool-agnostic. They work in Claude Code, Cursor, Devin, and whatever ships next quarter.</p>
+        <div class="must-do" role="list">
+          <div class="must-do-row" role="listitem">
+            <div class="must-do-row__num">1</div>
+            <div class="must-do-row__text">
+              <div class="must-do-row__head">Specs before prompts.</div>
+              <div class="must-do-row__why">Even <em>one paragraph</em> of intent beats a vibe-prompted feature. Write down what done looks like before the agent starts.</div>
+            </div>
+          </div>
+          <div class="must-do-row" role="listitem">
+            <div class="must-do-row__num">2</div>
+            <div class="must-do-row__text">
+              <div class="must-do-row__head">AGENTS.md is non-negotiable.</div>
+              <div class="must-do-row__why">One file at repo root. Saves you from re-prompting the same setup every session. Slide 25 — but now in <em>every</em> repo.</div>
+            </div>
+          </div>
+          <div class="must-do-row" role="listitem">
+            <div class="must-do-row__num">3</div>
+            <div class="must-do-row__text">
+              <div class="must-do-row__head">Plan mode first.</div>
+              <div class="must-do-row__why">Read the plan before the agent writes a line. <em>Skip this and you're back to vibe coding.</em></div>
+            </div>
+          </div>
+          <div class="must-do-row" role="listitem">
+            <div class="must-do-row__num">4</div>
+            <div class="must-do-row__text">
+              <div class="must-do-row__head">Isolate the work.</div>
+              <div class="must-do-row__why">Git worktrees per task, sandboxes per agent, Docker for anything with real-world side effects. The blast radius matters.</div>
+            </div>
+          </div>
+          <div class="must-do-row" role="listitem">
+            <div class="must-do-row__num">5</div>
+            <div class="must-do-row__text">
+              <div class="must-do-row__head">Review diffs, not transcripts.</div>
+              <div class="must-do-row__why">The agent's narration is sales pitch. The <em>diff is the truth</em>. Build the muscle to read diffs fast.</div>
+            </div>
+          </div>
+        </div>
+        <p class="slide__source">If you take only five things from this session, take these five. Memorise the numbers — they recur on Slides 32, 33, 35, and 36.</p>
+      `,
+      notes: {
+        time: "~4 min",
+        beat: "Read each row out loud and pause. The numbers are intentional — they'll come back on the next four slides. Practice #3 (plan mode first) and #5 (diffs not transcripts) are the two most violated in the wild.",
+        ask: "Which of these five practices do you already do consistently? Which one is the hardest to hold?",
+        bridge: "Five rules in the abstract. Ten steps in practice. Here's what they look like on day one of a new project.",
+      },
+    },
+
+    {
+      n: 32, act: 6,
+      title: "New project — agent-ready in 10 minutes",
+      body: `
+        <p class="section-lead">Ten steps. None of them require the agent yet. The first <em>nine</em> set the agent up to succeed on the tenth.</p>
+        <div class="walkthrough">
+
+          <div class="walk-step">
+            <div class="walk-step__num">01</div>
+            <div class="walk-step__what"><strong>Initialise the repo.</strong> Empty directory, fresh git history.</div>
+            <div class="walk-step__cmd"><span class="kw">$</span> mkdir my-project &amp;&amp; cd my-project &amp;&amp; git init</div>
+          </div>
+
+          <div class="walk-step">
+            <div class="walk-step__num">02</div>
+            <div class="walk-step__what"><strong>Write a one-page constitution.</strong> Mission, tech stack, architectural constraints, non-negotiables.</div>
+            <div class="walk-step__cmd walk-step__cmd--dim">.specs/constitution.md — editor, not terminal</div>
+          </div>
+
+          <div class="walk-step">
+            <div class="walk-step__num">03</div>
+            <div class="walk-step__what"><strong>Drop in AGENTS.md.</strong> Use the template from Slide 25. Project root only.</div>
+            <div class="walk-step__cmd walk-step__cmd--dim">./AGENTS.md — markdown, three sections minimum</div>
+          </div>
+
+          <div class="walk-step">
+            <div class="walk-step__num">04</div>
+            <div class="walk-step__what"><strong>Make room for feature specs.</strong> One folder, one file per feature.</div>
+            <div class="walk-step__cmd"><span class="kw">$</span> mkdir -p .specs/features</div>
+          </div>
+
+          <div class="walk-step">
+            <div class="walk-step__num">05</div>
+            <div class="walk-step__what"><strong>Boot the agent.</strong> Confirm it actually read the constitution and AGENTS.md before any work.</div>
+            <div class="walk-step__cmd"><span class="kw">$</span> claude <span class="arg">"Read constitution + AGENTS.md. Summarise the stack."</span></div>
+          </div>
+
+          <div class="walk-step">
+            <div class="walk-step__num">06</div>
+            <div class="walk-step__what"><strong>Write the first feature spec.</strong> One page, before any code.</div>
+            <div class="walk-step__cmd walk-step__cmd--dim">.specs/features/001-auth.md — what done looks like</div>
+          </div>
+
+          <div class="walk-step">
+            <div class="walk-step__num">07</div>
+            <div class="walk-step__what"><strong>Switch to Plan Mode.</strong> Agent reads the spec; agent drafts the plan.</div>
+            <div class="walk-step__cmd"><span class="kw">/plan</span> <span class="arg">"implement .specs/features/001-auth.md"</span></div>
+          </div>
+
+          <div class="walk-step">
+            <div class="walk-step__num">08</div>
+            <div class="walk-step__what"><strong>Review the plan.</strong> Edit. Push back. Cut scope. Repeat until it matches your spec.</div>
+            <div class="walk-step__cmd walk-step__cmd--dim">human-in-the-loop — no code yet</div>
+          </div>
+
+          <div class="walk-step">
+            <div class="walk-step__num">09</div>
+            <div class="walk-step__what"><strong>Approve.</strong> Only now does the agent write code.</div>
+            <div class="walk-step__cmd"><span class="kw">/approve</span> &nbsp;<span class="arg">— or press Enter in Cursor's Composer 2</span></div>
+          </div>
+
+          <div class="walk-step">
+            <div class="walk-step__num">10</div>
+            <div class="walk-step__what"><strong>Verify and commit.</strong> Diff, tests, lint, then merge. The agent's job is done; yours starts.</div>
+            <div class="walk-step__cmd"><span class="kw">$</span> git diff &amp;&amp; pnpm test -- --run &amp;&amp; git commit</div>
+          </div>
+
+        </div>
+      `,
+      notes: {
+        time: "~6 min",
+        beat: "Walk slow through 1–4 (the setup), faster through 5–6, slow again at 7–9 (Plan Mode), and land hard on 10 (review the diff). Repeat: nine setup steps for one code step. That ratio IS the new craft.",
+        ask: "How many of those ten steps does your current Day 1 workflow include? Honest count.",
+        bridge: "Greenfield is the easy case. The hard case — and the more common one — is dropping into a codebase that's already there.",
+      },
+    },
+
+    {
+      n: 33, act: 6,
+      title: "Existing codebase — strip the slop, keep the tribal knowledge",
+      body: `
+        <p class="section-lead">Run <code>/init</code>. Then <em>delete most of what it wrote</em>. The agent can read the repo; it can't read the senior engineer's brain.</p>
+        <div class="bloated-lean">
+          <div>
+            <div class="bloated-lean__label bloated-lean__label--bad">
+              <span>× Auto-generated AGENTS.md</span>
+              <span class="bloated-lean__label-detail">~120 lines · 3% drop in success rate · +20% inference cost</span>
+            </div>
+            <div class="codeblock" data-lang="markdown">
+              <span class="codeblock__lang">/init output</span>
+<pre><code class="language-markdown"># my-app
+
+## Overview
+This is a Next.js application built with React and TypeScript.
+It uses modern web development practices and is structured for
+scalability. The project includes authentication, state management,
+data fetching, server-side rendering, and a CI/CD pipeline.
+
+## Tech stack
+- Next.js (App Router)
+- React 18 with TypeScript
+- Tailwind CSS for styling
+- Zustand for client state
+- React Query for server state
+- Vitest for testing
+- ESLint + Prettier for linting
+
+## File structure
+- src/app: Next.js App Router pages and layouts
+- src/components: Reusable React components
+- src/lib: Utility functions and helpers
+- src/hooks: Custom React hooks
+- src/styles: Global styles and theme
+- src/types: Shared TypeScript types
+…
+</code></pre>
+            </div>
+          </div>
+
+          <div>
+            <div class="bloated-lean__label bloated-lean__label--good">
+              <span>✓ Hand-curated AGENTS.md</span>
+              <span class="bloated-lean__label-detail">~22 lines · all signal · agent reads the rest from the repo</span>
+            </div>
+            <div class="codeblock" data-lang="markdown">
+              <span class="codeblock__lang">curated</span>
+<pre><code class="language-markdown"># my-app
+
+Use \`pnpm\` (NOT npm, NOT yarn).
+\`pnpm dev\` · \`pnpm test -- --run\` · \`pnpm lint --fix\` pre-commit.
+
+## Code style
+- Functional React components only. No classes.
+- \`const\` only. \`var\` and \`let\` fail lint.
+- Tailwind classes; no inline styles, no styled-components.
+- Types live with their component. Don't extract \`.types.ts\`.
+
+## Boundaries
+- Never commit \`.env.local\` or anything in \`secrets/\`.
+- Never edit \`prisma/migrations/\`. Generate new ones instead.
+- Ask before adding a top-level dependency.
+
+## Gotchas
+- Stripe webhooks need \`STRIPE_WEBHOOK_SECRET\`; use the local
+  CLI tunnel to verify.
+- Vercel preview URLs run with sandbox env vars only.
+</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="bloated-lean__steps">
+          <span><em>1</em> Run /init as a draft, not a finished file.</span>
+          <span><em>2</em> Strip what the agent can discover (file tree, framework names).</span>
+          <span><em>3</em> Keep tribal knowledge (gotchas, naming, deployment quirks).</span>
+          <span><em>4</em> Show one real snippet per convention.</span>
+          <span><em>5</em> Commit, iterate, re-test on a real feature.</span>
+        </div>
+      `,
+      notes: {
+        time: "~5 min",
+        beat: "Hold both panels up. The lean one is shorter AND more useful — that's the counter-intuitive bit. Read the 'Gotchas' section out loud — that's the kind of tribal knowledge no auto-generator can produce.",
+        ask: "What's one piece of tribal knowledge in your codebase that would have to be in an AGENTS.md to onboard a new agent — that wouldn't be in any README?",
+        bridge: "Setup is settled. But not every task should go to an agent at all. Which ones do, and which ones don't?",
+      },
+    },
+
+    {
+      n: 34, act: 6,
+      title: "Delegate vs keep — the heuristic",
+      body: `
+        <p class="section-lead">If wrong-but-plausible would land in prod and embarrass you — keep it.</p>
+        <div class="duo">
+
+          <div class="duo__col duo__col--will">
+            <h3 class="duo__title">Delegate</h3>
+            <div class="duo__sub">Where AI excels — and where you're net faster outsourcing</div>
+            <ul class="duo__list duo__list--will">
+              <li>Boilerplate and scaffolding.</li>
+              <li>Multi-file refactors with clear scope.</li>
+              <li>Migrations between framework versions.</li>
+              <li>Test writing, doc generation, type-fixing.</li>
+              <li>Dependency upgrades with green CI.</li>
+              <li>Bug fixes that come with a reproducer.</li>
+              <li>CRUD endpoints, form scaffolds, integration glue.</li>
+            </ul>
+          </div>
+
+          <div class="duo__col duo__col--wont">
+            <h3 class="duo__title">Keep</h3>
+            <div class="duo__sub">Where human judgment is still the asset</div>
+            <ul class="duo__list duo__list--wont">
+              <li>Architectural decisions and system boundaries.</li>
+              <li>Novel domain logic — the rules of <em>your</em> business.</li>
+              <li>Security-sensitive code paths and trust boundaries.</li>
+              <li>Performance-critical sections where 5ms matters.</li>
+              <li>Any code path where wrong-but-plausible would land in prod.</li>
+              <li>Migrations involving real customer data.</li>
+              <li>Anything you'd refuse to merge without staring at it.</li>
+            </ul>
+          </div>
+
+        </div>
+        <blockquote class="pull-quote">
+          AI excels at implementation. Human creativity remains irreplaceable for breakthrough innovation — and for the parts of your codebase that, if wrong, would cost more than a sprint to recover from.
+          <span class="pull-quote__source">— Ox Security, State of AI Code 2026</span>
+        </blockquote>
+      `,
+      notes: {
+        time: "~3 min",
+        beat: "This is a heuristic, not a rule. The hinge phrase is 'wrong-but-plausible would land in prod' — the agent's output reads convincing even when it's subtly broken; that's the bar.",
+        ask: "What's one task you've delegated that — looking back — should have stayed in the 'keep' column? And vice versa?",
+        bridge: "Heuristics in the abstract. Concrete recipes — by task type — coming next.",
+      },
+    },
+
+    {
+      n: 35, act: 6,
+      title: "Workflow patterns — five recipes by task type",
+      body: `
+        <p class="section-lead">Match the task to the workflow. Don't run every job through the same loop.</p>
+        <div class="recipes">
+
+          <div class="recipe">
+            <div class="recipe__name">Greenfield prototype<small>Day-zero, no codebase yet</small></div>
+            <div class="recipe__chain">
+              <span class="recipe__step">Bolt / v0 / Lovable</span>
+              <span class="recipe__arrow">→</span>
+              <span class="recipe__step">export</span>
+              <span class="recipe__arrow">→</span>
+              <span class="recipe__step recipe__step--accent">AGENTS.md</span>
+              <span class="recipe__arrow">→</span>
+              <span class="recipe__step">continue in Cursor / Windsurf</span>
+            </div>
+          </div>
+
+          <div class="recipe">
+            <div class="recipe__name">Feature on an existing codebase<small>The 80% of weekly work</small></div>
+            <div class="recipe__chain">
+              <span class="recipe__step">write spec</span>
+              <span class="recipe__arrow">→</span>
+              <span class="recipe__step recipe__step--accent">AGENTS.md exists</span>
+              <span class="recipe__arrow">→</span>
+              <span class="recipe__step">Plan Mode</span>
+              <span class="recipe__arrow">→</span>
+              <span class="recipe__step">Code</span>
+              <span class="recipe__arrow">→</span>
+              <span class="recipe__step">diff review</span>
+            </div>
+          </div>
+
+          <div class="recipe">
+            <div class="recipe__name">Bug fix with reproducer<small>Assign and walk away</small></div>
+            <div class="recipe__chain">
+              <span class="recipe__step">file issue + repro</span>
+              <span class="recipe__arrow">→</span>
+              <span class="recipe__step recipe__step--accent">Copilot Coding Agent / Devin</span>
+              <span class="recipe__arrow">→</span>
+              <span class="recipe__step">review PR</span>
+            </div>
+          </div>
+
+          <div class="recipe">
+            <div class="recipe__name">Migration or refactor<small>Many files, well-scoped</small></div>
+            <div class="recipe__chain">
+              <span class="recipe__step">split into N tasks</span>
+              <span class="recipe__arrow">→</span>
+              <span class="recipe__step recipe__step--accent">Vibe Kanban (N worktrees)</span>
+              <span class="recipe__arrow">→</span>
+              <span class="recipe__step">batch-review diffs</span>
+            </div>
+          </div>
+
+          <div class="recipe">
+            <div class="recipe__name">Backlog drain<small>Friday afternoon → Monday morning</small></div>
+            <div class="recipe__chain">
+              <span class="recipe__step">10–20 tickets</span>
+              <span class="recipe__arrow">→</span>
+              <span class="recipe__step recipe__step--accent">Devin / Codex Web overnight</span>
+              <span class="recipe__arrow">→</span>
+              <span class="recipe__step">PR queue Monday</span>
+            </div>
+          </div>
+
+        </div>
+        <p class="slide__source">Same tools, different rhythms. The mistake is using the feature recipe for a bug fix, or the backlog-drain recipe for a refactor that needs sequencing.</p>
+      `,
+      notes: {
+        time: "~4 min",
+        beat: "Walk the chains left-to-right. The accent pill in each row is the tool that defines the recipe — point to it. Note that recipe 2 (feature on existing) is what most of the audience does most of the time.",
+        ask: "Which of these five do you have a real workflow for already? Which one do you not have anything for?",
+        bridge: "Three of these recipes use the same four-station loop under the hood. Name the loop, and it becomes a muscle.",
+      },
+    },
+
+    {
+      n: 36, act: 6,
+      title: "The Explore → Plan → Code → Verify loop",
+      body: `
+        <p class="section-lead">The rhythm under every recipe. <em>Skip a station and you've gone back to vibe coding.</em></p>
+        <div class="loop-cycle">
+
+          <div class="loop-station">
+            <div class="loop-station__num">Step 1</div>
+            <h3 class="loop-station__name">Explore</h3>
+            <p class="loop-station__action"><strong>Agent reads.</strong> Gathers files, traces imports, builds a mental map. You don't pre-load context — the agent finds it.</p>
+          </div>
+
+          <div class="loop-station">
+            <div class="loop-station__num">Step 2</div>
+            <h3 class="loop-station__name">Plan</h3>
+            <p class="loop-station__action"><strong>Agent drafts.</strong> Writes the approach in prose. You read it, edit it, push back. <em>No code yet.</em></p>
+          </div>
+
+          <div class="loop-station">
+            <div class="loop-station__num">Step 3</div>
+            <h3 class="loop-station__name">Code</h3>
+            <p class="loop-station__action"><strong>Agent executes.</strong> Follows the plan you signed off on. Streams diffs as it goes.</p>
+          </div>
+
+          <div class="loop-station">
+            <div class="loop-station__num">Step 4</div>
+            <h3 class="loop-station__name">Verify</h3>
+            <p class="loop-station__action"><strong>Human reviews.</strong> Run the tests. Lint. Stare at the diff. Match against the spec — not the agent's narration.</p>
+          </div>
+
+        </div>
+        <div class="loop-back">Loop back to Explore whenever Verify fails — that is the iteration, not chat history.</div>
+        <blockquote class="pull-quote">
+          If you skip Plan, you've gone back to vibe coding. If you skip Verify, you've gone back to faith.
+          <span class="pull-quote__source">— The whole point of Act 6</span>
+        </blockquote>
+      `,
+      notes: {
+        time: "~3 min",
+        beat: "Four stations. Twenty seconds each on Explore / Plan / Code; sixty seconds on Verify (it's where the discipline lives). The pull-quote is the take-home — pair it with the must-do practices from Slide 31.",
+        ask: "Which station do you spend the least time on today? And which station does the agent spend the least time on?",
+        bridge: "Act 6 was the discipline. Act 7 is the surface — the command centre where this loop runs in parallel across many agents.",
+      },
+    },
 
     /* ---------- Act 7 — The Command Center ---------- */
     { n: 37, act: 7, title: "Agents are async workers, not chatbots",               notes: { beat: "Mental model shift. Chat vs kanban contrast." } },
