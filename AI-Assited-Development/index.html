@@ -4698,6 +4698,158 @@ html[data-theme="light"] .tier-slider__btn--play:hover { color: #ffffff; }
   font-variant-numeric: tabular-nums;
 }
 
+/* ---- Widget 3 · Slide 22 — Tool-picker decision tree ---- */
+.tree-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+.tree-picker__row {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color var(--t-fast), background var(--t-fast), transform var(--t-fast);
+}
+.tree-picker__row:hover {
+  border-color: var(--accent);
+  border-left-color: var(--accent);
+  transform: translateX(1px);
+}
+.tree-picker__row:focus-within {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(255, 107, 61, 0.30);
+}
+.tree-picker__row--active {
+  border-color: var(--accent);
+  border-left-color: var(--accent);
+  background: linear-gradient(135deg, var(--accent-soft) 0%, transparent 75%), var(--bg-card);
+}
+.tree-picker__question {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 22px;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  letter-spacing: -0.005em;
+}
+.tree-picker__question:focus { outline: none; }
+.tree-picker__question em { color: var(--accent); font-style: italic; }
+.tree-picker__question-indicator {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-tertiary);
+  transition: transform var(--t-fast), color var(--t-fast);
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+}
+.tree-picker__row--active .tree-picker__question-indicator {
+  color: var(--accent);
+  transform: rotate(90deg);
+}
+.tree-picker__answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--t-mid) ease;
+}
+.tree-picker__row--active .tree-picker__answer {
+  max-height: 360px;
+}
+.tree-picker__answer-inner {
+  padding: 0 22px 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px dashed var(--border);
+  padding-top: 14px;
+}
+.tree-picker__rec {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 0;
+}
+.tree-picker__rec strong {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+}
+.tree-picker__rec-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+.tree-picker__rec-tool {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  white-space: nowrap;
+}
+.tree-picker__rec-tool--secondary {
+  background: var(--bg-elevated);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+.tree-picker__gloss {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  line-height: 1.55;
+  margin: 4px 0 0;
+}
+.tree-picker__reset-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.tree-picker__reset {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 7px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color var(--t-fast), border-color var(--t-fast);
+}
+.tree-picker__reset:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.tree-picker__reset:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255, 107, 61, 0.30);
+}
+.tree-picker__reset[disabled] { opacity: 0.4; cursor: not-allowed; }
+
 /* ============================================================
    Overlays (help, jump, notes)
    ============================================================ */
@@ -5030,6 +5182,9 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   .tier-slider__tier-name { font-size: 20px; }
   .tier-slider__tier-name small { font-size: 12px; }
   .tier-slider__axis-labels { font-size: 9px; }
+  .tree-picker__question { font-size: 15px; padding: 14px 18px; }
+  .tree-picker__answer-inner { padding: 14px 18px 18px; }
+  .tree-picker__rec { font-size: 13px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -6527,51 +6682,122 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
       title: "How to pick a stack — decide by your next task",
       body: `
         <p class="section-lead">Not by vendor. Not by hype. By <em>what's in front of you tomorrow</em>.</p>
-        <div class="flowchart" aria-label="Decision tree mapping a task type to a recommended tool">
+        <div class="tree-picker" role="list" aria-label="Decision tree — click a question to see the recommended tool stack">
 
-          <div class="flow-row">
-            <div class="flow-row__q">Focused, interactive work — design + write together?</div>
-            <div class="flow-row__arrow">→</div>
-            <div class="flow-row__a"><strong>Claude Code</strong> in a terminal — or <strong>Cursor 3</strong> if you want the editor surface.</div>
+          <div class="tree-picker__row tree-picker__row--active" role="listitem" data-step="1">
+            <button type="button" class="tree-picker__question" aria-expanded="true">
+              <span>Focused, interactive work — design + write together?</span>
+              <span class="tree-picker__question-indicator" aria-hidden="true">▸</span>
+            </button>
+            <div class="tree-picker__answer">
+              <div class="tree-picker__answer-inner">
+                <p class="tree-picker__rec"><strong>Claude Code</strong> in a terminal — or <strong>Cursor 3</strong> if you want the editor surface alongside the agent.</p>
+                <div class="tree-picker__rec-tools">
+                  <span class="tree-picker__rec-tool">Claude Code</span>
+                  <span class="tree-picker__rec-tool tree-picker__rec-tool--secondary">Cursor 3</span>
+                </div>
+                <p class="tree-picker__gloss">Both have Plan Mode. Both read AGENTS.md. Pick based on where your other context (browser, design files, terminal) already lives.</p>
+              </div>
+            </div>
           </div>
 
-          <div class="flow-row">
-            <div class="flow-row__q">A backlog of well-specified tickets?</div>
-            <div class="flow-row__arrow">→</div>
-            <div class="flow-row__a"><strong>Devin 2.2</strong> for harder work, <strong>Copilot Coding Agent</strong> for cheaper / GitHub-native.</div>
+          <div class="tree-picker__row" role="listitem" data-step="2">
+            <button type="button" class="tree-picker__question" aria-expanded="false">
+              <span>A backlog of well-specified tickets?</span>
+              <span class="tree-picker__question-indicator" aria-hidden="true">▸</span>
+            </button>
+            <div class="tree-picker__answer">
+              <div class="tree-picker__answer-inner">
+                <p class="tree-picker__rec"><strong>Devin 2.2</strong> for harder work, <strong>Copilot Coding Agent</strong> for cheaper / GitHub-native.</p>
+                <div class="tree-picker__rec-tools">
+                  <span class="tree-picker__rec-tool">Devin 2.2</span>
+                  <span class="tree-picker__rec-tool tree-picker__rec-tool--secondary">Copilot Coding Agent</span>
+                </div>
+                <p class="tree-picker__gloss">Both turn issues into PRs while you sleep. Devin handles longer, fuzzier tasks; Copilot is cheaper at higher volume and lives where your reviews already happen.</p>
+              </div>
+            </div>
           </div>
 
-          <div class="flow-row">
-            <div class="flow-row__q">Multiple parallel features in flight at once?</div>
-            <div class="flow-row__arrow">→</div>
-            <div class="flow-row__a"><strong>Vibe Kanban</strong> or <strong>Cline Kanban</strong> — each card in its own worktree, zero conflicts.</div>
+          <div class="tree-picker__row" role="listitem" data-step="3">
+            <button type="button" class="tree-picker__question" aria-expanded="false">
+              <span>Multiple parallel features in flight at once?</span>
+              <span class="tree-picker__question-indicator" aria-hidden="true">▸</span>
+            </button>
+            <div class="tree-picker__answer">
+              <div class="tree-picker__answer-inner">
+                <p class="tree-picker__rec"><strong>Vibe Kanban</strong> or <strong>Cline Kanban</strong> — each card runs in its own git worktree, zero conflicts.</p>
+                <div class="tree-picker__rec-tools">
+                  <span class="tree-picker__rec-tool">Vibe Kanban</span>
+                  <span class="tree-picker__rec-tool">Cline Kanban</span>
+                </div>
+                <p class="tree-picker__gloss">You become an air-traffic controller. Vibe Kanban is Rust-fast and one-vendor; Cline Kanban can mix Claude Code and Codex on the same board.</p>
+              </div>
+            </div>
           </div>
 
-          <div class="flow-row">
-            <div class="flow-row__q">Building from a designer's spec or Figma?</div>
-            <div class="flow-row__arrow">→</div>
-            <div class="flow-row__a"><strong>Cursor 3 Design Mode</strong> for in-editor iteration, or <strong>Lovable</strong> for full prompt-to-UI.</div>
+          <div class="tree-picker__row" role="listitem" data-step="4">
+            <button type="button" class="tree-picker__question" aria-expanded="false">
+              <span>Building from a designer's spec or Figma?</span>
+              <span class="tree-picker__question-indicator" aria-hidden="true">▸</span>
+            </button>
+            <div class="tree-picker__answer">
+              <div class="tree-picker__answer-inner">
+                <p class="tree-picker__rec"><strong>Cursor 3 Design Mode</strong> for in-editor iteration, or <strong>Lovable</strong> for full prompt-to-UI.</p>
+                <div class="tree-picker__rec-tools">
+                  <span class="tree-picker__rec-tool">Cursor 3 Design Mode</span>
+                  <span class="tree-picker__rec-tool tree-picker__rec-tool--secondary">Lovable</span>
+                </div>
+                <p class="tree-picker__gloss">Design Mode lets you keep one IDE for code <em>and</em> visual iteration. Lovable is better if you're starting from a brief and want polished UI fast.</p>
+              </div>
+            </div>
           </div>
 
-          <div class="flow-row">
-            <div class="flow-row__q">Free / open source / privacy-sensitive?</div>
-            <div class="flow-row__arrow">→</div>
-            <div class="flow-row__a"><strong>OpenCode</strong> + <strong>Aider</strong>, with a local Llama 4 or DeepSeek V4 model behind the wheel.</div>
+          <div class="tree-picker__row" role="listitem" data-step="5">
+            <button type="button" class="tree-picker__question" aria-expanded="false">
+              <span>Free / open source / privacy-sensitive?</span>
+              <span class="tree-picker__question-indicator" aria-hidden="true">▸</span>
+            </button>
+            <div class="tree-picker__answer">
+              <div class="tree-picker__answer-inner">
+                <p class="tree-picker__rec"><strong>OpenCode + Aider</strong>, with a local <strong>Llama 4</strong> or <strong>DeepSeek V4</strong> behind the wheel.</p>
+                <div class="tree-picker__rec-tools">
+                  <span class="tree-picker__rec-tool">OpenCode</span>
+                  <span class="tree-picker__rec-tool">Aider</span>
+                  <span class="tree-picker__rec-tool tree-picker__rec-tool--secondary">Llama 4 / DeepSeek V4</span>
+                </div>
+                <p class="tree-picker__gloss">Provider-agnostic CLI + git-native edits. BYO weights for regulated industries or sensitive code paths. Performance gap to the frontier is small in 2026.</p>
+              </div>
+            </div>
           </div>
 
-          <div class="flow-row">
-            <div class="flow-row__q">Just here to ship a weekend prototype?</div>
-            <div class="flow-row__arrow">→</div>
-            <div class="flow-row__a"><strong>Bolt</strong> or <strong>v0</strong> for the frontend, then port to Cursor / Claude Code when it survives Monday.</div>
+          <div class="tree-picker__row" role="listitem" data-step="6">
+            <button type="button" class="tree-picker__question" aria-expanded="false">
+              <span>Just here to ship a weekend prototype?</span>
+              <span class="tree-picker__question-indicator" aria-hidden="true">▸</span>
+            </button>
+            <div class="tree-picker__answer">
+              <div class="tree-picker__answer-inner">
+                <p class="tree-picker__rec"><strong>Bolt</strong> or <strong>v0</strong> for the frontend, then port to <strong>Cursor / Claude Code</strong> when it survives Monday.</p>
+                <div class="tree-picker__rec-tools">
+                  <span class="tree-picker__rec-tool">Bolt</span>
+                  <span class="tree-picker__rec-tool">v0</span>
+                  <span class="tree-picker__rec-tool tree-picker__rec-tool--secondary">Cursor / Claude Code</span>
+                </div>
+                <p class="tree-picker__gloss">Get something shippable in a few hours. If it earns the right to live past the weekend, promote it into a real codebase with AGENTS.md.</p>
+              </div>
+            </div>
           </div>
 
         </div>
-        <p class="slide__source">Phase 4 turns this into a clickable widget. For Phase 2 / your reading, the static rows answer the same six questions.</p>
+        <div class="tree-picker__reset-bar">
+          <button type="button" class="tree-picker__reset" data-action="collapse" aria-label="Collapse all questions">Collapse all</button>
+        </div>
+        <p class="slide__source">Click any question that matches your week to see the recommended stack. Six common cases — not exhaustive.</p>
       `,
       notes: {
         time: "~4 min",
-        beat: "Read each question, pause, then the answer. The audience will catch one row that maps to a real task on their plate this week — that's the win. Don't pretend it's exhaustive; it's six common cases.",
-        ask: "What was the most recent coding task you started? Which row in this tree would have been the right tool?",
+        beat: "Read the section lead, then invite the room to call out which question fits their week — click their pick on the deck so the recommendation lands visually. Six cases; don't pretend it's exhaustive. The audience will recognise one row.",
+        ask: "Show of hands — which of those six rows describes the work you'll do tomorrow morning?",
         bridge: "If you only adopt one stack — here's the four-pillar minimum.",
       },
     },
@@ -9228,6 +9454,70 @@ gh pr create --title "Add login form"</code></pre>
 
     setStep(1);
     setMode("auto");
+  });
+
+  // Slide 22 — Tool-picker decision tree (Phase 4 widget #3).
+  // Click a question to expand its recommendation; click again to collapse.
+  // Only one question expanded at a time. Keyboard: Enter/Space activates,
+  // arrows step through questions while focused inside the picker.
+  onSlideEnter(22, function mountTreePicker(el) {
+    if (el.dataset.treePickerMounted === "1") return;
+    const picker = el.querySelector(".tree-picker");
+    if (!picker) return;
+    el.dataset.treePickerMounted = "1";
+
+    const rows    = Array.from(picker.querySelectorAll(".tree-picker__row"));
+    const buttons = Array.from(picker.querySelectorAll(".tree-picker__question"));
+    const resetBtn = el.querySelector('[data-action="collapse"]');
+
+    function setActive(target) {
+      let anyActive = false;
+      rows.forEach(row => {
+        const button = row.querySelector(".tree-picker__question");
+        const isTarget = row === target;
+        const wasActive = row.classList.contains("tree-picker__row--active");
+        const willActivate = isTarget && !wasActive;
+        row.classList.toggle("tree-picker__row--active", willActivate);
+        if (button) button.setAttribute("aria-expanded", String(willActivate));
+        if (willActivate) anyActive = true;
+      });
+      if (resetBtn) resetBtn.disabled = !anyActive;
+    }
+
+    function collapseAll() {
+      rows.forEach(row => {
+        const button = row.querySelector(".tree-picker__question");
+        row.classList.remove("tree-picker__row--active");
+        if (button) button.setAttribute("aria-expanded", "false");
+      });
+      if (resetBtn) resetBtn.disabled = true;
+    }
+
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => setActive(btn.closest(".tree-picker__row")));
+    });
+
+    if (resetBtn) {
+      resetBtn.addEventListener("click", collapseAll);
+      // Sync initial enabled state with the initially-active row.
+      resetBtn.disabled = !picker.querySelector(".tree-picker__row--active");
+    }
+
+    // Arrow-key nav across questions while focus is in the picker.
+    function onKey(e) {
+      if (!el.classList.contains("is-current")) return;
+      if (!picker.contains(document.activeElement)) return;
+      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      const focusedBtn = document.activeElement.closest(".tree-picker__question");
+      if (!focusedBtn) return;
+      const idx = buttons.indexOf(focusedBtn);
+      if (idx === -1) return;
+      const nextIdx = e.key === "ArrowDown" ? Math.min(idx + 1, buttons.length - 1)
+                                            : Math.max(idx - 1, 0);
+      e.preventDefault();
+      buttons[nextIdx].focus();
+    }
+    document.addEventListener("keydown", onKey, true);
   });
 
   // Slide 7 — Cadence chart (Chart.js line series, one per vendor)
