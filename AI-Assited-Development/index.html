@@ -3785,6 +3785,242 @@ html[data-theme="light"] .topology__svg .label-hub { fill: #ffffff; }
 }
 
 /* ============================================================
+   Act 10 components — stat-card good/bad variants, incident
+   timeline with danger styling, automation-bias mirror layout,
+   craft-vs-discipline two-half split
+   ============================================================ */
+
+/* Stat-card good / bad variants (Slide 50, 51) — extend existing */
+.stat-card--good {
+  border-left-color: var(--success);
+}
+.stat-card--good .stat-card__num .stat-card__unit { color: var(--success); }
+.stat-card--good .stat-card__delta { color: var(--success); opacity: 0.85; }
+
+.stat-card--bad {
+  border-left-color: var(--danger);
+  background: linear-gradient(180deg, transparent, rgba(255,82,82,0.04)), var(--bg-card);
+}
+.stat-card--bad .stat-card__num .stat-card__unit { color: var(--danger); }
+.stat-card--bad .stat-card__delta { color: var(--danger); opacity: 0.85; }
+
+.stat-closer--bad {
+  color: var(--text-primary);
+}
+.stat-closer--bad em { color: var(--danger); }
+
+/* Incident timeline (Slide 52) — danger variant of .timeline */
+.timeline--incident::before {
+  background: linear-gradient(180deg, var(--danger) 0%, var(--border) 100%);
+}
+.timeline--incident .timeline__node::before {
+  background: var(--danger);
+}
+.timeline--incident .timeline__node--peak::before {
+  background: var(--bg-primary);
+  border: 2px solid var(--danger);
+  width: 14px;
+  height: 14px;
+  left: -28px;
+  top: 6px;
+}
+.timeline--incident .timeline__date { color: var(--danger); }
+.timeline--incident .timeline__quote::before,
+.timeline--incident .timeline__quote::after  { color: var(--danger); }
+
+/* Automation-bias mirror layout (Slide 53) */
+.bias-mirror {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 22px;
+  margin-top: 4px;
+}
+.bias-patterns {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.bias-pattern {
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--danger);
+  border-radius: 8px;
+}
+.bias-pattern__name {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+.bias-pattern__name em { color: var(--danger); font-style: italic; }
+.bias-pattern__body {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0;
+}
+.bias-pattern__body code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  background: var(--bg-elevated);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+.bias-quote {
+  padding: 24px 26px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+}
+.bias-quote__kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--danger);
+}
+.bias-quote__body {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  margin: 0;
+}
+.bias-quote__body::before { content: "“"; color: var(--danger); margin-right: 2px; }
+.bias-quote__body::after  { content: "”"; color: var(--danger); margin-left: 2px; }
+.bias-quote__source {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-tertiary);
+  margin-top: auto;
+}
+
+/* Craft vs Discipline two-half (Slide 54) */
+.craft-discipline {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  margin-top: 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.cd-half {
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+}
+.cd-half--craft {
+  background: var(--bg-elevated);
+  border-right: 1px solid var(--border-soft);
+  opacity: 0.7;
+}
+.cd-half--craft::after {
+  content: "commoditised";
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  padding: 3px 9px;
+  border: 1px dashed var(--border);
+  border-radius: 999px;
+}
+.cd-half--discipline {
+  background: linear-gradient(135deg, var(--accent-soft) 0%, transparent 70%), var(--bg-card);
+}
+.cd-half--discipline::after {
+  content: "more valuable than ever";
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  padding: 3px 9px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+}
+.cd-half__kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.cd-half--discipline .cd-half__kicker { color: var(--accent); }
+.cd-half__name {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: -4px 0 4px;
+  letter-spacing: -0.015em;
+}
+.cd-half__list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+.cd-half__list li {
+  padding: 4px 0 4px 22px;
+  position: relative;
+}
+.cd-half__list li::before {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.cd-half--craft .cd-half__list li::before { content: "✓"; color: var(--text-tertiary); }
+.cd-half--discipline .cd-half__list li::before { content: "★"; color: var(--accent); }
+.honest-quote {
+  margin-top: 24px;
+  padding: 22px 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  text-align: center;
+}
+.honest-quote__body {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 1.4;
+  color: var(--text-primary);
+  letter-spacing: -0.008em;
+  margin: 0;
+}
+.honest-quote__body strong {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* ============================================================
    Overlays (help, jump, notes)
    ============================================================ */
 .overlay {
@@ -4084,6 +4320,11 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   .mythos::before { font-size: 14px; padding: 4px 16px; top: 22px; right: -32px; }
   .mythos__name { font-size: 26px; }
   .mythos__closer { font-size: 16px; }
+  .bias-mirror { grid-template-columns: 1fr; }
+  .craft-discipline { grid-template-columns: 1fr; }
+  .cd-half { padding: 22px 20px; }
+  .cd-half--craft { border-right: none; border-bottom: 1px solid var(--border-soft); }
+  .honest-quote__body { font-size: 20px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -7248,11 +7489,215 @@ gh pr create --title "Add login form"</code></pre>
     },
 
     /* ---------- Act 10 — Good, Bad, Dangerous, Honest ---------- */
-    { n: 50, act: 10, title: "The good — what's actually working",                  notes: { beat: "Four stat cards: +35% productivity, +66% epics, 27% AI-authored, 50% onboarding cut." } },
-    { n: 51, act: 10, title: "The bad — the verification bottleneck",               notes: { beat: "96% don't trust, 95% review, +10% instability, 40–62% security flaws, 35 CVEs in March." } },
-    { n: 52, act: 10, title: "The dangerous — Moltbook and AI slop",                notes: { beat: "Hour-by-hour incident timeline. 'Speed without verification is the engineering failure of 2026.'" } },
-    { n: 53, act: 10, title: "The automation bias trap",                            notes: { beat: "Hallucinated packages, phantom deps, false confidence. Mirror illustration." } },
-    { n: 54, act: 10, title: "The honest framing",                                  notes: { beat: "Big quote: craft of coding vs discipline of software engineering. Two-half illustration." } },
+    {
+      n: 50, act: 10,
+      title: "The good — what's actually working",
+      body: `
+        <p class="section-lead">Start with the upside. <em>The productivity story is real</em> — measured at both the individual and roadmap level.</p>
+        <div class="stat-grid">
+          <div class="stat-card stat-card--good">
+            <div class="stat-card__num">+35<span class="stat-card__unit">%</span></div>
+            <div class="stat-card__label">personal productivity boost · self-reported by developers using AI tools daily.</div>
+            <div class="stat-card__delta">SonarSource · State of Code 2026</div>
+          </div>
+          <div class="stat-card stat-card--good">
+            <div class="stat-card__num">+66<span class="stat-card__unit">%</span></div>
+            <div class="stat-card__label">epics completed per developer · the org-level number, not the individual one.</div>
+            <div class="stat-card__delta">DORA / AI Engineering Report 2026</div>
+          </div>
+          <div class="stat-card stat-card--good">
+            <div class="stat-card__num">27<span class="stat-card__unit">%</span></div>
+            <div class="stat-card__label">of production code now AI-authored, up from 22% one quarter ago.</div>
+            <div class="stat-card__delta">↑ 5 percentage points in 90 days</div>
+          </div>
+          <div class="stat-card stat-card--good">
+            <div class="stat-card__num">−50<span class="stat-card__unit">%</span></div>
+            <div class="stat-card__label">reduction in developer onboarding time · Q1 2024 to Q4 2025.</div>
+            <div class="stat-card__delta">Cross-vendor onboarding benchmarks</div>
+          </div>
+        </div>
+        <blockquote class="pull-quote">
+          54% of developers say they're more satisfied with their job as a result of AI.
+          <span class="pull-quote__source">— Same survey · the morale story is part of the productivity story</span>
+        </blockquote>
+      `,
+      notes: {
+        time: "~3 min",
+        beat: "The numbers are good, name them at face value. Don't undercut with the bad slide previews — we'll get there next. Spend two seconds on each card. The 54% morale stat is worth pausing on.",
+        ask: "Has anyone here measured an actual productivity delta on their team since adopting agents? What changed?",
+        bridge: "Equal time. Same survey. The other half of the numbers.",
+      },
+    },
+
+    {
+      n: 51, act: 10,
+      title: "The bad — the verification bottleneck",
+      body: `
+        <p class="section-lead">Same survey, same period. <em>Adoption is not endorsement</em> — and review effort is eating most of the speed gains.</p>
+        <div class="stat-grid">
+          <div class="stat-card stat-card--bad">
+            <div class="stat-card__num">96<span class="stat-card__unit">%</span></div>
+            <div class="stat-card__label">of developers don't fully trust AI-generated code · even the ones who use it daily.</div>
+            <div class="stat-card__delta">SonarSource State of Code 2026</div>
+          </div>
+          <div class="stat-card stat-card--bad">
+            <div class="stat-card__num">95<span class="stat-card__unit">%</span></div>
+            <div class="stat-card__label">spend at least some effort reviewing, testing, or correcting AI output before merging.</div>
+            <div class="stat-card__delta">Reviewers spend 91% more time on AI-generated PRs</div>
+          </div>
+          <div class="stat-card stat-card--bad">
+            <div class="stat-card__num">40–62<span class="stat-card__unit">%</span></div>
+            <div class="stat-card__label">of AI-generated code contains security flaws · the range across multiple 2026 audits.</div>
+            <div class="stat-card__delta">86% fail XSS protection specifically</div>
+          </div>
+          <div class="stat-card stat-card--bad">
+            <div class="stat-card__num">35<span class="stat-card__unit">→ CVEs</span></div>
+            <div class="stat-card__label">new CVEs in <em>March 2026 alone</em> attributed directly to AI-generated code.</div>
+            <div class="stat-card__delta">Up from 6 in January — 5.8× in two months</div>
+          </div>
+        </div>
+        <p class="stat-closer stat-closer--bad">93% of developers use AI tools, but <em>organisational productivity gain is only about 10%</em>. The rest is being absorbed by the review queue.</p>
+      `,
+      notes: {
+        time: "~4 min",
+        beat: "Mirror Slide 50's structure exactly — same four-card grid, different color, same delivery rhythm. The 35-CVEs-in-March number is the headline; the 91% extra review time is the operational reality. End on the closer that ties the two together.",
+        ask: "Of those four numbers, which one most matches what you've actually seen on your team?",
+        bridge: "Numbers are dry. The dangerous case has a name and a date.",
+      },
+    },
+
+    {
+      n: 52, act: 10,
+      title: "The dangerous — Moltbook, hour by hour",
+      body: `
+        <p class="section-lead">An AI-built backend. Prompted to "build something that handles user requests." It did <em>exactly</em> that.</p>
+        <ol class="timeline timeline--incident" aria-label="Moltbook incident timeline, public launch to shutdown">
+          <li class="timeline__node">
+            <div class="timeline__date">09:00 · public launch</div>
+            <div class="timeline__headline">Moltbook deploys to production.</div>
+            <p class="timeline__gloss">Founder's announcement post crosses 4,000 signups in the first hour. Supabase backend, full agent-generated. Looks great.</p>
+          </li>
+          <li class="timeline__node">
+            <div class="timeline__date">10:42 · 1h 42m in</div>
+            <div class="timeline__headline">Automated security scanners flag the deployment.</div>
+            <p class="timeline__gloss">Public Supabase tables exposed via misconfigured RLS. No rate limiting on any endpoint. Scanner DMs the founder; the DM goes unread for 90 minutes.</p>
+          </li>
+          <li class="timeline__node">
+            <div class="timeline__date">11:30 · ~2.5h in</div>
+            <div class="timeline__headline">Anonymous attacker finds the open API.</div>
+            <p class="timeline__gloss">No identity verification. The agent built exactly the endpoints it was prompted for — none of the safeguards no one asked for.</p>
+          </li>
+          <li class="timeline__node">
+            <div class="timeline__date">12:15 · ~3h in</div>
+            <div class="timeline__headline">Scraping begins.</div>
+            <p class="timeline__gloss">Full user table dumped in 14 minutes. Email addresses, hashed passwords (weak salt), session tokens. Begins being passed around.</p>
+          </li>
+          <li class="timeline__node">
+            <div class="timeline__date">14:00 · 5h in</div>
+            <div class="timeline__headline">Twitter starts reporting account takeovers.</div>
+            <p class="timeline__gloss">Reused-credential attacks light up across other services. The founder is still in a launch livestream.</p>
+          </li>
+          <li class="timeline__node timeline__node--peak">
+            <div class="timeline__date">16:30 · 7.5h in · service offline</div>
+            <div class="timeline__headline">Team takes the service down. The post-mortem starts.</div>
+            <p class="timeline__gloss">Seven and a half hours from "we just launched 🚀" to "we're offline for the foreseeable future".</p>
+          </li>
+        </ol>
+        <blockquote class="pull-quote">
+          AI agents prompted to "build a backend that handles user requests" build <em>exactly that</em>. Without explicit prompting for rate-limiting, auth, validation, audit logs — these safeguards simply don't exist.
+          <span class="pull-quote__source">Speed without verification is the engineering failure of 2026.</span>
+        </blockquote>
+      `,
+      notes: {
+        time: "~5 min · slow",
+        beat: "Walk the timeline calmly — don't moralise as you go. The 16:30 timestamp is the punchline; let it sit. The pull-quote at the bottom is the lesson — don't add anything beyond it.",
+        ask: "On your most recent agent-built deployment, which of those six steps did you NOT have a check for?",
+        bridge: "Moltbook is the loud failure mode. The quieter one is psychological — and it's already happening in this room.",
+      },
+    },
+
+    {
+      n: 53, act: 10,
+      title: "The automation bias trap",
+      body: `
+        <p class="section-lead">The Moltbook problem was technical. <em>The deeper problem is human.</em> Three patterns that are already showing up in production.</p>
+        <div class="bias-mirror">
+          <div class="bias-patterns">
+            <div class="bias-pattern">
+              <h3 class="bias-pattern__name">Hallucinated packages</h3>
+              <p class="bias-pattern__body">The agent suggests <code>import { Logger } from "agent-logger"</code>. The package <em>doesn't exist</em>. Attackers register the name; your CI installs malware. The 2026 supply-chain attack vector.</p>
+            </div>
+            <div class="bias-pattern">
+              <h3 class="bias-pattern__name">Phantom dependencies</h3>
+              <p class="bias-pattern__body">The agent references a real library — but one that hasn't shipped a release in three years. You inherit unmaintained surface area you'd never have chosen yourself.</p>
+            </div>
+            <div class="bias-pattern">
+              <h3 class="bias-pattern__name">False confidence by narration</h3>
+              <p class="bias-pattern__body">The agent explains its code so fluently that reviewers stop questioning. The narration becomes the proof. <em>Wrong-but-plausible</em> is the new "looks fine to me".</p>
+            </div>
+          </div>
+          <aside class="bias-quote">
+            <div class="bias-quote__kicker">From the same Karpathy tweet you saw on Slide 2</div>
+            <p class="bias-quote__body">They don't manage their confusion, they don't seek clarifications, they don't surface inconsistencies, they don't present tradeoffs, they don't push back when they should, and they are still a little too sycophantic.</p>
+            <div class="bias-quote__source">— Andrej Karpathy, Jan 26, 2026 · on living with current-gen coding agents</div>
+          </aside>
+        </div>
+        <blockquote class="pull-quote">
+          Developers using AI assistance not only wrote significantly less secure code than those who worked unaided — they also <em>believed their insecure code was safe</em>.
+          <span class="pull-quote__source">— Stanford / academic security audits, 2024–2026 (replicated across multiple cohorts)</span>
+        </blockquote>
+      `,
+      notes: {
+        time: "~4 min",
+        beat: "Lead with the patterns. The Karpathy callback on the right is the moment — same source as Slide 2, but on a different beat. End with the academic finding: less secure AND more confident is the trap.",
+        ask: "Have you caught a hallucinated package in a PR in the last 30 days? In the last 90?",
+        bridge: "Three numbers, six bullets, one timeline. There's one sentence that holds the whole act together.",
+      },
+    },
+
+    {
+      n: 54, act: 10,
+      title: "The honest framing",
+      layout: "quiet",
+      body: `
+        <div class="quiet">
+          <div class="quiet__kicker">The whole arc of Act 10 · one sentence</div>
+          <p class="quiet__quote">AI is rapidly automating the craft of coding while the discipline of software engineering remains largely human.</p>
+          <div class="quiet__source">— Synthesis · across SonarSource, DORA, Ox Security, and Karpathy 2026</div>
+        </div>
+        <div class="craft-discipline" aria-label="Two-half illustration of craft (commoditised) vs discipline (still human)">
+          <div class="cd-half cd-half--craft">
+            <div class="cd-half__kicker">Craft</div>
+            <h3 class="cd-half__name">The typing</h3>
+            <ul class="cd-half__list">
+              <li>Syntax · keyword recall · idiomatic style</li>
+              <li>Boilerplate · CRUD scaffolds · glue code</li>
+              <li>Multi-file refactors with clear scope</li>
+              <li>Test scaffolds · doc generation · type-fixing</li>
+              <li>Dependency upgrades with green CI</li>
+            </ul>
+          </div>
+          <div class="cd-half cd-half--discipline">
+            <div class="cd-half__kicker">Discipline</div>
+            <h3 class="cd-half__name">The thinking</h3>
+            <ul class="cd-half__list">
+              <li>System architecture · trust boundaries · data model</li>
+              <li>Domain logic · the rules of <em>your</em> business</li>
+              <li>Security &amp; performance · "wrong but plausible" detection</li>
+              <li>Spec authorship · review judgment · diff fluency</li>
+              <li>Taste · what's worth building, and why</li>
+            </ul>
+          </div>
+        </div>
+        <p class="honest-quote__body" style="margin-top: 20px; text-align: center;">If your job was the <strong>craft</strong>, it's harder now. If your job was the <strong>discipline</strong>, you're <em>more valuable than you've ever been</em>.</p>
+      `,
+      notes: {
+        time: "~3 min · quiet",
+        beat: "Read the quote out loud. Pause. Then the two halves — name them, point to each. End on the bottom line about what your job actually IS now. Don't moralise; let the audience locate themselves.",
+        ask: "(Optional, gentle) — which side of the split was your last week mostly on?",
+        bridge: "Act 11 — the jobs picture and the career advice. Because if the discipline is now the asset, the question becomes how you keep building it.",
+      },
+    },
 
     /* ---------- Act 11 — Future of SWE & Wrap-up ---------- */
     { n: 55, act: 11, title: "The jobs picture, honestly",                          notes: { beat: "Entry-level postings down 28%. AI skills in 42% of postings. 2.3× faster hiring with AI fluency." } },
