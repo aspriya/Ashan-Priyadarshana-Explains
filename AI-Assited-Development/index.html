@@ -4412,6 +4412,292 @@ html[data-theme="light"] .scrubber__btn--play:hover { color: #ffffff; }
   font-variant-numeric: tabular-nums;
 }
 
+/* ---- Widget 2 · Slide 12 — Capability spectrum slider ---- */
+.tier-slider {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  --tier-pad: 38px;
+}
+
+/* Horizontal axis with 7 numbered dots */
+.tier-slider__axis {
+  position: relative;
+  padding: 16px var(--tier-pad) 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+  cursor: grab;
+}
+.tier-slider__axis:active { cursor: grabbing; }
+.tier-slider__axis:focus { outline: none; }
+.tier-slider__axis:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+.tier-slider__line {
+  position: absolute;
+  left: var(--tier-pad);
+  right: var(--tier-pad);
+  top: 38px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--text-tertiary) 0%, var(--accent-strong) 70%, var(--accent) 100%);
+  opacity: 0.35;
+  border-radius: 2px;
+  pointer-events: none;
+}
+.tier-slider__progress {
+  position: absolute;
+  left: var(--tier-pad);
+  right: var(--tier-pad);
+  top: 38px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  border-radius: 2px;
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform var(--t-mid);
+  pointer-events: none;
+}
+.tier-slider__dots {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 44px;
+  pointer-events: none;
+}
+.tier-slider__dot {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 2px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  pointer-events: auto;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform var(--t-fast), background var(--t-fast), border-color var(--t-fast), color var(--t-fast), box-shadow var(--t-fast);
+}
+.tier-slider__dot:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.06);
+}
+.tier-slider__dot:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(255, 107, 61, 0.30);
+}
+.tier-slider__dot--passed {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.tier-slider__dot--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-primary);
+  transform: scale(1.2);
+  box-shadow: 0 0 0 6px rgba(255, 107, 61, 0.22);
+}
+html[data-theme="light"] .tier-slider__dot--active { color: #ffffff; }
+.tier-slider__axis-labels {
+  position: absolute;
+  left: var(--tier-pad);
+  right: var(--tier-pad);
+  bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+.tier-slider__axis-labels span:last-child { color: var(--accent); }
+
+/* Detail card below the axis */
+.tier-slider__detail {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 12px;
+  padding: 26px 30px 24px;
+  min-height: 260px;
+  overflow: hidden;
+}
+.tier-slider__tier {
+  position: absolute;
+  inset: 26px 30px 24px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: opacity var(--t-mid), transform var(--t-mid), visibility 0s linear var(--t-mid);
+}
+.tier-slider__tier--active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity var(--t-mid), transform var(--t-mid), visibility 0s;
+}
+.tier-slider--dragging .tier-slider__tier {
+  transition: none;
+}
+.tier-slider__tier-header {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  margin-bottom: 12px;
+}
+.tier-slider__tier-num {
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 400;
+  color: var(--accent);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+}
+.tier-slider__tier-name {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.012em;
+}
+.tier-slider__tier-name small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+  letter-spacing: 0;
+}
+.tier-slider__tier-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 14px 0 14px;
+}
+.tier-slider__tier-tool {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.tier-slider__tier-when {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  margin: 0;
+}
+.tier-slider__tier-when strong {
+  color: var(--accent);
+  font-weight: 600;
+  margin-right: 6px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+/* Controls row (same shape as scrubber controls but with the tier-slider prefix) */
+.tier-slider__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.tier-slider__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+  min-width: 44px;
+}
+.tier-slider__btn:hover {
+  background: var(--bg-elevated);
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+.tier-slider__btn:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255, 107, 61, 0.30);
+}
+.tier-slider__btn:disabled { opacity: 0.42; cursor: not-allowed; }
+.tier-slider__btn:disabled:hover {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+.tier-slider__btn--play {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+html[data-theme="light"] .tier-slider__btn--play { color: #ffffff; }
+.tier-slider__btn--play:hover {
+  background: var(--accent-strong);
+  color: var(--bg-primary);
+  border-color: var(--accent-strong);
+}
+html[data-theme="light"] .tier-slider__btn--play:hover { color: #ffffff; }
+.tier-slider__btn--paused {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.tier-slider__btn--paused:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent-strong);
+}
+.tier-slider__counter {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.06em;
+  min-width: 58px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ============================================================
    Overlays (help, jump, notes)
    ============================================================ */
@@ -4733,6 +5019,17 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   .scrubber__milestone-headline { font-size: 19px; }
   .scrubber__milestone-quote { font-size: 14px; }
   .scrubber__milestone-gloss { font-size: 13px; }
+  .tier-slider { --tier-pad: 20px; }
+  .tier-slider__axis { padding: 14px var(--tier-pad) 26px; }
+  .tier-slider__line, .tier-slider__progress { left: var(--tier-pad); right: var(--tier-pad); top: 30px; }
+  .tier-slider__dots { height: 32px; }
+  .tier-slider__dot { width: 32px; height: 32px; font-size: 14px; }
+  .tier-slider__detail { padding: 18px 20px; min-height: 240px; }
+  .tier-slider__tier { inset: 18px 20px; }
+  .tier-slider__tier-num { font-size: 40px; }
+  .tier-slider__tier-name { font-size: 20px; }
+  .tier-slider__tier-name small { font-size: 12px; }
+  .tier-slider__axis-labels { font-size: 9px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -5404,90 +5701,128 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
       title: "The seven-tier capability spectrum",
       body: `
         <p class="section-lead">Each tier is a different <em>kind</em> of help — different cadence, different supervision, different failure mode.</p>
-        <div class="tier-list">
-
-          <div class="tier-row">
-            <div class="tier-row__num">1</div>
-            <div class="tier-row__name">Tab autocomplete<small>Inline single-token / single-line suggestions</small></div>
-            <div class="tier-row__tools">
-              <span class="tier-row__tool">Copilot classic</span>
-              <span class="tier-row__tool">Tabnine</span>
-              <span class="tier-row__tool">Amazon Q inline</span>
+        <div class="tier-slider" data-active="1">
+          <div class="tier-slider__axis" tabindex="0" role="slider"
+               aria-label="Capability spectrum slider — 7 tiers from autocomplete to multi-agent orchestration"
+               aria-valuemin="1" aria-valuemax="7" aria-valuenow="1">
+            <div class="tier-slider__line"></div>
+            <div class="tier-slider__progress"></div>
+            <div class="tier-slider__dots">
+              <button type="button" class="tier-slider__dot tier-slider__dot--active" data-step="1" aria-label="Tier 1 — Tab autocomplete">1</button>
+              <button type="button" class="tier-slider__dot" data-step="2" aria-label="Tier 2 — Inline edit">2</button>
+              <button type="button" class="tier-slider__dot" data-step="3" aria-label="Tier 3 — Multi-file agent">3</button>
+              <button type="button" class="tier-slider__dot" data-step="4" aria-label="Tier 4 — Agent mode">4</button>
+              <button type="button" class="tier-slider__dot" data-step="5" aria-label="Tier 5 — Parallel local agents">5</button>
+              <button type="button" class="tier-slider__dot" data-step="6" aria-label="Tier 6 — Cloud agents">6</button>
+              <button type="button" class="tier-slider__dot" data-step="7" aria-label="Tier 7 — Multi-agent orchestration">7</button>
             </div>
-            <div class="tier-row__when">Typing speed. ~92% of devs still use it daily.</div>
+            <div class="tier-slider__axis-labels"><span>Autocomplete</span><span>Autonomy →</span></div>
           </div>
 
-          <div class="tier-row">
-            <div class="tier-row__num">2</div>
-            <div class="tier-row__name">Inline edit<small>Focused multi-line refactor on a selection</small></div>
-            <div class="tier-row__tools">
-              <span class="tier-row__tool">Cursor Cmd+K</span>
-              <span class="tier-row__tool">Copilot Edits</span>
-              <span class="tier-row__tool">Windsurf inline</span>
-            </div>
-            <div class="tier-row__when">Renaming. Type-fixing. Small refactors.</div>
+          <div class="tier-slider__detail" aria-live="polite">
+            <article class="tier-slider__tier tier-slider__tier--active" data-step="1">
+              <div class="tier-slider__tier-header">
+                <div class="tier-slider__tier-num">1</div>
+                <h3 class="tier-slider__tier-name">Tab autocomplete<small>Inline single-token / single-line suggestions</small></h3>
+              </div>
+              <div class="tier-slider__tier-tools">
+                <span class="tier-slider__tier-tool">Copilot classic</span>
+                <span class="tier-slider__tier-tool">Tabnine</span>
+                <span class="tier-slider__tier-tool">Amazon Q inline</span>
+              </div>
+              <p class="tier-slider__tier-when"><strong>Use it for</strong>Typing speed. ~92% of devs still use it daily as background noise.</p>
+            </article>
+
+            <article class="tier-slider__tier" data-step="2">
+              <div class="tier-slider__tier-header">
+                <div class="tier-slider__tier-num">2</div>
+                <h3 class="tier-slider__tier-name">Inline edit<small>Focused multi-line refactor on a selection</small></h3>
+              </div>
+              <div class="tier-slider__tier-tools">
+                <span class="tier-slider__tier-tool">Cursor Cmd+K</span>
+                <span class="tier-slider__tier-tool">Copilot Edits</span>
+                <span class="tier-slider__tier-tool">Windsurf inline</span>
+              </div>
+              <p class="tier-slider__tier-when"><strong>Use it for</strong>Renaming. Type-fixing. Small refactors. You're still driving; the AI is helping with one focused change.</p>
+            </article>
+
+            <article class="tier-slider__tier" data-step="3">
+              <div class="tier-slider__tier-header">
+                <div class="tier-slider__tier-num">3</div>
+                <h3 class="tier-slider__tier-name">Multi-file agent<small>Edits across files in one shot, scoped to a task</small></h3>
+              </div>
+              <div class="tier-slider__tier-tools">
+                <span class="tier-slider__tier-tool">Cursor Composer</span>
+                <span class="tier-slider__tier-tool">Copilot Edits multi-file</span>
+                <span class="tier-slider__tier-tool">Windsurf Cascade</span>
+              </div>
+              <p class="tier-slider__tier-when"><strong>Use it for</strong>"Add a settings page." Scoped feature work where you write the prompt and review the resulting diff.</p>
+            </article>
+
+            <article class="tier-slider__tier" data-step="4">
+              <div class="tier-slider__tier-header">
+                <div class="tier-slider__tier-num">4</div>
+                <h3 class="tier-slider__tier-name">Agent mode<small>Plans, edits, runs commands, iterates against feedback</small></h3>
+              </div>
+              <div class="tier-slider__tier-tools">
+                <span class="tier-slider__tier-tool">Claude Code</span>
+                <span class="tier-slider__tier-tool">Copilot Agent Mode</span>
+                <span class="tier-slider__tier-tool">Codex CLI</span>
+              </div>
+              <p class="tier-slider__tier-when"><strong>Use it for</strong>Most daily work in May 2026. You watch; you don't type. The agent plans → codes → tests → reports back.</p>
+            </article>
+
+            <article class="tier-slider__tier" data-step="5">
+              <div class="tier-slider__tier-header">
+                <div class="tier-slider__tier-num">5</div>
+                <h3 class="tier-slider__tier-name">Parallel local agents<small>3–10 agents in isolated git worktrees on your machine</small></h3>
+              </div>
+              <div class="tier-slider__tier-tools">
+                <span class="tier-slider__tier-tool">Claude Squad</span>
+                <span class="tier-slider__tier-tool">Vibe Kanban</span>
+                <span class="tier-slider__tier-tool">Cline Kanban</span>
+                <span class="tier-slider__tier-tool">Conductor</span>
+              </div>
+              <p class="tier-slider__tier-when"><strong>Use it for</strong>Parallel sprints. Many features at once. You become an air-traffic controller instead of a coder.</p>
+            </article>
+
+            <article class="tier-slider__tier" data-step="6">
+              <div class="tier-slider__tier-header">
+                <div class="tier-slider__tier-num">6</div>
+                <h3 class="tier-slider__tier-name">Cloud agents<small>Assign a ticket, walk away, review a PR</small></h3>
+              </div>
+              <div class="tier-slider__tier-tools">
+                <span class="tier-slider__tier-tool">Devin 2.2</span>
+                <span class="tier-slider__tier-tool">Claude Code Web</span>
+                <span class="tier-slider__tier-tool">Copilot Coding Agent</span>
+                <span class="tier-slider__tier-tool">Jules</span>
+                <span class="tier-slider__tier-tool">Codex Web</span>
+              </div>
+              <p class="tier-slider__tier-when"><strong>Use it for</strong>Backlog drain. Overnight work. The agent runs on someone else's machine; you wake up to PRs in your inbox.</p>
+            </article>
+
+            <article class="tier-slider__tier" data-step="7">
+              <div class="tier-slider__tier-header">
+                <div class="tier-slider__tier-num">7</div>
+                <h3 class="tier-slider__tier-name">Multi-agent orchestration<small>Agents that spawn and coordinate other agents</small></h3>
+              </div>
+              <div class="tier-slider__tier-tools">
+                <span class="tier-slider__tier-tool">Anthropic Agent Teams</span>
+                <span class="tier-slider__tier-tool">Antigravity Manager</span>
+                <span class="tier-slider__tier-tool">Composio Orchestrator</span>
+              </div>
+              <p class="tier-slider__tier-when"><strong>Use it for</strong>Pipelines &amp; large refactors. Use sparingly — Act 8 covers when this is worth the 15× token cost and when it isn't.</p>
+            </article>
           </div>
 
-          <div class="tier-row">
-            <div class="tier-row__num">3</div>
-            <div class="tier-row__name">Multi-file agent<small>Edits across files in one shot, scoped to a task</small></div>
-            <div class="tier-row__tools">
-              <span class="tier-row__tool">Cursor Composer</span>
-              <span class="tier-row__tool">Copilot Edits multi-file</span>
-              <span class="tier-row__tool">Windsurf Cascade</span>
-            </div>
-            <div class="tier-row__when">"Add a settings page." Scoped feature work.</div>
+          <div class="tier-slider__controls" role="group" aria-label="Capability spectrum controls">
+            <button type="button" class="tier-slider__btn" data-action="prev" aria-label="Previous tier">←</button>
+            <button type="button" class="tier-slider__btn tier-slider__btn--play" data-action="toggle" aria-label="Toggle auto-advance">▮▮ Pause</button>
+            <button type="button" class="tier-slider__btn" data-action="next" aria-label="Next tier">→</button>
+            <div class="tier-slider__counter" aria-hidden="true">1 / 7</div>
           </div>
-
-          <div class="tier-row">
-            <div class="tier-row__num">4</div>
-            <div class="tier-row__name">Agent mode<small>Plans, edits, runs commands, iterates against feedback</small></div>
-            <div class="tier-row__tools">
-              <span class="tier-row__tool">Claude Code</span>
-              <span class="tier-row__tool">Copilot Agent Mode</span>
-              <span class="tier-row__tool">Codex CLI</span>
-            </div>
-            <div class="tier-row__when">Most daily work. You watch; you don't type.</div>
-          </div>
-
-          <div class="tier-row">
-            <div class="tier-row__num">5</div>
-            <div class="tier-row__name">Parallel local agents<small>3–10 agents in isolated git worktrees on your machine</small></div>
-            <div class="tier-row__tools">
-              <span class="tier-row__tool">Claude Squad</span>
-              <span class="tier-row__tool">Vibe Kanban</span>
-              <span class="tier-row__tool">Cline Kanban</span>
-              <span class="tier-row__tool">Conductor</span>
-            </div>
-            <div class="tier-row__when">Parallel sprints. Many features at once.</div>
-          </div>
-
-          <div class="tier-row">
-            <div class="tier-row__num">6</div>
-            <div class="tier-row__name">Cloud agents<small>Assign a ticket, walk away, review a PR</small></div>
-            <div class="tier-row__tools">
-              <span class="tier-row__tool">Devin 2.2</span>
-              <span class="tier-row__tool">Claude Code Web</span>
-              <span class="tier-row__tool">Copilot Coding Agent</span>
-              <span class="tier-row__tool">Jules</span>
-              <span class="tier-row__tool">Codex Web</span>
-            </div>
-            <div class="tier-row__when">Backlog drain. Overnight work.</div>
-          </div>
-
-          <div class="tier-row">
-            <div class="tier-row__num">7</div>
-            <div class="tier-row__name">Multi-agent orchestration<small>Agents that spawn and coordinate other agents</small></div>
-            <div class="tier-row__tools">
-              <span class="tier-row__tool">Anthropic Agent Teams</span>
-              <span class="tier-row__tool">Antigravity Manager</span>
-              <span class="tier-row__tool">Composio Orchestrator</span>
-            </div>
-            <div class="tier-row__when">Pipelines &amp; large refactors. Use sparingly — Act 8.</div>
-          </div>
-
         </div>
-        <p class="slide__source">Phase 4 will turn this list into a draggable slider where each tier expands inline. For Phase 2, the stacked view is the readable fallback.</p>
+        <p class="slide__source">Click any number, drag the rail, or use ← / → keys to move along the autonomy axis. Auto-advances until you take control.</p>
       `,
       notes: {
         time: "~8 min",
@@ -8755,6 +9090,142 @@ gh pr create --title "Add login form"</code></pre>
     document.addEventListener("keydown", onKey, true);
 
     // --- Initial state + kick off auto-advance ---
+    setStep(1);
+    setMode("auto");
+  });
+
+  // Slide 12 — Capability spectrum slider (Phase 4 widget #2).
+  // Same interaction surface as the timeline scrubber but 7 tiers, larger
+  // numbered dots, richer detail card. Drag pauses the fade transition for
+  // snappier scrubbing.
+  onSlideEnter(12, function mountTierSlider(el) {
+    if (el.dataset.tierSliderMounted === "1") return;
+    const slider = el.querySelector(".tier-slider");
+    if (!slider) return;
+    el.dataset.tierSliderMounted = "1";
+
+    const axis      = slider.querySelector(".tier-slider__axis");
+    const dots      = Array.from(slider.querySelectorAll(".tier-slider__dot"));
+    const progress  = slider.querySelector(".tier-slider__progress");
+    const tiers     = Array.from(slider.querySelectorAll(".tier-slider__tier"));
+    const counter   = slider.querySelector(".tier-slider__counter");
+    const btnPrev   = slider.querySelector('[data-action="prev"]');
+    const btnNext   = slider.querySelector('[data-action="next"]');
+    const btnToggle = slider.querySelector('[data-action="toggle"]');
+
+    const TOTAL = tiers.length;          // 7
+    const AUTO_MS = 5200;
+    let current = 1;
+    let mode = "auto";
+    let timerId = null;
+    let dragging = false;
+
+    function setStep(n) {
+      n = Math.max(1, Math.min(TOTAL, n));
+      current = n;
+      dots.forEach((d, i) => {
+        const step = i + 1;
+        d.classList.toggle("tier-slider__dot--active", step === n);
+        d.classList.toggle("tier-slider__dot--passed", step < n);
+      });
+      tiers.forEach((t, i) => {
+        t.classList.toggle("tier-slider__tier--active", i + 1 === n);
+      });
+      const pct = (n - 1) / (TOTAL - 1);
+      progress.style.transform = `scaleX(${pct})`;
+      counter.textContent = `${n} / ${TOTAL}`;
+      slider.dataset.active = String(n);
+      axis.setAttribute("aria-valuenow", String(n));
+      btnPrev.disabled = n === 1;
+      btnNext.disabled = n === TOTAL;
+    }
+
+    function startTimer() {
+      stopTimer();
+      timerId = setInterval(() => {
+        if (mode !== "auto") return;
+        if (!el.classList.contains("is-current")) return;
+        if (current >= TOTAL) {
+          setMode("paused");
+          return;
+        }
+        setStep(current + 1);
+      }, AUTO_MS);
+    }
+    function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
+    function setMode(m) {
+      mode = m;
+      btnToggle.classList.toggle("tier-slider__btn--paused", m === "paused");
+      btnToggle.textContent = m === "auto" ? "▮▮ Pause" : "▶ Play";
+      btnToggle.setAttribute("aria-label", m === "auto" ? "Pause auto-advance" : "Resume auto-advance");
+      if (m === "auto") startTimer(); else stopTimer();
+    }
+
+    // --- Dot clicks ---
+    dots.forEach(dot => {
+      dot.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const step = parseInt(dot.dataset.step, 10);
+        if (Number.isFinite(step)) { setMode("paused"); setStep(step); }
+      });
+    });
+
+    btnPrev.addEventListener("click", () => { setMode("paused"); setStep(current - 1); });
+    btnNext.addEventListener("click", () => { setMode("paused"); setStep(current + 1); });
+    btnToggle.addEventListener("click", () => setMode(mode === "auto" ? "paused" : "auto"));
+
+    // --- Drag on the axis (mouse + touch) ---
+    function stepFromX(clientX) {
+      const rect = axis.getBoundingClientRect();
+      const padPx = parseFloat(getComputedStyle(slider).getPropertyValue("--tier-pad")) || 38;
+      const innerLeft  = rect.left + padPx;
+      const innerRight = rect.right - padPx;
+      const ratio = Math.max(0, Math.min(1, (clientX - innerLeft) / (innerRight - innerLeft)));
+      return Math.round(ratio * (TOTAL - 1)) + 1;
+    }
+    function onPointerDown(e) {
+      if (e.target.closest(".tier-slider__dot")) return;
+      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      dragging = true;
+      slider.classList.add("tier-slider--dragging");
+      setMode("paused");
+      setStep(stepFromX(x));
+      window.addEventListener("mousemove", onPointerMove);
+      window.addEventListener("mouseup",   onPointerUp);
+      window.addEventListener("touchmove", onPointerMove, { passive: true });
+      window.addEventListener("touchend",  onPointerUp);
+      e.preventDefault?.();
+    }
+    function onPointerMove(e) {
+      if (!dragging) return;
+      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      setStep(stepFromX(x));
+    }
+    function onPointerUp() {
+      dragging = false;
+      slider.classList.remove("tier-slider--dragging");
+      window.removeEventListener("mousemove", onPointerMove);
+      window.removeEventListener("mouseup",   onPointerUp);
+      window.removeEventListener("touchmove", onPointerMove);
+      window.removeEventListener("touchend",  onPointerUp);
+    }
+    axis.addEventListener("mousedown",  onPointerDown);
+    axis.addEventListener("touchstart", onPointerDown, { passive: true });
+
+    // --- Keyboard nav (boundary fall-through to slide nav) ---
+    function onKey(e) {
+      if (!el.classList.contains("is-current")) return;
+      if (!slider.contains(document.activeElement)) return;
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      const goingRight = e.key === "ArrowRight";
+      if ((goingRight && current === TOTAL) || (!goingRight && current === 1)) return;
+      e.stopPropagation();
+      e.preventDefault();
+      setMode("paused");
+      setStep(current + (goingRight ? 1 : -1));
+    }
+    document.addEventListener("keydown", onKey, true);
+
     setStep(1);
     setMode("auto");
   });
