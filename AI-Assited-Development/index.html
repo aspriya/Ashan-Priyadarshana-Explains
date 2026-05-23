@@ -4978,6 +4978,212 @@ html[data-theme="light"] .before-after-sim__btn { color: #ffffff; }
   font-variant-numeric: tabular-nums;
 }
 
+/* ---- Widget 5 · Slide 40 — Parallel kanban agent simulator ---- */
+.parallel-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 4px;
+}
+.parallel-demo__bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 18px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+.parallel-demo__btn {
+  padding: 9px 20px;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--t-fast);
+  min-width: 150px;
+}
+html[data-theme="light"] .parallel-demo__btn { color: #ffffff; }
+.parallel-demo__btn:hover { background: var(--accent-strong); }
+.parallel-demo__btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 107, 61, 0.45);
+}
+.parallel-demo__status {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  letter-spacing: 0.03em;
+  min-width: 220px;
+}
+.parallel-demo__status strong { color: var(--accent); font-weight: 600; }
+.parallel-demo__status .ok { color: var(--success); font-weight: 600; }
+.parallel-demo__elapsed {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  min-width: 76px;
+  text-align: center;
+  font-weight: 500;
+}
+.parallel-demo[data-state="running"] .parallel-demo__elapsed { color: var(--accent); border-color: var(--accent); }
+.parallel-demo[data-state="done"]    .parallel-demo__elapsed { color: var(--success); border-color: var(--success); }
+
+/* Mini kanban — 4 columns, animated card moves */
+.parallel-kanban {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.parallel-kanban__col {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  min-height: 180px;
+}
+.parallel-kanban__col-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border);
+}
+.parallel-kanban__col-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  min-width: 24px;
+  text-align: center;
+}
+.parallel-kanban__col[data-col="progress"] .parallel-kanban__col-count {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.parallel-kanban__col[data-col="review"] .parallel-kanban__col-count {
+  background: rgba(255, 138, 99, 0.15);
+  border-color: var(--accent-strong);
+  color: var(--accent-strong);
+}
+.parallel-kanban__col[data-col="done"] .parallel-kanban__col-count {
+  background: rgba(107, 217, 104, 0.12);
+  border-color: var(--success);
+  color: var(--success);
+}
+.parallel-kanban__col-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.parallel-kanban__card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-family: var(--font-body);
+  animation: parallel-card-appear var(--t-mid) ease;
+  position: relative;
+}
+@keyframes parallel-card-appear {
+  from { opacity: 0; transform: translateY(6px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.parallel-kanban__card-title {
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text-primary);
+  margin: 0;
+}
+.parallel-kanban__card-meta {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+.parallel-kanban__card[data-state="progress"] {
+  border-left-color: var(--accent);
+  background: linear-gradient(90deg, var(--accent-soft) 0%, var(--bg-card) 75%);
+}
+.parallel-kanban__card[data-state="progress"] .parallel-kanban__card-meta { color: var(--accent); }
+.parallel-kanban__card[data-state="review"] {
+  border-left-color: var(--accent-strong);
+  background: linear-gradient(90deg, rgba(255,138,99,0.14) 0%, var(--bg-card) 75%);
+}
+.parallel-kanban__card[data-state="review"] .parallel-kanban__card-meta { color: var(--accent-strong); }
+.parallel-kanban__card[data-state="done"] {
+  border-left-color: var(--success);
+  opacity: 0.92;
+}
+.parallel-kanban__card[data-state="done"] .parallel-kanban__card-meta {
+  color: var(--success);
+}
+.parallel-kanban__card-progress {
+  margin-top: 6px;
+  height: 3px;
+  background: var(--border-soft);
+  border-radius: 2px;
+  overflow: hidden;
+  display: none;
+}
+.parallel-kanban__card[data-state="progress"] .parallel-kanban__card-progress { display: block; }
+.parallel-kanban__card-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+/* Agent rows below the kanban — extends the existing .agent-row */
+.parallel-agents {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.parallel-agents .agent-row { transition: border-color var(--t-mid), background var(--t-mid); }
+.parallel-agents .agent-row[data-row-state="queued"]  .agent-row__terminal { opacity: 0.5; }
+.parallel-agents .agent-row[data-row-state="running"] { border-left: 3px solid var(--accent-strong); }
+.parallel-agents .agent-row[data-row-state="done"]    { border-left: 3px solid var(--success); }
+.parallel-agents .agent-row__terminal .terminal__line { display: block; }
+
 /* ============================================================
    Overlays (help, jump, notes)
    ============================================================ */
@@ -5317,6 +5523,11 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   .before-after-sim__hint { flex: 1 1 100%; font-size: 12px; order: 3; }
   .before-after-sim__btn { padding: 8px 14px; min-width: 90px; font-size: 11px; }
   .before-after-sim__status { font-size: 10px; padding: 4px 9px; }
+  .parallel-demo__bar { padding: 10px 14px; gap: 12px; }
+  .parallel-demo__btn { min-width: 130px; padding: 8px 14px; }
+  .parallel-demo__status { flex: 1 1 100%; order: 3; font-size: 11px; }
+  .parallel-kanban { grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px; }
+  .parallel-kanban__col { min-height: 140px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -8065,66 +8276,91 @@ gh pr create --title "Add login form"</code></pre>
       title: "Live demo — three agents in parallel",
       body: `
         <p class="section-lead">Three tasks. Three agents. Three worktrees. One review queue.</p>
-        <div class="demo-control">
-          <button class="demo-control__btn" type="button" aria-label="Start agents (Phase 4 will wire this up)">▶ Start agents</button>
-          <span class="demo-control__status">Status: <strong>3 agents · 1 done · 2 running</strong> · simulated elapsed <strong>00:42</strong></span>
-          <span class="demo-control__phase4">Phase 4 will make this live — buttons, streaming, the lot.</span>
+        <div class="parallel-demo" data-state="idle">
+          <div class="parallel-demo__bar">
+            <button type="button" class="parallel-demo__btn" data-action="run" aria-label="Start three agents in parallel">▶ Start agents</button>
+            <span class="parallel-demo__status" aria-live="polite"><strong>3 agents</strong> queued · ready to dispatch</span>
+            <span class="parallel-demo__elapsed" data-elapsed>00:00</span>
+          </div>
+
+          <div class="parallel-kanban" aria-label="Mini kanban showing card progress across To Do, In progress, Review, Done">
+            <div class="parallel-kanban__col" data-col="todo">
+              <div class="parallel-kanban__col-title"><span>To Do</span><span class="parallel-kanban__col-count" data-count="todo">3</span></div>
+              <div class="parallel-kanban__col-cards" data-cards="todo">
+                <div class="parallel-kanban__card" data-agent="a" data-state="todo">
+                  <div class="parallel-kanban__card-title">Add login form to /auth</div>
+                  <div class="parallel-kanban__card-meta"><span>feat/login</span><span>Agent A</span></div>
+                  <div class="parallel-kanban__card-progress"><div class="parallel-kanban__card-progress-fill" data-progress="a"></div></div>
+                </div>
+                <div class="parallel-kanban__card" data-agent="b" data-state="todo">
+                  <div class="parallel-kanban__card-title">Fix billing calculator bug</div>
+                  <div class="parallel-kanban__card-meta"><span>fix/billing</span><span>Agent B</span></div>
+                  <div class="parallel-kanban__card-progress"><div class="parallel-kanban__card-progress-fill" data-progress="b"></div></div>
+                </div>
+                <div class="parallel-kanban__card" data-agent="c" data-state="todo">
+                  <div class="parallel-kanban__card-title">Refactor user model</div>
+                  <div class="parallel-kanban__card-meta"><span>refactor/user</span><span>Agent C</span></div>
+                  <div class="parallel-kanban__card-progress"><div class="parallel-kanban__card-progress-fill" data-progress="c"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="parallel-kanban__col" data-col="progress">
+              <div class="parallel-kanban__col-title"><span>In progress</span><span class="parallel-kanban__col-count" data-count="progress">0</span></div>
+              <div class="parallel-kanban__col-cards" data-cards="progress"></div>
+            </div>
+            <div class="parallel-kanban__col" data-col="review">
+              <div class="parallel-kanban__col-title"><span>Review</span><span class="parallel-kanban__col-count" data-count="review">0</span></div>
+              <div class="parallel-kanban__col-cards" data-cards="review"></div>
+            </div>
+            <div class="parallel-kanban__col" data-col="done">
+              <div class="parallel-kanban__col-title"><span>Done</span><span class="parallel-kanban__col-count" data-count="done">0</span></div>
+              <div class="parallel-kanban__col-cards" data-cards="done"></div>
+            </div>
+          </div>
+
+          <div class="parallel-agents">
+
+            <div class="agent-row" data-row-state="queued" data-agent-row="a">
+              <div class="agent-row__id">
+                <div class="agent-row__task">Add login form to /auth</div>
+                <div class="agent-row__branch"><em>worktree</em>../proj-login · feat/login</div>
+              </div>
+              <div class="agent-row__terminal" data-terminal="a">
+                <span class="terminal__line"><span class="terminal__dim">queued · waiting for dispatch</span></span>
+              </div>
+              <div class="agent-row__status agent-row__status--queued" data-status-pill="a">Queued<small>—</small></div>
+            </div>
+
+            <div class="agent-row" data-row-state="queued" data-agent-row="b">
+              <div class="agent-row__id">
+                <div class="agent-row__task">Fix billing calculator bug</div>
+                <div class="agent-row__branch"><em>worktree</em>../proj-billing · fix/billing</div>
+              </div>
+              <div class="agent-row__terminal" data-terminal="b">
+                <span class="terminal__line"><span class="terminal__dim">queued · waiting for dispatch</span></span>
+              </div>
+              <div class="agent-row__status agent-row__status--queued" data-status-pill="b">Queued<small>—</small></div>
+            </div>
+
+            <div class="agent-row" data-row-state="queued" data-agent-row="c">
+              <div class="agent-row__id">
+                <div class="agent-row__task">Refactor user model</div>
+                <div class="agent-row__branch"><em>worktree</em>../proj-user · refactor/user</div>
+              </div>
+              <div class="agent-row__terminal" data-terminal="c">
+                <span class="terminal__line"><span class="terminal__dim">queued · waiting for dispatch</span></span>
+              </div>
+              <div class="agent-row__status agent-row__status--queued" data-status-pill="c">Queued<small>—</small></div>
+            </div>
+
+          </div>
         </div>
-        <div class="agent-rows">
-
-          <div class="agent-row agent-row--done">
-            <div class="agent-row__id">
-              <div class="agent-row__task">Add login form to /auth</div>
-              <div class="agent-row__branch"><em>worktree</em>../proj-login · feat/login</div>
-            </div>
-            <div class="agent-row__terminal">
-              <span class="terminal__line"><span class="prompt">$</span> claude "implement .specs/features/001-login.md"</span>
-              <span class="terminal__line">Plan accepted · writing src/auth/LoginForm.tsx</span>
-              <span class="terminal__line">Wrote 8 files · pnpm test -- --run</span>
-              <span class="terminal__line"><span class="ok">✓ 12 tests pass · pnpm lint --fix clean</span></span>
-              <span class="terminal__line"><span class="ok">✓ git push -u origin feat/login</span></span>
-              <span class="terminal__line"><span class="ok">PR #482 opened · ready for review</span></span>
-            </div>
-            <div class="agent-row__status agent-row__status--done">Done<small>PR #482</small></div>
-          </div>
-
-          <div class="agent-row agent-row--running">
-            <div class="agent-row__id">
-              <div class="agent-row__task">Fix billing calculator bug</div>
-              <div class="agent-row__branch"><em>worktree</em>../proj-billing · fix/billing</div>
-            </div>
-            <div class="agent-row__terminal">
-              <span class="terminal__line"><span class="prompt">$</span> codex run "reproduce issue #371 then fix"</span>
-              <span class="terminal__line">Reading src/billing/invoice.py · src/billing/tax.py</span>
-              <span class="terminal__line">Found rounding error at invoice.py:148</span>
-              <span class="terminal__line">Writing tests/billing_rounding_test.py</span>
-              <span class="terminal__line">Running pnpm test -- --run --filter billing …</span>
-            </div>
-            <div class="agent-row__status agent-row__status--running">Running<small>+186 lines so far</small></div>
-          </div>
-
-          <div class="agent-row agent-row--running">
-            <div class="agent-row__id">
-              <div class="agent-row__task">Refactor user model</div>
-              <div class="agent-row__branch"><em>worktree</em>../proj-user · refactor/user</div>
-            </div>
-            <div class="agent-row__terminal">
-              <span class="terminal__line"><span class="prompt">$</span> cursor . --task ".specs/refactor-user.md"</span>
-              <span class="terminal__line">Composer 2 planning · 14 files touched</span>
-              <span class="terminal__line">Migrating fields to new schema · src/models/user.ts</span>
-              <span class="terminal__line">Updating consumers across src/api · 6 sites</span>
-              <span class="terminal__line">Generating prisma migration …</span>
-            </div>
-            <div class="agent-row__status agent-row__status--running">Running<small>+412 / −38</small></div>
-          </div>
-
-        </div>
-        <p class="slide__source">Three minutes of real time, three feature branches, three PRs in the review queue. Your job is the diffs — not the typing.</p>
+        <p class="slide__source">Click ▶ Start agents to dispatch all three. Each card moves through To Do → In Progress → Review → Done at its own pace. Total run is roughly 30 seconds of accelerated wall-clock — the real-world equivalent is closer to ten minutes per agent.</p>
       `,
       notes: {
         time: "~5 min",
-        beat: "Don't read the terminal contents — point to them. The audience reads at their own pace. Spend the time on the demo-control bar at the top: 3 agents · 1 done · 2 running. That's the punchline.",
-        ask: "If three agents finish in 3 minutes — how long does your team currently take to review three PRs? That's the new bottleneck.",
+        beat: "Click Start while you set up the lesson; don't talk over the streams. The audience watches three agents move from queued through Done at staggered times. Pause at the end on the all-three-Done state — that's the new posture.",
+        ask: "If three agents finish in 30 seconds of demo time — how long does your team currently take to review three PRs? That's the new bottleneck.",
         bridge: "Demo surface for many agents. There's also a UI pattern for switching between this and the editor — Antigravity made it the headline.",
       },
     },
@@ -9780,6 +10016,275 @@ gh pr create --title "Add login form"</code></pre>
         resetPanels();
         run();
       }
+    });
+  });
+
+  // Slide 40 — Parallel kanban agent simulator (Phase 4 widget #5, the big
+  // one). Three agents dispatched in parallel; each has its own scripted
+  // terminal output and lifecycle (todo → progress → review → done).
+  // The mini kanban above the agent rows reflects each card's state and
+  // ticks the column counts as cards move. Cards animate in via CSS keyframe
+  // when their parent column changes.
+  onSlideEnter(40, function mountParallelDemo(el) {
+    if (el.dataset.parallelDemoMounted === "1") return;
+    const widget = el.querySelector(".parallel-demo");
+    if (!widget) return;
+    el.dataset.parallelDemoMounted = "1";
+
+    const btn       = widget.querySelector('[data-action="run"]');
+    const statusEl  = widget.querySelector('.parallel-demo__status');
+    const elapsedEl = widget.querySelector('[data-elapsed]');
+    const kanban    = widget.querySelector('.parallel-kanban');
+
+    const cards = {
+      a: widget.querySelector('.parallel-kanban__card[data-agent="a"]'),
+      b: widget.querySelector('.parallel-kanban__card[data-agent="b"]'),
+      c: widget.querySelector('.parallel-kanban__card[data-agent="c"]'),
+    };
+    const progressFills = {
+      a: widget.querySelector('[data-progress="a"]'),
+      b: widget.querySelector('[data-progress="b"]'),
+      c: widget.querySelector('[data-progress="c"]'),
+    };
+    const terminals = {
+      a: widget.querySelector('[data-terminal="a"]'),
+      b: widget.querySelector('[data-terminal="b"]'),
+      c: widget.querySelector('[data-terminal="c"]'),
+    };
+    const statusPills = {
+      a: widget.querySelector('[data-status-pill="a"]'),
+      b: widget.querySelector('[data-status-pill="b"]'),
+      c: widget.querySelector('[data-status-pill="c"]'),
+    };
+    const rows = {
+      a: widget.querySelector('[data-agent-row="a"]'),
+      b: widget.querySelector('[data-agent-row="b"]'),
+      c: widget.querySelector('[data-agent-row="c"]'),
+    };
+    const cardSlots = {
+      todo:     kanban.querySelector('[data-cards="todo"]'),
+      progress: kanban.querySelector('[data-cards="progress"]'),
+      review:   kanban.querySelector('[data-cards="review"]'),
+      done:     kanban.querySelector('[data-cards="done"]'),
+    };
+    const counts = {
+      todo:     kanban.querySelector('[data-count="todo"]'),
+      progress: kanban.querySelector('[data-count="progress"]'),
+      review:   kanban.querySelector('[data-count="review"]'),
+      done:     kanban.querySelector('[data-count="done"]'),
+    };
+
+    // Scripts: each entry is { html, delay }. Delays are cumulative within
+    // each agent's stream. Totals: A ≈ 13s, B ≈ 22s, C ≈ 28s.
+    const AGENT_SCRIPTS = {
+      a: [
+        { html: '<span class="terminal__prompt">$</span> <span class="terminal__cmd">claude "implement .specs/features/001-login.md"</span>', delay: 500 },
+        { html: '<span class="terminal__dim">Plan: 6 files</span> · <span class="terminal__cmd">accept ▌</span>', delay: 1500 },
+        { html: '<span class="terminal__ok">✓ accepted</span>', delay: 1500 },
+        { html: '<span class="terminal__out">writing src/auth/LoginForm.tsx</span>', delay: 1700 },
+        { html: '<span class="terminal__out">writing 5 more files · session.ts · routes/login.ts</span>', delay: 1700 },
+        { html: '<span class="terminal__out">running pnpm test -- --run</span>', delay: 1900 },
+        { html: '<span class="terminal__ok">✓ 12 tests pass · pnpm lint --fix clean</span>', delay: 1900 },
+        { html: '<span class="terminal__ok">✓ PR #482 opened · ready for review</span>', delay: 2300 },
+      ],
+      b: [
+        { html: '<span class="terminal__prompt">$</span> <span class="terminal__cmd">codex run "reproduce issue #371 then fix"</span>', delay: 500 },
+        { html: '<span class="terminal__dim">→ reading src/billing/invoice.py · tax.py</span>', delay: 2200 },
+        { html: '<span class="terminal__out">found rounding error at invoice.py:148</span>', delay: 2300 },
+        { html: '<span class="terminal__out">writing tests/billing_rounding_test.py</span>', delay: 2200 },
+        { html: '<span class="terminal__out">patching invoice.py + tax.py</span>', delay: 2200 },
+        { html: '<span class="terminal__out">running pnpm test -- --run --filter billing</span>', delay: 2300 },
+        { html: '<span class="terminal__ok">✓ 4 tests pass (was 3 failing)</span>', delay: 2200 },
+        { html: '<span class="terminal__out">git commit · pnpm lint --fix</span>', delay: 1800 },
+        { html: '<span class="terminal__ok">✓ clean</span>', delay: 1800 },
+        { html: '<span class="terminal__ok">✓ PR #489 opened · awaiting review</span>', delay: 2300 },
+      ],
+      c: [
+        { html: '<span class="terminal__prompt">$</span> <span class="terminal__cmd">cursor . --task ".specs/refactor-user.md"</span>', delay: 500 },
+        { html: '<span class="terminal__dim">Composer 2 · planning · 14 files</span>', delay: 2500 },
+        { html: '<span class="terminal__out">→ migrating fields · models/user.ts</span>', delay: 2500 },
+        { html: '<span class="terminal__out">→ updating consumers · src/api (4 sites)</span>', delay: 2200 },
+        { html: '<span class="terminal__out">→ updating consumers · src/api (4 more)</span>', delay: 2200 },
+        { html: '<span class="terminal__out">generating prisma migration …</span>', delay: 2500 },
+        { html: '<span class="terminal__out">$ pnpm prisma generate</span>', delay: 2200 },
+        { html: '<span class="terminal__ok">✓ migration scaffolded</span>', delay: 2500 },
+        { html: '<span class="terminal__out">$ pnpm test -- --run</span>', delay: 2300 },
+        { html: '<span class="terminal__ok">✓ 28 tests pass · no breakages</span>', delay: 2500 },
+        { html: '<span class="terminal__out">$ git push -u origin refactor/user</span>', delay: 2300 },
+        { html: '<span class="terminal__ok">✓ PR #491 opened · review for schema change</span>', delay: 2700 },
+      ],
+    };
+
+    const PR_NUMBERS = { a: "#482", b: "#489", c: "#491" };
+
+    let state = "idle";
+    let timeouts = [];
+    let clockInterval = null;
+    let runStart = 0;
+
+    function clearAll() {
+      timeouts.forEach(t => clearTimeout(t));
+      timeouts = [];
+      if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
+    }
+    function pad2(n) { return String(n).padStart(2, "0"); }
+    function fmtClock(ms) {
+      const sec = Math.max(0, Math.floor(ms / 1000));
+      return `${pad2(Math.floor(sec / 60))}:${pad2(sec % 60)}`;
+    }
+    function updateCounts() {
+      Object.keys(cardSlots).forEach(col => {
+        counts[col].textContent = cardSlots[col].querySelectorAll('.parallel-kanban__card').length;
+      });
+    }
+    function moveCardTo(agent, columnName) {
+      const card = cards[agent];
+      cardSlots[columnName].appendChild(card);
+      card.setAttribute("data-state", columnName);
+      // Force re-trigger of the appear animation by toggling inline animation.
+      card.style.animation = "none";
+      void card.offsetWidth;
+      card.style.animation = "";
+      updateCounts();
+    }
+    function setRowState(agent, rowState, summary) {
+      rows[agent].setAttribute("data-row-state", rowState);
+      const pill = statusPills[agent];
+      pill.className = `agent-row__status agent-row__status--${rowState}`;
+      let label, sub;
+      if (rowState === "queued")  { label = "Queued"; sub = "—"; }
+      if (rowState === "running") { label = "Running"; sub = summary || "streaming…"; }
+      if (rowState === "done")    { label = "Done"; sub = summary || "✓ PR opened"; }
+      pill.innerHTML = `${label}<small>${sub}</small>`;
+    }
+    function appendLine(agent, html) {
+      const term = terminals[agent];
+      const line = document.createElement("span");
+      line.className = "terminal__line";
+      line.innerHTML = html;
+      term.appendChild(line);
+      term.scrollTop = term.scrollHeight;
+    }
+    function clearTerminal(agent) {
+      terminals[agent].innerHTML = '<span class="terminal__line"><span class="terminal__dim">queued · waiting for dispatch</span></span>';
+    }
+    function setState(s) {
+      state = s;
+      widget.dataset.state = s;
+      if (s === "idle") {
+        btn.textContent = "▶ Start agents";
+        statusEl.innerHTML = "<strong>3 agents</strong> queued · ready to dispatch";
+      } else if (s === "running") {
+        btn.textContent = "⟲ Reset";
+      } else if (s === "done") {
+        btn.textContent = "↻ Replay";
+        statusEl.innerHTML = '<span class="ok">3 agents · all done · 3 PRs in the review queue</span>';
+      }
+    }
+    function updateAggregateStatus() {
+      if (state !== "running") return;
+      let running = 0, review = 0, done = 0;
+      ["a", "b", "c"].forEach(a => {
+        const cs = cards[a].getAttribute("data-state");
+        if (cs === "progress") running++;
+        else if (cs === "review") review++;
+        else if (cs === "done") done++;
+      });
+      const parts = [];
+      if (running) parts.push(`<strong>${running} running</strong>`);
+      if (review)  parts.push(`${review} in review`);
+      if (done)    parts.push(`<span class="ok">${done} done</span>`);
+      statusEl.innerHTML = `3 agents · ${parts.join(" · ") || "dispatching…"}`;
+    }
+    function scheduleAgent(agent, baseDelay) {
+      const script = AGENT_SCRIPTS[agent];
+      const totalSteps = script.length;
+      let cum = baseDelay;
+      script.forEach((entry, i) => {
+        cum += entry.delay;
+        timeouts.push(setTimeout(() => {
+          appendLine(agent, entry.html);
+          const pct = ((i + 1) / totalSteps) * 100;
+          if (progressFills[agent]) progressFills[agent].style.width = `${pct}%`;
+          const linesSoFar = i + 1;
+          setRowState(agent, "running", `+${linesSoFar * 24} lines streamed`);
+        }, cum));
+      });
+      // After last line: move to review, then to done.
+      const reviewAt = cum + 600;
+      const doneAt   = cum + 1700;
+      timeouts.push(setTimeout(() => {
+        moveCardTo(agent, "review");
+        setRowState(agent, "running", "review queued");
+        updateAggregateStatus();
+      }, reviewAt));
+      timeouts.push(setTimeout(() => {
+        moveCardTo(agent, "done");
+        setRowState(agent, "done", `PR ${PR_NUMBERS[agent]}`);
+        updateAggregateStatus();
+      }, doneAt));
+      return doneAt;
+    }
+
+    function reset() {
+      clearAll();
+      // Move every card back to To Do and clear styles.
+      ["a", "b", "c"].forEach(a => {
+        cards[a].style.animation = "";
+        moveCardTo(a, "todo");
+        if (progressFills[a]) progressFills[a].style.width = "0%";
+        clearTerminal(a);
+        setRowState(a, "queued");
+      });
+      elapsedEl.textContent = "00:00";
+      setState("idle");
+    }
+
+    function run() {
+      // Always start from a clean state — let reset() handle clearing.
+      clearAll();
+      ["a", "b", "c"].forEach(a => {
+        if (progressFills[a]) progressFills[a].style.width = "0%";
+        clearTerminal(a);
+        setRowState(a, "queued");
+        cards[a].setAttribute("data-state", "todo");
+        cardSlots.todo.appendChild(cards[a]);
+      });
+      updateCounts();
+      setState("running");
+
+      runStart = performance.now();
+      clockInterval = setInterval(() => {
+        if (state !== "running") return;
+        elapsedEl.textContent = fmtClock(performance.now() - runStart);
+      }, 100);
+
+      // Stagger dispatch slightly so the audience sees three cards move in
+      // sequence rather than all snapping at once.
+      const STAGGER = [200, 700, 1200];
+      let lastDone = 0;
+      ["a", "b", "c"].forEach((a, i) => {
+        timeouts.push(setTimeout(() => {
+          moveCardTo(a, "progress");
+          setRowState(a, "running", "+0 lines streamed");
+          updateAggregateStatus();
+        }, STAGGER[i]));
+        const doneAt = scheduleAgent(a, STAGGER[i]);
+        lastDone = Math.max(lastDone, doneAt);
+      });
+
+      // After the last card lands in Done, freeze the elapsed clock and
+      // flip state to "done".
+      timeouts.push(setTimeout(() => {
+        if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
+        elapsedEl.textContent = fmtClock(performance.now() - runStart);
+        setState("done");
+      }, lastDone + 500));
+    }
+
+    btn.addEventListener("click", () => {
+      if (state === "running") reset();
+      else                     run();
     });
   });
 
