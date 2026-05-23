@@ -4163,6 +4163,256 @@ html[data-theme="light"] .closing-cta__questions { color: #ffffff; }
 }
 
 /* ============================================================
+   Phase 4 — Interactive widgets
+   ============================================================ */
+
+/* ---- Widget 1 · Slide 2 — Karpathy timeline scrubber ---- */
+.scrubber {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  --scrubber-pad: 32px;
+}
+.scrubber__rail {
+  position: relative;
+  padding: 14px var(--scrubber-pad) 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+  cursor: grab;
+}
+.scrubber__rail:active { cursor: grabbing; }
+.scrubber__rail:focus { outline: none; }
+.scrubber__rail:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 12px; }
+.scrubber__line {
+  position: absolute;
+  left: var(--scrubber-pad);
+  right: var(--scrubber-pad);
+  top: 32px;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+}
+.scrubber__progress {
+  position: absolute;
+  left: var(--scrubber-pad);
+  right: var(--scrubber-pad);
+  top: 32px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  border-radius: 2px;
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform var(--t-mid);
+  pointer-events: none;
+}
+.scrubber__dots {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 36px;
+  pointer-events: none;
+}
+.scrubber__dot {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 2px solid var(--border);
+  cursor: pointer;
+  padding: 0;
+  pointer-events: auto;
+  transition: transform var(--t-fast), border-color var(--t-fast), background var(--t-fast), box-shadow var(--t-fast);
+  flex-shrink: 0;
+}
+.scrubber__dot:hover {
+  border-color: var(--accent);
+  transform: scale(1.1);
+}
+.scrubber__dot:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(255, 107, 61, 0.30);
+}
+.scrubber__dot--passed { border-color: var(--accent); background: var(--accent-soft); }
+.scrubber__dot--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.25);
+  box-shadow: 0 0 0 6px rgba(255, 107, 61, 0.20);
+}
+.scrubber__dot--punchline::after {
+  content: "★";
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--accent);
+  font-size: 13px;
+  pointer-events: none;
+}
+.scrubber__dot-label {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: color var(--t-fast);
+}
+.scrubber__dot--active .scrubber__dot-label,
+.scrubber__dot--passed .scrubber__dot-label { color: var(--text-secondary); }
+.scrubber__dot--active .scrubber__dot-label { color: var(--accent); font-weight: 600; }
+
+.scrubber__panel {
+  position: relative;
+  min-height: 220px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 12px;
+  padding: 26px 30px 28px;
+  overflow: hidden;
+}
+.scrubber__milestone {
+  position: absolute;
+  inset: 26px 30px 28px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: opacity var(--t-mid), transform var(--t-mid), visibility 0s linear var(--t-mid);
+}
+.scrubber__milestone--active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity var(--t-mid), transform var(--t-mid), visibility 0s;
+}
+.scrubber__milestone-date {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.scrubber__milestone-headline {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  margin: 0 0 14px;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
+  color: var(--text-primary);
+}
+.scrubber__milestone-headline em { color: var(--accent); font-style: italic; }
+.scrubber__milestone-quote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0 0 12px;
+}
+.scrubber__milestone-quote::before { content: "“"; color: var(--accent); margin-right: 2px; }
+.scrubber__milestone-quote::after  { content: "”"; color: var(--accent); margin-left: 2px; }
+.scrubber__milestone-gloss {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+.scrubber__milestone-gloss em { font-style: italic; color: var(--text-primary); }
+
+.scrubber__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.scrubber__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+  min-width: 44px;
+}
+.scrubber__btn:hover {
+  background: var(--bg-elevated);
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+.scrubber__btn:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255, 107, 61, 0.30);
+}
+.scrubber__btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+.scrubber__btn:disabled:hover {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+.scrubber__btn--play {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+html[data-theme="light"] .scrubber__btn--play { color: #ffffff; }
+.scrubber__btn--play:hover {
+  background: var(--accent-strong);
+  color: var(--bg-primary);
+  border-color: var(--accent-strong);
+}
+html[data-theme="light"] .scrubber__btn--play:hover { color: #ffffff; }
+.scrubber__btn--paused {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.scrubber__btn--paused:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent-strong);
+}
+.scrubber__counter {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.06em;
+  min-width: 58px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
    Overlays (help, jump, notes)
    ============================================================ */
 .overlay {
@@ -4472,6 +4722,17 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   .quiet__punchline { font-size: 22px; padding-left: 14px; }
   .closing-cta__body { font-size: 17px; }
   .closing-cta { padding: 22px 20px; }
+  .scrubber { --scrubber-pad: 20px; }
+  .scrubber__rail { padding: 12px var(--scrubber-pad) 30px; }
+  .scrubber__line, .scrubber__progress { left: var(--scrubber-pad); right: var(--scrubber-pad); top: 26px; }
+  .scrubber__dots { height: 28px; }
+  .scrubber__dot { width: 18px; height: 18px; }
+  .scrubber__dot-label { font-size: 9px; }
+  .scrubber__panel { padding: 18px 20px; min-height: 200px; }
+  .scrubber__milestone { inset: 18px 20px; }
+  .scrubber__milestone-headline { font-size: 19px; }
+  .scrubber__milestone-quote { font-size: 14px; }
+  .scrubber__milestone-gloss { font-size: 13px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4646,39 +4907,73 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
       title: "The 15-month story",
       body: `
         <p class="section-lead">The same person <em>coined</em> vibe coding, then <em>killed</em> it, then joined the lab building Claude — in fifteen months.</p>
-        <ol class="timeline" aria-label="Karpathy timeline: Feb 2025 to May 2026">
-          <li class="timeline__node">
-            <div class="timeline__date">Feb 2, 2025</div>
-            <div class="timeline__headline">Karpathy coins “vibe coding.”</div>
-            <p class="timeline__quote">There's a new kind of coding I call vibe coding, where you fully give in to the vibes, embrace exponentials, and forget that the code even exists.</p>
-          </li>
-          <li class="timeline__node">
-            <div class="timeline__date">Mid-2025</div>
-            <div class="timeline__headline">Vibe coding goes mainstream.</div>
-            <p class="timeline__gloss">Cursor, Windsurf, Bolt, Lovable explode. Everyone is "vibe coding." Twitter is wall-to-wall AI-built apps.</p>
-          </li>
-          <li class="timeline__node">
-            <div class="timeline__date">Jan 26, 2026 · looking back at Nov–Dec 2025</div>
-            <div class="timeline__headline">His own workflow has inverted in a single month.</div>
-            <p class="timeline__quote">I rapidly went from about 80% manual + autocomplete coding in November to 80% agent coding and 20% edits + touchups in December. I'm mostly programming in English now — a bit sheepishly telling the LLM what code to write… in words.</p>
-            <p class="timeline__gloss">Same tweet, a few paragraphs later: <em>"I've already noticed that I am slowly starting to atrophy my ability to write code manually."</em></p>
-          </li>
-          <li class="timeline__node">
-            <div class="timeline__date">Feb 10, 2026</div>
-            <div class="timeline__headline">He declares vibe coding dead — renames it <em>agentic engineering</em>.</div>
-            <p class="timeline__quote">The new default is that you are not writing the code directly 99% of the time, you are orchestrating agents who do, and acting as oversight.</p>
-          </li>
-          <li class="timeline__node timeline__node--punchline">
-            <div class="timeline__date">May 19, 2026 · four days ago</div>
-            <div class="timeline__headline">Karpathy joins Anthropic.</div>
-            <p class="timeline__gloss">The person who named both eras now works at the lab building Claude.</p>
-          </li>
-        </ol>
-        <p class="slide__source">Phase 4 will replace this rail with a draggable scrubber — the static timeline is the readable fallback.</p>
+        <div class="scrubber" data-active="1">
+          <div class="scrubber__rail" tabindex="0" role="slider"
+               aria-label="Karpathy timeline scrubber — 5 milestones from Feb 2025 to May 2026"
+               aria-valuemin="1" aria-valuemax="5" aria-valuenow="1">
+            <div class="scrubber__line"></div>
+            <div class="scrubber__progress"></div>
+            <div class="scrubber__dots">
+              <button type="button" class="scrubber__dot scrubber__dot--active" data-step="1" aria-label="Step 1 of 5 — Feb 2, 2025">
+                <span class="scrubber__dot-label">Feb 2 '25</span>
+              </button>
+              <button type="button" class="scrubber__dot" data-step="2" aria-label="Step 2 of 5 — Mid-2025">
+                <span class="scrubber__dot-label">Mid '25</span>
+              </button>
+              <button type="button" class="scrubber__dot" data-step="3" aria-label="Step 3 of 5 — Jan 26, 2026">
+                <span class="scrubber__dot-label">Jan 26 '26</span>
+              </button>
+              <button type="button" class="scrubber__dot" data-step="4" aria-label="Step 4 of 5 — Feb 10, 2026">
+                <span class="scrubber__dot-label">Feb 10 '26</span>
+              </button>
+              <button type="button" class="scrubber__dot scrubber__dot--punchline" data-step="5" aria-label="Step 5 of 5 — May 19, 2026 — Karpathy joins Anthropic">
+                <span class="scrubber__dot-label">May 19 '26</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="scrubber__panel" aria-live="polite">
+            <article class="scrubber__milestone scrubber__milestone--active" data-step="1">
+              <div class="scrubber__milestone-date">Feb 2, 2025</div>
+              <h3 class="scrubber__milestone-headline">Karpathy coins “vibe coding.”</h3>
+              <p class="scrubber__milestone-quote">There's a new kind of coding I call vibe coding, where you fully give in to the vibes, embrace exponentials, and forget that the code even exists.</p>
+              <p class="scrubber__milestone-gloss">The post that named a year of AI-assisted development.</p>
+            </article>
+            <article class="scrubber__milestone" data-step="2">
+              <div class="scrubber__milestone-date">Mid-2025</div>
+              <h3 class="scrubber__milestone-headline">Vibe coding goes mainstream.</h3>
+              <p class="scrubber__milestone-gloss">Cursor, Windsurf, Bolt, Lovable explode. Everyone is "vibe coding." Twitter is wall-to-wall AI-built apps.</p>
+            </article>
+            <article class="scrubber__milestone" data-step="3">
+              <div class="scrubber__milestone-date">Jan 26, 2026 · looking back at Nov–Dec 2025</div>
+              <h3 class="scrubber__milestone-headline">His own workflow has <em>inverted</em> in a single month.</h3>
+              <p class="scrubber__milestone-quote">I rapidly went from about 80% manual + autocomplete coding in November to 80% agent coding and 20% edits + touchups in December. I'm mostly programming in English now — a bit sheepishly telling the LLM what code to write… in words.</p>
+              <p class="scrubber__milestone-gloss">Same tweet, a few paragraphs later: <em>"I've already noticed that I am slowly starting to atrophy my ability to write code manually."</em></p>
+            </article>
+            <article class="scrubber__milestone" data-step="4">
+              <div class="scrubber__milestone-date">Feb 10, 2026</div>
+              <h3 class="scrubber__milestone-headline">He declares vibe coding dead — renames it <em>agentic engineering</em>.</h3>
+              <p class="scrubber__milestone-quote">The new default is that you are not writing the code directly 99% of the time, you are orchestrating agents who do, and acting as oversight.</p>
+            </article>
+            <article class="scrubber__milestone" data-step="5">
+              <div class="scrubber__milestone-date">May 19, 2026 · four days ago</div>
+              <h3 class="scrubber__milestone-headline">Karpathy joins Anthropic.</h3>
+              <p class="scrubber__milestone-gloss">The person who named both eras now works at the lab building Claude.</p>
+            </article>
+          </div>
+
+          <div class="scrubber__controls" role="group" aria-label="Timeline scrubber controls">
+            <button type="button" class="scrubber__btn" data-action="prev" aria-label="Previous milestone">←</button>
+            <button type="button" class="scrubber__btn scrubber__btn--play" data-action="toggle" aria-label="Toggle auto-advance">▮▮ Pause</button>
+            <button type="button" class="scrubber__btn" data-action="next" aria-label="Next milestone">→</button>
+            <div class="scrubber__counter" aria-hidden="true">1 / 5</div>
+          </div>
+        </div>
+        <p class="slide__source">Click any date, drag the rail, or use ← / → keys to move through the timeline. Auto-advances until you take control.</p>
       `,
       notes: {
         time: "~5 min",
-        beat: "Make participants feel the velocity. Don't summarise — read each quote with a pause. On the Jan 26 node, point out both beats: the workflow inversion AND the atrophy observation come from the same tweet. The May 19 dot is the punchline.",
+        beat: "Let the scrubber auto-advance through the first pass while you narrate — each milestone fades in for ~5 seconds. On the Jan 26 node, point out both beats: the workflow inversion AND the atrophy observation come from the same tweet. The May 19 dot is the punchline; pause auto-advance there for emphasis.",
         ask: "Who here read Karpathy's February 2025 'vibe coding' tweet at the time? And his January 26 'mostly programming in English now' post?",
         bridge: "If the inventor of the term is calling it dead — and even his own coding muscle is atrophying — where does that leave the rest of us? Locate yourself.",
       },
@@ -8313,6 +8608,156 @@ gh pr create --title "Add login form"</code></pre>
   /* ============================================================
      Slide-specific hooks
      ============================================================ */
+
+  // Slide 2 — Karpathy timeline scrubber (Phase 4 widget #1).
+  // Click a dot, drag the rail, or use arrow keys to scrub. Auto-
+  // advances every ~5s until the user takes control. Visibility-
+  // aware: timer pauses when the slide isn't current.
+  onSlideEnter(2, function mountTimelineScrubber(el) {
+    if (el.dataset.scrubberMounted === "1") return;
+    const scrubber = el.querySelector(".scrubber");
+    if (!scrubber) return;
+    el.dataset.scrubberMounted = "1";
+
+    const rail       = scrubber.querySelector(".scrubber__rail");
+    const dots       = Array.from(scrubber.querySelectorAll(".scrubber__dot"));
+    const progress   = scrubber.querySelector(".scrubber__progress");
+    const milestones = Array.from(scrubber.querySelectorAll(".scrubber__milestone"));
+    const counter    = scrubber.querySelector(".scrubber__counter");
+    const btnPrev    = scrubber.querySelector('[data-action="prev"]');
+    const btnNext    = scrubber.querySelector('[data-action="next"]');
+    const btnToggle  = scrubber.querySelector('[data-action="toggle"]');
+
+    const TOTAL = milestones.length;     // 5
+    const AUTO_MS = 5500;
+    let current = 1;
+    let mode = "auto";                   // 'auto' | 'paused'
+    let timerId = null;
+    let dragging = false;
+
+    function setStep(n) {
+      n = Math.max(1, Math.min(TOTAL, n));
+      current = n;
+      dots.forEach((d, i) => {
+        const step = i + 1;
+        d.classList.toggle("scrubber__dot--active", step === n);
+        d.classList.toggle("scrubber__dot--passed", step < n);
+      });
+      milestones.forEach((m, i) => {
+        m.classList.toggle("scrubber__milestone--active", i + 1 === n);
+      });
+      const pct = (n - 1) / (TOTAL - 1);
+      progress.style.transform = `scaleX(${pct})`;
+      counter.textContent = `${n} / ${TOTAL}`;
+      scrubber.dataset.active = String(n);
+      rail.setAttribute("aria-valuenow", String(n));
+      btnPrev.disabled = n === 1;
+      btnNext.disabled = n === TOTAL;
+    }
+
+    function startTimer() {
+      stopTimer();
+      timerId = setInterval(() => {
+        if (mode !== "auto") return;
+        if (!el.classList.contains("is-current")) return;
+        if (current >= TOTAL) {
+          // Reached the punchline — stop auto-advance so the May-19 dot lingers.
+          setMode("paused");
+          return;
+        }
+        setStep(current + 1);
+      }, AUTO_MS);
+    }
+    function stopTimer() {
+      if (timerId) { clearInterval(timerId); timerId = null; }
+    }
+    function setMode(m) {
+      mode = m;
+      btnToggle.classList.toggle("scrubber__btn--paused", m === "paused");
+      btnToggle.textContent = m === "auto" ? "▮▮ Pause" : "▶ Play";
+      btnToggle.setAttribute("aria-label", m === "auto" ? "Pause auto-advance" : "Resume auto-advance");
+      if (m === "auto") startTimer(); else stopTimer();
+    }
+
+    // --- Dot click handlers ---
+    dots.forEach(dot => {
+      dot.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const step = parseInt(dot.dataset.step, 10);
+        if (Number.isFinite(step)) {
+          setMode("paused");
+          setStep(step);
+        }
+      });
+    });
+
+    // --- Prev / next / toggle controls ---
+    btnPrev.addEventListener("click", () => { setMode("paused"); setStep(current - 1); });
+    btnNext.addEventListener("click", () => { setMode("paused"); setStep(current + 1); });
+    btnToggle.addEventListener("click", () => setMode(mode === "auto" ? "paused" : "auto"));
+
+    // --- Drag on the rail itself ---
+    function stepFromPointerX(clientX) {
+      const rect = rail.getBoundingClientRect();
+      const padPx = parseFloat(getComputedStyle(scrubber).getPropertyValue("--scrubber-pad")) || 32;
+      const innerLeft  = rect.left + padPx;
+      const innerRight = rect.right - padPx;
+      const ratio = Math.max(0, Math.min(1, (clientX - innerLeft) / (innerRight - innerLeft)));
+      return Math.round(ratio * (TOTAL - 1)) + 1;
+    }
+    function onPointerDown(e) {
+      // Ignore clicks on the dot buttons (handled above)
+      if (e.target.closest(".scrubber__dot")) return;
+      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      dragging = true;
+      setMode("paused");
+      setStep(stepFromPointerX(x));
+      window.addEventListener("mousemove", onPointerMove);
+      window.addEventListener("mouseup",   onPointerUp);
+      window.addEventListener("touchmove", onPointerMove, { passive: true });
+      window.addEventListener("touchend",  onPointerUp);
+      e.preventDefault?.();
+    }
+    function onPointerMove(e) {
+      if (!dragging) return;
+      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      setStep(stepFromPointerX(x));
+    }
+    function onPointerUp() {
+      dragging = false;
+      window.removeEventListener("mousemove", onPointerMove);
+      window.removeEventListener("mouseup",   onPointerUp);
+      window.removeEventListener("touchmove", onPointerMove);
+      window.removeEventListener("touchend",  onPointerUp);
+    }
+    rail.addEventListener("mousedown",  onPointerDown);
+    rail.addEventListener("touchstart", onPointerDown, { passive: true });
+
+    // --- Keyboard nav (when scrubber rail or any dot is focused) ---
+    // Arrow keys scrub through milestones while inside the scrubber, but at
+    // the boundaries they fall through to the deck's global slide nav so the
+    // audience isn't trapped on slide 2 after clicking a dot.
+    function onKey(e) {
+      if (!el.classList.contains("is-current")) return;
+      if (!scrubber.contains(document.activeElement)) return;
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      const goingRight = e.key === "ArrowRight";
+      if ((goingRight && current === TOTAL) || (!goingRight && current === 1)) {
+        // At the boundary — let the deck navigate to the adjacent slide.
+        return;
+      }
+      e.stopPropagation();
+      e.preventDefault();
+      setMode("paused");
+      setStep(current + (goingRight ? 1 : -1));
+    }
+    // Capture phase so we run before the deck's global arrow handler.
+    document.addEventListener("keydown", onKey, true);
+
+    // --- Initial state + kick off auto-advance ---
+    setStep(1);
+    setMode("auto");
+  });
 
   // Slide 7 — Cadence chart (Chart.js line series, one per vendor)
   onSlideEnter(7, function mountCadenceChart(el) {
