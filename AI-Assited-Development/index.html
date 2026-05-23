@@ -1726,6 +1726,10 @@ html[data-theme="light"] .terminal { background: #1a1a1e; }
   background: rgba(255, 138, 99, 0.85);
   color: rgba(255, 138, 99, 0.85);
   margin-left: 1px;
+  animation: terminal-cursor-blink 1.1s steps(2, start) infinite;
+}
+@keyframes terminal-cursor-blink {
+  50% { opacity: 0; }
 }
 .terminal-card__name {
   font-family: var(--font-display);
@@ -4850,6 +4854,130 @@ html[data-theme="light"] .tier-slider__btn--play:hover { color: #ffffff; }
 }
 .tree-picker__reset[disabled] { opacity: 0.4; cursor: not-allowed; }
 
+/* ---- Widget 4 · Slide 27 — AGENTS.md before / after streaming sim ---- */
+.before-after-sim {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 4px;
+}
+.before-after-sim__bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 18px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.before-after-sim__btn {
+  padding: 9px 20px;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--t-fast);
+  min-width: 110px;
+}
+html[data-theme="light"] .before-after-sim__btn { color: #ffffff; }
+.before-after-sim__btn:hover { background: var(--accent-strong); }
+.before-after-sim__btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 107, 61, 0.45);
+}
+.before-after-sim__hint {
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+.before-after-sim__hint em { color: var(--accent); font-style: italic; }
+.before-after-sim__status {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-card);
+  min-width: 84px;
+  text-align: center;
+}
+.before-after-sim[data-state="running"] .before-after-sim__status {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.before-after-sim[data-state="done"] .before-after-sim__status {
+  color: var(--success);
+  border-color: var(--success);
+  background: rgba(107, 217, 104, 0.10);
+}
+
+/* Wall-clock counter living in the terminal title bar */
+.before-after-sim__clock {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(245, 245, 240, 0.58);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+}
+.before-after-sim[data-state="done"] [data-panel="bad"] .before-after-sim__clock { color: rgba(255, 126, 126, 0.85); }
+.before-after-sim[data-state="done"] [data-panel="good"] .before-after-sim__clock { color: rgba(107, 217, 104, 0.95); }
+
+/* Placeholder text shown before the user clicks Run */
+.before-after-sim__placeholder {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(245, 245, 240, 0.42);
+  font-style: italic;
+  padding: 4px 0;
+}
+
+/* Final summary chip that appears at the end of each panel */
+.before-after-sim__finish {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  margin-top: 10px;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.before-after-sim__finish--bad {
+  background: rgba(255, 82, 82, 0.10);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+.before-after-sim__finish--good {
+  background: rgba(107, 217, 104, 0.10);
+  border: 1px solid var(--success);
+  color: var(--success);
+}
+.before-after-sim__finish-label { letter-spacing: 0.06em; }
+.before-after-sim__finish-value {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ============================================================
    Overlays (help, jump, notes)
    ============================================================ */
@@ -5185,6 +5313,10 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
   .tree-picker__question { font-size: 15px; padding: 14px 18px; }
   .tree-picker__answer-inner { padding: 14px 18px 18px; }
   .tree-picker__rec { font-size: 13px; }
+  .before-after-sim__bar { flex-wrap: wrap; gap: 10px; padding: 10px 14px; }
+  .before-after-sim__hint { flex: 1 1 100%; font-size: 12px; order: 3; }
+  .before-after-sim__btn { padding: 8px 14px; min-width: 90px; font-size: 11px; }
+  .before-after-sim__status { font-size: 10px; padding: 4px 9px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -7003,67 +7135,49 @@ html[data-theme="light"] .overlay { background: rgba(245, 244, 235, 0.88); }
       title: "AGENTS.md before / after — same prompt, same model",
       body: `
         <p class="section-lead">Two terminals. Identical prompt. The only difference is whether <em>AGENTS.md</em> sits at the repo root.</p>
-        <div class="before-after">
+        <div class="before-after-sim" data-state="idle">
+          <div class="before-after-sim__bar">
+            <button type="button" class="before-after-sim__btn" data-action="run" aria-label="Run the agent simulation in both terminals">▶ Run</button>
+            <span class="before-after-sim__hint">Same prompt. Same model. <em>Only AGENTS.md differs.</em> Hit Run to stream both sessions in real time.</span>
+            <span class="before-after-sim__status" aria-live="polite">Idle</span>
+          </div>
+          <div class="before-after">
 
-          <div class="before-after__panel">
-            <div class="before-after__label before-after__label--bad">× without AGENTS.md</div>
-            <div class="terminal" aria-hidden="true">
-              <div class="terminal__bar">
-                <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
-                <span class="terminal__bar-title">~/project</span>
-              </div>
-              <div class="terminal__body">
-                <span class="terminal__line"><span class="terminal__prompt">$</span> <span class="terminal__cmd">claude "add a billing endpoint"</span></span>
-                <span class="terminal__line"><span class="terminal__dim">→ scanning repo …</span></span>
-                <span class="terminal__line"><span class="terminal__out">writing src/billing/route.js</span></span>
-                <span class="terminal__line"><span class="terminal__out">$ npm install stripe</span></span>
-                <span class="terminal__line"><span class="terminal__err">! workspace error — pnpm.lock detected</span></span>
-                <span class="terminal__line"><span class="terminal__out">retry: $ pnpm add stripe</span></span>
-                <span class="terminal__line"><span class="terminal__out">writing tests/billing.test.js</span></span>
-                <span class="terminal__line"><span class="terminal__out">$ npm test</span></span>
-                <span class="terminal__line"><span class="terminal__err">! command not found in package scripts</span></span>
-                <span class="terminal__line"><span class="terminal__warn">~ assuming watch mode …</span></span>
-                <span class="terminal__line"><span class="terminal__out">$ pnpm test</span></span>
-                <span class="terminal__line"><span class="terminal__err">! hangs in watch mode for 60s</span></span>
-                <span class="terminal__line"><span class="terminal__out">retry: $ pnpm test -- --run</span></span>
-                <span class="terminal__line"><span class="terminal__err">! 2 lint errors: no-var, inline-styles</span></span>
-                <span class="terminal__line"><span class="terminal__warn">~ rewriting class component …</span></span>
-                <span class="terminal__line"><span class="terminal__warn">4 retries, 1 still failing</span><span class="terminal__cursor">▌</span></span>
+            <div class="before-after__panel" data-panel="bad">
+              <div class="before-after__label before-after__label--bad">× without AGENTS.md</div>
+              <div class="terminal" aria-hidden="true">
+                <div class="terminal__bar">
+                  <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
+                  <span class="terminal__bar-title">~/project</span>
+                  <span class="before-after-sim__clock" data-clock="bad">00:00</span>
+                </div>
+                <div class="terminal__body" data-body="bad">
+                  <span class="before-after-sim__placeholder">Press ▶ Run to stream the agent's session…</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="before-after__panel">
-            <div class="before-after__label before-after__label--good">✓ with AGENTS.md present</div>
-            <div class="terminal" aria-hidden="true">
-              <div class="terminal__bar">
-                <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
-                <span class="terminal__bar-title">~/project</span>
-              </div>
-              <div class="terminal__body">
-                <span class="terminal__line"><span class="terminal__prompt">$</span> <span class="terminal__cmd">claude "add a billing endpoint"</span></span>
-                <span class="terminal__line"><span class="terminal__dim">→ reading AGENTS.md …</span></span>
-                <span class="terminal__line"><span class="terminal__out">pnpm · functional · const-only · pnpm test -- --run</span></span>
-                <span class="terminal__line"><span class="terminal__out">writing src/billing/route.ts</span></span>
-                <span class="terminal__line"><span class="terminal__out">$ pnpm add stripe</span></span>
-                <span class="terminal__line"><span class="terminal__ok">✓ added stripe@18.0.2</span></span>
-                <span class="terminal__line"><span class="terminal__out">writing tests/billing.test.ts</span></span>
-                <span class="terminal__line"><span class="terminal__out">$ pnpm test -- --run</span></span>
-                <span class="terminal__line"><span class="terminal__ok">✓ 8 tests passed (1.2s)</span></span>
-                <span class="terminal__line"><span class="terminal__out">$ pnpm lint --fix</span></span>
-                <span class="terminal__line"><span class="terminal__ok">✓ clean</span></span>
-                <span class="terminal__line"><span class="terminal__dim">→ ready for review</span></span>
-                <span class="terminal__line"><span class="terminal__ok">no retries · one shot · 38s</span><span class="terminal__cursor">▌</span></span>
+            <div class="before-after__panel" data-panel="good">
+              <div class="before-after__label before-after__label--good">✓ with AGENTS.md present</div>
+              <div class="terminal" aria-hidden="true">
+                <div class="terminal__bar">
+                  <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
+                  <span class="terminal__bar-title">~/project</span>
+                  <span class="before-after-sim__clock" data-clock="good">00:00</span>
+                </div>
+                <div class="terminal__body" data-body="good">
+                  <span class="before-after-sim__placeholder">Press ▶ Run to stream the agent's session…</span>
+                </div>
               </div>
             </div>
-          </div>
 
+          </div>
         </div>
-        <p class="slide__source">Phase 4 turns this into a real-time simulated demo. Until then, the static panels carry the same lesson: one file at the repo root saves four context windows.</p>
+        <p class="slide__source">Both panels stream as scripted simulations — the agent without AGENTS.md retries four times across ~25 seconds and still leaves one lint error; the agent with AGENTS.md ships a clean PR in roughly the same wall-clock time.</p>
       `,
       notes: {
         time: "~4 min",
-        beat: "Don't read every line. Compare the totals: 'four retries, one still failing' vs 'no retries, one shot, 38 seconds'. That's the whole slide. Phase 4 makes this a live race.",
+        beat: "Click Run while you set up the lesson — don't talk during the stream, let the audience watch both terminals race. After both panels finish, compare totals: 'four retries, one still failing' vs 'no retries, one shot, ~24s'. Replay if questions arise.",
         ask: "Imagine multiplying this by 50 agent sessions a week. How much of your team's review time is currently spent fixing the left column?",
         bridge: "AGENTS.md is the convention. There's a richer one on top — Skills.",
       },
@@ -9518,6 +9632,155 @@ gh pr create --title "Add login form"</code></pre>
       buttons[nextIdx].focus();
     }
     document.addEventListener("keydown", onKey, true);
+  });
+
+  // Slide 27 — AGENTS.md before / after streaming sim (Phase 4 widget #4).
+  // Click Run -> both terminal panels stream their scripted output in real
+  // time, each with its own wall-clock counter ticking in the title bar.
+  // The "without" panel ends with retries + one still-failing line; the
+  // "with" panel finishes cleanly a beat earlier. Click again to replay.
+  onSlideEnter(27, function mountBeforeAfter(el) {
+    if (el.dataset.beforeAfterMounted === "1") return;
+    const widget = el.querySelector(".before-after-sim");
+    if (!widget) return;
+    el.dataset.beforeAfterMounted = "1";
+
+    const btn       = widget.querySelector('[data-action="run"]');
+    const statusEl  = widget.querySelector('.before-after-sim__status');
+    const badBody   = widget.querySelector('[data-body="bad"]');
+    const goodBody  = widget.querySelector('[data-body="good"]');
+    const badClock  = widget.querySelector('[data-clock="bad"]');
+    const goodClock = widget.querySelector('[data-clock="good"]');
+
+    // Each entry's delay is added to a cumulative timeline per panel.
+    // Total run for either panel is roughly 25 seconds.
+    const BAD_SCRIPT = [
+      { html: '<span class="terminal__prompt">$</span> <span class="terminal__cmd">claude "add a billing endpoint"</span>', delay: 200 },
+      { html: '<span class="terminal__dim">→ scanning repo …</span>',                             delay: 1500 },
+      { html: '<span class="terminal__out">writing src/billing/route.js</span>',                  delay: 1800 },
+      { html: '<span class="terminal__out">$ npm install stripe</span>',                          delay: 1600 },
+      { html: '<span class="terminal__err">! workspace error — pnpm.lock detected</span>',        delay: 1400 },
+      { html: '<span class="terminal__out">retry: $ pnpm add stripe</span>',                      delay: 1800 },
+      { html: '<span class="terminal__out">writing tests/billing.test.js</span>',                 delay: 1700 },
+      { html: '<span class="terminal__out">$ npm test</span>',                                    delay: 1500 },
+      { html: '<span class="terminal__err">! command not found in package scripts</span>',        delay: 1500 },
+      { html: '<span class="terminal__warn">~ assuming watch mode …</span>',                      delay: 1400 },
+      { html: '<span class="terminal__out">$ pnpm test</span>',                                   delay: 1500 },
+      { html: '<span class="terminal__err">! hangs in watch mode for 60s</span>',                 delay: 2200 },
+      { html: '<span class="terminal__out">retry: $ pnpm test -- --run</span>',                   delay: 1800 },
+      { html: '<span class="terminal__err">! 2 lint errors: no-var, inline-styles</span>',        delay: 1500 },
+      { html: '<span class="terminal__warn">~ rewriting class component …</span>',                delay: 1700 },
+      { html: '<span class="terminal__warn">4 retries, 1 still failing</span><span class="terminal__cursor">▌</span>', delay: 1800 },
+    ];
+
+    const GOOD_SCRIPT = [
+      { html: '<span class="terminal__prompt">$</span> <span class="terminal__cmd">claude "add a billing endpoint"</span>', delay: 200 },
+      { html: '<span class="terminal__dim">→ reading AGENTS.md …</span>',                             delay: 1600 },
+      { html: '<span class="terminal__out">pnpm · functional · const-only · pnpm test -- --run</span>', delay: 2400 },
+      { html: '<span class="terminal__out">writing src/billing/route.ts</span>',                       delay: 3000 },
+      { html: '<span class="terminal__out">$ pnpm add stripe</span>',                                  delay: 2000 },
+      { html: '<span class="terminal__ok">✓ added stripe@18.0.2</span>',                              delay: 1600 },
+      { html: '<span class="terminal__out">writing tests/billing.test.ts</span>',                      delay: 2800 },
+      { html: '<span class="terminal__out">$ pnpm test -- --run</span>',                               delay: 1800 },
+      { html: '<span class="terminal__ok">✓ 8 tests passed (1.2s)</span>',                            delay: 2200 },
+      { html: '<span class="terminal__out">$ pnpm lint --fix</span>',                                  delay: 1500 },
+      { html: '<span class="terminal__ok">✓ clean</span>',                                            delay: 1400 },
+      { html: '<span class="terminal__dim">→ ready for review</span>',                                delay: 1500 },
+      { html: '<span class="terminal__ok">no retries · one shot · done</span><span class="terminal__cursor">▌</span>', delay: 1500 },
+    ];
+
+    function pad2(n) { return String(n).padStart(2, "0"); }
+    function fmtClock(ms) {
+      const sec = Math.max(0, Math.floor(ms / 1000));
+      return `${pad2(Math.floor(sec / 60))}:${pad2(sec % 60)}`;
+    }
+
+    let state = "idle";
+    let timeouts = [];
+    let clockInterval = null;
+    const PLACEHOLDER_HTML = '<span class="before-after-sim__placeholder">Press ▶ Run to stream the agent\'s session…</span>';
+
+    function clearAll() {
+      timeouts.forEach(t => clearTimeout(t));
+      timeouts = [];
+      if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
+    }
+
+    function setState(s) {
+      state = s;
+      widget.dataset.state = s;
+      if (s === "idle")    { statusEl.textContent = "Idle";    btn.textContent = "▶ Run"; }
+      if (s === "running") { statusEl.textContent = "Running"; btn.textContent = "⟲ Reset"; }
+      if (s === "done")    { statusEl.textContent = "Done";    btn.textContent = "↻ Replay"; }
+    }
+
+    function resetPanels() {
+      badBody.innerHTML = PLACEHOLDER_HTML;
+      goodBody.innerHTML = PLACEHOLDER_HTML;
+      badClock.textContent = "00:00";
+      goodClock.textContent = "00:00";
+    }
+
+    function reset() {
+      clearAll();
+      resetPanels();
+      setState("idle");
+    }
+
+    function scheduleScript(script, body) {
+      body.innerHTML = "";
+      let cum = 0;
+      script.forEach((entry) => {
+        cum += entry.delay;
+        const fireAt = cum;
+        timeouts.push(setTimeout(() => {
+          const line = document.createElement("span");
+          line.className = "terminal__line";
+          line.innerHTML = entry.html;
+          body.appendChild(line);
+          body.scrollTop = body.scrollHeight;
+          // Only the latest cursor in this panel should blink; freeze earlier ones.
+          const cursors = body.querySelectorAll(".terminal__cursor");
+          cursors.forEach((c, i) => {
+            if (i < cursors.length - 1) c.style.animation = "none";
+          });
+        }, fireAt));
+      });
+      return cum;
+    }
+
+    function run() {
+      clearAll();
+      setState("running");
+
+      const badTotal  = scheduleScript(BAD_SCRIPT, badBody);
+      const goodTotal = scheduleScript(GOOD_SCRIPT, goodBody);
+      const startedAt = performance.now();
+
+      clockInterval = setInterval(() => {
+        if (state !== "running") return;
+        const elapsed = performance.now() - startedAt;
+        badClock.textContent  = fmtClock(Math.min(elapsed, badTotal));
+        goodClock.textContent = fmtClock(Math.min(elapsed, goodTotal));
+        if (elapsed >= Math.max(badTotal, goodTotal)) {
+          clearInterval(clockInterval);
+          clockInterval = null;
+        }
+      }, 80);
+
+      const finishAt = Math.max(badTotal, goodTotal) + 400;
+      timeouts.push(setTimeout(() => setState("done"), finishAt));
+    }
+
+    btn.addEventListener("click", () => {
+      if (state === "running") {
+        reset();
+      } else {
+        // idle or done — always start a fresh run
+        resetPanels();
+        run();
+      }
+    });
   });
 
   // Slide 7 — Cadence chart (Chart.js line series, one per vendor)
