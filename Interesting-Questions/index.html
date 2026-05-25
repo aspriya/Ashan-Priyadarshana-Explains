@@ -1235,6 +1235,109 @@
       }
 
       /* =====================================================================
+         Scene 6 — Floyd's cycle detection: linked-list SVG with two pointers.
+         ===================================================================== */
+      .ll-svg { width: 100%; display: block; max-width: 700px; margin: 0 auto; }
+      .ll-svg .ll-edge       { stroke: var(--gray-600); stroke-width: 1.5; fill: none; }
+      .ll-svg .ll-edge-cycle { stroke: var(--coral-600); stroke-width: 1.8; fill: none; }
+      .ll-svg .ll-null {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        fill: var(--gray-600);
+      }
+      .ll-svg .ll-node circle {
+        fill: #ffffff;
+        stroke: var(--gray-400);
+        stroke-width: 1.5;
+        transition: fill 240ms ease, stroke 240ms ease, stroke-width 240ms ease;
+      }
+      .ll-svg .ll-node text {
+        font-family: var(--font-mono);
+        font-size: 16px;
+        font-weight: 600;
+        fill: var(--gray-800);
+        pointer-events: none;
+      }
+      .ll-svg .ll-node.is-visited circle {
+        fill: var(--teal-50);
+        stroke: var(--teal-600);
+      }
+      .ll-svg .ll-node.is-collision circle {
+        fill: var(--coral-100);
+        stroke: var(--coral-600);
+        stroke-width: 3;
+      }
+      .ll-svg .ll-node.is-meeting circle {
+        fill: var(--purple-100);
+        stroke: var(--purple-600);
+        stroke-width: 3;
+      }
+
+      .ll-svg .ll-ptr { transition: transform 360ms cubic-bezier(0.4, 0.15, 0.2, 1); }
+      .ll-svg .ll-ptr circle { stroke-width: 2; }
+      .ll-svg .ll-ptr text {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        font-weight: 700;
+        text-anchor: middle;
+        pointer-events: none;
+      }
+      .ll-svg .ll-ptr.ll-ptr-T circle { fill: var(--teal-100);  stroke: var(--teal-600); }
+      .ll-svg .ll-ptr.ll-ptr-T text   { fill: var(--teal-800); }
+      .ll-svg .ll-ptr.ll-ptr-H circle { fill: var(--coral-100); stroke: var(--coral-600); }
+      .ll-svg .ll-ptr.ll-ptr-H text   { fill: var(--coral-800); }
+      .ll-svg .ll-ptr.is-hidden { opacity: 0; }
+
+      .ll-svg .hash-set-cell {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        text-anchor: middle;
+        fill: var(--gray-800);
+      }
+      .ll-svg .hash-set-cell.empty {
+        fill: var(--gray-400);
+        font-style: italic;
+      }
+
+      .toggle-group {
+        display: inline-flex;
+        border: 1px solid var(--gray-100);
+        border-radius: 999px;
+        padding: 3px;
+        background: var(--gray-50);
+        gap: 0;
+      }
+      .toggle-group .toggle-btn {
+        padding: 6px 16px;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        border: none;
+        background: transparent;
+        color: var(--gray-600);
+        border-radius: 999px;
+        cursor: pointer;
+        transition: background 150ms ease, color 150ms ease;
+      }
+      .toggle-group .toggle-btn:hover { color: var(--gray-800); }
+      .toggle-group .toggle-btn.is-active {
+        background: var(--gray-800);
+        color: #ffffff;
+      }
+
+      .ll-result {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        padding: 12px 16px;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-100);
+        border-radius: var(--radius-md);
+        color: var(--gray-800);
+      }
+      .ll-result.is-cycle    { background: var(--purple-50);  border-color: var(--purple-100); color: var(--purple-800); }
+      .ll-result.is-no-cycle { background: var(--teal-50);    border-color: var(--teal-100);   color: var(--teal-800); }
+
+      /* =====================================================================
          Reduced motion: disable nice-to-have transitions, keep final state.
          ===================================================================== */
       @media (prefers-reduced-motion: reduce) {
@@ -2679,6 +2782,279 @@ groups.computeIfAbsent(canon(s), k -&gt; <span class="c-key">new</span> <span cl
             <span class="pill time">Time: O(n · L)</span>
             <span class="pill space">Space: O(n · L)</span>
             <span style="color:var(--gray-600); font-size: 14px;">counting fingerprint</span>
+          </div>
+        </section>
+
+      </article>
+    </template>
+
+    <!-- ----- Scene 6: Detect a cycle in a linked list ----- -->
+    <template id="scene-6">
+      <article class="scene" data-scene-title="Detect a cycle in a linked list (Floyd's)">
+
+        <!-- Slide 1: Problem -->
+        <section
+          class="slide slide-problem"
+          data-init="scene-6-problem"
+          data-notes="Given a singly linked list, detect a cycle. Constraint: O(1) extra memory — no hash set. The classic Floyd's 'tortoise and hare' is the answer."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 6 · the problem</span>
+            <h1>Detect a cycle in a linked list</h1>
+          </header>
+
+          <p class="lead">
+            Given the head of a singly linked list, decide whether it contains
+            a cycle. Constraint:
+            <code style="font-family:var(--font-mono)">O(1)</code> extra memory.
+          </p>
+
+          <div class="viz">
+            <h2>Tiny example — two lists</h2>
+
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+              <div>
+                <span class="sum-label" style="display:block; margin-bottom: 6px;">list A — no cycle</span>
+                <div id="scene-6-listA-svg"></div>
+              </div>
+              <div>
+                <span class="sum-label" style="display:block; margin-bottom: 6px;">list B — cycle at node 3</span>
+                <div id="scene-6-listB-svg"></div>
+              </div>
+            </div>
+
+            <p class="viz-caption">
+              Same shape until the tail. List A's last
+              <code style="font-family:var(--font-mono)">next</code> is
+              <code style="font-family:var(--font-mono)">null</code>; list B's
+              loops back to node 3.
+            </p>
+          </div>
+
+          <div class="callout">
+            <strong>The constraint matters.</strong>
+            With unbounded extra memory, this is trivial. The fun is doing it
+            in <code style="font-family:var(--font-mono)">O(1)</code> — without
+            so much as a hash set.
+          </div>
+        </section>
+
+        <!-- Slide 2: Naive -->
+        <section
+          class="slide slide-naive"
+          data-init="scene-6-naive"
+          data-notes="Naive: hash set of visited nodes. O(n) time, O(n) extra. Correct, but violates the constraint."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 6 · the naive try</span>
+            <h1>Keep a set of visited nodes</h1>
+          </header>
+
+          <p class="lead">
+            Walk the list, store every node reference in a hash set. If we
+            ever try to insert a node that's already there, we've found a
+            cycle. Correct. Violates the memory constraint.
+          </p>
+
+          <div class="split split-wide-right">
+            <div class="stack">
+              <div class="code"><span class="c-ty">Set</span>&lt;<span class="c-ty">Node</span>&gt; seen = <span class="c-key">new</span> <span class="c-ty">HashSet</span>&lt;&gt;();
+<span class="c-key">for</span> (<span class="c-ty">Node</span> n = head; n != <span class="c-key">null</span>; n = n.next) {
+  <span class="c-key">if</span> (!seen.add(n)) <span class="c-key">return</span> <span class="c-key">true</span>;   <span class="c-com">// collision = cycle</span>
+}
+<span class="c-key">return</span> <span class="c-key">false</span>;</div>
+
+              <div class="complexity" role="note">
+                <span class="pill time">Time: O(n)</span>
+                <span class="pill bad">Space: O(n) — disallowed</span>
+              </div>
+
+              <div class="callout callout--naive">
+                <strong>Why this is wasteful.</strong>
+                It treats the question as "have I seen this node before?" when
+                it could be reframed as "do two walkers on this list ever
+                meet?"
+              </div>
+            </div>
+
+            <div class="viz">
+              <h2>Watch the hash-set walk on list B</h2>
+              <div id="scene-6-naive-svg"></div>
+              <div class="viz-actions">
+                <button class="btn btn--primary" data-action="step">Step</button>
+                <button class="btn" data-action="run">Run</button>
+                <span class="spacer"></span>
+                <button class="btn btn--ghost" data-action="reset">Reset</button>
+              </div>
+              <p class="viz-caption">
+                Each visited node turns teal. When the walker tries to revisit
+                node 3, it lights up coral — that's the collision.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 3: Insight -->
+        <section
+          class="slide slide-insight"
+          data-init="scene-6-insight"
+          data-notes="Two pointers, different speeds. Slow advances by 1, fast by 2. On a circular track, the faster runner always laps the slower one. No cycle ⇒ fast hits null."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 6 · the insight</span>
+            <h1>Two pointers, different speeds</h1>
+          </header>
+
+          <div class="split split-wide-left">
+            <div class="stack">
+              <p class="lead">
+                Forget tracking. Track <em>relative motion</em> instead. A
+                slow pointer moves one node per step. A fast pointer moves
+                two. If a cycle exists, the fast one laps the slow one.
+              </p>
+
+              <div class="callout callout--insight">
+                <strong>One sentence.</strong>
+                On a circular track, the faster runner always laps the slower
+                one. The gap between them shrinks by exactly one node per
+                step.
+              </div>
+
+              <div class="code"><span class="c-ty">Node</span> slow = head, fast = head;
+<span class="c-key">while</span> (fast != <span class="c-key">null</span> &amp;&amp; fast.next != <span class="c-key">null</span>) {
+  slow = slow.next;
+  fast = fast.next.next;
+  <span class="c-key">if</span> (slow == fast) <span class="c-key">return</span> <span class="c-key">true</span>;   <span class="c-com">// they met — cycle</span>
+}
+<span class="c-key">return</span> <span class="c-key">false</span>;                       <span class="c-com">// fast hit null — no cycle</span></div>
+
+              <div class="complexity" role="note">
+                <span class="pill time">Time: O(n)</span>
+                <span class="pill space">Space: O(1)</span>
+              </div>
+            </div>
+
+            <div class="viz">
+              <h2>Final state on list B</h2>
+              <div id="scene-6-insight-svg"></div>
+              <p class="viz-caption" style="margin-top: 24px;">
+                Three iterations on list B and the pointers meet at node 4.
+                That meeting is the proof — only possible on a cycle.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 4: Walkthrough -->
+        <section
+          class="slide slide-walkthrough"
+          data-init="scene-6-walkthrough"
+          data-notes="Toggle between lists. Step both pointers. List A: hare reaches null in two steps → no cycle. List B: pointers meet at node 4 in three steps → cycle."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 6 · walkthrough</span>
+            <h1>Step the tortoise and the hare</h1>
+          </header>
+
+          <p class="lead">
+            <strong>Step</strong> advances tortoise by one and hare by two.
+            Toggle the list to see both outcomes — meeting (cycle) or hare
+            hits null (no cycle).
+          </p>
+
+          <div class="viz">
+            <div class="viz-actions" style="margin-bottom: 4px;">
+              <span class="sum-label">list:</span>
+              <div class="toggle-group" id="scene-6-walk-toggle">
+                <button class="toggle-btn is-active" data-list="A" type="button">A — no cycle</button>
+                <button class="toggle-btn" data-list="B" type="button">B — cycle at node 3</button>
+              </div>
+              <span class="spacer"></span>
+              <span class="sum-label" id="scene-6-walk-stepcount">step 0</span>
+            </div>
+
+            <div id="scene-6-walk-svg"></div>
+
+            <div class="viz-actions">
+              <button class="btn btn--data" data-action="step">Step</button>
+              <button class="btn" data-action="run">Run</button>
+              <span class="spacer"></span>
+              <button class="btn btn--ghost" data-action="reset">Reset</button>
+            </div>
+
+            <div class="ll-result" id="scene-6-walk-result">
+              both pointers at the head. tortoise advances by 1, hare by 2.
+            </div>
+
+            <p class="viz-caption">
+              Watch the hare on list B — it laps around the cycle and catches
+              the tortoise. On list A, it just falls off the end.
+            </p>
+          </div>
+
+          <div class="complexity" role="note">
+            <span class="pill time">Time: O(n)</span>
+            <span class="pill space">Space: O(1)</span>
+          </div>
+        </section>
+
+        <!-- Slide 5: Follow-up — where does the cycle start? -->
+        <section
+          class="slide slide-followup"
+          data-init="scene-6-followup"
+          data-notes="Once they meet inside the cycle, reset slow to head, step both by 1. They meet again — at the cycle's entry node. Don't fully implement; leave as a discussion prompt."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 6 · follow-up</span>
+            <h1>Where does the cycle start?</h1>
+          </header>
+
+          <p class="lead">
+            Detection isn't the only question. Sometimes you need the cycle's
+            entry node — the place where the tail loops back.
+          </p>
+
+          <div class="split split-wide-left">
+            <div class="stack">
+              <div class="callout callout--insight">
+                <strong>The trick.</strong>
+                Once the pointers meet inside the cycle, reset
+                <code style="font-family:var(--font-mono)">slow</code> to
+                <code style="font-family:var(--font-mono)">head</code> and
+                advance both by exactly 1 per step. They will meet again —
+                and that meeting point is the cycle's entry node.
+              </div>
+
+              <div class="code"><span class="c-com">// after detecting a cycle, with slow and fast at the meeting node:</span>
+slow = head;
+<span class="c-key">while</span> (slow != fast) {
+  slow = slow.next;
+  fast = fast.next;       <span class="c-com">// note: now also +1, not +2</span>
+}
+<span class="c-key">return</span> slow;             <span class="c-com">// cycle's entry node</span></div>
+
+              <div class="complexity" role="note">
+                <span class="pill time">Time: O(n)</span>
+                <span class="pill space">Space: O(1)</span>
+              </div>
+            </div>
+
+            <div class="stack">
+              <div class="callout callout--data">
+                <strong>Why it works (one line).</strong>
+                Distance from head to entry equals distance from meeting point
+                back to entry, by the algebra of the cycle's geometry. The
+                two pointers reach the entry at the same time.
+              </div>
+
+              <div class="callout">
+                <strong>The transferable lesson.</strong>
+                Relative motion is often a cheaper signal than absolute
+                tracking. Same trick detects palindromes, finds the midpoint
+                of a list, and removes the kth element from the end — all in
+                <code style="font-family:var(--font-mono)">O(1)</code> space.
+              </div>
+            </div>
           </div>
         </section>
 
@@ -4360,6 +4736,308 @@ groups.computeIfAbsent(canon(s), k -&gt; <span class="c-key">new</span> <span cl
           });
         }
 
+        /* ===============================================================
+           Per-slide init hooks for Scene 6 — Floyd's cycle detection.
+           =============================================================== */
+        const LL_NODE_R       = 24;
+        const LL_NODE_SPACING = 92;
+        const LL_START_X      = 44;
+        const LL_NODE_Y       = 70;
+        const LL_HEIGHT       = 200;
+
+        let llArrowCounter = 0;
+
+        function buildList(values, cycleEntryIdx = -1) {
+          // returns array of {value, next} where the last node loops to
+          // cycleEntryIdx if cycleEntryIdx >= 0, otherwise next is null.
+          const nodes = values.map(v => ({ value: v, next: null }));
+          for (let i = 0; i < nodes.length - 1; i++) nodes[i].next = nodes[i + 1];
+          if (cycleEntryIdx >= 0) {
+            nodes[nodes.length - 1].next = nodes[cycleEntryIdx];
+          }
+          return nodes;
+        }
+
+        function nodeIdxIn(list, node) {
+          if (node === null) return null;
+          for (let i = 0; i < list.length; i++) if (list[i] === node) return i;
+          return null;
+        }
+
+        function renderLinkedListSvg(host, nodes, cycleEntryIdx = -1, opts = {}) {
+          const { withPointers = false } = opts;
+          const n = nodes.length;
+          const totalW = LL_START_X + (n - 1) * LL_NODE_SPACING + LL_NODE_R + 70;
+          const arrowId = `ll-arrow-${++llArrowCounter}`;
+
+          let edges = '';
+          for (let i = 0; i < n - 1; i++) {
+            const x1 = LL_START_X + i * LL_NODE_SPACING + LL_NODE_R;
+            const x2 = LL_START_X + (i + 1) * LL_NODE_SPACING - LL_NODE_R;
+            edges += `<line class="ll-edge" x1="${x1}" y1="${LL_NODE_Y}" x2="${x2 - 4}" y2="${LL_NODE_Y}" marker-end="url(#${arrowId})" />`;
+          }
+
+          if (cycleEntryIdx >= 0) {
+            const xFrom = LL_START_X + (n - 1) * LL_NODE_SPACING;
+            const xTo   = LL_START_X + cycleEntryIdx * LL_NODE_SPACING;
+            const yEdge = LL_NODE_Y - LL_NODE_R - 2;
+            const midY  = 14;
+            edges += `<path class="ll-edge ll-edge-cycle" d="M ${xFrom} ${yEdge} C ${xFrom} ${midY} ${xTo} ${midY} ${xTo} ${yEdge - 4}" marker-end="url(#${arrowId})" />`;
+          } else {
+            const xLast = LL_START_X + (n - 1) * LL_NODE_SPACING + LL_NODE_R;
+            edges += `<line class="ll-edge" x1="${xLast}" y1="${LL_NODE_Y}" x2="${xLast + 36}" y2="${LL_NODE_Y}" marker-end="url(#${arrowId})" />`;
+            edges += `<text class="ll-null" x="${xLast + 46}" y="${LL_NODE_Y + 5}">null</text>`;
+          }
+
+          let nodeMarkup = '';
+          for (let i = 0; i < n; i++) {
+            const cx = LL_START_X + i * LL_NODE_SPACING;
+            nodeMarkup += `
+              <g class="ll-node" data-idx="${i}">
+                <circle cx="${cx}" cy="${LL_NODE_Y}" r="${LL_NODE_R}" />
+                <text x="${cx}" y="${LL_NODE_Y + 5}" text-anchor="middle">${nodes[i].value}</text>
+              </g>`;
+          }
+
+          let pointers = '';
+          if (withPointers) {
+            const ptrY_T = LL_NODE_Y + LL_NODE_R + 28;
+            const ptrY_H = LL_NODE_Y + LL_NODE_R + 60;
+            const cx0 = LL_START_X;
+            pointers = `
+              <g class="ll-ptr ll-ptr-T" transform="translate(0, 0)">
+                <circle cx="${cx0}" cy="${ptrY_T}" r="13" />
+                <text x="${cx0}" y="${ptrY_T + 4}">T</text>
+              </g>
+              <g class="ll-ptr ll-ptr-H" transform="translate(0, 0)">
+                <circle cx="${cx0}" cy="${ptrY_H}" r="13" />
+                <text x="${cx0}" y="${ptrY_H + 4}">H</text>
+              </g>
+            `;
+          }
+
+          host.innerHTML = `
+            <svg class="ll-svg" viewBox="0 0 ${totalW} ${LL_HEIGHT}" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="${arrowId}" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                  <polygon points="0 0, 9 4.5, 0 9" fill="var(--gray-600)" />
+                </marker>
+              </defs>
+              ${edges}
+              ${nodeMarkup}
+              ${pointers}
+            </svg>
+          `;
+          return host.querySelector('.ll-svg');
+        }
+
+        function setLlPointer(svg, who, idx) {
+          const ptr = svg.querySelector(`.ll-ptr-${who}`);
+          if (!ptr) return;
+          if (idx === null) {
+            // Off to the right + faded
+            ptr.classList.add('is-hidden');
+            ptr.setAttribute('transform', `translate(${(svg.dataset.listLen || 6) * LL_NODE_SPACING}, 0)`);
+          } else {
+            ptr.classList.remove('is-hidden');
+            ptr.setAttribute('transform', `translate(${idx * LL_NODE_SPACING}, 0)`);
+          }
+        }
+
+        /* Scene 6, Slide 1 — Problem (static): show List A and List B */
+        function initSceneSixProblem(slide) {
+          const listA = buildList([1, 2, 3, 4]);
+          const listB = buildList([1, 2, 3, 4, 5], 2);
+          renderLinkedListSvg($('#scene-6-listA-svg', slide), listA, -1);
+          renderLinkedListSvg($('#scene-6-listB-svg', slide), listB, 2);
+        }
+
+        /* Scene 6, Slide 2 — Naive: walk list B with a hash set */
+        function initSceneSixNaive(slide) {
+          const stepBtn = $('[data-action="step"]', slide);
+          const runBtn  = $('[data-action="run"]',  slide);
+          const resetBtn= $('[data-action="reset"]', slide);
+
+          const list = buildList([1, 2, 3, 4, 5], 2);
+          const svg  = renderLinkedListSvg($('#scene-6-naive-svg', slide), list, 2);
+
+          let current = list[0];
+          const seen = new Set();
+          let busy = false;
+          let done = false;
+
+          function clear() {
+            $$('.ll-node', svg).forEach(n => n.classList.remove('is-visited', 'is-collision'));
+          }
+
+          function step() {
+            if (busy || done) return;
+            if (current === null) {
+              done = true;
+              return;
+            }
+            busy = true;
+            const idx = nodeIdxIn(list, current);
+            const nodeEl = svg.querySelector(`.ll-node[data-idx="${idx}"]`);
+            if (seen.has(current)) {
+              nodeEl.classList.add('is-collision');
+              done = true;
+              busy = false;
+              stepBtn.disabled = true;
+              runBtn.disabled  = true;
+              return;
+            }
+            seen.add(current);
+            nodeEl.classList.add('is-visited');
+            current = current.next;
+            setT(() => { busy = false; }, 240);
+          }
+
+          stepBtn.addEventListener('click', step);
+          runBtn.addEventListener('click', () => {
+            stepBtn.disabled = true;
+            runBtn.disabled  = true;
+            const tick = () => {
+              if (done) return;
+              step();
+              setT(tick, 380);
+            };
+            tick();
+          });
+          resetBtn.addEventListener('click', () => {
+            current = list[0];
+            seen.clear();
+            done = false;
+            busy = false;
+            clear();
+            stepBtn.disabled = false;
+            runBtn.disabled  = false;
+          });
+        }
+
+        /* Scene 6, Slide 3 — Insight (static): show List B at the meeting point */
+        function initSceneSixInsight(slide) {
+          const list = buildList([1, 2, 3, 4, 5], 2);
+          const svg  = renderLinkedListSvg($('#scene-6-insight-svg', slide), list, 2, { withPointers: true });
+          // Final state after 3 steps: T at idx 3 (node 4), H at idx 3 (node 4)
+          setLlPointer(svg, 'T', 3);
+          setLlPointer(svg, 'H', 3);
+          svg.querySelector('.ll-node[data-idx="3"]').classList.add('is-meeting');
+        }
+
+        /* Scene 6, Slide 4 — Walkthrough: interactive toggle + step */
+        function initSceneSixWalkthrough(slide) {
+          const stepBtn   = $('[data-action="step"]', slide);
+          const runBtn    = $('[data-action="run"]',  slide);
+          const resetBtn  = $('[data-action="reset"]', slide);
+          const stepCntEl = $('#scene-6-walk-stepcount', slide);
+          const resultEl  = $('#scene-6-walk-result',   slide);
+          const toggle    = $('#scene-6-walk-toggle',   slide);
+          const svgHost   = $('#scene-6-walk-svg',      slide);
+
+          let currentListKey = 'A';
+          let list, svg, tortoise, hare, steps, phase, busy;
+
+          function buildScene() {
+            if (currentListKey === 'A') {
+              list = buildList([1, 2, 3, 4]);
+              svg  = renderLinkedListSvg(svgHost, list, -1, { withPointers: true });
+            } else {
+              list = buildList([1, 2, 3, 4, 5], 2);
+              svg  = renderLinkedListSvg(svgHost, list, 2, { withPointers: true });
+            }
+            svg.dataset.listLen = list.length;
+            tortoise = list[0];
+            hare     = list[0];
+            steps = 0;
+            phase = 'running';
+            busy = false;
+            setLlPointer(svg, 'T', 0);
+            setLlPointer(svg, 'H', 0);
+            stepBtn.disabled = false;
+            runBtn.disabled  = false;
+            stepCntEl.textContent = 'step 0';
+            updateResult();
+          }
+
+          function describePtr(p) {
+            if (p === null) return 'null';
+            return `node ${p.value}`;
+          }
+          function updateResult() {
+            resultEl.classList.remove('is-cycle', 'is-no-cycle');
+            if (phase === 'running') {
+              resultEl.textContent = `step ${steps}. T = ${describePtr(tortoise)}, H = ${describePtr(hare)}. running…`;
+            } else if (phase === 'no-cycle') {
+              resultEl.classList.add('is-no-cycle');
+              resultEl.textContent = `no cycle. hare reached null after ${steps} step${steps === 1 ? '' : 's'}.`;
+            } else if (phase === 'cycle') {
+              resultEl.classList.add('is-cycle');
+              resultEl.textContent = `cycle detected. T and H met at node ${tortoise.value} after ${steps} step${steps === 1 ? '' : 's'}.`;
+            }
+          }
+
+          function step() {
+            if (busy || phase !== 'running') return;
+            busy = true;
+            if (hare === null || hare.next === null) {
+              hare = null;
+              setLlPointer(svg, 'H', null);
+              phase = 'no-cycle';
+              stepBtn.disabled = true;
+              runBtn.disabled  = true;
+              updateResult();
+              busy = false;
+              return;
+            }
+            tortoise = tortoise.next;
+            hare = hare.next.next;
+            steps++;
+            stepCntEl.textContent = `step ${steps}`;
+            setLlPointer(svg, 'T', nodeIdxIn(list, tortoise));
+            setLlPointer(svg, 'H', nodeIdxIn(list, hare));
+            if (tortoise === hare) {
+              phase = 'cycle';
+              stepBtn.disabled = true;
+              runBtn.disabled  = true;
+              const idx = nodeIdxIn(list, tortoise);
+              if (idx !== null) {
+                svg.querySelector(`.ll-node[data-idx="${idx}"]`).classList.add('is-meeting');
+              }
+            }
+            updateResult();
+            setT(() => { busy = false; }, 360);
+          }
+
+          stepBtn.addEventListener('click', step);
+          runBtn.addEventListener('click', () => {
+            stepBtn.disabled = true;
+            runBtn.disabled  = true;
+            const tick = () => {
+              if (phase !== 'running') return;
+              step();
+              setT(tick, 440);
+            };
+            tick();
+          });
+          resetBtn.addEventListener('click', buildScene);
+
+          $$('.toggle-btn', toggle).forEach(btn => {
+            btn.addEventListener('click', () => {
+              if (btn.dataset.list === currentListKey) return;
+              $$('.toggle-btn', toggle).forEach(b => b.classList.remove('is-active'));
+              btn.classList.add('is-active');
+              currentListKey = btn.dataset.list;
+              buildScene();
+            });
+          });
+
+          buildScene();
+        }
+
+        /* Scene 6, Slide 5 — Follow-up (static discussion) */
+        function initSceneSixFollowup(/* slide */) { /* no interactivity */ }
+
         /* ---------------------------------------------------------------
            Slide init registry. Each key matches a slide's data-init.
            --------------------------------------------------------------- */
@@ -4386,6 +5064,11 @@ groups.computeIfAbsent(canon(s), k -&gt; <span class="c-key">new</span> <span cl
           'scene-5-naive':         initSceneFiveNaive,
           'scene-5-insight':       initSceneFiveInsight,
           'scene-5-walkthrough':   initSceneFiveWalkthrough,
+          'scene-6-problem':       initSceneSixProblem,
+          'scene-6-naive':         initSceneSixNaive,
+          'scene-6-insight':       initSceneSixInsight,
+          'scene-6-walkthrough':   initSceneSixWalkthrough,
+          'scene-6-followup':      initSceneSixFollowup,
         };
 
         /* ---------------------------------------------------------------
