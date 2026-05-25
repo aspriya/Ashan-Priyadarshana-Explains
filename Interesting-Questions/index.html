@@ -684,6 +684,20 @@
         color: var(--amber-800);
         box-shadow: 0 0 0 2px var(--amber-100), var(--shadow-md);
       }
+      /* Anchor cursor: the slow/outer index in a nested scan (Scene 2 naive). */
+      .chip.chip-cursor--anchor {
+        background: var(--coral-100);
+        border-color: var(--coral-400);
+        color: var(--coral-800);
+        box-shadow: 0 0 0 2px var(--coral-100), var(--shadow-md);
+      }
+      /* Answer chip — the algorithm's chosen output. */
+      .chip.chip-found {
+        background: var(--teal-100);
+        border-color: var(--teal-400);
+        color: var(--teal-800);
+        box-shadow: 0 0 0 2px var(--teal-100), var(--shadow-md);
+      }
       .chip.chip-consumed {
         opacity: 0;
         transform: scale(0.4);
@@ -738,8 +752,9 @@
         gap: 14px;
       }
       .bucket-grid {
+        --cols: 101;
         display: grid;
-        grid-template-columns: repeat(101, 1fr);
+        grid-template-columns: repeat(var(--cols), 1fr);
         gap: 1px;
         background: var(--gray-100);
         border: 1px solid var(--gray-100);
@@ -1331,6 +1346,226 @@
       </article>
     </template>
 
+    <!-- ----- Scene 2: First non-repeating character ----- -->
+    <template id="scene-2">
+      <article class="scene" data-scene-title="First non-repeating character">
+
+        <!-- Slide 1: Problem -->
+        <section
+          class="slide slide-problem"
+          data-init="scene-2-problem"
+          data-notes="Find the first character whose count is exactly one. 'First' means first by position in the input — not first alphabetically. 'c' wins because it appears before 'd', both of which have count 1."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 2 · the problem</span>
+            <h1>First non-repeating character</h1>
+          </header>
+
+          <p class="lead">
+            Given a string of up to ten million ASCII characters, return the
+            first character that appears exactly once. Return a sentinel if no
+            such character exists.
+          </p>
+
+          <div class="split split-wide-left">
+            <div class="viz">
+              <h2>Tiny example — "aabbcdeeff"</h2>
+              <div class="chip-row" id="scene-2-input-chips"></div>
+              <p class="viz-caption">
+                Each tile is one character. The answer is the first tile whose
+                count across the whole string is exactly 1.
+              </p>
+            </div>
+
+            <div class="viz">
+              <h2>Expected output</h2>
+              <pre class="output-block">'c'</pre>
+              <p class="viz-caption">
+                <code style="font-family:var(--font-mono)">'c'</code> wins —
+                its count is 1 and it appears before
+                <code style="font-family:var(--font-mono)">'d'</code> (also
+                count 1).
+              </p>
+            </div>
+          </div>
+
+          <div class="callout">
+            <strong>Two facts to hold onto.</strong>
+            Input length <code style="font-family:var(--font-mono)">n</code>
+            can be huge — up to 10⁷. The alphabet is fixed:
+            <code style="font-family:var(--font-mono)">k = 128</code>
+            ASCII codepoints. Those two facts are the whole story again.
+          </div>
+        </section>
+
+        <!-- Slide 2: Naive -->
+        <section
+          class="slide slide-naive"
+          data-init="scene-2-naive"
+          data-notes="Naive nested scan. For each i, sweep all other indices looking for a duplicate. O(n²). For n = 10⁷ that's 10¹⁴ ops — infeasible."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 2 · the naive try</span>
+            <h1>Scan each character against the rest</h1>
+          </header>
+
+          <p class="lead">
+            For every character, sweep the rest of the string looking for a
+            duplicate. The first character whose sweep finds nothing wins.
+            Correct. Also quadratic.
+          </p>
+
+          <div class="split split-wide-right">
+            <div class="stack">
+              <div class="code"><span class="c-com">// pseudocode</span>
+<span class="c-key">for</span> i = <span class="c-num">0</span> .. n-<span class="c-num">1</span>:
+  is_unique = <span class="c-key">true</span>
+  <span class="c-key">for</span> j = <span class="c-num">0</span> .. n-<span class="c-num">1</span>:
+    <span class="c-key">if</span> j != i <span class="c-op">and</span> s[j] == s[i]:
+      is_unique = <span class="c-key">false</span>
+      <span class="c-key">break</span>
+  <span class="c-key">if</span> is_unique: <span class="c-key">return</span> s[i]
+<span class="c-key">return</span> sentinel</div>
+
+              <div class="complexity" role="note">
+                <span class="pill bad">Time: O(n²)</span>
+                <span class="pill space">Space: O(1)</span>
+              </div>
+
+              <div class="callout callout--naive">
+                <strong>Why this is wasteful.</strong>
+                It re-scans regions you've already seen. Every character is
+                examined many times.
+              </div>
+            </div>
+
+            <div class="viz">
+              <h2>Watch the nested scan</h2>
+              <div class="chip-row" id="scene-2-naive-chips"></div>
+              <div class="viz-actions">
+                <button class="btn btn--primary" data-action="run-scan">Run nested scan</button>
+                <span class="spacer"></span>
+                <button class="btn btn--ghost" data-action="reset">Reset</button>
+              </div>
+              <p class="viz-caption">
+                The coral chip is <code style="font-family:var(--font-mono)">i</code>;
+                the amber chip is <code style="font-family:var(--font-mono)">j</code>
+                sweeping the whole string for each <code style="font-family:var(--font-mono)">i</code>.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 3: Insight -->
+        <section
+          class="slide slide-insight"
+          data-init="scene-2-insight"
+          data-notes="Two passes with int[128]. Pass 1 fills counts in O(n). Pass 2 walks the string and returns the first char whose count slot reads 1. Two clean passes beat one tangled pass."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 2 · the insight</span>
+            <h1>Two passes beat one clever pass</h1>
+          </header>
+
+          <div class="split split-wide-left">
+            <div class="stack">
+              <p class="lead">
+                Stop trying to do it in one walk. Two clean walks each do half
+                the work: count first, then find.
+              </p>
+
+              <div class="callout callout--insight">
+                <strong>One sentence.</strong>
+                When a one-pass solution gets tangled because it has to track
+                two things at once, two clean passes are simpler — and faster.
+              </div>
+
+              <div class="code"><span class="c-key">int</span>[] counts = <span class="c-key">new</span> <span class="c-key">int</span>[<span class="c-num">128</span>];
+
+<span class="c-com">// pass 1 — O(n) fill counts</span>
+<span class="c-key">for</span> (<span class="c-key">char</span> c : s.toCharArray())
+  counts[c]++;
+
+<span class="c-com">// pass 2 — O(n) find first with count == 1</span>
+<span class="c-key">for</span> (<span class="c-key">char</span> c : s.toCharArray())
+  <span class="c-key">if</span> (counts[c] == <span class="c-num">1</span>) <span class="c-key">return</span> c;
+
+<span class="c-key">return</span> <span class="c-num">-1</span>;</div>
+
+              <div class="complexity" role="note">
+                <span class="pill time">Time: O(n)</span>
+                <span class="pill space">Space: O(k)</span>
+                <span style="color:var(--gray-600); font-size: 14px;">k = 128</span>
+              </div>
+            </div>
+
+            <div class="viz">
+              <h2>Counts after pass 1 — 128 slots, indexed by codepoint</h2>
+              <div class="bucket-grid" id="scene-2-insight-counts" style="--cols: 128;" aria-hidden="true"></div>
+              <div class="bucket-axis" aria-hidden="true">
+                <span>0</span><span>32</span><span>64</span><span>97 (a)</span><span>127</span>
+              </div>
+              <p class="viz-caption">
+                One slot per ASCII codepoint. After pass 1, only the six
+                touched slots are non-zero. The rest stay flat.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 4: Walkthrough -->
+        <section
+          class="slide slide-walkthrough"
+          data-init="scene-2-walkthrough"
+          data-notes="Step through pass 1 then pass 2. The first chip whose slot shows 1 lights up green. Note how pass 2 only reads from counts — it never modifies them."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 2 · walkthrough</span>
+            <h1>Count, then find</h1>
+          </header>
+
+          <p class="lead">
+            Pass 1 fills the counts. Pass 2 walks left to right, asking
+            <em>"is this slot exactly 1?"</em> The first <em>yes</em> wins.
+          </p>
+
+          <div class="viz">
+            <h2>Two passes, one counting array</h2>
+            <div class="chip-row" id="scene-2-walk-chips"></div>
+            <div class="bucket-grid" id="scene-2-walk-counts" style="--cols: 128;" aria-hidden="true"></div>
+            <div class="bucket-axis" aria-hidden="true">
+              <span>0</span><span>32</span><span>64</span><span>97 (a)</span><span>127</span>
+            </div>
+
+            <div class="viz-actions">
+              <button class="btn btn--data"    data-action="step-1">Pass 1: step</button>
+              <button class="btn"              data-action="run-1">Pass 1: run</button>
+              <button class="btn btn--insight" data-action="step-2" disabled>Pass 2: step</button>
+              <button class="btn"              data-action="run-2"  disabled>Pass 2: run</button>
+              <span class="spacer"></span>
+              <button class="btn btn--ghost"   data-action="reset">Reset</button>
+            </div>
+
+            <p class="viz-caption">
+              <strong>Step</strong> advances one character. <strong>Run</strong>
+              flushes the rest of the pass. Pass 2 unlocks once pass 1 is done.
+            </p>
+          </div>
+
+          <div class="callout" id="scene-2-walk-result">
+            Answer will appear here.
+          </div>
+
+          <div class="complexity" role="note">
+            <span class="pill time">Time: O(n)</span>
+            <span class="pill space">Space: O(k)</span>
+            <span style="color:var(--gray-600); font-size: 14px;">two passes, k = 128</span>
+          </div>
+        </section>
+
+      </article>
+    </template>
+
     <!--
       SCENE TEMPLATE (copy-pasteable starter for new scenes — Phase 2+).
       Drop a block like this anywhere in <body>. The engine discovers it via
@@ -1667,9 +1902,9 @@
           return [...host.children];
         }
 
-        function buildBucketGrid(host) {
+        function buildBucketGrid(host, count = 101) {
           host.innerHTML = '';
-          for (let v = 0; v <= 100; v++) {
+          for (let v = 0; v < count; v++) {
             const b = document.createElement('div');
             b.className = 'bucket';
             b.dataset.v = v;
@@ -1683,6 +1918,27 @@
             host.appendChild(b);
           }
           return [...host.children];
+        }
+
+        function renderCharChips(host, chars) {
+          host.innerHTML = '';
+          chars.forEach((ch, i) => {
+            const c = document.createElement('span');
+            c.className = 'chip';
+            c.dataset.ch = ch;
+            c.dataset.code = ch.charCodeAt(0);
+            c.dataset.i = i;
+            c.textContent = ch;
+            host.appendChild(c);
+          });
+          return [...host.children];
+        }
+
+        function setBucketCount(cell, newCount) {
+          cell.dataset.count = String(newCount);
+          $('.bucket-count', cell).textContent = newCount > 0 ? String(newCount) : '';
+          $('.bucket-fill', cell).style.height = Math.min(100, newCount * 24) + '%';
+          cell.classList.toggle('bucket-active', newCount > 0);
         }
 
         /* ---- Scene 1, Slide 1 — Problem (static) ---- */
@@ -2094,6 +2350,220 @@
           paint('');
         }
 
+        /* ===============================================================
+           Per-slide init hooks for Scene 2 — First non-repeating character.
+           =============================================================== */
+        const SCENE_2_STR = 'aabbcdeeff';
+
+        /* Scene 2, Slide 1 — Problem (static) */
+        function initSceneTwoProblem(slide) {
+          const host = $('#scene-2-input-chips', slide);
+          const chips = renderCharChips(host, [...SCENE_2_STR]);
+          // Pre-highlight the answer so the final state is visible immediately.
+          chips[4].classList.add('chip-found');
+        }
+
+        /* Scene 2, Slide 2 — Naive nested scan */
+        function initSceneTwoNaive(slide) {
+          const host     = $('#scene-2-naive-chips', slide);
+          const runBtn   = $('[data-action="run-scan"]', slide);
+          const resetBtn = $('[data-action="reset"]', slide);
+          const chips = renderCharChips(host, [...SCENE_2_STR]);
+
+          let busy = false;
+
+          function clearScanCursors() {
+            chips.forEach(c => c.classList.remove('chip-cursor', 'chip-cursor--anchor'));
+          }
+
+          runBtn.addEventListener('click', () => {
+            if (busy) return;
+            busy = true;
+            runBtn.disabled = true;
+            chips.forEach(c => c.classList.remove('chip-cursor', 'chip-cursor--anchor', 'chip-found'));
+
+            let i = 0;
+
+            function tryI() {
+              if (i >= SCENE_2_STR.length) {
+                busy = false;
+                runBtn.disabled = false;
+                return;
+              }
+              clearScanCursors();
+              chips[i].classList.add('chip-cursor--anchor');
+              let j = 0;
+              let foundDup = false;
+
+              function nextJ() {
+                if (j === i) j++;
+                if (j >= SCENE_2_STR.length) {
+                  if (!foundDup) {
+                    clearScanCursors();
+                    chips[i].classList.add('chip-found');
+                    busy = false;
+                    return;
+                  }
+                  i++;
+                  setT(tryI, 200);
+                  return;
+                }
+                chips.forEach((c, idx) => {
+                  if (idx !== i) c.classList.remove('chip-cursor');
+                });
+                chips[j].classList.add('chip-cursor');
+                if (SCENE_2_STR[j] === SCENE_2_STR[i]) {
+                  foundDup = true;
+                  setT(() => { i++; tryI(); }, 280);
+                  return;
+                }
+                j++;
+                setT(nextJ, 80);
+              }
+              nextJ();
+            }
+            tryI();
+          });
+
+          resetBtn.addEventListener('click', () => {
+            busy = false;
+            runBtn.disabled = false;
+            chips.forEach(c => c.classList.remove('chip-cursor', 'chip-cursor--anchor', 'chip-found'));
+          });
+        }
+
+        /* Scene 2, Slide 3 — Insight: post-pass-1 snapshot (static) */
+        function initSceneTwoInsight(slide) {
+          const countsHost = $('#scene-2-insight-counts', slide);
+          const slots = buildBucketGrid(countsHost, 128);
+          const counts = new Array(128).fill(0);
+          for (const ch of SCENE_2_STR) counts[ch.charCodeAt(0)]++;
+          counts.forEach((c, code) => {
+            if (c > 0) setBucketCount(slots[code], c);
+          });
+        }
+
+        /* Scene 2, Slide 4 — Walkthrough: two passes, interactive */
+        function initSceneTwoWalkthrough(slide) {
+          const chipsHost  = $('#scene-2-walk-chips', slide);
+          const countsHost = $('#scene-2-walk-counts', slide);
+          const step1Btn   = $('[data-action="step-1"]', slide);
+          const run1Btn    = $('[data-action="run-1"]',  slide);
+          const step2Btn   = $('[data-action="step-2"]', slide);
+          const run2Btn    = $('[data-action="run-2"]',  slide);
+          const resetBtn   = $('[data-action="reset"]',  slide);
+          const resultBox  = $('#scene-2-walk-result',   slide);
+
+          const chips = renderCharChips(chipsHost, [...SCENE_2_STR]);
+          const slots = buildBucketGrid(countsHost, 128);
+
+          let i = 0;           // pass 1 cursor (position in string)
+          let j = 0;           // pass 2 cursor (position in string)
+          let phase = 'pass1'; // 'pass1' | 'pass2' | 'done'
+          let busy = false;
+
+          function clearAllCursors() {
+            chips.forEach(c => c.classList.remove('chip-cursor', 'chip-cursor--anchor'));
+            slots.forEach(s => s.classList.remove('bucket-cursor'));
+          }
+
+          function step1() {
+            if (phase !== 'pass1' || busy) return;
+            if (i >= SCENE_2_STR.length) {
+              phase = 'pass2';
+              clearAllCursors();
+              step1Btn.disabled = true;
+              run1Btn.disabled  = true;
+              step2Btn.disabled = false;
+              run2Btn.disabled  = false;
+              resultBox.innerHTML = '<strong>Pass 1 complete.</strong> Now walk the string again, returning the first count == 1.';
+              return;
+            }
+            busy = true;
+            clearAllCursors();
+            chips[i].classList.add('chip-cursor--anchor');
+            const code = parseInt(chips[i].dataset.code, 10);
+            const cell = slots[code];
+            const c = parseInt(cell.dataset.count, 10) + 1;
+            setBucketCount(cell, c);
+            cell.classList.add('bucket-flash');
+            setT(() => cell.classList.remove('bucket-flash'), 240);
+            i++;
+            setT(() => { busy = false; }, 180);
+          }
+
+          function step2() {
+            if (phase !== 'pass2' || busy) return;
+            if (j >= SCENE_2_STR.length) {
+              phase = 'done';
+              clearAllCursors();
+              step2Btn.disabled = true;
+              run2Btn.disabled  = true;
+              resultBox.innerHTML = '<strong>No non-repeating character.</strong>';
+              return;
+            }
+            busy = true;
+            clearAllCursors();
+            chips[j].classList.add('chip-cursor');
+            const code = parseInt(chips[j].dataset.code, 10);
+            const cell = slots[code];
+            cell.classList.add('bucket-cursor');
+            setT(() => cell.classList.remove('bucket-cursor'), 360);
+            if (parseInt(cell.dataset.count, 10) === 1) {
+              chips[j].classList.remove('chip-cursor');
+              chips[j].classList.add('chip-found');
+              resultBox.innerHTML = `<strong>Answer:</strong> <code style="font-family:var(--font-mono)">'${SCENE_2_STR[j]}'</code> at index ${j}.`;
+              phase = 'done';
+              step2Btn.disabled = true;
+              run2Btn.disabled  = true;
+              busy = false;
+              return;
+            }
+            j++;
+            setT(() => { busy = false; }, 220);
+          }
+
+          step1Btn.addEventListener('click', step1);
+          step2Btn.addEventListener('click', step2);
+
+          run1Btn.addEventListener('click', () => {
+            if (phase !== 'pass1') return;
+            step1Btn.disabled = true;
+            run1Btn.disabled  = true;
+            const tick = () => {
+              if (phase !== 'pass1') return;
+              step1();
+              setT(tick, 200);
+            };
+            tick();
+          });
+
+          run2Btn.addEventListener('click', () => {
+            if (phase !== 'pass2') return;
+            step2Btn.disabled = true;
+            run2Btn.disabled  = true;
+            const tick = () => {
+              if (phase !== 'pass2') return;
+              step2();
+              setT(tick, 240);
+            };
+            tick();
+          });
+
+          resetBtn.addEventListener('click', () => {
+            i = 0; j = 0;
+            phase = 'pass1';
+            busy = false;
+            chips.forEach(c => c.classList.remove('chip-cursor', 'chip-cursor--anchor', 'chip-found'));
+            slots.forEach((s, code) => setBucketCount(s, 0));
+            step1Btn.disabled = false;
+            run1Btn.disabled  = false;
+            step2Btn.disabled = true;
+            run2Btn.disabled  = true;
+            resultBox.textContent = 'Answer will appear here.';
+          });
+        }
+
         /* ---------------------------------------------------------------
            Slide init registry. Each key matches a slide's data-init.
            --------------------------------------------------------------- */
@@ -2103,6 +2573,10 @@
           'scene-1-insight':       initSceneOneInsight,
           'scene-1-walkthrough':   initSceneOneWalkthrough,
           'scene-1-stringbuilder': initSceneOneStringBuilder,
+          'scene-2-problem':       initSceneTwoProblem,
+          'scene-2-naive':         initSceneTwoNaive,
+          'scene-2-insight':       initSceneTwoInsight,
+          'scene-2-walkthrough':   initSceneTwoWalkthrough,
         };
 
         /* ---------------------------------------------------------------
