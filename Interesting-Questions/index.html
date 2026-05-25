@@ -903,6 +903,119 @@
       .big-number.live {
         color: var(--amber-600);
       }
+      .big-number.answer {
+        color: var(--purple-600);
+      }
+
+      /* =====================================================================
+         Scene 3 — Find the missing number: sum cards + dual-row visualization.
+         ===================================================================== */
+      .chip.chip-missing {
+        background: var(--gray-50);
+        border: 1px dashed var(--coral-400);
+        color: var(--coral-600);
+        font-style: italic;
+      }
+      .chip.chip-faded {
+        opacity: 0.35;
+        background: var(--gray-50);
+        border-color: var(--gray-100);
+        color: var(--gray-600);
+        box-shadow: none;
+      }
+      .chip.chip-ghost {
+        background: var(--purple-50);
+        border: 1px dashed var(--purple-400);
+        color: var(--purple-600);
+        font-style: italic;
+        animation: chip-ghost-in 320ms ease;
+      }
+      @keyframes chip-ghost-in {
+        0% { opacity: 0; transform: scale(0.6); }
+        100% { opacity: 1; transform: scale(1); }
+      }
+
+      .sum-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px;
+      }
+      .sum-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding: 18px 12px;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-100);
+        border-radius: var(--radius-md);
+        text-align: center;
+        min-height: 130px;
+        justify-content: center;
+        transition: background 200ms ease, border-color 200ms ease, opacity 200ms ease;
+      }
+      .sum-card--expected { border-color: var(--teal-100); background: var(--teal-50); }
+      .sum-card--actual   { border-color: var(--amber-100); background: var(--amber-50); }
+      .sum-card--answer   { border-color: var(--purple-400); background: var(--purple-50); }
+      .sum-card--hidden   { opacity: 0.25; }
+      .sum-label {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--gray-600);
+        text-transform: lowercase;
+      }
+      .sum-card--expected .sum-label { color: var(--teal-600); }
+      .sum-card--actual   .sum-label { color: var(--amber-600); }
+      .sum-card--answer   .sum-label { color: var(--purple-600); }
+      .sum-explain {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--gray-600);
+      }
+      .sum-card.tick {
+        animation: sum-tick 320ms ease;
+      }
+      @keyframes sum-tick {
+        0%   { transform: scale(1); }
+        40%  { transform: scale(1.05); }
+        100% { transform: scale(1); }
+      }
+
+      .dual-sum {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .dual-sum__row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      @media (max-width: 720px) {
+        .dual-sum__row, .sum-cards { grid-template-columns: 1fr; }
+      }
+      .dual-sum__cell {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px 14px;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-100);
+        border-radius: var(--radius-md);
+      }
+      .dual-sum__cell--expected { border-color: var(--teal-100); }
+      .dual-sum__cell--actual   { border-color: var(--amber-100); }
+      .dual-sum__label {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--gray-600);
+        text-transform: lowercase;
+      }
+      .dual-sum__chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
 
       /* =====================================================================
          Reduced motion: disable nice-to-have transitions, keep final state.
@@ -1560,6 +1673,323 @@
             <span class="pill time">Time: O(n)</span>
             <span class="pill space">Space: O(k)</span>
             <span style="color:var(--gray-600); font-size: 14px;">two passes, k = 128</span>
+          </div>
+        </section>
+
+      </article>
+    </template>
+
+    <!-- ----- Scene 3: Find the missing number ----- -->
+    <template id="scene-3">
+      <article class="scene" data-scene-title="Find the missing number">
+
+        <!-- Slide 1: Problem -->
+        <section
+          class="slide slide-problem"
+          data-init="scene-3-problem"
+          data-notes="999,999 unique integers in [1, 1_000_000]. Exactly one missing. Find it with O(1) extra memory. The tiny example uses range 1..5; missing = 4."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 3 · the problem</span>
+            <h1>Find the missing number</h1>
+          </header>
+
+          <p class="lead">
+            You're given 999,999 unique integers, each in the range 1 to
+            1,000,000. Exactly one number from that range is missing. Find it.
+            Constraint: <code style="font-family:var(--font-mono)">O(1)</code>
+            extra memory.
+          </p>
+
+          <div class="split split-wide-left">
+            <div class="viz">
+              <h2>Tiny example — range 1..5</h2>
+              <div style="display:flex; flex-direction:column; gap: 14px;">
+                <div>
+                  <span class="sum-label" style="display:block; margin-bottom: 6px;">input array</span>
+                  <div class="chip-row" id="scene-3-input-chips"></div>
+                </div>
+                <div>
+                  <span class="sum-label" style="display:block; margin-bottom: 6px;">full range 1..5</span>
+                  <div class="chip-row" id="scene-3-full-range"></div>
+                </div>
+              </div>
+              <p class="viz-caption">
+                Input on top, full range below. The dashed chip is the missing
+                value.
+              </p>
+            </div>
+
+            <div class="viz">
+              <h2>Expected output</h2>
+              <pre class="output-block">4</pre>
+              <p class="viz-caption">
+                One integer. No hash set, no auxiliary array — just a constant
+                amount of extra memory.
+              </p>
+            </div>
+          </div>
+
+          <div class="callout">
+            <strong>The hidden gift.</strong>
+            "Consecutive integers from 1 to N" is algebraic structure. Naive
+            solutions treat this as a search problem; the optimal one treats
+            it as arithmetic.
+          </div>
+        </section>
+
+        <!-- Slide 2: Naive -->
+        <section
+          class="slide slide-naive"
+          data-init="scene-3-naive"
+          data-notes="Sort + walk works in O(n log n) but ignores the arithmetic. Hash set is O(n) space — disallowed by the constraint."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 3 · the naive try</span>
+            <h1>Sort it, or hash it</h1>
+          </header>
+
+          <p class="lead">
+            Two obvious approaches. One is correct but slow. The other is fast
+            but cheats on memory.
+          </p>
+
+          <div class="split">
+            <div class="stack">
+              <h2>Option A — sort and walk</h2>
+              <div class="code"><span class="c-com">// O(n log n) time, O(1) extra</span>
+<span class="c-key">sort</span>(arr)
+<span class="c-key">for</span> i = <span class="c-num">0</span> .. n-<span class="c-num">2</span>:
+  <span class="c-key">if</span> arr[i+<span class="c-num">1</span>] != arr[i] + <span class="c-num">1</span>:
+    <span class="c-key">return</span> arr[i] + <span class="c-num">1</span></div>
+              <div class="complexity" role="note">
+                <span class="pill bad">Time: O(n log n)</span>
+                <span class="pill space">Space: O(1)</span>
+              </div>
+            </div>
+
+            <div class="stack">
+              <h2>Option B — hash set</h2>
+              <div class="code"><span class="c-com">// O(n) time, O(n) extra — violates!</span>
+seen = <span class="c-ty">HashSet</span>(arr)
+<span class="c-key">for</span> v = <span class="c-num">1</span> .. N:
+  <span class="c-key">if</span> v <span class="c-key">not in</span> seen: <span class="c-key">return</span> v</div>
+              <div class="complexity" role="note">
+                <span class="pill time">Time: O(n)</span>
+                <span class="pill bad">Space: O(n) — disallowed</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="viz">
+            <h2>Watch the sort + walk on the tiny example</h2>
+            <div class="chip-row" id="scene-3-naive-chips"></div>
+            <div class="viz-actions">
+              <button class="btn btn--primary" data-action="run">Run sort + walk</button>
+              <span class="spacer"></span>
+              <button class="btn btn--ghost" data-action="reset">Reset</button>
+            </div>
+            <p class="viz-caption">
+              Sort puts the chips in order. A walking cursor opens a "gap"
+              whenever
+              <code style="font-family:var(--font-mono)">arr[i+1] != arr[i] + 1</code>.
+            </p>
+          </div>
+
+          <div class="callout callout--naive">
+            <strong>Why both feel wasteful.</strong>
+            They treat this as a search problem. Neither uses the fact that
+            the full range 1..N has a closed-form sum.
+          </div>
+        </section>
+
+        <!-- Slide 3: Insight -->
+        <section
+          class="slide slide-insight"
+          data-init="scene-3-insight"
+          data-notes="Sum 1..N has a closed form: N(N+1)/2. Subtract actual array sum. The difference IS the missing number. One pass, zero data structures."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 3 · the insight</span>
+            <h1>Math beats iteration</h1>
+          </header>
+
+          <div class="split split-wide-right">
+            <div class="stack">
+              <p class="lead">
+                Forget the array as a data structure. Treat 1..N as a
+                closed-form sum, the input as another, and subtract.
+              </p>
+
+              <div class="callout callout--insight">
+                <strong>One sentence.</strong>
+                Sum of integers 1 to N is
+                <code style="font-family:var(--font-mono)">N(N+1)/2</code>.
+                Subtract the actual array sum — the difference is the missing
+                number.
+              </div>
+
+              <div class="code"><span class="c-key">long</span> expected = (<span class="c-key">long</span>)N * (N + <span class="c-num">1</span>) / <span class="c-num">2</span>;
+<span class="c-key">long</span> actual = <span class="c-num">0</span>;
+<span class="c-key">for</span> (<span class="c-key">int</span> v : arr) actual += v;   <span class="c-com">// O(n) — one pass</span>
+<span class="c-key">return</span> (<span class="c-key">int</span>)(expected - actual);</div>
+
+              <div class="complexity" role="note">
+                <span class="pill time">Time: O(n)</span>
+                <span class="pill space">Space: O(1)</span>
+              </div>
+            </div>
+
+            <div class="viz">
+              <h2>Two sums, one subtraction</h2>
+              <div class="sum-cards">
+                <div class="sum-card sum-card--expected">
+                  <span class="sum-label">expected</span>
+                  <span class="big-number">15</span>
+                  <span class="sum-explain">= 5 × 6 / 2</span>
+                </div>
+                <div class="sum-card sum-card--actual">
+                  <span class="sum-label">actual</span>
+                  <span class="big-number">11</span>
+                  <span class="sum-explain">= 3 + 1 + 5 + 2</span>
+                </div>
+                <div class="sum-card sum-card--answer">
+                  <span class="sum-label">missing</span>
+                  <span class="big-number answer">4</span>
+                  <span class="sum-explain">expected − actual</span>
+                </div>
+              </div>
+              <p class="viz-caption">
+                Three numbers, one subtraction. The third is the answer.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 4: Walkthrough -->
+        <section
+          class="slide slide-walkthrough"
+          data-init="scene-3-walkthrough"
+          data-notes="Tick both counters together: 1..N on the left, array elements on the right. When both rows are empty, the difference is the answer."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 3 · walkthrough</span>
+            <h1>Tick both sums, then subtract</h1>
+          </header>
+
+          <p class="lead">
+            The expected counter walks 1 to N adding each value. The actual
+            counter walks the array adding each element. When both finish, the
+            difference appears.
+          </p>
+
+          <div class="viz">
+            <h2>Two sums in lockstep</h2>
+
+            <div class="dual-sum">
+              <div class="dual-sum__row">
+                <div class="dual-sum__cell dual-sum__cell--expected">
+                  <span class="dual-sum__label">expected: 1..N</span>
+                  <div class="dual-sum__chips" id="scene-3-walk-expected-chips"></div>
+                </div>
+                <div class="dual-sum__cell dual-sum__cell--actual">
+                  <span class="dual-sum__label">actual: the array</span>
+                  <div class="dual-sum__chips" id="scene-3-walk-actual-chips"></div>
+                </div>
+              </div>
+
+              <div class="sum-cards">
+                <div class="sum-card sum-card--expected">
+                  <span class="sum-label">expected sum</span>
+                  <span class="big-number" id="scene-3-walk-expected-sum">0</span>
+                </div>
+                <div class="sum-card sum-card--actual">
+                  <span class="sum-label">actual sum</span>
+                  <span class="big-number" id="scene-3-walk-actual-sum">0</span>
+                </div>
+                <div class="sum-card sum-card--answer sum-card--hidden" id="scene-3-walk-answer-card">
+                  <span class="sum-label">missing</span>
+                  <span class="big-number answer" id="scene-3-walk-answer">?</span>
+                  <span class="sum-explain">expected − actual</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="viz-actions">
+              <button class="btn btn--data" data-action="step">Step</button>
+              <button class="btn" data-action="run">Run</button>
+              <span class="spacer"></span>
+              <button class="btn btn--ghost" data-action="reset">Reset</button>
+            </div>
+
+            <p class="viz-caption">
+              Each step consumes one chip from each row and adds it to the
+              running sum. When both rows are empty, the answer appears.
+            </p>
+          </div>
+
+          <div class="complexity" role="note">
+            <span class="pill time">Time: O(n)</span>
+            <span class="pill space">Space: O(1)</span>
+          </div>
+        </section>
+
+        <!-- Slide 5: Follow-up — two missing numbers -->
+        <section
+          class="slide slide-followup"
+          data-init="scene-3-followup"
+          data-notes="Two missing: use two equations (sum and sum-of-squares) for a and b, or XOR partitioning. Don't fully implement — leave it as a discussion prompt."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 3 · follow-up</span>
+            <h1>What if two numbers are missing?</h1>
+          </header>
+
+          <p class="lead">
+            Same shape. One arithmetic identity isn't enough. Take two.
+          </p>
+
+          <div class="split">
+            <div class="stack">
+              <div class="callout callout--insight">
+                <strong>Approach 1 — two equations, two unknowns.</strong>
+                <code style="font-family:var(--font-mono)">expected_sum − actual_sum = a + b</code>.
+                <code style="font-family:var(--font-mono)">expected_Σv² − actual_Σv² = a² + b²</code>.
+                Two equations, two unknowns. Solve with the quadratic formula.
+              </div>
+
+              <div class="code"><span class="c-key">long</span> S1 = expectedSum     - actualSum;     <span class="c-com">// = a + b</span>
+<span class="c-key">long</span> S2 = expectedSqSum   - actualSqSum;   <span class="c-com">// = a² + b²</span>
+<span class="c-com">// (a+b)² = a² + 2ab + b²  ⇒  2ab = S1² − S2</span>
+<span class="c-key">long</span> sum  = S1;
+<span class="c-key">long</span> prod = (S1*S1 - S2) / <span class="c-num">2</span>;
+<span class="c-com">// a, b = roots of  x² − sum·x + prod = 0</span></div>
+            </div>
+
+            <div class="stack">
+              <div class="callout callout--data">
+                <strong>Approach 2 — XOR partitioning.</strong>
+                XOR all array elements with 1..N. The result is
+                <code style="font-family:var(--font-mono)">a ⊕ b</code>.
+                Pick any bit set in that XOR — it tells you a bit where
+                <em>a</em> and <em>b</em> differ. Split by that bit, XOR each
+                half, get each missing number.
+              </div>
+
+              <div class="code"><span class="c-key">int</span> x = <span class="c-num">0</span>;
+<span class="c-key">for</span> v <span class="c-key">in</span> arr:  x ^= v;
+<span class="c-key">for</span> v <span class="c-key">in</span> <span class="c-num">1</span>..N: x ^= v;
+<span class="c-com">// x is now (a XOR b). Pick lowest set bit.</span>
+<span class="c-key">int</span> bit = x &amp; -x;
+<span class="c-com">// Split inputs by that bit, XOR each half.</span></div>
+            </div>
+          </div>
+
+          <div class="callout">
+            <strong>The takeaway.</strong>
+            When the input has algebraic structure (consecutive ints, XOR
+            identities, sums of squares), data structures step out of the way.
+            Math takes over.
           </div>
         </section>
 
@@ -2564,6 +2994,222 @@
           });
         }
 
+        /* ===============================================================
+           Per-slide init hooks for Scene 3 — Find the missing number.
+           =============================================================== */
+        const SCENE_3_INPUT = [3, 1, 5, 2];   // example array, missing 4
+        const SCENE_3_N     = 5;              // range upper bound
+
+        function renderIntChips(host, values, classes = []) {
+          host.innerHTML = '';
+          values.forEach((v, i) => {
+            const c = document.createElement('span');
+            c.className = 'chip ' + classes.join(' ');
+            c.dataset.v = v;
+            c.dataset.i = i;
+            c.textContent = v;
+            host.appendChild(c);
+          });
+          return [...host.children];
+        }
+
+        /* Scene 3, Slide 1 — Problem (static) */
+        function initSceneThreeProblem(slide) {
+          renderIntChips($('#scene-3-input-chips', slide), SCENE_3_INPUT);
+          const rangeHost = $('#scene-3-full-range', slide);
+          rangeHost.innerHTML = '';
+          for (let v = 1; v <= SCENE_3_N; v++) {
+            const c = document.createElement('span');
+            c.className = 'chip';
+            if (v === 4) {
+              c.classList.add('chip-missing');
+              c.textContent = '?';
+            } else {
+              c.textContent = v;
+            }
+            rangeHost.appendChild(c);
+          }
+        }
+
+        /* Scene 3, Slide 2 — Naive sort + walk for the missing gap */
+        function initSceneThreeNaive(slide) {
+          const host     = $('#scene-3-naive-chips', slide);
+          const runBtn   = $('[data-action="run"]', slide);
+          const resetBtn = $('[data-action="reset"]', slide);
+          const chips = renderIntChips(host, SCENE_3_INPUT);
+
+          // Stable sorted order
+          const tagged = SCENE_3_INPUT.map((v, i) => ({ v, i }));
+          tagged.sort((a, b) => a.v - b.v || a.i - b.i);
+          const sortedOrder = new Array(SCENE_3_INPUT.length);
+          tagged.forEach((item, newIdx) => (sortedOrder[item.i] = newIdx));
+
+          let phase = 'idle';
+
+          function pixelsPerChip() {
+            if (chips.length < 2) return 0;
+            const a = chips[0].getBoundingClientRect();
+            const b = chips[1].getBoundingClientRect();
+            return b.left - a.left;
+          }
+
+          runBtn.addEventListener('click', () => {
+            if (phase !== 'idle') return;
+            phase = 'sorting';
+            runBtn.disabled = true;
+            const step = pixelsPerChip();
+            chips.forEach((chip, i) => {
+              chip.style.transform = `translateX(${(sortedOrder[i] - i) * step}px)`;
+            });
+            setT(() => {
+              // Walk for the gap
+              phase = 'walking';
+              let k = 0;
+              function walk() {
+                if (k >= tagged.length - 1) {
+                  phase = 'done';
+                  return;
+                }
+                const a = tagged[k].v;
+                const b = tagged[k + 1].v;
+                chips.forEach(c => c.classList.remove('chip-cursor', 'chip-cursor--anchor'));
+                chips[tagged[k].i].classList.add('chip-cursor--anchor');
+                chips[tagged[k + 1].i].classList.add('chip-cursor');
+                if (b !== a + 1) {
+                  // Gap — insert a ghost chip showing the missing value
+                  setT(() => {
+                    const ghost = document.createElement('span');
+                    ghost.className = 'chip chip-ghost';
+                    ghost.textContent = a + 1;
+                    // Position the ghost between sorted positions k and k+1
+                    // by appending it to the row and translating it into place.
+                    host.appendChild(ghost);
+                    const newSlot = sortedOrder[tagged[k].i] + 0.5;
+                    const lastIdx = chips.length;
+                    ghost.style.transform = `translateX(${(newSlot - lastIdx) * step}px)`;
+                    phase = 'done';
+                  }, 320);
+                  return;
+                }
+                k++;
+                setT(walk, 380);
+              }
+              walk();
+            }, 700);
+          });
+
+          resetBtn.addEventListener('click', () => {
+            phase = 'idle';
+            runBtn.disabled = false;
+            // Strip any ghost chips and restore the originals
+            host.querySelectorAll('.chip-ghost').forEach(g => g.remove());
+            chips.forEach(c => {
+              c.style.transform = '';
+              c.classList.remove('chip-cursor', 'chip-cursor--anchor');
+            });
+          });
+        }
+
+        /* Scene 3, Slide 3 — Insight (static; the final state is the answer) */
+        function initSceneThreeInsight(/* slide */) {
+          // No interactivity: AGENTS.md prefers final state on load.
+        }
+
+        /* Scene 3, Slide 4 — Walkthrough: lockstep sums + difference */
+        function initSceneThreeWalkthrough(slide) {
+          const expectedChipsHost = $('#scene-3-walk-expected-chips', slide);
+          const actualChipsHost   = $('#scene-3-walk-actual-chips',   slide);
+          const expectedSumEl     = $('#scene-3-walk-expected-sum',   slide);
+          const actualSumEl       = $('#scene-3-walk-actual-sum',     slide);
+          const answerCard        = $('#scene-3-walk-answer-card',    slide);
+          const answerEl          = $('#scene-3-walk-answer',         slide);
+          const stepBtn           = $('[data-action="step"]', slide);
+          const runBtn            = $('[data-action="run"]',  slide);
+          const resetBtn          = $('[data-action="reset"]', slide);
+
+          const expectedValues = Array.from({ length: SCENE_3_N }, (_, i) => i + 1);
+          const actualValues   = [...SCENE_3_INPUT];
+          const expectedChips = renderIntChips(expectedChipsHost, expectedValues);
+          const actualChips   = renderIntChips(actualChipsHost,   actualValues);
+
+          // Color the parent cards
+          expectedChips.forEach(c => c.classList.add('chip'));
+          actualChips.forEach(c => c.classList.add('chip'));
+
+          let k = 0;
+          let expectedSum = 0;
+          let actualSum = 0;
+          let busy = false;
+
+          function tickCard(card) {
+            card.classList.add('tick');
+            setT(() => card.classList.remove('tick'), 320);
+          }
+
+          function step() {
+            if (busy) return;
+            if (k >= Math.max(expectedValues.length, actualValues.length)) {
+              // Finalise
+              answerCard.classList.remove('sum-card--hidden');
+              answerEl.textContent = String(expectedSum - actualSum);
+              tickCard(answerCard);
+              stepBtn.disabled = true;
+              runBtn.disabled = true;
+              return;
+            }
+            busy = true;
+            if (k < expectedValues.length) {
+              expectedSum += expectedValues[k];
+              expectedSumEl.textContent = String(expectedSum);
+              expectedChips[k].classList.add('chip-cursor');
+              setT(() => expectedChips[k].classList.replace('chip-cursor', 'chip-faded'), 220);
+              tickCard(expectedSumEl.parentElement);
+            }
+            if (k < actualValues.length) {
+              actualSum += actualValues[k];
+              actualSumEl.textContent = String(actualSum);
+              actualChips[k].classList.add('chip-cursor');
+              setT(() => actualChips[k].classList.replace('chip-cursor', 'chip-faded'), 220);
+              tickCard(actualSumEl.parentElement);
+            }
+            k++;
+            setT(() => { busy = false; }, 240);
+          }
+
+          stepBtn.addEventListener('click', step);
+          runBtn.addEventListener('click', () => {
+            stepBtn.disabled = true;
+            runBtn.disabled = true;
+            const tick = () => {
+              if (k >= Math.max(expectedValues.length, actualValues.length)) {
+                step(); // finalize
+                return;
+              }
+              step();
+              setT(tick, 260);
+            };
+            tick();
+          });
+
+          resetBtn.addEventListener('click', () => {
+            k = 0;
+            expectedSum = 0;
+            actualSum = 0;
+            busy = false;
+            stepBtn.disabled = false;
+            runBtn.disabled = false;
+            expectedSumEl.textContent = '0';
+            actualSumEl.textContent = '0';
+            answerEl.textContent = '?';
+            answerCard.classList.add('sum-card--hidden');
+            expectedChips.forEach(c => c.classList.remove('chip-cursor', 'chip-faded'));
+            actualChips.forEach(c => c.classList.remove('chip-cursor', 'chip-faded'));
+          });
+        }
+
+        /* Scene 3, Slide 5 — Follow-up (static discussion) */
+        function initSceneThreeFollowup(/* slide */) { /* no interactivity */ }
+
         /* ---------------------------------------------------------------
            Slide init registry. Each key matches a slide's data-init.
            --------------------------------------------------------------- */
@@ -2577,6 +3223,11 @@
           'scene-2-naive':         initSceneTwoNaive,
           'scene-2-insight':       initSceneTwoInsight,
           'scene-2-walkthrough':   initSceneTwoWalkthrough,
+          'scene-3-problem':       initSceneThreeProblem,
+          'scene-3-naive':         initSceneThreeNaive,
+          'scene-3-insight':       initSceneThreeInsight,
+          'scene-3-walkthrough':   initSceneThreeWalkthrough,
+          'scene-3-followup':      initSceneThreeFollowup,
         };
 
         /* ---------------------------------------------------------------
