@@ -1102,6 +1102,139 @@
       .most-frequent-card .sum-label { color: var(--purple-600); }
 
       /* =====================================================================
+         Scene 5 — Group anagrams: word chips, canonicalizer, group buckets.
+         ===================================================================== */
+      .chip.chip--word {
+        min-width: 64px;
+        padding: 0 12px;
+        font-size: 15px;
+        letter-spacing: 0.02em;
+      }
+
+      .canonicalizer {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 18px;
+        padding: 20px 24px;
+        background: var(--purple-50);
+        border: 1px solid var(--purple-100);
+        border-radius: var(--radius-md);
+        position: relative;
+      }
+      .canonicalizer::before {
+        content: 'canonicalize';
+        position: absolute;
+        top: -10px;
+        left: 18px;
+        background: var(--purple-50);
+        padding: 0 8px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        text-transform: lowercase;
+        color: var(--purple-600);
+      }
+      .canonicalizer .word,
+      .canonicalizer .key {
+        font-family: var(--font-mono);
+        font-size: 24px;
+        text-align: center;
+        line-height: 1;
+        padding: 14px 12px;
+        background: #ffffff;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--purple-100);
+      }
+      .canonicalizer .word { color: var(--gray-800); }
+      .canonicalizer .key {
+        color: var(--purple-600);
+        font-weight: 600;
+        letter-spacing: 0.05em;
+      }
+      .canonicalizer .arrow {
+        font-family: var(--font-mono);
+        font-size: 28px;
+        color: var(--purple-400);
+        font-weight: 500;
+      }
+
+      .anagram-groups {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .anagram-bucket {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px 14px;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-100);
+        border-radius: var(--radius-md);
+        transition: background 240ms ease;
+      }
+      .anagram-bucket[data-color="0"] { background: var(--purple-50); border-color: var(--purple-100); }
+      .anagram-bucket[data-color="1"] { background: var(--teal-50);   border-color: var(--teal-100); }
+      .anagram-bucket[data-color="2"] { background: var(--amber-50);  border-color: var(--amber-100); }
+      .anagram-bucket[data-color="3"] { background: var(--coral-50);  border-color: var(--coral-100); }
+      .anagram-bucket .bucket-key {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--gray-600);
+        letter-spacing: 0.03em;
+      }
+      .anagram-bucket[data-color="0"] .bucket-key { color: var(--purple-600); }
+      .anagram-bucket[data-color="1"] .bucket-key { color: var(--teal-600); }
+      .anagram-bucket[data-color="2"] .bucket-key { color: var(--amber-600); }
+      .anagram-bucket[data-color="3"] .bucket-key { color: var(--coral-600); }
+      .anagram-bucket .bucket-words {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .anagram-bucket.flash {
+        animation: bucket-flash 360ms ease;
+      }
+
+      /* Count-fingerprint mini-grid (Scene 5 insight slide) */
+      .count-fingerprint {
+        display: grid;
+        grid-template-columns: repeat(26, 1fr);
+        gap: 2px;
+        padding: 6px;
+        background: var(--gray-100);
+        border-radius: var(--radius-sm);
+      }
+      .count-fingerprint .slot {
+        background: #ffffff;
+        min-height: 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 2px 0 4px;
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--gray-400);
+        position: relative;
+      }
+      .count-fingerprint .slot[data-c="0"] {}
+      .count-fingerprint .slot:not([data-c="0"]) {
+        background: var(--teal-50);
+        color: var(--teal-800);
+        font-weight: 600;
+      }
+      .count-fingerprint .slot::after {
+        content: attr(data-letter);
+        position: absolute;
+        bottom: -16px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 9px;
+        color: var(--gray-600);
+      }
+
+      /* =====================================================================
          Reduced motion: disable nice-to-have transitions, keep final state.
          ===================================================================== */
       @media (prefers-reduced-motion: reduce) {
@@ -2311,6 +2444,241 @@ seen = <span class="c-ty">HashSet</span>(arr)
             <span class="pill time">Insert: O(1)</span>
             <span class="pill time">Query: O(1)</span>
             <span class="pill space">Space: O(k)</span>
+          </div>
+        </section>
+
+      </article>
+    </template>
+
+    <!-- ----- Scene 5: Group anagrams ----- -->
+    <template id="scene-5">
+      <article class="scene" data-scene-title="Group anagrams">
+
+        <!-- Slide 1: Problem -->
+        <section
+          class="slide slide-problem"
+          data-init="scene-5-problem"
+          data-notes="About a million lowercase strings. Group anagrams (same letters, different order). The naive way compares every pair; the optimal one maps every anagram to one key."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 5 · the problem</span>
+            <h1>Group anagrams</h1>
+          </header>
+
+          <p class="lead">
+            Given about a million lowercase strings, group all anagrams
+            together. Anagrams are strings that share the same letters in
+            different orders.
+          </p>
+
+          <div class="split split-wide-left">
+            <div class="viz">
+              <h2>Tiny example — 6 words</h2>
+              <div class="chip-row" id="scene-5-input-words"></div>
+              <p class="viz-caption">
+                Six words; three groups. The first three are anagrams of each
+                other; the next two are anagrams of each other; the last is
+                alone.
+              </p>
+            </div>
+
+            <div class="viz">
+              <h2>Expected output</h2>
+              <div class="anagram-groups" id="scene-5-expected-groups"></div>
+              <p class="viz-caption">
+                Order within a group doesn't matter. Order across groups
+                doesn't matter. Only the partition does.
+              </p>
+            </div>
+          </div>
+
+          <div class="callout">
+            <strong>The hidden gift.</strong>
+            "Same letters in different order" is an equivalence relation.
+            Every equivalence problem becomes trivial once you map equivalent
+            inputs to a single canonical key.
+          </div>
+        </section>
+
+        <!-- Slide 2: Naive -->
+        <section
+          class="slide slide-naive"
+          data-init="scene-5-naive"
+          data-notes="Naive: compare every pair, anagram-check by sorting and comparing. O(n² · L log L). Quadratic in n — fine for 6 words, fatal for a million."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 5 · the naive try</span>
+            <h1>Compare every pair</h1>
+          </header>
+
+          <p class="lead">
+            For each unvisited word, sweep the rest, anagram-check each pair,
+            collect matches into a group. Correct. Also quadratic in
+            <code style="font-family:var(--font-mono)">n</code>.
+          </p>
+
+          <div class="split split-wide-right">
+            <div class="stack">
+              <div class="code"><span class="c-com">// pseudocode</span>
+visited = <span class="c-key">new</span> <span class="c-key">boolean</span>[n]
+<span class="c-key">for</span> i = <span class="c-num">0</span> .. n-<span class="c-num">1</span>:
+  <span class="c-key">if</span> visited[i]: <span class="c-key">continue</span>
+  group = [s[i]]; visited[i] = <span class="c-key">true</span>
+  <span class="c-key">for</span> j = i+<span class="c-num">1</span> .. n-<span class="c-num">1</span>:
+    <span class="c-key">if</span> !visited[j] <span class="c-op">and</span> isAnagram(s[i], s[j]):  <span class="c-com">// O(L log L)</span>
+      group.append(s[j]); visited[j] = <span class="c-key">true</span>
+  groups.append(group)</div>
+
+              <div class="complexity" role="note">
+                <span class="pill bad">Time: O(n² · L log L)</span>
+                <span class="pill space">Space: O(n · L)</span>
+              </div>
+
+              <div class="callout callout--naive">
+                <strong>Why this is wasteful.</strong>
+                It re-derives the canonical form of
+                <code style="font-family:var(--font-mono)">s[i]</code>
+                inside every anagram check. If we'd computed it once, we
+                wouldn't need to compare it to every other word individually.
+              </div>
+            </div>
+
+            <div class="viz">
+              <h2>Watch the pair-by-pair sweep</h2>
+              <div class="chip-row" id="scene-5-naive-words"></div>
+              <div class="viz-actions">
+                <button class="btn btn--primary" data-action="run">Run pair sweep</button>
+                <span class="spacer"></span>
+                <button class="btn btn--ghost" data-action="reset">Reset</button>
+              </div>
+              <p class="viz-caption">
+                Coral chip is the outer
+                <code style="font-family:var(--font-mono)">i</code>.
+                Amber chip is the inner
+                <code style="font-family:var(--font-mono)">j</code>.
+                Six words → up to fifteen comparisons.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 3: Insight -->
+        <section
+          class="slide slide-insight"
+          data-init="scene-5-insight"
+          data-notes="Canonicalize once, group by key. Two canonicalizers: sort (O(L log L)) and 26-count fingerprint (O(L)). The counting fingerprint ties back to Scene 1."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 5 · the insight</span>
+            <h1>Map equal things to one key</h1>
+          </header>
+
+          <div class="split split-wide-left">
+            <div class="stack">
+              <p class="lead">
+                Two strings are anagrams if and only if their canonical forms
+                are identical. Compute a canonical key once per string, group
+                by key in a hash map.
+              </p>
+
+              <div class="callout callout--insight">
+                <strong>One sentence.</strong>
+                Equivalence problems become trivial when you map equivalent
+                inputs to a single canonical key.
+              </div>
+
+              <h2 style="margin-top: 8px;">Two canonicalizers</h2>
+
+              <div class="code"><span class="c-com">// option A — sort the letters: O(L log L)</span>
+<span class="c-fn">canon</span>(<span class="c-str">"eat"</span>) = sort_chars(<span class="c-str">"eat"</span>) = <span class="c-str">"aet"</span>
+
+<span class="c-com">// option B — count the letters: O(L)</span>
+<span class="c-fn">canon</span>(<span class="c-str">"eat"</span>) = [<span class="c-num">1</span>,<span class="c-num">0</span>,<span class="c-num">0</span>,<span class="c-num">0</span>,<span class="c-num">1</span>,<span class="c-num">0</span>,...,<span class="c-num">0</span>,<span class="c-num">1</span>,<span class="c-num">0</span>,...]
+<span class="c-com">//          a   ...  e  ...  t  ...</span>
+
+<span class="c-com">// then group by key</span>
+groups.computeIfAbsent(canon(s), k -&gt; <span class="c-key">new</span> <span class="c-ty">List</span>()).add(s);</div>
+
+              <div class="complexity" role="note">
+                <span class="pill time">Time: O(n · L)</span>
+                <span class="pill space">Space: O(n · L)</span>
+                <span style="color:var(--gray-600); font-size: 14px;">with counting fingerprint</span>
+              </div>
+            </div>
+
+            <div class="viz">
+              <h2>The 26-count fingerprint of "eat"</h2>
+              <div class="count-fingerprint" id="scene-5-insight-fingerprint"></div>
+              <p class="viz-caption" style="margin-top: 24px;">
+                One slot per lowercase letter. Three slots non-zero —
+                <code style="font-family:var(--font-mono)">a</code>,
+                <code style="font-family:var(--font-mono)">e</code>,
+                <code style="font-family:var(--font-mono)">t</code>.
+                Same fingerprint as <code style="font-family:var(--font-mono)">tea</code> and
+                <code style="font-family:var(--font-mono)">ate</code>.
+                Counting arrays — same trick as Scene 1.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 4: Walkthrough -->
+        <section
+          class="slide slide-walkthrough"
+          data-init="scene-5-walkthrough"
+          data-notes="Step each word through the canonicalizer. The key chooses (or creates) a bucket. Same key → same bucket. Six steps → three buckets."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 5 · walkthrough</span>
+            <h1>One canonicalizer, many buckets</h1>
+          </header>
+
+          <p class="lead">
+            <strong>Step</strong> processes the next word: sort its letters
+            into a canonical key, then drop the word into the bucket for that
+            key (or create the bucket if it doesn't exist).
+          </p>
+
+          <div class="viz">
+            <h2>Words → canonicalizer → buckets</h2>
+
+            <div class="split">
+              <div class="stack">
+                <div>
+                  <span class="sum-label" style="display:block; margin-bottom: 8px;">input queue</span>
+                  <div class="chip-row" id="scene-5-walk-words"></div>
+                </div>
+
+                <div class="canonicalizer">
+                  <span class="word" id="scene-5-walk-current">—</span>
+                  <span class="arrow">→</span>
+                  <span class="key" id="scene-5-walk-key">—</span>
+                </div>
+              </div>
+
+              <div>
+                <span class="sum-label" style="display:block; margin-bottom: 8px;">groups (one per canonical key)</span>
+                <div class="anagram-groups" id="scene-5-walk-groups"></div>
+              </div>
+            </div>
+
+            <div class="viz-actions">
+              <button class="btn btn--data" data-action="step">Step</button>
+              <button class="btn" data-action="run">Run all</button>
+              <span class="spacer"></span>
+              <button class="btn btn--ghost" data-action="reset">Reset</button>
+            </div>
+
+            <p class="viz-caption">
+              Each step takes one word, sorts its letters, then places it in
+              the bucket keyed by that sorted string.
+            </p>
+          </div>
+
+          <div class="complexity" role="note">
+            <span class="pill time">Time: O(n · L)</span>
+            <span class="pill space">Space: O(n · L)</span>
+            <span style="color:var(--gray-600); font-size: 14px;">counting fingerprint</span>
           </div>
         </section>
 
@@ -3765,6 +4133,233 @@ seen = <span class="c-ty">HashSet</span>(arr)
           resetBtn.addEventListener('click', reset);
         }
 
+        /* ===============================================================
+           Per-slide init hooks for Scene 5 — Group anagrams.
+           =============================================================== */
+        const SCENE_5_WORDS = ['eat', 'tea', 'tan', 'ate', 'nat', 'bat'];
+
+        function canonKey(word) {
+          return [...word].sort().join('');
+        }
+
+        function renderWordChips(host, words) {
+          host.innerHTML = '';
+          words.forEach((w, i) => {
+            const c = document.createElement('span');
+            c.className = 'chip chip--word';
+            c.dataset.w = w;
+            c.dataset.i = i;
+            c.textContent = w;
+            host.appendChild(c);
+          });
+          return [...host.children];
+        }
+
+        function createGroupBucket(key, colorIdx) {
+          const bucket = document.createElement('div');
+          bucket.className = 'anagram-bucket';
+          bucket.dataset.key = key;
+          bucket.dataset.color = String(colorIdx % 4);
+          bucket.innerHTML = `
+            <span class="bucket-key">key: "${key}"</span>
+            <div class="bucket-words"></div>
+          `;
+          return bucket;
+        }
+
+        /* Scene 5, Slide 1 — Problem (static) */
+        function initSceneFiveProblem(slide) {
+          renderWordChips($('#scene-5-input-words', slide), SCENE_5_WORDS);
+          const groupsHost = $('#scene-5-expected-groups', slide);
+          groupsHost.innerHTML = '';
+          // Pre-bucket the words to show the final answer.
+          const byKey = new Map();
+          SCENE_5_WORDS.forEach(w => {
+            const k = canonKey(w);
+            if (!byKey.has(k)) byKey.set(k, []);
+            byKey.get(k).push(w);
+          });
+          let colorIdx = 0;
+          for (const [key, words] of byKey) {
+            const bucket = createGroupBucket(key, colorIdx++);
+            const wordsHost = bucket.querySelector('.bucket-words');
+            words.forEach(w => {
+              const c = document.createElement('span');
+              c.className = 'chip chip--word';
+              c.textContent = w;
+              wordsHost.appendChild(c);
+            });
+            groupsHost.appendChild(bucket);
+          }
+        }
+
+        /* Scene 5, Slide 2 — Naive pair sweep */
+        function initSceneFiveNaive(slide) {
+          const host     = $('#scene-5-naive-words', slide);
+          const runBtn   = $('[data-action="run"]', slide);
+          const resetBtn = $('[data-action="reset"]', slide);
+          const chips = renderWordChips(host, SCENE_5_WORDS);
+
+          let busy = false;
+
+          function clear() {
+            chips.forEach(c => c.classList.remove('chip-cursor', 'chip-cursor--anchor', 'chip-faded'));
+          }
+
+          runBtn.addEventListener('click', () => {
+            if (busy) return;
+            busy = true;
+            runBtn.disabled = true;
+            clear();
+            const visited = new Array(chips.length).fill(false);
+            let i = 0;
+
+            function tryI() {
+              while (i < chips.length && visited[i]) i++;
+              if (i >= chips.length) {
+                busy = false;
+                return;
+              }
+              chips.forEach(c => c.classList.remove('chip-cursor', 'chip-cursor--anchor'));
+              chips[i].classList.add('chip-cursor--anchor');
+              visited[i] = true;
+              const keyI = canonKey(SCENE_5_WORDS[i]);
+              let j = i + 1;
+
+              function nextJ() {
+                while (j < chips.length && visited[j]) j++;
+                if (j >= chips.length) {
+                  // Done with this i; mark i faded
+                  chips[i].classList.remove('chip-cursor--anchor');
+                  chips[i].classList.add('chip-faded');
+                  i++;
+                  setT(tryI, 240);
+                  return;
+                }
+                chips.forEach((c, idx) => {
+                  if (idx !== i && !visited[idx]) c.classList.remove('chip-cursor');
+                });
+                chips[j].classList.add('chip-cursor');
+                if (canonKey(SCENE_5_WORDS[j]) === keyI) {
+                  // Anagram match — mark visited and fade
+                  visited[j] = true;
+                  setT(() => {
+                    chips[j].classList.remove('chip-cursor');
+                    chips[j].classList.add('chip-faded');
+                    j++;
+                    setT(nextJ, 220);
+                  }, 280);
+                  return;
+                }
+                j++;
+                setT(nextJ, 200);
+              }
+              nextJ();
+            }
+            tryI();
+          });
+
+          resetBtn.addEventListener('click', () => {
+            busy = false;
+            runBtn.disabled = false;
+            clear();
+          });
+        }
+
+        /* Scene 5, Slide 3 — Insight (static fingerprint of "eat") */
+        function initSceneFiveInsight(slide) {
+          const host = $('#scene-5-insight-fingerprint', slide);
+          host.innerHTML = '';
+          const counts = new Array(26).fill(0);
+          for (const ch of 'eat') counts[ch.charCodeAt(0) - 97]++;
+          for (let i = 0; i < 26; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'slot';
+            cell.dataset.c = String(counts[i]);
+            cell.dataset.letter = String.fromCharCode(97 + i);
+            cell.textContent = counts[i] > 0 ? counts[i] : '';
+            host.appendChild(cell);
+          }
+        }
+
+        /* Scene 5, Slide 4 — Walkthrough: canonicalize and group */
+        function initSceneFiveWalkthrough(slide) {
+          const wordsHost   = $('#scene-5-walk-words',   slide);
+          const groupsHost  = $('#scene-5-walk-groups',  slide);
+          const currentEl   = $('#scene-5-walk-current', slide);
+          const keyEl       = $('#scene-5-walk-key',     slide);
+          const stepBtn     = $('[data-action="step"]',  slide);
+          const runBtn      = $('[data-action="run"]',   slide);
+          const resetBtn    = $('[data-action="reset"]', slide);
+
+          const chips = renderWordChips(wordsHost, SCENE_5_WORDS);
+
+          let idx = 0;
+          let busy = false;
+          const buckets = new Map(); // canon key → bucket element
+
+          function step() {
+            if (idx >= SCENE_5_WORDS.length || busy) return;
+            busy = true;
+            const word = SCENE_5_WORDS[idx];
+            const key  = canonKey(word);
+
+            chips.forEach(c => c.classList.remove('chip-cursor'));
+            chips[idx].classList.add('chip-cursor');
+            currentEl.textContent = word;
+            keyEl.textContent = key;
+
+            setT(() => {
+              let bucket = buckets.get(key);
+              if (!bucket) {
+                bucket = createGroupBucket(key, buckets.size);
+                buckets.set(key, bucket);
+                groupsHost.appendChild(bucket);
+              }
+              const wHost = bucket.querySelector('.bucket-words');
+              const c = document.createElement('span');
+              c.className = 'chip chip--word';
+              c.textContent = word;
+              wHost.appendChild(c);
+              bucket.classList.add('flash');
+              setT(() => bucket.classList.remove('flash'), 360);
+
+              chips[idx].classList.remove('chip-cursor');
+              chips[idx].classList.add('chip-faded');
+              idx++;
+              busy = false;
+              if (idx >= SCENE_5_WORDS.length) {
+                stepBtn.disabled = true;
+                runBtn.disabled  = true;
+              }
+            }, 360);
+          }
+
+          stepBtn.addEventListener('click', step);
+          runBtn.addEventListener('click', () => {
+            stepBtn.disabled = true;
+            runBtn.disabled  = true;
+            const tick = () => {
+              if (idx >= SCENE_5_WORDS.length) return;
+              step();
+              setT(tick, 520);
+            };
+            tick();
+          });
+
+          resetBtn.addEventListener('click', () => {
+            idx = 0;
+            busy = false;
+            chips.forEach(c => c.classList.remove('chip-cursor', 'chip-faded'));
+            buckets.clear();
+            groupsHost.innerHTML = '';
+            currentEl.textContent = '—';
+            keyEl.textContent     = '—';
+            stepBtn.disabled = false;
+            runBtn.disabled  = false;
+          });
+        }
+
         /* ---------------------------------------------------------------
            Slide init registry. Each key matches a slide's data-init.
            --------------------------------------------------------------- */
@@ -3787,6 +4382,10 @@ seen = <span class="c-ty">HashSet</span>(arr)
           'scene-4-naive':         initSceneFourNaive,
           'scene-4-insight':       initSceneFourInsight,
           'scene-4-walkthrough':   initSceneFourWalkthrough,
+          'scene-5-problem':       initSceneFiveProblem,
+          'scene-5-naive':         initSceneFiveNaive,
+          'scene-5-insight':       initSceneFiveInsight,
+          'scene-5-walkthrough':   initSceneFiveWalkthrough,
         };
 
         /* ---------------------------------------------------------------
