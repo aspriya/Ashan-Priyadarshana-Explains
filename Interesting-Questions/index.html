@@ -1,0 +1,2116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Interactive learning slides for algorithm problems that are easy once you see the insight." />
+    <title>Easy once you get it — interactive algorithm slides</title>
+
+    <!--
+      Fonts come from Google Fonts via CDN (the only external dependency permitted
+      by AGENTS.md). No JS libraries, no bundler, no build step.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* =====================================================================
+         Design tokens — colors, fonts, radii, spacing.
+         Semantic roles per AGENTS.md:
+           purple = insight,
+           teal   = data structure,
+           coral  = naive / bad,
+           amber  = live state during animation,
+           gray   = structural / neutral.
+         ===================================================================== */
+      :root {
+        /* Purple — insight */
+        --purple-50:  #F2EFFC;
+        --purple-100: #DDD2F7;
+        --purple-400: #8C7AE6;
+        --purple-600: #534AB7;
+        --purple-800: #2A2380;
+
+        /* Teal — data structure */
+        --teal-50:  #E6F7F2;
+        --teal-100: #BCEADC;
+        --teal-400: #2EB89A;
+        --teal-600: #0E8A75;
+        --teal-800: #074F44;
+
+        /* Coral — naive / bad */
+        --coral-50:  #FCEEE8;
+        --coral-100: #F8CFC0;
+        --coral-400: #E97A56;
+        --coral-600: #BF4528;
+        --coral-800: #6F2613;
+
+        /* Amber — live state */
+        --amber-50:  #FFF7E0;
+        --amber-100: #FFE7A1;
+        --amber-400: #F2B400;
+        --amber-600: #B58400;
+        --amber-800: #6B4D00;
+
+        /* Gray — neutral */
+        --gray-50:  #F7F7F9;
+        --gray-100: #ECECEF;
+        --gray-400: #A1A1AB;
+        --gray-600: #595965;
+        --gray-800: #1E1E28;
+
+        /* Fonts */
+        --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+        --font-body:    'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+        --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', 'Menlo', monospace;
+
+        /* Radii */
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --radius-lg: 16px;
+
+        /* Layout */
+        --content-max: 1100px;
+        --slide-py: 64px;
+        --slide-px: 48px;
+
+        /* Shadows */
+        --shadow-sm: 0 1px 2px rgba(30, 30, 40, 0.06), 0 1px 1px rgba(30, 30, 40, 0.04);
+        --shadow-md: 0 6px 18px rgba(30, 30, 40, 0.08), 0 2px 6px rgba(30, 30, 40, 0.04);
+        --shadow-lg: 0 14px 40px rgba(30, 30, 40, 0.10), 0 4px 12px rgba(30, 30, 40, 0.06);
+      }
+
+      /* =====================================================================
+         Base reset and document layout.
+         ===================================================================== */
+      *, *::before, *::after { box-sizing: border-box; }
+
+      html, body { margin: 0; padding: 0; }
+
+      body {
+        font-family: var(--font-body);
+        font-size: 19px;
+        line-height: 1.6;
+        color: var(--gray-800);
+        background: var(--gray-50);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      h1, h2, h3, h4 {
+        font-family: var(--font-display);
+        font-weight: 500;
+        margin: 0;
+        color: var(--gray-800);
+        letter-spacing: -0.01em;
+      }
+
+      p { margin: 0; }
+      button { font-family: inherit; }
+      kbd {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        padding: 2px 6px;
+        background: var(--gray-100);
+        border: 1px solid var(--gray-100);
+        border-bottom-width: 2px;
+        border-radius: 4px;
+        color: var(--gray-800);
+      }
+
+      /* =====================================================================
+         Header — title, scene progress, hint row.
+         ===================================================================== */
+      .app-header {
+        display: flex;
+        align-items: center;
+        gap: 32px;
+        padding: 18px 32px 14px;
+        border-bottom: 1px solid var(--gray-100);
+        background: #ffffff;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .brand-mark {
+        width: 12px;
+        height: 12px;
+        border-radius: 4px;
+        background: linear-gradient(135deg, var(--purple-600), var(--teal-600));
+        box-shadow: 0 0 0 2px var(--purple-100);
+      }
+
+      .brand-title {
+        font-family: var(--font-display);
+        font-size: 18px;
+        font-weight: 500;
+        color: var(--gray-800);
+        white-space: nowrap;
+      }
+
+      .progress-bar {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+      }
+
+      .progress-meta {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        font-size: 14px;
+        color: var(--gray-600);
+      }
+
+      .progress-scene-title {
+        font-family: var(--font-display);
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--gray-800);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .progress-numerals {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--gray-600);
+      }
+
+      .progress-numerals .dot { margin: 0 6px; color: var(--gray-400); }
+
+      .progress-track {
+        height: 3px;
+        width: 100%;
+        background: var(--gray-100);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--purple-600), var(--teal-600));
+        border-radius: 999px;
+        transition: width 220ms ease-out;
+      }
+
+      .help-hint {
+        font-size: 12px;
+        color: var(--gray-600);
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .help-hint .sep {
+        color: var(--gray-400);
+        margin: 0 4px;
+      }
+
+      /* =====================================================================
+         Stage — where the active slide is mounted.
+         ===================================================================== */
+      #stage {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        padding: var(--slide-py) var(--slide-px);
+        outline: none;
+      }
+
+      .slide {
+        width: 100%;
+        max-width: var(--content-max);
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+      }
+
+      .slide > header.slide-header {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .scene-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        color: var(--gray-600);
+        text-transform: lowercase;
+      }
+
+      .scene-tag::before {
+        content: '';
+        display: block;
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: var(--gray-400);
+      }
+
+      .slide h1 {
+        font-size: 44px;
+        line-height: 1.1;
+        font-weight: 500;
+      }
+
+      .slide h2 {
+        font-size: 24px;
+        font-family: var(--font-body);
+        font-weight: 500;
+        color: var(--gray-800);
+      }
+
+      .slide p { font-size: 19px; }
+
+      .slide .lead {
+        font-size: 21px;
+        color: var(--gray-800);
+        max-width: 70ch;
+      }
+
+      /* Role-specific accent strips on the left edge of each slide title */
+      .slide-problem     .scene-tag::before { background: var(--gray-600); }
+      .slide-naive       .scene-tag::before { background: var(--coral-600); }
+      .slide-insight     .scene-tag::before { background: var(--purple-600); }
+      .slide-walkthrough .scene-tag::before { background: var(--teal-600); }
+      .slide-followup    .scene-tag::before { background: var(--amber-600); }
+
+      /* =====================================================================
+         Reusable content blocks: callout, code, viz, complexity.
+         ===================================================================== */
+      .callout {
+        padding: 20px 24px;
+        border-radius: var(--radius-md);
+        border-left: 4px solid var(--gray-400);
+        background: var(--gray-50);
+        color: var(--gray-800);
+        font-size: 18px;
+      }
+      .callout--insight {
+        border-left-color: var(--purple-600);
+        background: var(--purple-50);
+        color: var(--purple-800);
+      }
+      .callout--data {
+        border-left-color: var(--teal-600);
+        background: var(--teal-50);
+        color: var(--teal-800);
+      }
+      .callout--naive {
+        border-left-color: var(--coral-600);
+        background: var(--coral-50);
+        color: var(--coral-800);
+      }
+      .callout--live {
+        border-left-color: var(--amber-600);
+        background: var(--amber-50);
+        color: var(--amber-800);
+      }
+      .callout strong { font-weight: 600; }
+
+      .code {
+        font-family: var(--font-mono);
+        font-size: 16px;
+        background: var(--gray-800);
+        color: #E6E6F0;
+        padding: 20px 24px;
+        border-radius: var(--radius-md);
+        line-height: 1.6;
+        overflow-x: auto;
+        white-space: pre;
+      }
+      .code .c-key  { color: #C9A6FF; }
+      .code .c-op   { color: #FFA6C9; }
+      .code .c-num  { color: #FFC470; }
+      .code .c-str  { color: #97E1B8; }
+      .code .c-com  { color: #8E8E9E; font-style: italic; }
+      .code .c-fn   { color: #82D7FF; }
+      .code .c-ty   { color: #FFD27F; }
+
+      .complexity {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        font-family: var(--font-mono);
+        font-size: 16px;
+        color: var(--gray-800);
+        padding: 10px 14px;
+        background: #ffffff;
+        border: 1px solid var(--gray-100);
+        border-radius: var(--radius-sm);
+      }
+      .complexity .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .complexity .pill::before {
+        content: '';
+        display: block;
+        width: 8px; height: 8px;
+        border-radius: 999px;
+        background: var(--gray-400);
+      }
+      .complexity .pill.time::before  { background: var(--purple-600); }
+      .complexity .pill.space::before { background: var(--teal-600); }
+      .complexity .pill.bad::before   { background: var(--coral-600); }
+
+      .viz {
+        background: #ffffff;
+        border: 1px solid var(--gray-100);
+        border-radius: var(--radius-lg);
+        padding: 28px 28px 20px;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .viz-caption {
+        font-size: 14px;
+        color: var(--gray-600);
+        margin-top: 4px;
+      }
+
+      .viz-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .viz-actions .spacer { flex: 1; }
+
+      /* =====================================================================
+         Buttons and form controls.
+         ===================================================================== */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.2;
+        border-radius: 999px;
+        border: 1px solid var(--gray-100);
+        background: #ffffff;
+        color: var(--gray-800);
+        cursor: pointer;
+        transition: background 150ms ease, border-color 150ms ease, transform 100ms ease;
+      }
+      .btn:hover { background: var(--gray-50); }
+      .btn:active { transform: translateY(1px); }
+      .btn:focus-visible { outline: 2px solid var(--purple-400); outline-offset: 2px; }
+      .btn[disabled] {
+        opacity: 0.45;
+        cursor: not-allowed;
+        background: var(--gray-50);
+      }
+      .btn--primary {
+        background: var(--gray-800);
+        color: #ffffff;
+        border-color: var(--gray-800);
+      }
+      .btn--primary:hover { background: #000000; }
+      .btn--insight {
+        background: var(--purple-600);
+        color: #ffffff;
+        border-color: var(--purple-600);
+      }
+      .btn--insight:hover { background: var(--purple-800); }
+      .btn--data {
+        background: var(--teal-600);
+        color: #ffffff;
+        border-color: var(--teal-600);
+      }
+      .btn--data:hover { background: var(--teal-800); }
+      .btn--ghost {
+        background: transparent;
+      }
+
+      /* =====================================================================
+         Bottom navigation bar.
+         ===================================================================== */
+      .nav-bar {
+        position: sticky;
+        bottom: 0;
+        z-index: 8;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        border-top: 1px solid var(--gray-100);
+        padding: 12px 32px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .nav-bar .nav-group {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .nav-jump {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--gray-100);
+        background: #ffffff;
+        color: var(--gray-800);
+        cursor: pointer;
+      }
+      .nav-jump:focus-visible { outline: 2px solid var(--purple-400); outline-offset: 2px; }
+
+      /* =====================================================================
+         Overview dialog.
+         ===================================================================== */
+      dialog#overview {
+        border: none;
+        padding: 0;
+        border-radius: var(--radius-lg);
+        background: transparent;
+        max-width: min(90vw, 900px);
+        width: 100%;
+      }
+      dialog#overview::backdrop {
+        background: rgba(15, 15, 25, 0.55);
+        backdrop-filter: blur(2px);
+      }
+
+      .overview-inner {
+        background: #ffffff;
+        border-radius: var(--radius-lg);
+        padding: 24px 28px 28px;
+        box-shadow: var(--shadow-lg);
+      }
+
+      .overview-inner > header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+      }
+
+      .overview-inner h2 {
+        font-family: var(--font-display);
+        font-size: 24px;
+        font-weight: 500;
+        color: var(--gray-800);
+      }
+
+      .overview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 14px;
+      }
+
+      .scene-tile {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        text-align: left;
+        padding: 16px 18px;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-100);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: background 150ms ease, transform 100ms ease, border-color 150ms ease;
+        font-family: inherit;
+        color: inherit;
+      }
+      .scene-tile:hover {
+        background: var(--purple-50);
+        border-color: var(--purple-100);
+      }
+      .scene-tile:focus-visible { outline: 2px solid var(--purple-400); outline-offset: 2px; }
+      .tile-num {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--gray-600);
+        text-transform: lowercase;
+      }
+      .tile-title {
+        font-family: var(--font-display);
+        font-size: 19px;
+        font-weight: 500;
+        color: var(--gray-800);
+      }
+      .tile-meta {
+        font-size: 13px;
+        color: var(--gray-600);
+      }
+
+      .close-btn {
+        background: transparent;
+        border: 1px solid var(--gray-100);
+        border-radius: 999px;
+        width: 32px; height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--gray-600);
+      }
+      .close-btn:hover { background: var(--gray-50); color: var(--gray-800); }
+
+      /* =====================================================================
+         Speaker notes panel.
+         ===================================================================== */
+      .notes-panel {
+        position: fixed;
+        right: 20px;
+        bottom: 84px;
+        z-index: 9;
+        width: min(380px, 90vw);
+        max-height: 50vh;
+        background: var(--gray-800);
+        color: #F4F4F8;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        padding: 14px 18px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        transform: translateY(20px);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 200ms ease, opacity 200ms ease;
+      }
+      .notes-panel.open {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .notes-panel header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        text-transform: lowercase;
+        color: var(--gray-400);
+      }
+      .notes-panel .close-btn {
+        border-color: rgba(255,255,255,0.15);
+        color: #C9C9D5;
+      }
+      .notes-panel .close-btn:hover { background: rgba(255,255,255,0.06); color: #ffffff; }
+      .notes-panel .notes-content {
+        font-size: 14px;
+        line-height: 1.55;
+        overflow-y: auto;
+      }
+      .notes-panel .notes-content:empty::after {
+        content: 'No notes for this slide.';
+        color: var(--gray-400);
+        font-style: italic;
+      }
+
+      /* =====================================================================
+         Scene 1 — Bucket-count and print: visualization styles.
+         ===================================================================== */
+
+      /* Chip — a small square representing one input value. */
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 44px;
+        height: 44px;
+        padding: 0 6px;
+        font-family: var(--font-mono);
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--gray-800);
+        background: #ffffff;
+        border: 1px solid var(--gray-100);
+        border-radius: var(--radius-sm);
+        box-shadow: var(--shadow-sm);
+        transition: transform 600ms cubic-bezier(0.25, 0.7, 0.3, 1),
+                    opacity 280ms ease,
+                    background 280ms ease,
+                    border-color 280ms ease;
+        position: relative;
+        will-change: transform;
+      }
+      .chip[data-bucket="0-9"]    { background: var(--purple-50);  border-color: var(--purple-100); color: var(--purple-800); }
+      .chip[data-bucket="10-19"]  { background: var(--teal-50);    border-color: var(--teal-100);   color: var(--teal-800); }
+      .chip[data-bucket="20-29"]  { background: var(--amber-50);   border-color: var(--amber-100);  color: var(--amber-800); }
+      .chip[data-bucket="30-39"]  { background: var(--coral-50);   border-color: var(--coral-100);  color: var(--coral-800); }
+      .chip[data-bucket="40-49"]  { background: var(--purple-50);  border-color: var(--purple-100); color: var(--purple-800); }
+      .chip[data-bucket="50-59"]  { background: var(--teal-50);    border-color: var(--teal-100);   color: var(--teal-800); }
+      .chip.chip-cursor {
+        background: var(--amber-100);
+        border-color: var(--amber-400);
+        color: var(--amber-800);
+        box-shadow: 0 0 0 2px var(--amber-100), var(--shadow-md);
+      }
+      .chip.chip-consumed {
+        opacity: 0;
+        transform: scale(0.4);
+      }
+      .chip.chip-pulse {
+        animation: chip-pulse 320ms ease;
+      }
+      @keyframes chip-pulse {
+        0%   { box-shadow: 0 0 0 0 var(--amber-400); }
+        100% { box-shadow: 0 0 0 8px rgba(242,180,0,0); }
+      }
+
+      .output-block {
+        font-family: var(--font-mono);
+        font-size: 15px;
+        line-height: 1.7;
+        white-space: pre;
+        background: var(--gray-800);
+        color: #F0F0F5;
+        border-radius: var(--radius-md);
+        padding: 18px 22px;
+        min-height: 1.6em;
+        max-height: 280px;
+        overflow-y: auto;
+      }
+      .output-block .placeholder {
+        color: var(--gray-400);
+        font-style: italic;
+      }
+
+      /* Two-column generic split */
+      .split {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+      }
+      .split.split-wide-left { grid-template-columns: 1.4fr 1fr; }
+      .split.split-wide-right { grid-template-columns: 1fr 1.4fr; }
+      @media (max-width: 880px) {
+        .split, .split.split-wide-left, .split.split-wide-right {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .stack { display: flex; flex-direction: column; gap: 14px; }
+      .stack-sm { display: flex; flex-direction: column; gap: 8px; }
+
+      /* ---- Bucket grid (101 cells, 0-100) ---- */
+      .bucket-stage {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .bucket-grid {
+        display: grid;
+        grid-template-columns: repeat(101, 1fr);
+        gap: 1px;
+        background: var(--gray-100);
+        border: 1px solid var(--gray-100);
+        border-radius: var(--radius-sm);
+        padding: 1px;
+        position: relative;
+      }
+      .bucket {
+        position: relative;
+        background: #ffffff;
+        min-height: 36px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        font-family: var(--font-mono);
+        font-size: 10px;
+        transition: background 220ms ease;
+      }
+      .bucket-count {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--gray-600);
+        line-height: 1;
+        padding: 3px 0 2px;
+        min-height: 12px;
+      }
+      .bucket-fill {
+        width: 100%;
+        height: 0%;
+        background: linear-gradient(180deg, var(--teal-100), var(--teal-400));
+        transition: height 220ms ease;
+      }
+      .bucket-label {
+        position: absolute;
+        bottom: -18px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 10px;
+        color: var(--gray-600);
+        font-family: var(--font-mono);
+      }
+      .bucket.bucket-active {
+        background: var(--teal-50);
+      }
+      .bucket.bucket-cursor {
+        background: var(--amber-100);
+        outline: 1px solid var(--amber-400);
+        z-index: 2;
+      }
+      .bucket.bucket-flash {
+        animation: bucket-flash 260ms ease;
+      }
+      @keyframes bucket-flash {
+        0%   { background: var(--amber-100); }
+        100% { background: var(--teal-50); }
+      }
+
+      .bucket-axis {
+        display: flex;
+        justify-content: space-between;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--gray-600);
+        padding: 0 2px;
+      }
+
+      /* The "ghost" chips used during fly-to-bucket animation.
+         They are absolutely positioned overlays so they can travel anywhere. */
+      .fly-layer {
+        position: relative;
+        min-height: 1px;
+      }
+
+      /* ---- StringBuilder visualization ---- */
+      .sb-buffer {
+        background: #ffffff;
+        border: 1px solid var(--gray-100);
+        border-radius: var(--radius-md);
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        position: relative;
+      }
+      .sb-buffer-label {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--gray-600);
+      }
+      .sb-capacity {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--gray-400);
+        position: absolute;
+        top: 12px;
+        right: 14px;
+      }
+      .sb-buffer-slots {
+        display: grid;
+        grid-template-columns: repeat(16, 1fr);
+        gap: 4px;
+      }
+      .sb-slot {
+        height: 28px;
+        background: var(--gray-50);
+        border: 1px dashed var(--gray-100);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-size: 13px;
+        color: var(--gray-800);
+        transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
+      }
+      .sb-slot.filled {
+        background: var(--purple-50);
+        border: 1px solid var(--purple-400);
+        color: var(--purple-800);
+      }
+      .sb-buffer.flash .sb-slot.filled {
+        animation: sb-flash 260ms ease;
+      }
+      @keyframes sb-flash {
+        0% { background: var(--amber-100); }
+        100% { background: var(--purple-50); }
+      }
+      .sb-buffer.cleared .sb-slot {
+        animation: sb-clear 320ms ease;
+      }
+      @keyframes sb-clear {
+        0%   { background: var(--coral-50); border-color: var(--coral-100); }
+        100% { background: var(--gray-50); border-color: var(--gray-100); }
+      }
+
+      /* ---- Counter (used on follow-up / sum slide) ---- */
+      .big-number {
+        font-family: var(--font-display);
+        font-size: 56px;
+        font-weight: 500;
+        line-height: 1;
+        color: var(--gray-800);
+      }
+      .big-number.live {
+        color: var(--amber-600);
+      }
+
+      /* =====================================================================
+         Reduced motion: disable nice-to-have transitions, keep final state.
+         ===================================================================== */
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          transition-duration: 0.001ms !important;
+          animation-duration: 0.001ms !important;
+        }
+      }
+
+      /* =====================================================================
+         Small screens — keep usable on tablet portrait.
+         ===================================================================== */
+      @media (max-width: 720px) {
+        :root { --slide-px: 24px; --slide-py: 36px; }
+        .app-header { flex-wrap: wrap; gap: 16px; padding: 14px 18px; }
+        .help-hint { display: none; }
+        .nav-bar { padding: 10px 16px; }
+        .slide h1 { font-size: 34px; }
+        .slide p, .slide .lead { font-size: 17px; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ===================================================================
+         Header
+         =================================================================== -->
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-title">Easy once you get it</span>
+      </div>
+      <div class="progress-bar" aria-label="Deck progress">
+        <div class="progress-meta">
+          <span class="progress-scene-title" id="progress-title">—</span>
+          <span class="progress-numerals">
+            <span id="progress-scene">1 / 1</span>
+            <span class="dot">·</span>
+            <span id="progress-slide">Slide 1</span>
+          </span>
+        </div>
+        <span class="progress-track" aria-hidden="true">
+          <span class="progress-fill" id="progress-fill"></span>
+        </span>
+      </div>
+      <div class="help-hint" aria-hidden="true">
+        <kbd>←</kbd><kbd>→</kbd>
+        <span>navigate</span>
+        <span class="sep">·</span>
+        <kbd>N</kbd>
+        <span>notes</span>
+        <span class="sep">·</span>
+        <kbd>Esc</kbd>
+        <span>overview</span>
+      </div>
+    </header>
+
+    <!-- ===================================================================
+         Stage — engine writes the active slide here.
+         =================================================================== -->
+    <main id="stage" tabindex="-1" aria-live="polite"></main>
+
+    <!-- ===================================================================
+         Bottom nav bar
+         =================================================================== -->
+    <nav class="nav-bar" aria-label="Slide navigation">
+      <div class="nav-group">
+        <button class="btn" id="prev-btn" aria-label="Previous slide">← Prev</button>
+        <button class="btn" id="next-btn" aria-label="Next slide">Next →</button>
+      </div>
+      <div class="nav-group">
+        <select class="nav-jump" id="nav-jump" aria-label="Jump to scene"></select>
+        <button class="btn btn--ghost" id="overview-btn" aria-label="Open scene overview">Overview</button>
+        <button class="btn btn--ghost" id="notes-btn" aria-label="Toggle speaker notes">Notes</button>
+      </div>
+    </nav>
+
+    <!-- ===================================================================
+         Overview dialog
+         =================================================================== -->
+    <dialog id="overview" aria-label="Scene overview">
+      <div class="overview-inner">
+        <header>
+          <h2>Scenes</h2>
+          <button class="close-btn" id="overview-close" aria-label="Close overview" type="button">&times;</button>
+        </header>
+        <div class="overview-grid" id="overview-grid"></div>
+      </div>
+    </dialog>
+
+    <!-- ===================================================================
+         Speaker notes panel
+         =================================================================== -->
+    <aside id="notes" class="notes-panel" aria-label="Speaker notes" aria-hidden="true">
+      <header>
+        <span>Speaker notes</span>
+        <button class="close-btn" id="notes-close" aria-label="Close notes" type="button">&times;</button>
+      </header>
+      <div class="notes-content"></div>
+    </aside>
+
+    <!-- ===================================================================
+         SCENE TEMPLATES
+         A scene is added by dropping a new <template id="scene-N">…</template>
+         block here. The navigation engine discovers scenes via
+         document.querySelectorAll('template[id^="scene-"]') — no registry to
+         update, no script changes required.
+         =================================================================== -->
+
+    <!-- ----- Scene 1: Bucket-count and print ----- -->
+    <template id="scene-1">
+      <article class="scene" data-scene-title="Bucket-count and print">
+
+        <!-- Slide 1: Problem -->
+        <section
+          class="slide slide-problem"
+          data-init="scene-1-problem"
+          data-notes="Anchor: 1M integers in [0,100]. Group by value, sort ascending, comma-separate each line. Stress: the values are bounded — that's the hidden gift."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 1 · the problem</span>
+            <h1>Bucket-count and print</h1>
+          </header>
+
+          <p class="lead">
+            You're handed an array of about one million integers. Every value
+            sits in the range 0–100. Print all occurrences grouped by value,
+            sorted ascending, one value per line, comma-separated.
+          </p>
+
+          <div class="split split-wide-left">
+            <div class="viz">
+              <h2>Tiny example — 17 inputs</h2>
+              <div class="chip-row" id="scene-1-input-chips"></div>
+              <p class="viz-caption">
+                The input we'll use throughout this scene. Real input is a
+                million long; this slice keeps the logic visible.
+              </p>
+            </div>
+
+            <div class="viz">
+              <h2>Expected output</h2>
+              <pre class="output-block">0,0,0
+1,1,1
+2,2
+3,3
+4,4,4
+21
+31
+51
+54,54</pre>
+              <p class="viz-caption">
+                One line per distinct value, in ascending order. Solo values
+                still get a line — single number, no commas.
+              </p>
+            </div>
+          </div>
+
+          <div class="callout">
+            <strong>Two facts to hold onto.</strong>
+            The input size <code style="font-family:var(--font-mono)">n ≈ 10⁶</code> is large.
+            The value range <code style="font-family:var(--font-mono)">k = 101</code> is small.
+            Those two facts are the whole story.
+          </div>
+        </section>
+
+        <!-- Slide 2: Naive -->
+        <section
+          class="slide slide-naive"
+          data-init="scene-1-naive"
+          data-notes="Naive: sort the array, then walk emitting newlines on value change. Works correctly, but pays log n per element for ordering we could derive from the value itself."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 1 · the naive try</span>
+            <h1>Sort it, then walk it</h1>
+          </header>
+
+          <p class="lead">
+            The obvious move: hand the array to the language's sort routine,
+            then walk left to right, emitting a newline whenever the value
+            changes. It works. It also pays for an ordering you didn't need.
+          </p>
+
+          <div class="split split-wide-right">
+            <div class="stack">
+              <div class="code"><span class="c-com">// pseudocode</span>
+<span class="c-key">sort</span>(arr)                       <span class="c-com">// built-in comparison sort</span>
+<span class="c-key">prev</span> = <span class="c-key">none</span>
+<span class="c-key">line</span> = []
+<span class="c-key">for</span> v <span class="c-key">in</span> arr:
+  <span class="c-key">if</span> v != prev <span class="c-op">and</span> line:
+    print(join(line, <span class="c-str">","</span>))
+    line.clear()
+  line.append(v)
+  prev = v
+<span class="c-key">if</span> line: print(join(line, <span class="c-str">","</span>))</div>
+
+              <div class="complexity" role="note">
+                <span class="pill bad">Time: O(n log n)</span>
+                <span class="pill space">Space: O(1) or O(n)</span>
+                <span style="color:var(--gray-600); font-size: 14px;">(depends on sort)</span>
+              </div>
+
+              <div class="callout callout--naive">
+                <strong>Why this is wasteful.</strong>
+                The values are bounded to 0–100. Sorting pays
+                <code style="font-family:var(--font-mono)">log n</code>
+                per element for an order you can derive from the value itself.
+              </div>
+            </div>
+
+            <div class="viz">
+              <h2>Watch the sort, then the walk</h2>
+              <div class="chip-row" id="scene-1-naive-chips"></div>
+              <pre class="output-block" id="scene-1-naive-output"><span class="placeholder">Output will fill here…</span></pre>
+              <div class="viz-actions">
+                <button class="btn btn--primary" data-action="run-sort">Run sort</button>
+                <button class="btn" data-action="walk-emit" disabled>Walk and emit</button>
+                <span class="spacer"></span>
+                <button class="btn btn--ghost" data-action="reset">Reset</button>
+              </div>
+              <p class="viz-caption">
+                Sort first, then a cursor walks the sorted chips, opening a new
+                line every time the value changes.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 3: Insight -->
+        <section
+          class="slide slide-insight"
+          data-init="scene-1-insight"
+          data-notes="The insight: the values ARE the indices. One int[101] of counts. One linear pass to fill it. Then walk 0→100, print each non-zero value count times."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 1 · the insight</span>
+            <h1>The values <em style="font-style: italic;">are</em> the indices</h1>
+          </header>
+
+          <div class="split split-wide-left">
+            <div class="stack">
+              <p class="lead">
+                Stop sorting. Make an array of 101 counters, one per possible
+                value. One pass over the input increments the counter at each
+                value's index. The order falls out for free.
+              </p>
+
+              <div class="callout callout--insight">
+                <strong>One sentence.</strong>
+                When the value range is small and dense, the value itself
+                becomes an index — and comparisons become direct array access.
+              </div>
+
+              <div class="code"><span class="c-key">int</span>[] counts = <span class="c-key">new</span> <span class="c-key">int</span>[<span class="c-num">101</span>];
+<span class="c-key">for</span> (<span class="c-key">int</span> v : arr) counts[v]++;   <span class="c-com">// O(n) — one pass</span>
+<span class="c-key">for</span> (<span class="c-key">int</span> v = <span class="c-num">0</span>; v &lt;= <span class="c-num">100</span>; v++)
+  <span class="c-key">if</span> (counts[v] &gt; <span class="c-num">0</span>) emit(v, counts[v]); <span class="c-com">// O(k)</span></div>
+
+              <div class="complexity" role="note">
+                <span class="pill time">Time: O(n + k)</span>
+                <span class="pill space">Space: O(k)</span>
+                <span style="color:var(--gray-600); font-size: 14px;">k = 101</span>
+              </div>
+            </div>
+
+            <div class="viz">
+              <h2>Counting array — 101 buckets, indexed by value</h2>
+
+              <div class="bucket-stage">
+                <div class="fly-layer" id="scene-1-insight-fly-layer">
+                  <div class="chip-row" id="scene-1-insight-chips"></div>
+                </div>
+
+                <div class="bucket-grid" id="scene-1-insight-buckets" aria-hidden="true"></div>
+                <div class="bucket-axis" aria-hidden="true">
+                  <span>0</span><span>10</span><span>20</span><span>30</span>
+                  <span>40</span><span>50</span><span>60</span><span>70</span>
+                  <span>80</span><span>90</span><span>100</span>
+                </div>
+              </div>
+
+              <div class="viz-actions">
+                <button class="btn btn--insight" data-action="run-pass">Run the pass</button>
+                <button class="btn" data-action="step-one">Step one</button>
+                <span class="spacer"></span>
+                <button class="btn btn--ghost" data-action="reset">Reset</button>
+              </div>
+
+              <p class="viz-caption">
+                Each chip flies into the bucket whose label matches its value.
+                Watch buckets <code style="font-family:var(--font-mono)">0</code>–<code style="font-family:var(--font-mono)">4</code> climb fast and the tail (21, 31, 51, 54) flicker on once.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 4: Walkthrough -->
+        <section
+          class="slide slide-walkthrough"
+          data-init="scene-1-walkthrough"
+          data-notes="Step the algorithm yourself: each click consumes one input element. Once the input is empty, Print walks the buckets 0→100, building lines in a single reused StringBuilder."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 1 · walkthrough</span>
+            <h1>Step it, then print it</h1>
+          </header>
+
+          <p class="lead">
+            Drive the algorithm by hand. Each <em>Step</em> consumes one input
+            element. When the input is empty, <em>Print</em> walks the buckets
+            from 0 to 100 — emitting one line per non-zero bucket through a
+            single reused buffer.
+          </p>
+
+          <div class="viz">
+            <h2>Pass 1 — count</h2>
+
+            <div class="bucket-stage">
+              <div class="fly-layer" id="scene-1-walk-fly-layer">
+                <div class="chip-row" id="scene-1-walk-chips"></div>
+              </div>
+              <div class="bucket-grid" id="scene-1-walk-buckets" aria-hidden="true"></div>
+              <div class="bucket-axis" aria-hidden="true">
+                <span>0</span><span>10</span><span>20</span><span>30</span>
+                <span>40</span><span>50</span><span>60</span><span>70</span>
+                <span>80</span><span>90</span><span>100</span>
+              </div>
+            </div>
+
+            <div class="viz-actions">
+              <button class="btn btn--data" data-action="step">Step</button>
+              <button class="btn" data-action="run-all">Run all</button>
+              <button class="btn btn--primary" data-action="print" disabled>Print</button>
+              <span class="spacer"></span>
+              <button class="btn btn--ghost" data-action="reset">Reset</button>
+            </div>
+
+            <p class="viz-caption">
+              <strong>Step</strong> increments one bucket. <strong>Run all</strong> flushes
+              the queue. <strong>Print</strong> appears once counting is done.
+            </p>
+          </div>
+
+          <div class="split">
+            <div class="viz">
+              <h2>Pass 2 — emit (one reused buffer)</h2>
+              <div class="sb-buffer" id="scene-1-walk-sb">
+                <span class="sb-buffer-label">StringBuilder · current line</span>
+                <span class="sb-capacity" id="scene-1-walk-sb-cap">capacity: 16</span>
+                <div class="sb-buffer-slots" id="scene-1-walk-sb-slots"></div>
+              </div>
+              <p class="viz-caption">
+                One buffer. Wipe it between lines, never throw it away.
+              </p>
+            </div>
+
+            <div class="viz">
+              <h2>Console</h2>
+              <pre class="output-block" id="scene-1-walk-output"><span class="placeholder">Lines will print here…</span></pre>
+              <div class="complexity" role="note">
+                <span class="pill time">Time: O(n + k)</span>
+                <span class="pill space">Space: O(k)</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 5: Why a single reused StringBuilder -->
+        <section
+          class="slide slide-followup"
+          data-init="scene-1-stringbuilder"
+          data-notes="Allocating a new StringBuilder per line means many short-lived heap allocations and GC pressure. setLength(0) keeps the underlying char[] capacity and only resets the length counter. Free reuse."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 1 · why setLength(0)</span>
+            <h1>One buffer, wiped between lines</h1>
+          </header>
+
+          <p class="lead">
+            The algorithm is fast. The output stage shouldn't undo that. A
+            fresh <code style="font-family:var(--font-mono)">StringBuilder</code>
+            per line allocates a new char array each time — fine for one line,
+            wasteful when you're emitting thousands.
+          </p>
+
+          <div class="split split-wide-right">
+            <div class="stack">
+              <div class="code"><span class="c-ty">StringBuilder</span> line = <span class="c-key">new</span> <span class="c-ty">StringBuilder</span>(<span class="c-num">16</span>);
+<span class="c-com">// reused across every output line</span>
+<span class="c-key">for</span> (<span class="c-key">int</span> v = <span class="c-num">0</span>; v &lt;= <span class="c-num">100</span>; v++) {
+  <span class="c-key">int</span> c = counts[v];
+  <span class="c-key">if</span> (c == <span class="c-num">0</span>) <span class="c-key">continue</span>;
+  line.setLength(<span class="c-num">0</span>);              <span class="c-com">// length = 0, char[] kept</span>
+  <span class="c-key">for</span> (<span class="c-key">int</span> i = <span class="c-num">0</span>; i &lt; c; i++) {
+    <span class="c-key">if</span> (i &gt; <span class="c-num">0</span>) line.append(<span class="c-str">','</span>);
+    line.append(v);
+  }
+  out.println(line);             <span class="c-com">// one buffer, many lines</span>
+}</div>
+
+              <div class="callout callout--insight">
+                <strong>The trick.</strong>
+                <code style="font-family:var(--font-mono)">setLength(0)</code>
+                does not free the underlying array. Length resets, capacity
+                stays. The next line writes into the same memory.
+              </div>
+
+              <div class="complexity" role="note">
+                <span class="pill space">Allocations: 1 buffer total</span>
+              </div>
+            </div>
+
+            <div class="viz">
+              <h2>Watch the buffer</h2>
+              <div class="sb-buffer" id="scene-1-sb-buffer">
+                <span class="sb-buffer-label">char[] · length / capacity</span>
+                <span class="sb-capacity" id="scene-1-sb-cap">len 0 / cap 16</span>
+                <div class="sb-buffer-slots" id="scene-1-sb-slots"></div>
+              </div>
+
+              <div class="viz-actions">
+                <button class="btn btn--primary" data-action="append">Append next line</button>
+                <button class="btn" data-action="clear">setLength(0)</button>
+                <span class="spacer"></span>
+                <button class="btn btn--ghost" data-action="reset">Reset</button>
+              </div>
+
+              <pre class="output-block" id="scene-1-sb-output"><span class="placeholder">Each appended line lands here.</span></pre>
+
+              <p class="viz-caption">
+                Setting the length to zero clears the content — the capacity
+                indicator never changes. That's the allocation we keep.
+              </p>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </template>
+
+    <!--
+      SCENE TEMPLATE (copy-pasteable starter for new scenes — Phase 2+).
+      Drop a block like this anywhere in <body>. The engine discovers it via
+      document.querySelectorAll('template[id^="scene-"]').
+
+      <template id="scene-2">
+        <article class="scene" data-scene-title="Your scene title">
+          <section class="slide slide-problem"     data-init="scene-2-problem"     data-notes="One-line hint.">…</section>
+          <section class="slide slide-naive"       data-init="scene-2-naive"       data-notes="One-line hint.">…</section>
+          <section class="slide slide-insight"     data-init="scene-2-insight"     data-notes="One-line hint.">…</section>
+          <section class="slide slide-walkthrough" data-init="scene-2-walkthrough" data-notes="One-line hint.">…</section>
+        </article>
+      </template>
+    -->
+
+    <!-- ===================================================================
+         SCRIPT — navigation engine + per-slide init hooks.
+         =================================================================== -->
+    <script>
+      (() => {
+        'use strict';
+
+        /* ---------------------------------------------------------------
+           Tiny DOM helpers.
+           --------------------------------------------------------------- */
+        const $  = (sel, root = document) => root.querySelector(sel);
+        const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+        /* ---------------------------------------------------------------
+           Scene discovery — no hardcoded list.
+           --------------------------------------------------------------- */
+        const sceneTemplates = $$('template[id^="scene-"]').sort((a, b) => {
+          const na = parseInt(a.id.replace('scene-', ''), 10);
+          const nb = parseInt(b.id.replace('scene-', ''), 10);
+          return na - nb;
+        });
+
+        const scenes = sceneTemplates.map((tpl, i) => {
+          // Build once just to read metadata (slide count, title).
+          const probe = tpl.content.cloneNode(true).querySelector('.scene');
+          const slides = probe ? $$('.slide', probe) : [];
+          return {
+            idx: i + 1,
+            id: tpl.id,
+            title: probe?.dataset.sceneTitle || `Scene ${i + 1}`,
+            slideCount: slides.length,
+            template: tpl,
+          };
+        });
+
+        if (scenes.length === 0) {
+          $('#stage').innerHTML =
+            '<div style="margin:64px auto;font-family:var(--font-body);color:var(--gray-600)">No scenes found. Add a &lt;template id="scene-1"&gt; block to get started.</div>';
+          return;
+        }
+
+        /* ---------------------------------------------------------------
+           Flat slide index (used for prev/next).
+           --------------------------------------------------------------- */
+        const flat = [];
+        scenes.forEach(s => {
+          for (let m = 1; m <= s.slideCount; m++) flat.push({ scene: s.idx, slide: m });
+        });
+
+        /* ---------------------------------------------------------------
+           Current position + active-timer bookkeeping.
+           --------------------------------------------------------------- */
+        let current = { scene: 1, slide: 1 };
+        const timers = { timeouts: [], intervals: [] };
+
+        const setT = (fn, ms) => {
+          const id = setTimeout(fn, ms);
+          timers.timeouts.push(id);
+          return id;
+        };
+        const setI = (fn, ms) => {
+          const id = setInterval(fn, ms);
+          timers.intervals.push(id);
+          return id;
+        };
+        const clearTimers = () => {
+          timers.timeouts.forEach(clearTimeout);
+          timers.intervals.forEach(clearInterval);
+          timers.timeouts = [];
+          timers.intervals = [];
+        };
+
+        /* ---------------------------------------------------------------
+           Render the current slide into the stage.
+           --------------------------------------------------------------- */
+        const stage      = $('#stage');
+        const notesPanel = $('#notes');
+        const notesText  = $('.notes-content', notesPanel);
+        const overview   = $('#overview');
+        const navJump    = $('#nav-jump');
+
+        function buildSlide(sceneIdx, slideIdx) {
+          const tpl = scenes[sceneIdx - 1].template;
+          const article = tpl.content.cloneNode(true).querySelector('.scene');
+          const slides = $$('.slide', article);
+          return slides[slideIdx - 1] || null;
+        }
+
+        function clampPosition() {
+          current.scene = Math.max(1, Math.min(scenes.length, current.scene));
+          const slideCount = scenes[current.scene - 1].slideCount;
+          current.slide = Math.max(1, Math.min(slideCount, current.slide));
+        }
+
+        function render({ updateHash = true } = {}) {
+          clearTimers();
+          clampPosition();
+          const slide = buildSlide(current.scene, current.slide);
+          stage.innerHTML = '';
+          if (!slide) return;
+
+          stage.appendChild(slide);
+          stage.scrollTop = 0;
+
+          // Run init hook for the slide.
+          const initKey = slide.dataset.init;
+          if (initKey && slideInit[initKey]) {
+            try {
+              slideInit[initKey](slide);
+            } catch (err) {
+              console.error('slide init failed for', initKey, err);
+            }
+          }
+
+          updateProgress();
+          updateNotes(slide);
+          updateNavJump();
+          if (updateHash) writeHash();
+        }
+
+        function updateProgress() {
+          $('#progress-scene').textContent = `${current.scene} / ${scenes.length}`;
+          $('#progress-slide').textContent = `Slide ${current.slide} of ${scenes[current.scene - 1].slideCount}`;
+          $('#progress-title').textContent = scenes[current.scene - 1].title;
+          const idx = flat.findIndex(s => s.scene === current.scene && s.slide === current.slide);
+          const pct = ((idx + 1) / flat.length) * 100;
+          $('#progress-fill').style.width = pct + '%';
+          $('#prev-btn').disabled = (idx <= 0);
+          $('#next-btn').disabled = (idx >= flat.length - 1);
+        }
+
+        function updateNotes(slide) {
+          const txt = (slide.dataset.notes || '').trim();
+          notesText.textContent = txt;
+        }
+
+        function updateNavJump() {
+          if (!navJump.dataset.populated) {
+            navJump.innerHTML = '';
+            scenes.forEach(s => {
+              const opt = document.createElement('option');
+              opt.value = String(s.idx);
+              opt.textContent = `${s.idx}. ${s.title}`;
+              navJump.appendChild(opt);
+            });
+            navJump.dataset.populated = '1';
+          }
+          navJump.value = String(current.scene);
+        }
+
+        /* ---------------------------------------------------------------
+           URL hash sync. Format: #s<scene>/m<slide>
+           --------------------------------------------------------------- */
+        function writeHash() {
+          const want = `#s${current.scene}/m${current.slide}`;
+          if (location.hash !== want) {
+            history.replaceState(null, '', want);
+          }
+        }
+
+        function readHash() {
+          const m = /^#s(\d+)\/m(\d+)$/.exec(location.hash);
+          if (m) {
+            current.scene = parseInt(m[1], 10);
+            current.slide = parseInt(m[2], 10);
+            clampPosition();
+            return true;
+          }
+          return false;
+        }
+
+        /* ---------------------------------------------------------------
+           Movement helpers.
+           --------------------------------------------------------------- */
+        function move(delta) {
+          const idx = flat.findIndex(s => s.scene === current.scene && s.slide === current.slide);
+          const next = Math.max(0, Math.min(flat.length - 1, idx + delta));
+          current = { ...flat[next] };
+          render();
+        }
+        function goTo(scene, slide = 1) {
+          current = { scene, slide };
+          render();
+        }
+        function first() { current = { scene: 1, slide: 1 }; render(); }
+        function last()  { current = { ...flat[flat.length - 1] }; render(); }
+
+        /* ---------------------------------------------------------------
+           Keyboard.
+           --------------------------------------------------------------- */
+        function isTypingTarget(t) {
+          return t && t.matches && t.matches('input, textarea, select, [contenteditable="true"]');
+        }
+
+        document.addEventListener('keydown', (e) => {
+          if (isTypingTarget(e.target)) return;
+          // Modifiers off — pure navigation keys only.
+          if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+          const overviewOpen = overview.open;
+
+          switch (e.key) {
+            case 'ArrowRight':
+            case 'PageDown':
+              if (overviewOpen) return;
+              e.preventDefault();
+              move(1);
+              break;
+            case 'ArrowLeft':
+            case 'PageUp':
+              if (overviewOpen) return;
+              e.preventDefault();
+              move(-1);
+              break;
+            case 'Home':
+              if (overviewOpen) return;
+              e.preventDefault();
+              first();
+              break;
+            case 'End':
+              if (overviewOpen) return;
+              e.preventDefault();
+              last();
+              break;
+            case 'Escape':
+              e.preventDefault();
+              if (overviewOpen) overview.close();
+              else overview.showModal();
+              break;
+            case 'n':
+            case 'N':
+              if (overviewOpen) return;
+              e.preventDefault();
+              toggleNotes();
+              break;
+          }
+        });
+
+        /* ---------------------------------------------------------------
+           Click handlers (prev/next/overview/notes).
+           --------------------------------------------------------------- */
+        $('#prev-btn').addEventListener('click', () => move(-1));
+        $('#next-btn').addEventListener('click', () => move(1));
+        $('#overview-btn').addEventListener('click', () => {
+          if (overview.open) overview.close();
+          else overview.showModal();
+        });
+        $('#overview-close').addEventListener('click', () => overview.close());
+        $('#notes-btn').addEventListener('click', toggleNotes);
+        $('#notes-close').addEventListener('click', () => notesPanel.classList.remove('open'));
+
+        navJump.addEventListener('change', () => {
+          const n = parseInt(navJump.value, 10);
+          if (Number.isFinite(n)) goTo(n, 1);
+        });
+
+        function toggleNotes() {
+          notesPanel.classList.toggle('open');
+          notesPanel.setAttribute(
+            'aria-hidden',
+            notesPanel.classList.contains('open') ? 'false' : 'true'
+          );
+        }
+
+        /* ---------------------------------------------------------------
+           Overview grid (built once).
+           --------------------------------------------------------------- */
+        const overviewGrid = $('#overview-grid');
+        scenes.forEach(s => {
+          const tile = document.createElement('button');
+          tile.className = 'scene-tile';
+          tile.type = 'button';
+          tile.innerHTML = `
+            <span class="tile-num">scene ${s.idx}</span>
+            <span class="tile-title">${s.title}</span>
+            <span class="tile-meta">${s.slideCount} slide${s.slideCount === 1 ? '' : 's'}</span>
+          `;
+          tile.addEventListener('click', () => {
+            goTo(s.idx, 1);
+            overview.close();
+          });
+          overviewGrid.appendChild(tile);
+        });
+
+        /* ---------------------------------------------------------------
+           Hash listener (back/forward navigation).
+           --------------------------------------------------------------- */
+        window.addEventListener('hashchange', () => {
+          if (readHash()) render({ updateHash: false });
+        });
+
+        /* ===============================================================
+           Per-slide init hooks for Scene 1.
+           Each hook receives the freshly cloned slide element and wires
+           up interactivity for that slide only.
+           =============================================================== */
+        const SCENE_1_INPUT = [1, 3, 4, 2, 1, 0, 0, 4, 0, 1, 2, 3, 4, 31, 54, 21, 51];
+
+        function bucketBand(v) {
+          if (v < 10)  return '0-9';
+          if (v < 20)  return '10-19';
+          if (v < 30)  return '20-29';
+          if (v < 40)  return '30-39';
+          if (v < 50)  return '40-49';
+          return '50-59';
+        }
+
+        function renderChips(host, values) {
+          host.innerHTML = '';
+          values.forEach((v, i) => {
+            const c = document.createElement('span');
+            c.className = 'chip';
+            c.dataset.v = v;
+            c.dataset.i = i;
+            c.dataset.bucket = bucketBand(v);
+            c.textContent = v;
+            host.appendChild(c);
+          });
+          return [...host.children];
+        }
+
+        function buildBucketGrid(host) {
+          host.innerHTML = '';
+          for (let v = 0; v <= 100; v++) {
+            const b = document.createElement('div');
+            b.className = 'bucket';
+            b.dataset.v = v;
+            b.dataset.count = '0';
+            const fill = document.createElement('div');
+            fill.className = 'bucket-fill';
+            b.appendChild(fill);
+            const c = document.createElement('div');
+            c.className = 'bucket-count';
+            b.appendChild(c);
+            host.appendChild(b);
+          }
+          return [...host.children];
+        }
+
+        /* ---- Scene 1, Slide 1 — Problem (static) ---- */
+        function initSceneOneProblem(slide) {
+          const host = $('#scene-1-input-chips', slide);
+          renderChips(host, SCENE_1_INPUT);
+        }
+
+        /* ---- Scene 1, Slide 2 — Naive sort + walk ---- */
+        function initSceneOneNaive(slide) {
+          const host    = $('#scene-1-naive-chips', slide);
+          const output  = $('#scene-1-naive-output', slide);
+          const runBtn  = $('[data-action="run-sort"]',  slide);
+          const walkBtn = $('[data-action="walk-emit"]', slide);
+          const resetBtn= $('[data-action="reset"]',     slide);
+
+          const chips = renderChips(host, SCENE_1_INPUT);
+
+          // Pre-compute stable sorted order: sortedOrder[origIdx] = newIdx
+          const tagged = SCENE_1_INPUT.map((v, i) => ({ v, i }));
+          tagged.sort((a, b) => a.v - b.v || a.i - b.i);
+          const sortedOrder = new Array(SCENE_1_INPUT.length);
+          tagged.forEach((item, newIdx) => (sortedOrder[item.i] = newIdx));
+
+          let sorted = false;
+
+          function pixelsPerChip() {
+            if (chips.length < 2) return 0;
+            const a = chips[0].getBoundingClientRect();
+            const b = chips[1].getBoundingClientRect();
+            return b.left - a.left;
+          }
+
+          runBtn.addEventListener('click', () => {
+            if (sorted) return;
+            const step = pixelsPerChip();
+            chips.forEach((chip, i) => {
+              const newIdx = sortedOrder[i];
+              chip.style.transform = `translateX(${(newIdx - i) * step}px)`;
+            });
+            sorted = true;
+            runBtn.disabled = true;
+            walkBtn.disabled = false;
+          });
+
+          walkBtn.addEventListener('click', () => {
+            walkBtn.disabled = true;
+            output.innerHTML = '';
+            let i = 0;
+            let line = [];
+            let prev = null;
+
+            const sortedTagged = tagged; // already sorted
+            const stepDelay = 220;
+
+            function tick() {
+              if (i >= sortedTagged.length) {
+                if (line.length) output.textContent += (output.textContent ? '\n' : '') + line.join(',');
+                chips.forEach(c => c.classList.remove('chip-cursor'));
+                return;
+              }
+              const it = sortedTagged[i];
+              if (prev !== null && it.v !== prev) {
+                output.textContent += (output.textContent ? '\n' : '') + line.join(',');
+                line = [];
+              }
+              line.push(it.v);
+              prev = it.v;
+              chips.forEach(c => c.classList.remove('chip-cursor'));
+              chips[it.i].classList.add('chip-cursor');
+              i++;
+              setT(tick, stepDelay);
+            }
+            tick();
+          });
+
+          resetBtn.addEventListener('click', () => {
+            sorted = false;
+            chips.forEach(c => {
+              c.style.transform = '';
+              c.classList.remove('chip-cursor');
+            });
+            output.innerHTML = '<span class="placeholder">Output will fill here…</span>';
+            runBtn.disabled = false;
+            walkBtn.disabled = true;
+          });
+        }
+
+        /* ---- Scene 1, Slide 3 — Insight: fly to buckets ---- */
+        function initSceneOneInsight(slide) {
+          const chipsHost = $('#scene-1-insight-chips', slide);
+          const buckHost  = $('#scene-1-insight-buckets', slide);
+          const runBtn    = $('[data-action="run-pass"]', slide);
+          const stepBtn   = $('[data-action="step-one"]', slide);
+          const resetBtn  = $('[data-action="reset"]',    slide);
+
+          const chips   = renderChips(chipsHost, SCENE_1_INPUT);
+          const buckets = buildBucketGrid(buckHost);
+          let idx = 0;
+          let busy = false;
+
+          function consumeOne() {
+            if (idx >= chips.length || busy) return false;
+            busy = true;
+            const chip = chips[idx];
+            const v = parseInt(chip.dataset.v, 10);
+            const bucket = buckets[v];
+
+            const cr = chip.getBoundingClientRect();
+            const br = bucket.getBoundingClientRect();
+            const dx = (br.left + br.width / 2) - (cr.left + cr.width / 2);
+            const dy = (br.top  + br.height / 2) - (cr.top  + cr.height / 2);
+
+            chip.style.transform = `translate(${dx}px, ${dy}px) scale(0.35)`;
+            chip.style.opacity = '0';
+            chip.classList.add('chip-consumed');
+
+            setT(() => {
+              const c = parseInt(bucket.dataset.count, 10) + 1;
+              bucket.dataset.count = String(c);
+              $('.bucket-count', bucket).textContent = String(c);
+              const fill = $('.bucket-fill', bucket);
+              fill.style.height = Math.min(100, c * 24) + '%';
+              bucket.classList.add('bucket-active');
+              bucket.classList.add('bucket-flash');
+              setT(() => bucket.classList.remove('bucket-flash'), 240);
+              busy = false;
+            }, 360);
+
+            idx++;
+            return true;
+          }
+
+          stepBtn.addEventListener('click', () => {
+            consumeOne();
+          });
+
+          runBtn.addEventListener('click', () => {
+            if (idx >= chips.length) return;
+            runBtn.disabled = true;
+            stepBtn.disabled = true;
+            const tick = () => {
+              if (idx >= chips.length) {
+                return;
+              }
+              consumeOne();
+              setT(tick, 220);
+            };
+            tick();
+          });
+
+          resetBtn.addEventListener('click', () => {
+            idx = 0;
+            busy = false;
+            runBtn.disabled  = false;
+            stepBtn.disabled = false;
+            chips.forEach(c => {
+              c.style.transform = '';
+              c.style.opacity = '';
+              c.classList.remove('chip-consumed');
+            });
+            buckets.forEach(b => {
+              b.dataset.count = '0';
+              $('.bucket-count', b).textContent = '';
+              $('.bucket-fill', b).style.height = '0%';
+              b.classList.remove('bucket-active', 'bucket-flash');
+            });
+          });
+        }
+
+        /* ---- Scene 1, Slide 4 — Walkthrough (count + print) ---- */
+        function initSceneOneWalkthrough(slide) {
+          const chipsHost = $('#scene-1-walk-chips', slide);
+          const buckHost  = $('#scene-1-walk-buckets', slide);
+          const stepBtn   = $('[data-action="step"]',   slide);
+          const runAllBtn = $('[data-action="run-all"]',slide);
+          const printBtn  = $('[data-action="print"]',  slide);
+          const resetBtn  = $('[data-action="reset"]',  slide);
+          const slotsHost = $('#scene-1-walk-sb-slots', slide);
+          const capLabel  = $('#scene-1-walk-sb-cap',   slide);
+          const sbBuffer  = $('#scene-1-walk-sb',       slide);
+          const output    = $('#scene-1-walk-output',   slide);
+
+          const chips   = renderChips(chipsHost, SCENE_1_INPUT);
+          const buckets = buildBucketGrid(buckHost);
+          let idx = 0;
+          let busy = false;
+          let phase = 'count';  // 'count' | 'print' | 'done'
+
+          // Buffer setup (16 slots; capacity stays constant)
+          const CAPACITY = 16;
+          slotsHost.innerHTML = '';
+          const slots = [];
+          for (let i = 0; i < CAPACITY; i++) {
+            const s = document.createElement('div');
+            s.className = 'sb-slot';
+            slotsHost.appendChild(s);
+            slots.push(s);
+          }
+          function bufferWrite(text) {
+            for (let i = 0; i < CAPACITY; i++) {
+              if (i < text.length) {
+                slots[i].textContent = text[i];
+                slots[i].classList.add('filled');
+              } else {
+                slots[i].textContent = '';
+                slots[i].classList.remove('filled');
+              }
+            }
+            capLabel.textContent = `len ${text.length} / cap ${CAPACITY}`;
+            sbBuffer.classList.add('flash');
+            setT(() => sbBuffer.classList.remove('flash'), 240);
+          }
+          function bufferClear() {
+            slots.forEach(s => { s.textContent = ''; s.classList.remove('filled'); });
+            capLabel.textContent = `len 0 / cap ${CAPACITY}`;
+            sbBuffer.classList.add('cleared');
+            setT(() => sbBuffer.classList.remove('cleared'), 320);
+          }
+
+          function checkCountDone() {
+            if (idx >= chips.length) {
+              printBtn.disabled = false;
+              stepBtn.disabled  = true;
+              runAllBtn.disabled= true;
+              phase = 'count-done';
+            }
+          }
+
+          function stepOne() {
+            if (idx >= chips.length || busy) return false;
+            busy = true;
+            const chip = chips[idx];
+            const v = parseInt(chip.dataset.v, 10);
+            const bucket = buckets[v];
+
+            const cr = chip.getBoundingClientRect();
+            const br = bucket.getBoundingClientRect();
+            const dx = (br.left + br.width / 2) - (cr.left + cr.width / 2);
+            const dy = (br.top  + br.height / 2) - (cr.top  + cr.height / 2);
+
+            chip.style.transform = `translate(${dx}px, ${dy}px) scale(0.35)`;
+            chip.style.opacity = '0';
+            chip.classList.add('chip-consumed');
+
+            setT(() => {
+              const c = parseInt(bucket.dataset.count, 10) + 1;
+              bucket.dataset.count = String(c);
+              $('.bucket-count', bucket).textContent = String(c);
+              const fill = $('.bucket-fill', bucket);
+              fill.style.height = Math.min(100, c * 24) + '%';
+              bucket.classList.add('bucket-active');
+              bucket.classList.add('bucket-flash');
+              setT(() => bucket.classList.remove('bucket-flash'), 240);
+              busy = false;
+              idx++;
+              checkCountDone();
+            }, 320);
+            return true;
+          }
+
+          stepBtn.addEventListener('click', stepOne);
+          runAllBtn.addEventListener('click', () => {
+            if (idx >= chips.length) return;
+            stepBtn.disabled = true;
+            runAllBtn.disabled = true;
+            const tick = () => {
+              if (idx >= chips.length) return;
+              stepOne();
+              setT(tick, 220);
+            };
+            tick();
+          });
+
+          printBtn.addEventListener('click', () => {
+            if (phase === 'print' || phase === 'done') return;
+            phase = 'print';
+            printBtn.disabled = true;
+            output.innerHTML = '';
+            buckets.forEach(b => b.classList.remove('bucket-cursor'));
+
+            let v = 0;
+            function walk() {
+              // Move cursor to current v
+              buckets.forEach(b => b.classList.remove('bucket-cursor'));
+              if (v > 100) {
+                phase = 'done';
+                return;
+              }
+              const bucket = buckets[v];
+              bucket.classList.add('bucket-cursor');
+              const c = parseInt(bucket.dataset.count, 10);
+
+              if (c > 0) {
+                // Build line with reused buffer
+                let line = String(v);
+                for (let i = 1; i < c; i++) line += ',' + v;
+                bufferWrite(line.slice(0, CAPACITY));
+                output.textContent += (output.textContent ? '\n' : '') + line;
+                v++;
+                // wait, then wipe and continue
+                setT(() => {
+                  bufferClear();
+                  setT(walk, 220);
+                }, 480);
+              } else {
+                v++;
+                setT(walk, 16); // fast skip when empty
+              }
+            }
+            walk();
+          });
+
+          resetBtn.addEventListener('click', () => {
+            idx = 0;
+            busy = false;
+            phase = 'count';
+            stepBtn.disabled = false;
+            runAllBtn.disabled = false;
+            printBtn.disabled = true;
+            chips.forEach(c => {
+              c.style.transform = '';
+              c.style.opacity = '';
+              c.classList.remove('chip-consumed');
+            });
+            buckets.forEach(b => {
+              b.dataset.count = '0';
+              $('.bucket-count', b).textContent = '';
+              $('.bucket-fill', b).style.height = '0%';
+              b.classList.remove('bucket-active', 'bucket-flash', 'bucket-cursor');
+            });
+            output.innerHTML = '<span class="placeholder">Lines will print here…</span>';
+            bufferClear();
+          });
+        }
+
+        /* ---- Scene 1, Slide 5 — StringBuilder buffer reuse ---- */
+        function initSceneOneStringBuilder(slide) {
+          const slotsHost = $('#scene-1-sb-slots',  slide);
+          const capLabel  = $('#scene-1-sb-cap',    slide);
+          const sbBuffer  = $('#scene-1-sb-buffer', slide);
+          const appendBtn = $('[data-action="append"]', slide);
+          const clearBtn  = $('[data-action="clear"]',  slide);
+          const resetBtn  = $('[data-action="reset"]',  slide);
+          const output    = $('#scene-1-sb-output', slide);
+
+          const LINES = ['0,0,0','1,1,1','2,2','3,3','4,4,4','21','31','51','54,54'];
+          const CAPACITY = 16;
+
+          slotsHost.innerHTML = '';
+          const slots = [];
+          for (let i = 0; i < CAPACITY; i++) {
+            const s = document.createElement('div');
+            s.className = 'sb-slot';
+            slotsHost.appendChild(s);
+            slots.push(s);
+          }
+
+          let lineIdx = 0;
+          let bufferLength = 0;
+
+          function paint(text) {
+            for (let i = 0; i < CAPACITY; i++) {
+              if (i < text.length) {
+                slots[i].textContent = text[i];
+                slots[i].classList.add('filled');
+              } else {
+                slots[i].textContent = '';
+                slots[i].classList.remove('filled');
+              }
+            }
+            bufferLength = text.length;
+            capLabel.textContent = `len ${bufferLength} / cap ${CAPACITY}`;
+          }
+
+          function flash() {
+            sbBuffer.classList.add('flash');
+            setT(() => sbBuffer.classList.remove('flash'), 240);
+          }
+
+          appendBtn.addEventListener('click', () => {
+            if (lineIdx >= LINES.length) {
+              appendBtn.disabled = true;
+              return;
+            }
+            const line = LINES[lineIdx];
+            paint(line.slice(0, CAPACITY));
+            flash();
+            if (output.querySelector('.placeholder')) output.innerHTML = '';
+            output.textContent += (output.textContent ? '\n' : '') + line;
+            lineIdx++;
+            if (lineIdx >= LINES.length) appendBtn.disabled = true;
+          });
+
+          clearBtn.addEventListener('click', () => {
+            paint('');
+            sbBuffer.classList.add('cleared');
+            setT(() => sbBuffer.classList.remove('cleared'), 320);
+          });
+
+          resetBtn.addEventListener('click', () => {
+            lineIdx = 0;
+            paint('');
+            output.innerHTML = '<span class="placeholder">Each appended line lands here.</span>';
+            appendBtn.disabled = false;
+          });
+
+          // start empty
+          paint('');
+        }
+
+        /* ---------------------------------------------------------------
+           Slide init registry. Each key matches a slide's data-init.
+           --------------------------------------------------------------- */
+        const slideInit = {
+          'scene-1-problem':       initSceneOneProblem,
+          'scene-1-naive':         initSceneOneNaive,
+          'scene-1-insight':       initSceneOneInsight,
+          'scene-1-walkthrough':   initSceneOneWalkthrough,
+          'scene-1-stringbuilder': initSceneOneStringBuilder,
+        };
+
+        /* ---------------------------------------------------------------
+           Bootstrap.
+           --------------------------------------------------------------- */
+        readHash();
+        render();
+      })();
+    </script>
+  </body>
+</html>
