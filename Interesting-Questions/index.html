@@ -1018,6 +1018,90 @@
       }
 
       /* =====================================================================
+         Scene 4 — Most frequent in a stream: bar chart + most-frequent card.
+         ===================================================================== */
+      .chip.chip--event { font-weight: 600; }
+      .chip.chip--event[data-ev="A"] { background: var(--teal-50);  border-color: var(--teal-100);  color: var(--teal-800); }
+      .chip.chip--event[data-ev="B"] { background: var(--amber-50); border-color: var(--amber-100); color: var(--amber-800); }
+      .chip.chip--event[data-ev="C"] { background: var(--coral-50); border-color: var(--coral-100); color: var(--coral-800); }
+
+      .bar-chart {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .bar-row {
+        display: grid;
+        grid-template-columns: 40px 1fr 48px;
+        align-items: center;
+        gap: 12px;
+      }
+      .bar-label {
+        font-family: var(--font-mono);
+        font-size: 18px;
+        font-weight: 600;
+        text-align: center;
+        color: var(--gray-800);
+      }
+      .bar-track {
+        height: 22px;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-100);
+        border-radius: 999px;
+        overflow: hidden;
+        position: relative;
+      }
+      .bar-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--teal-100), var(--teal-400));
+        border-radius: 999px;
+        transition: width 320ms ease, background 280ms ease;
+      }
+      .bar-row.is-leader .bar-fill {
+        background: linear-gradient(90deg, var(--purple-400), var(--purple-600));
+      }
+      .bar-row.is-scanned .bar-track {
+        outline: 2px solid var(--amber-400);
+        outline-offset: 2px;
+      }
+      .bar-count {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        color: var(--gray-800);
+        text-align: right;
+      }
+      .bar-row.is-leader .bar-count {
+        color: var(--purple-600);
+        font-weight: 600;
+      }
+
+      .most-frequent-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 28px 20px;
+        border: 1px solid var(--purple-100);
+        background: var(--purple-50);
+        border-radius: var(--radius-lg);
+        text-align: center;
+        min-height: 160px;
+        justify-content: center;
+        transition: background 240ms ease, border-color 240ms ease;
+      }
+      .most-frequent-card .big-number { color: var(--purple-600); font-size: 64px; }
+      .most-frequent-card.flash {
+        animation: most-flash 460ms ease;
+      }
+      @keyframes most-flash {
+        0%   { background: var(--amber-100); border-color: var(--amber-400); transform: scale(1); }
+        40%  { background: var(--amber-100); border-color: var(--amber-400); transform: scale(1.04); }
+        100% { background: var(--purple-50); border-color: var(--purple-100); transform: scale(1); }
+      }
+      .most-frequent-card .sum-label { color: var(--purple-600); }
+
+      /* =====================================================================
          Reduced motion: disable nice-to-have transitions, keep final state.
          ===================================================================== */
       @media (prefers-reduced-motion: reduce) {
@@ -1990,6 +2074,243 @@ seen = <span class="c-ty">HashSet</span>(arr)
             When the input has algebraic structure (consecutive ints, XOR
             identities, sums of squares), data structures step out of the way.
             Math takes over.
+          </div>
+        </section>
+
+      </article>
+    </template>
+
+    <!-- ----- Scene 4: Most frequent in a stream ----- -->
+    <template id="scene-4">
+      <article class="scene" data-scene-title="Most frequent in a stream">
+
+        <!-- Slide 1: Problem -->
+        <section
+          class="slide slide-problem"
+          data-init="scene-4-problem"
+          data-notes="Live event stream, ~50 event types. At any moment a query asks 'most common so far?' and must answer in O(1). Demo stream: A,B,A,C,B,A,C,C,C. The last C makes C overtake A (4 vs 3)."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 4 · the problem</span>
+            <h1>Most frequent in a stream</h1>
+          </header>
+
+          <p class="lead">
+            Events arrive one at a time, each of about 50 known types. At any
+            moment, a query asks "what's the most common event so far?" — and
+            must return in <code style="font-family:var(--font-mono)">O(1)</code>.
+          </p>
+
+          <div class="viz">
+            <h2>Tiny example — 9 events, 3 types</h2>
+
+            <div style="display:flex; flex-direction:column; gap: 14px;">
+              <div>
+                <span class="sum-label" style="display:block; margin-bottom: 6px;">events arriving (left to right)</span>
+                <div class="chip-row" id="scene-4-input-stream"></div>
+              </div>
+
+              <div>
+                <span class="sum-label" style="display:block; margin-bottom: 6px;">most frequent after each event</span>
+                <div class="chip-row" id="scene-4-most-trace"></div>
+              </div>
+            </div>
+
+            <p class="viz-caption">
+              The last <code style="font-family:var(--font-mono)">C</code>
+              flips the answer: <code style="font-family:var(--font-mono)">C</code>
+              overtakes <code style="font-family:var(--font-mono)">A</code>
+              (4 vs 3). Every other step keeps the previous leader.
+            </p>
+          </div>
+
+          <div class="callout">
+            <strong>The hot path.</strong>
+            Reads can be far more frequent than writes. Whatever work the
+            query does, the algorithm does on every read — so pay the cost
+            on insertion instead.
+          </div>
+        </section>
+
+        <!-- Slide 2: Naive -->
+        <section
+          class="slide slide-naive"
+          data-init="scene-4-naive"
+          data-notes="Naive: keep counts, scan all entries on each query. O(k) per query where k = distinct types. Fails the O(1) query requirement."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 4 · the naive try</span>
+            <h1>Scan the map on every query</h1>
+          </header>
+
+          <p class="lead">
+            Keep a counts map. On every query, iterate the map and return the
+            entry with the highest count. Each query costs
+            <code style="font-family:var(--font-mono)">O(k)</code> — failing
+            the requirement.
+          </p>
+
+          <div class="split split-wide-right">
+            <div class="stack">
+              <div class="code"><span class="c-ty">Map</span>&lt;<span class="c-ty">Event</span>, <span class="c-ty">Integer</span>&gt; counts = <span class="c-key">new</span> <span class="c-ty">HashMap</span>&lt;&gt;();
+
+<span class="c-key">void</span> <span class="c-fn">onEvent</span>(<span class="c-ty">Event</span> e) {
+  counts.merge(e, <span class="c-num">1</span>, <span class="c-ty">Integer</span>::sum);
+}
+
+<span class="c-ty">Event</span> <span class="c-fn">mostFrequent</span>() {
+  <span class="c-ty">Event</span> best = <span class="c-key">null</span>; <span class="c-key">int</span> bestN = -<span class="c-num">1</span>;
+  <span class="c-key">for</span> (<span class="c-key">var</span> e : counts.entrySet()) {     <span class="c-com">// O(k) scan</span>
+    <span class="c-key">if</span> (e.getValue() &gt; bestN) {
+      bestN = e.getValue(); best = e.getKey();
+    }
+  }
+  <span class="c-key">return</span> best;
+}</div>
+
+              <div class="complexity" role="note">
+                <span class="pill time">Insert: O(1)</span>
+                <span class="pill bad">Query: O(k)</span>
+                <span class="pill space">Space: O(k)</span>
+              </div>
+
+              <div class="callout callout--naive">
+                <strong>Why this is wasteful.</strong>
+                Queries repeat the same scan, finding the same winner most of
+                the time. The work is the same whether anything changed or not.
+              </div>
+            </div>
+
+            <div class="viz">
+              <h2>Watch one query scan the map</h2>
+              <div class="bar-chart" id="scene-4-naive-bars"></div>
+              <div class="viz-actions">
+                <button class="btn btn--primary" data-action="run-scan">Run a query</button>
+                <span class="spacer"></span>
+                <button class="btn btn--ghost" data-action="reset">Reset</button>
+              </div>
+              <p class="viz-caption">
+                A cursor visits every bar, holding the current leader. The
+                last visit determines the result. Three bars → three steps.
+                Fifty bars → fifty steps.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 3: Insight -->
+        <section
+          class="slide slide-insight"
+          data-init="scene-4-insight"
+          data-notes="Shift the work to insertion time. Maintain counts AND a mostFrequent variable. On insert, compare the new count against counts[mostFrequent]; update if larger. Query becomes a single variable read."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 4 · the insight</span>
+            <h1>Pay at insertion, read for free</h1>
+          </header>
+
+          <div class="split split-wide-left">
+            <div class="stack">
+              <p class="lead">
+                Move the work off the hot path. Maintain a single
+                <code style="font-family:var(--font-mono)">mostFrequent</code>
+                variable next to the counts map and update it whenever a new
+                count overtakes the current leader.
+              </p>
+
+              <div class="callout callout--insight">
+                <strong>One sentence.</strong>
+                Identify which operation is on the hot path, and pay the cost
+                on the cold one.
+              </div>
+
+              <div class="code"><span class="c-ty">Map</span>&lt;<span class="c-ty">Event</span>, <span class="c-ty">Integer</span>&gt; counts = <span class="c-key">new</span> <span class="c-ty">HashMap</span>&lt;&gt;();
+<span class="c-ty">Event</span> mostFrequent = <span class="c-key">null</span>;
+<span class="c-key">int</span>   mostCount    = <span class="c-num">0</span>;
+
+<span class="c-key">void</span> <span class="c-fn">onEvent</span>(<span class="c-ty">Event</span> e) {
+  <span class="c-key">int</span> c = counts.merge(e, <span class="c-num">1</span>, <span class="c-ty">Integer</span>::sum);
+  <span class="c-key">if</span> (c &gt; mostCount) {              <span class="c-com">// O(1) update</span>
+    mostCount = c; mostFrequent = e;
+  }
+}
+
+<span class="c-ty">Event</span> <span class="c-fn">mostFrequent</span>() {
+  <span class="c-key">return</span> mostFrequent;             <span class="c-com">// O(1) read</span>
+}</div>
+
+              <div class="complexity" role="note">
+                <span class="pill time">Insert: O(1)</span>
+                <span class="pill time">Query: O(1)</span>
+                <span class="pill space">Space: O(k)</span>
+              </div>
+            </div>
+
+            <div class="viz">
+              <h2>State after all 9 events</h2>
+              <div class="split" style="grid-template-columns: 1.4fr 1fr; gap: 18px;">
+                <div class="bar-chart" id="scene-4-insight-bars"></div>
+                <div class="most-frequent-card" id="scene-4-insight-most">
+                  <span class="sum-label">most frequent</span>
+                  <span class="big-number">C</span>
+                  <span class="sum-explain">count = 4</span>
+                </div>
+              </div>
+              <p class="viz-caption">
+                The leader pill is purple. The card on the right is what the
+                query returns — a single variable read.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 4: Walkthrough -->
+        <section
+          class="slide slide-walkthrough"
+          data-init="scene-4-walkthrough"
+          data-notes="Step events one at a time. Watch counts update and the mostFrequent label flash exactly when the leader changes. For this stream, it flashes only once — on the final C."
+        >
+          <header class="slide-header">
+            <span class="scene-tag">Scene 4 · walkthrough</span>
+            <h1>Ingest one event, query for free</h1>
+          </header>
+
+          <p class="lead">
+            <strong>Step</strong> consumes the next event. Counts update on
+            insertion. The big card on the right is the query result — note
+            how rarely it actually changes.
+          </p>
+
+          <div class="viz">
+            <h2>Live stream</h2>
+            <div class="chip-row" id="scene-4-walk-stream"></div>
+
+            <div class="split" style="grid-template-columns: 1.4fr 1fr; gap: 18px;">
+              <div class="bar-chart" id="scene-4-walk-bars"></div>
+              <div class="most-frequent-card" id="scene-4-walk-most">
+                <span class="sum-label">most frequent</span>
+                <span class="big-number" id="scene-4-walk-most-letter">—</span>
+                <span class="sum-explain" id="scene-4-walk-most-explain">no events yet</span>
+              </div>
+            </div>
+
+            <div class="viz-actions">
+              <button class="btn btn--data" data-action="step">Step</button>
+              <button class="btn" data-action="run">Run all</button>
+              <span class="spacer"></span>
+              <button class="btn btn--ghost" data-action="reset">Reset</button>
+            </div>
+
+            <p class="viz-caption">
+              The card flashes amber only when the leader changes. Eight of
+              nine steps don't trigger a flash — that's the whole point.
+            </p>
+          </div>
+
+          <div class="complexity" role="note">
+            <span class="pill time">Insert: O(1)</span>
+            <span class="pill time">Query: O(1)</span>
+            <span class="pill space">Space: O(k)</span>
           </div>
         </section>
 
@@ -3210,6 +3531,240 @@ seen = <span class="c-ty">HashSet</span>(arr)
         /* Scene 3, Slide 5 — Follow-up (static discussion) */
         function initSceneThreeFollowup(/* slide */) { /* no interactivity */ }
 
+        /* ===============================================================
+           Per-slide init hooks for Scene 4 — Most frequent in a stream.
+           =============================================================== */
+        const SCENE_4_STREAM = ['A', 'B', 'A', 'C', 'B', 'A', 'C', 'C', 'C'];
+        const SCENE_4_TYPES  = ['A', 'B', 'C'];
+
+        function renderEventChips(host, events) {
+          host.innerHTML = '';
+          events.forEach((ev, i) => {
+            const c = document.createElement('span');
+            c.className = 'chip chip--event';
+            c.dataset.ev = ev;
+            c.dataset.i = i;
+            c.textContent = ev;
+            host.appendChild(c);
+          });
+          return [...host.children];
+        }
+
+        function buildBarChart(host, types, initial = {}) {
+          host.innerHTML = '';
+          const rows = {};
+          types.forEach(t => {
+            const row = document.createElement('div');
+            row.className = 'bar-row';
+            row.dataset.ev = t;
+            row.innerHTML = `
+              <span class="bar-label">${t}</span>
+              <div class="bar-track"><div class="bar-fill"></div></div>
+              <span class="bar-count">${initial[t] || 0}</span>
+            `;
+            host.appendChild(row);
+            rows[t] = row;
+          });
+          return rows;
+        }
+
+        function setBar(rows, type, count, maxCount) {
+          const row = rows[type];
+          if (!row) return;
+          const fill = row.querySelector('.bar-fill');
+          const cnt  = row.querySelector('.bar-count');
+          fill.style.width = (maxCount > 0 ? (count / maxCount) * 100 : 0) + '%';
+          cnt.textContent = String(count);
+        }
+
+        function markLeader(rows, leaderType) {
+          for (const t in rows) {
+            rows[t].classList.toggle('is-leader', t === leaderType);
+          }
+        }
+
+        /* Trace through the stream and produce the per-step state. */
+        function traceStream(stream) {
+          const counts = {};
+          let leader = null;
+          let leaderCount = 0;
+          const trace = [];
+          for (const ev of stream) {
+            counts[ev] = (counts[ev] || 0) + 1;
+            const flashed = counts[ev] > leaderCount;
+            if (flashed) {
+              leader = ev;
+              leaderCount = counts[ev];
+            }
+            trace.push({ ev, counts: { ...counts }, leader, leaderCount, flashed });
+          }
+          return trace;
+        }
+
+        /* Scene 4, Slide 1 — Problem (static) */
+        function initSceneFourProblem(slide) {
+          renderEventChips($('#scene-4-input-stream', slide), SCENE_4_STREAM);
+          const traceHost = $('#scene-4-most-trace', slide);
+          const trace = traceStream(SCENE_4_STREAM);
+          traceHost.innerHTML = '';
+          trace.forEach((step, i) => {
+            const c = document.createElement('span');
+            c.className = 'chip chip--event';
+            c.dataset.ev = step.leader;
+            c.textContent = step.leader;
+            if (step.flashed && i > 0) c.classList.add('chip-cursor');
+            traceHost.appendChild(c);
+          });
+        }
+
+        /* Scene 4, Slide 2 — Naive: animate one O(k) query scan */
+        function initSceneFourNaive(slide) {
+          const barsHost = $('#scene-4-naive-bars', slide);
+          const runBtn   = $('[data-action="run-scan"]', slide);
+          const resetBtn = $('[data-action="reset"]', slide);
+
+          // Counts after all 9 events
+          const finalCounts = { A: 3, B: 2, C: 4 };
+          const max = Math.max(...Object.values(finalCounts));
+          const rows = buildBarChart(barsHost, SCENE_4_TYPES, finalCounts);
+          SCENE_4_TYPES.forEach(t => setBar(rows, t, finalCounts[t], max));
+
+          let busy = false;
+
+          runBtn.addEventListener('click', () => {
+            if (busy) return;
+            busy = true;
+            runBtn.disabled = true;
+            // Reset highlights
+            SCENE_4_TYPES.forEach(t => rows[t].classList.remove('is-scanned', 'is-leader'));
+            let i = 0;
+            let bestType = null;
+            let bestCount = -1;
+            function tick() {
+              if (i > 0) rows[SCENE_4_TYPES[i - 1]].classList.remove('is-scanned');
+              if (i >= SCENE_4_TYPES.length) {
+                if (bestType) rows[bestType].classList.add('is-leader');
+                busy = false;
+                return;
+              }
+              const t = SCENE_4_TYPES[i];
+              rows[t].classList.add('is-scanned');
+              if (finalCounts[t] > bestCount) {
+                bestCount = finalCounts[t];
+                bestType = t;
+              }
+              i++;
+              setT(tick, 600);
+            }
+            tick();
+          });
+
+          resetBtn.addEventListener('click', () => {
+            busy = false;
+            runBtn.disabled = false;
+            SCENE_4_TYPES.forEach(t => rows[t].classList.remove('is-scanned', 'is-leader'));
+          });
+        }
+
+        /* Scene 4, Slide 3 — Insight: static final-state snapshot */
+        function initSceneFourInsight(slide) {
+          const barsHost = $('#scene-4-insight-bars', slide);
+          const finalCounts = { A: 3, B: 2, C: 4 };
+          const max = Math.max(...Object.values(finalCounts));
+          const rows = buildBarChart(barsHost, SCENE_4_TYPES, finalCounts);
+          SCENE_4_TYPES.forEach(t => setBar(rows, t, finalCounts[t], max));
+          rows.C.classList.add('is-leader');
+        }
+
+        /* Scene 4, Slide 4 — Walkthrough: live stream */
+        function initSceneFourWalkthrough(slide) {
+          const streamHost = $('#scene-4-walk-stream', slide);
+          const barsHost   = $('#scene-4-walk-bars', slide);
+          const mostCard   = $('#scene-4-walk-most', slide);
+          const mostLetter = $('#scene-4-walk-most-letter', slide);
+          const mostExplain= $('#scene-4-walk-most-explain', slide);
+          const stepBtn    = $('[data-action="step"]', slide);
+          const runBtn     = $('[data-action="run"]',  slide);
+          const resetBtn   = $('[data-action="reset"]', slide);
+
+          const chips = renderEventChips(streamHost, SCENE_4_STREAM);
+          const rows  = buildBarChart(barsHost, SCENE_4_TYPES);
+
+          let idx = 0;
+          let counts = { A: 0, B: 0, C: 0 };
+          let leader = null;
+          let leaderCount = 0;
+          let busy = false;
+
+          function reset() {
+            idx = 0;
+            counts = { A: 0, B: 0, C: 0 };
+            leader = null;
+            leaderCount = 0;
+            busy = false;
+            chips.forEach(c => c.classList.remove('chip-cursor', 'chip-faded'));
+            SCENE_4_TYPES.forEach(t => {
+              setBar(rows, t, 0, 1);
+              rows[t].classList.remove('is-leader');
+            });
+            mostLetter.textContent = '—';
+            mostExplain.textContent = 'no events yet';
+            stepBtn.disabled = false;
+            runBtn.disabled  = false;
+          }
+          reset();
+
+          function step() {
+            if (idx >= SCENE_4_STREAM.length || busy) return;
+            busy = true;
+            const ev = SCENE_4_STREAM[idx];
+            const chip = chips[idx];
+            chips.forEach(c => c.classList.remove('chip-cursor'));
+            chip.classList.add('chip-cursor');
+            counts[ev]++;
+            const max = Math.max(...Object.values(counts), 1);
+            SCENE_4_TYPES.forEach(t => setBar(rows, t, counts[t], max));
+
+            const flashed = counts[ev] > leaderCount;
+            if (flashed) {
+              leader = ev;
+              leaderCount = counts[ev];
+              markLeader(rows, leader);
+              mostLetter.textContent = leader;
+              mostExplain.textContent = `count = ${leaderCount}`;
+              mostCard.classList.add('flash');
+              setT(() => mostCard.classList.remove('flash'), 460);
+            } else {
+              markLeader(rows, leader);
+            }
+
+            setT(() => {
+              chip.classList.remove('chip-cursor');
+              chip.classList.add('chip-faded');
+              busy = false;
+            }, 320);
+
+            idx++;
+            if (idx >= SCENE_4_STREAM.length) {
+              stepBtn.disabled = true;
+              runBtn.disabled  = true;
+            }
+          }
+
+          stepBtn.addEventListener('click', step);
+          runBtn.addEventListener('click', () => {
+            stepBtn.disabled = true;
+            runBtn.disabled  = true;
+            const tick = () => {
+              if (idx >= SCENE_4_STREAM.length) return;
+              step();
+              setT(tick, 480);
+            };
+            tick();
+          });
+          resetBtn.addEventListener('click', reset);
+        }
+
         /* ---------------------------------------------------------------
            Slide init registry. Each key matches a slide's data-init.
            --------------------------------------------------------------- */
@@ -3228,6 +3783,10 @@ seen = <span class="c-ty">HashSet</span>(arr)
           'scene-3-insight':       initSceneThreeInsight,
           'scene-3-walkthrough':   initSceneThreeWalkthrough,
           'scene-3-followup':      initSceneThreeFollowup,
+          'scene-4-problem':       initSceneFourProblem,
+          'scene-4-naive':         initSceneFourNaive,
+          'scene-4-insight':       initSceneFourInsight,
+          'scene-4-walkthrough':   initSceneFourWalkthrough,
         };
 
         /* ---------------------------------------------------------------
