@@ -542,7 +542,7 @@
         flex-direction: column;
         gap: 6px;
         text-align: left;
-        padding: 16px 18px;
+        padding: 16px 18px 16px 22px;
         background: var(--gray-50);
         border: 1px solid var(--gray-100);
         border-radius: var(--radius-md);
@@ -550,7 +550,25 @@
         transition: background 150ms ease, transform 100ms ease, border-color 150ms ease;
         font-family: inherit;
         color: inherit;
+        position: relative;
       }
+      .scene-tile::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 14px;
+        bottom: 14px;
+        width: 4px;
+        border-radius: 2px;
+        background: var(--purple-600);
+      }
+      /* Cycle accent colours through tiles so the grid is scannable. */
+      .scene-tile:nth-child(6n+1)::before { background: var(--purple-600); }
+      .scene-tile:nth-child(6n+2)::before { background: var(--teal-600); }
+      .scene-tile:nth-child(6n+3)::before { background: var(--amber-600); }
+      .scene-tile:nth-child(6n+4)::before { background: var(--coral-600); }
+      .scene-tile:nth-child(6n+5)::before { background: var(--purple-400); }
+      .scene-tile:nth-child(6n)::before   { background: var(--teal-400); }
       .scene-tile:hover {
         background: var(--purple-50);
         border-color: var(--purple-100);
@@ -750,17 +768,30 @@
         display: flex;
         flex-direction: column;
         gap: 14px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
       }
       .bucket-grid {
         --cols: 101;
+        --min-cell: 7px;
         display: grid;
-        grid-template-columns: repeat(var(--cols), 1fr);
+        grid-template-columns: repeat(var(--cols), minmax(var(--min-cell), 1fr));
         gap: 1px;
         background: var(--gray-100);
         border: 1px solid var(--gray-100);
         border-radius: var(--radius-sm);
         padding: 1px;
         position: relative;
+      }
+      .bucket-grid[style*="--cols: 128"] { --min-cell: 6px; }
+      /* Wrapper that allows horizontal scrolling when a bucket-grid is too
+         wide for narrow viewports. Used on both Scene 1's bucket-stage and
+         Scene 2's standalone count grids. */
+      .scroll-x {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
       }
       .bucket {
         position: relative;
@@ -1348,15 +1379,84 @@
       }
 
       /* =====================================================================
-         Small screens — keep usable on tablet portrait.
+         Small screens — keep usable on tablet portrait and phone landscape.
          ===================================================================== */
       @media (max-width: 720px) {
-        :root { --slide-px: 24px; --slide-py: 36px; }
-        .app-header { flex-wrap: wrap; gap: 16px; padding: 14px 18px; }
+        :root { --slide-px: 20px; --slide-py: 32px; }
+        body { font-size: 17px; }
+        .app-header { flex-wrap: wrap; gap: 16px; padding: 12px 16px; }
         .help-hint { display: none; }
-        .nav-bar { padding: 10px 16px; }
-        .slide h1 { font-size: 34px; }
-        .slide p, .slide .lead { font-size: 17px; }
+        .nav-bar { padding: 10px 12px; }
+        .nav-bar .btn { padding: 7px 12px; font-size: 13px; }
+        .nav-jump { font-size: 12px; padding: 7px 10px; }
+        .slide h1 { font-size: 30px; line-height: 1.15; }
+        .slide h2 { font-size: 20px; }
+        .slide p, .slide .lead { font-size: 16px; }
+        .slide .lead { font-size: 18px; }
+        .code { font-size: 13px; padding: 14px 16px; }
+        .viz { padding: 18px 16px 14px; }
+        .complexity { font-size: 14px; padding: 8px 10px; }
+        .complexity .pill { font-size: 12px; }
+        .canonicalizer { gap: 10px; padding: 16px; }
+        .canonicalizer .word, .canonicalizer .key { font-size: 18px; padding: 10px 8px; }
+        .big-number { font-size: 44px; }
+        .most-frequent-card .big-number { font-size: 48px; }
+        .notes-panel { right: 12px; bottom: 76px; width: calc(100vw - 24px); max-width: none; }
+      }
+
+      /* =====================================================================
+         Print stylesheet — make Ctrl/Cmd+P produce a readable handout.
+         Hides interactive chrome; shows the current slide on a clean page.
+         ===================================================================== */
+      @media print {
+        :root {
+          --slide-py: 24px;
+          --slide-px: 24px;
+        }
+        body {
+          background: #ffffff !important;
+          color: #000000;
+          font-size: 12pt;
+          line-height: 1.45;
+        }
+        .app-header,
+        .nav-bar,
+        .notes-panel,
+        dialog#overview,
+        .viz-actions,
+        .help-hint {
+          display: none !important;
+        }
+        #stage { padding: 0; }
+        .slide {
+          max-width: none;
+          page-break-after: always;
+          break-after: page;
+        }
+        .slide:last-of-type { page-break-after: auto; }
+        .slide h1 { font-size: 24pt; }
+        .slide h2 { font-size: 14pt; }
+        .slide p, .slide .lead { font-size: 11pt; }
+        .code {
+          background: #f4f4f7;
+          color: #111;
+          border: 1px solid #ccc;
+          font-size: 9.5pt;
+        }
+        .code .c-key, .code .c-op,
+        .code .c-num, .code .c-str,
+        .code .c-com, .code .c-fn,
+        .code .c-ty {
+          color: #000;
+        }
+        .code .c-com { font-style: italic; color: #666; }
+        .chip { box-shadow: none; }
+        .viz { box-shadow: none; }
+        .output-block { background: #f4f4f7; color: #111; }
+        /* Don't try to print tiny bucket grids — they're meaningless on paper. */
+        .bucket-grid, .count-fingerprint { display: none; }
+        .bucket-axis { display: none; }
+        /* Linked-list SVGs print fine; keep them. */
       }
     </style>
   </head>
@@ -1410,8 +1510,8 @@
       </div>
       <div class="nav-group">
         <select class="nav-jump" id="nav-jump" aria-label="Jump to scene"></select>
-        <button class="btn btn--ghost" id="overview-btn" aria-label="Open scene overview">Overview</button>
-        <button class="btn btn--ghost" id="notes-btn" aria-label="Toggle speaker notes">Notes</button>
+        <button class="btn btn--ghost" id="overview-btn" aria-label="Open scene overview" aria-expanded="false" aria-controls="overview">Overview</button>
+        <button class="btn btn--ghost" id="notes-btn" aria-label="Toggle speaker notes" aria-expanded="false" aria-controls="notes">Notes</button>
       </div>
     </nav>
 
@@ -1436,7 +1536,7 @@
         <span>Speaker notes</span>
         <button class="close-btn" id="notes-close" aria-label="Close notes" type="button">&times;</button>
       </header>
-      <div class="notes-content"></div>
+      <div class="notes-content" role="status" aria-live="polite"></div>
     </aside>
 
     <!-- ===================================================================
@@ -1934,9 +2034,11 @@
 
             <div class="viz">
               <h2>Counts after pass 1 — 128 slots, indexed by codepoint</h2>
-              <div class="bucket-grid" id="scene-2-insight-counts" style="--cols: 128;" aria-hidden="true"></div>
-              <div class="bucket-axis" aria-hidden="true">
-                <span>0</span><span>32</span><span>64</span><span>97 (a)</span><span>127</span>
+              <div class="scroll-x">
+                <div class="bucket-grid" id="scene-2-insight-counts" style="--cols: 128;" aria-hidden="true"></div>
+                <div class="bucket-axis" aria-hidden="true">
+                  <span>0</span><span>32</span><span>64</span><span>97 (a)</span><span>127</span>
+                </div>
               </div>
               <p class="viz-caption">
                 One slot per ASCII codepoint. After pass 1, only the six
@@ -1965,9 +2067,11 @@
           <div class="viz">
             <h2>Two passes, one counting array</h2>
             <div class="chip-row" id="scene-2-walk-chips"></div>
-            <div class="bucket-grid" id="scene-2-walk-counts" style="--cols: 128;" aria-hidden="true"></div>
-            <div class="bucket-axis" aria-hidden="true">
-              <span>0</span><span>32</span><span>64</span><span>97 (a)</span><span>127</span>
+            <div class="scroll-x">
+              <div class="bucket-grid" id="scene-2-walk-counts" style="--cols: 128;" aria-hidden="true"></div>
+              <div class="bucket-axis" aria-hidden="true">
+                <span>0</span><span>32</span><span>64</span><span>97 (a)</span><span>127</span>
+              </div>
             </div>
 
             <div class="viz-actions">
@@ -2965,9 +3069,9 @@ groups.computeIfAbsent(canon(s), k -&gt; <span class="c-key">new</span> <span cl
           <div class="viz">
             <div class="viz-actions" style="margin-bottom: 4px;">
               <span class="sum-label">list:</span>
-              <div class="toggle-group" id="scene-6-walk-toggle">
-                <button class="toggle-btn is-active" data-list="A" type="button">A — no cycle</button>
-                <button class="toggle-btn" data-list="B" type="button">B — cycle at node 3</button>
+              <div class="toggle-group" id="scene-6-walk-toggle" role="group" aria-label="Choose example list">
+                <button class="toggle-btn is-active" data-list="A" type="button" aria-pressed="true">A — no cycle</button>
+                <button class="toggle-btn" data-list="B" type="button" aria-pressed="false">B — cycle at node 3</button>
               </div>
               <span class="spacer"></span>
               <span class="sum-label" id="scene-6-walk-stepcount">step 0</span>
@@ -3062,26 +3166,100 @@ slow = head;
     </template>
 
     <!--
-      SCENE TEMPLATE (copy-pasteable starter for new scenes — Phase 2+).
-      Drop a block like this anywhere in <body>. The engine discovers it via
-      document.querySelectorAll('template[id^="scene-"]').
+      ===================================================================
+      SCENE TEMPLATE — copy-pasteable starter for new scenes.
 
-      <template id="scene-2">
-        <article class="scene" data-scene-title="Your scene title">
-          <section class="slide slide-problem"     data-init="scene-2-problem"     data-notes="One-line hint.">…</section>
-          <section class="slide slide-naive"       data-init="scene-2-naive"       data-notes="One-line hint.">…</section>
-          <section class="slide slide-insight"     data-init="scene-2-insight"     data-notes="One-line hint.">…</section>
-          <section class="slide slide-walkthrough" data-init="scene-2-walkthrough" data-notes="One-line hint.">…</section>
+      Adding a scene is a strictly local edit: drop two blocks anywhere in
+      <body> after the existing scenes (or before; ordering follows the
+      numeric suffix in the template ID, not the document order). No part
+      of the navigation engine, overview, hash routing, or progress bar
+      needs to be touched.
+
+      Two blocks:
+
+        1. The <template> with your scene's HTML.
+        2. An optional <script> that registers init hooks for any
+           interactive slides, using the public SlideDeck API.
+
+      Example — a hypothetical Scene 7 about prefix sums:
+
+      <template id="scene-7">
+        <article class="scene" data-scene-title="Prefix sums">
+          <section class="slide slide-problem"     data-init="scene-7-problem"     data-notes="Range queries on a static array.">…</section>
+          <section class="slide slide-naive"       data-init="scene-7-naive"       data-notes="Sum the range each query — O(n) per query.">…</section>
+          <section class="slide slide-insight"     data-init="scene-7-insight"     data-notes="Precompute once. prefix[r+1] − prefix[l].">…</section>
+          <section class="slide slide-walkthrough" data-init="scene-7-walkthrough" data-notes="Step through the prefix-sum build, then run a query.">…</section>
         </article>
       </template>
+
+      <script>
+        // Either of these styles works — the engine checks both.
+        SlideDeck.registerInit('scene-7-problem', function (slide) {
+          // wire up the problem slide
+        });
+        window['scene-7-walkthrough'] = function (slide) {
+          // wire up the interactive slide
+        };
+      </script>
+
+      What's still on the agent's plate per scene:
+        • 3–5 slides following problem / naive / insight / walkthrough.
+        • Complexity annotations in monospace on every algorithmic claim.
+        • A custom visualisation on the insight slide.
+        • Speaker notes on every section via data-notes.
+
+      See AGENTS.md Part 2 for the full "easy once you get it" criteria and
+      the per-scene production checklist.
+      ===================================================================
     -->
 
     <!-- ===================================================================
          SCRIPT — navigation engine + per-slide init hooks.
+
+         How to add a new scene without touching the engine (Phase 4 contract):
+
+         1. HTML — drop a <template id="scene-N"> block anywhere in <body>.
+            The engine discovers scenes via
+            `document.querySelectorAll('template[id^="scene-"]')` and orders
+            them by their numeric suffix. Inside the template, write a
+            <article class="scene" data-scene-title="..."> containing 3–5
+            <section class="slide ..."> children.
+
+         2. Init hooks — for any slide that needs interactivity, give it a
+            `data-init="some-key"` attribute, then expose a function under
+            that key via the public API:
+
+              SlideDeck.registerInit('some-key', function (slide) {
+                // wire up the slide's buttons / animations here
+              });
+
+            Built-in scenes register through the internal `slideInit` map
+            below; external scenes can use either `SlideDeck.registerInit`
+            or just `window['some-key'] = function (slide) { ... }`. The
+            engine checks all three locations in order.
+
+         3. Speaker notes — add `data-notes="..."` on each <section> for the
+            instructor-mode panel.
+
+         No registry update is needed for navigation, the overview grid, the
+         nav-jump dropdown, the progress bar, or hash routing — all of those
+         derive from the DOM at runtime.
          =================================================================== -->
     <script>
       (() => {
         'use strict';
+
+        // Public API surface for externally-added scenes. The internal init
+        // map is private; this is the supported extension point.
+        const externalHooks = {};
+        window.SlideDeck = window.SlideDeck || {
+          registerInit(key, fn) {
+            if (typeof key === 'string' && typeof fn === 'function') {
+              externalHooks[key] = fn;
+            }
+          },
+          get initHooks() { return externalHooks; },
+        };
 
         /* ---------------------------------------------------------------
            Tiny DOM helpers.
@@ -3180,11 +3358,23 @@ slow = head;
           stage.appendChild(slide);
           stage.scrollTop = 0;
 
-          // Run init hook for the slide.
+          // Run init hook for the slide. The engine looks in three places, in
+          // order of priority, so an externally-added scene can wire itself up
+          // without editing this file:
+          //   1. The internal `slideInit` map (built-in scenes).
+          //   2. `window.SlideDeck.initHooks[key]` (registered via the public
+          //      `SlideDeck.registerInit(key, fn)` API — see top of file).
+          //   3. `window[key]` (a global function named after the data-init key).
           const initKey = slide.dataset.init;
-          if (initKey && slideInit[initKey]) {
+          const externalHooks = (window.SlideDeck && window.SlideDeck.initHooks) || {};
+          const fn = (initKey && (
+            slideInit[initKey] ||
+            externalHooks[initKey] ||
+            (typeof window[initKey] === 'function' ? window[initKey] : null)
+          )) || null;
+          if (fn) {
             try {
-              slideInit[initKey](slide);
+              fn(slide);
             } catch (err) {
               console.error('slide init failed for', initKey, err);
             }
@@ -3302,8 +3492,7 @@ slow = head;
               break;
             case 'Escape':
               e.preventDefault();
-              if (overviewOpen) overview.close();
-              else overview.showModal();
+              toggleOverview();
               break;
             case 'n':
             case 'N':
@@ -3319,25 +3508,39 @@ slow = head;
            --------------------------------------------------------------- */
         $('#prev-btn').addEventListener('click', () => move(-1));
         $('#next-btn').addEventListener('click', () => move(1));
-        $('#overview-btn').addEventListener('click', () => {
-          if (overview.open) overview.close();
-          else overview.showModal();
+        $('#overview-btn').addEventListener('click', toggleOverview);
+        $('#overview-close').addEventListener('click', () => {
+          overview.close();
+          syncOverviewAria();
         });
-        $('#overview-close').addEventListener('click', () => overview.close());
+        overview.addEventListener('close', syncOverviewAria);
         $('#notes-btn').addEventListener('click', toggleNotes);
-        $('#notes-close').addEventListener('click', () => notesPanel.classList.remove('open'));
+        $('#notes-close').addEventListener('click', () => {
+          notesPanel.classList.remove('open');
+          syncNotesAria();
+        });
 
         navJump.addEventListener('change', () => {
           const n = parseInt(navJump.value, 10);
           if (Number.isFinite(n)) goTo(n, 1);
         });
 
+        function syncOverviewAria() {
+          $('#overview-btn').setAttribute('aria-expanded', overview.open ? 'true' : 'false');
+        }
+        function syncNotesAria() {
+          const open = notesPanel.classList.contains('open');
+          notesPanel.setAttribute('aria-hidden', open ? 'false' : 'true');
+          $('#notes-btn').setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+        function toggleOverview() {
+          if (overview.open) overview.close();
+          else overview.showModal();
+          syncOverviewAria();
+        }
         function toggleNotes() {
           notesPanel.classList.toggle('open');
-          notesPanel.setAttribute(
-            'aria-hidden',
-            notesPanel.classList.contains('open') ? 'false' : 'true'
-          );
+          syncNotesAria();
         }
 
         /* ---------------------------------------------------------------
@@ -5025,8 +5228,12 @@ slow = head;
           $$('.toggle-btn', toggle).forEach(btn => {
             btn.addEventListener('click', () => {
               if (btn.dataset.list === currentListKey) return;
-              $$('.toggle-btn', toggle).forEach(b => b.classList.remove('is-active'));
+              $$('.toggle-btn', toggle).forEach(b => {
+                b.classList.remove('is-active');
+                b.setAttribute('aria-pressed', 'false');
+              });
               btn.classList.add('is-active');
+              btn.setAttribute('aria-pressed', 'true');
               currentListKey = btn.dataset.list;
               buildScene();
             });
