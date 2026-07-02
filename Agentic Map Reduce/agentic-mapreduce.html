@@ -54,6 +54,10 @@
   .pill.d{color:var(--muted);border-color:var(--line)}
   .src{font-size:14px}
   .src a{color:var(--teal);text-decoration:none;border-bottom:1px dotted var(--teal)}
+  pre.code{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:0;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:#c6d0e2;overflow-x:auto}
+  pre.code .cm{color:var(--muted)}
+  pre.code .ok{color:var(--teal)}
+  pre.code .bad{color:var(--coral)}
   footer{padding:44px 0 72px;color:var(--muted);font-size:13px;font-family:var(--mono)}
   /* SVG text defaults */
   svg text{font-family:'Space Grotesk',sans-serif}
@@ -283,6 +287,118 @@
 
 <section>
   <div class="wrap">
+    <h2>A second walkthrough: retiring a deprecated API</h2>
+    <p>Security scanning is the flagship, but nothing about Plan → Shard → Map → Reduce is specific to vulnerabilities — it's a general answer to <em>"is this file relevant, and what should happen to it?"</em> Point the same four stages at <em>"does this file call a deprecated API"</em> instead, and you get a migration engine. Only the selector, the Map verdict, and what Reduce goes looking for change. (Cognition hasn't shipped a packaged product for this — but the pipeline underneath doesn't know the difference.)</p>
+
+    <div class="story">
+      <span class="tag">The old-building analogy</span>
+      <p style="margin:0">Picture a 1930s office building getting rewired for modern code: instead of one electrician tracing every wire from basement to roof, you split the job floor by floor and send a crew to each, in parallel. That's safe almost everywhere — a floor's outlets and switches are self-contained. The danger lives at the <strong>risers</strong>, where floor 4's wiring ties into floor 3's breaker panel. A floor-by-floor crew can rewire their own floor flawlessly and still leave a live breaker feeding a rewired outlet one floor up — no single crew would ever see that. It takes the inspector holding the whole building's blueprint. In Agentic MapReduce that's the Reduce stage; in code, the risers are shard boundaries.</p>
+    </div>
+
+    <p>Here's a representative walkthrough — illustrative, not a published case study, but a shape every long-lived codebase eventually hits. Call the repo <strong>Helios</strong>: 38,000 files, six services, and years of calling <span class="k">datetime.utcnow()</span> to stamp events in UTC. Python deprecated it in 3.12 — it returns a <em>naive</em> datetime, no timezone attached, which looks correct right up until it collides with an aware one. A repo-wide search turns up <strong>1,900 call sites</strong>. Rewriting one is a one-line diff; rewriting 1,900 without quietly breaking the ones that depend on the old naive behaviour is the actual job.</p>
+
+    <figure>
+      <svg viewBox="0 0 860 340" role="img" aria-label="A deterministic sweep across Helios's 38,000 files finds 1,900 matches, which Map then classifies into four outcomes">
+        <text x="30" y="30" fill="#e8edf6" font-size="15" font-weight="600">One deterministic sweep — 38,000 files, no model</text>
+        <rect x="30" y="54" width="430" height="252" rx="10" fill="#0e1728" stroke="#1e2c47"/>
+        <g id="sweepdots"></g>
+        <text x="50" y="276" fill="#8fa1bd" font-size="12" class="m">≈1,900 matches (5%) continue to Map</text>
+        <text x="50" y="294" fill="#8fa1bd" font-size="12" class="m">36,100 files are never opened at all</text>
+
+        <text x="490" y="30" fill="#e8edf6" font-size="15" font-weight="600">What Map decided, per match</text>
+        <rect x="490" y="54" width="340" height="252" rx="10" fill="#0e1728" stroke="#1e2c47"/>
+
+        <rect x="512" y="80" width="16" height="16" rx="3" fill="#3dd6c3"/>
+        <text x="538" y="92" fill="#e8edf6" font-size="13">Mechanical rewrite</text>
+        <text x="806" y="92" text-anchor="end" fill="#3dd6c3" font-size="12" class="m">1,540 · 81%</text>
+
+        <rect x="512" y="130" width="16" height="16" rx="3" fill="#f2c14e"/>
+        <text x="538" y="142" fill="#e8edf6" font-size="13">Rewrite + local fix</text>
+        <text x="806" y="142" text-anchor="end" fill="#f2c14e" font-size="12" class="m">260 · 14%</text>
+
+        <rect x="512" y="180" width="16" height="16" rx="3" fill="#ff7a6b"/>
+        <text x="538" y="192" fill="#e8edf6" font-size="13">Flag for human</text>
+        <text x="806" y="192" text-anchor="end" fill="#ff7a6b" font-size="12" class="m">74 · 4%</text>
+
+        <rect x="512" y="230" width="16" height="16" rx="3" fill="#8fa1bd"/>
+        <text x="538" y="242" fill="#e8edf6" font-size="13">False positive</text>
+        <text x="806" y="242" text-anchor="end" fill="#8fa1bd" font-size="12" class="m">26 · 1%</text>
+
+        <line x1="512" y1="266" x2="806" y2="266" stroke="#1e2c47" stroke-width="1"/>
+        <text x="512" y="286" fill="#8fa1bd" font-size="11" class="m">1,900 matches, out of 38,000 files scanned</text>
+      </svg>
+      <figcaption>Fig. 4 — Illustrative walkthrough, not a measured benchmark: one AST pass finds every call site; Map turns each into one of four verdicts.</figcaption>
+    </figure>
+
+    <table>
+      <thead><tr><th>Stage</th><th>What happens for this migration</th><th>Agentic?</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Plan</strong></td><td>Writes an AST selector for <span class="k">utcnow()</span>/<span class="k">utcfromtimestamp()</span> (Python's own <span class="k">ast</span> module, no model) and a rulebook of transformations a Map worker may apply on its own</td><td class="yes">YES ✦</td></tr>
+        <tr><td><strong>Shard</strong></td><td>Selector walks the AST of every file once; 1,900 matches bucketed into 40 batches of roughly 48, grouped by service</td><td class="no">no</td></tr>
+        <tr><td><strong>Map</strong></td><td>40 child agents in parallel apply the rulebook to their batch, reading the real function around each call site, and emit one verdict per match</td><td class="yes">YES ✦</td></tr>
+        <tr><td><strong>Reduce</strong></td><td>Collects every verdict, walks the import graph one hop out from every changed function to catch what the selector structurally can't see, and emits one migration plan</td><td class="yes">YES ✦</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Why Reduce has to hold the blueprint</h3>
+    <p>A selector built from <span class="k">utcnow()</span>'s spelling only finds call sites of that exact name — it can't find every place downstream that later touches the value, since that means tracing data flow through the whole program, exactly the expense this pattern avoids. So two Map workers, in two different batches, each do their job correctly and still leave a live bug between them:</p>
+
+    <div class="grid3">
+      <pre class="code"><span class="cm"># shard 12 · matched the selector</span>
+def issue_invoice(order):
+    return {
+        "issued_at": <span class="ok">datetime.now(timezone.utc)</span>,
+    }</pre>
+      <pre class="code"><span class="cm"># shard 27 · never matched, no utcnow() here</span>
+def days_since_issued(issued_at):
+    return (<span class="bad">datetime.now()</span> - issued_at).days</pre>
+    </div>
+
+    <p>Worker 12 is right: <span class="k">issue_invoice</span> now returns a timezone-aware datetime, exactly as the rulebook says. Worker 27's shard was never even in the queue — <span class="k">aging.py</span> doesn't call <span class="k">utcnow()</span> anywhere, so no selector matched it. But <span class="k">datetime.now()</span> with no argument returns <em>naive local time</em>, nothing to do with UTC, and the moment that naive value meets the newly-aware <span class="k">issued_at</span> in a subtraction, Python refuses outright.</p>
+
+    <figure>
+      <svg viewBox="0 0 860 380" role="img" aria-label="A value migrated in shard 12 flows at runtime into shard 27, which was never migrated, raising a TypeError that only the Reduce stage can catch">
+        <defs>
+          <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#8fa1bd"/>
+          </marker>
+        </defs>
+        <text x="40" y="28" fill="#e8edf6" font-size="15" font-weight="600">The value crosses a boundary no single worker can see</text>
+
+        <rect x="40" y="48" width="350" height="112" rx="12" fill="#101a2e" stroke="#3dd6c3" stroke-width="1.4"/>
+        <text x="60" y="74" fill="#3dd6c3" font-size="12" class="m" letter-spacing="1">SHARD 12 · billing/invoices.py</text>
+        <text x="60" y="98" fill="#e8edf6" font-size="13" font-weight="600">issue_invoice() returns issued_at</text>
+        <text x="60" y="120" fill="#3dd6c3" font-size="12" class="m">now timezone-aware — migrated ✓</text>
+
+        <rect x="470" y="48" width="350" height="112" rx="12" fill="#101a2e" stroke="#1e2c47" stroke-width="1.4"/>
+        <text x="490" y="74" fill="#8fa1bd" font-size="12" class="m" letter-spacing="1">SHARD 27 · reporting/aging.py</text>
+        <text x="490" y="98" fill="#e8edf6" font-size="13" font-weight="600">days_since_issued(issued_at)</text>
+        <text x="490" y="120" fill="#8fa1bd" font-size="12" class="m">no utcnow() call — never queued ✗</text>
+
+        <path d="M215,160 C215,205 645,205 645,160" fill="none" stroke="#8fa1bd" stroke-width="1.5" stroke-dasharray="5 5" marker-end="url(#arr3)"/>
+        <text x="430" y="196" text-anchor="middle" fill="#8fa1bd" font-size="12" class="m">issued_at flows here, at runtime</text>
+
+        <circle cx="430" cy="222" r="15" fill="#1a0e0e" stroke="#ff7a6b" stroke-width="2"/>
+        <text x="430" y="228" text-anchor="middle" fill="#ff7a6b" font-size="16" font-weight="700">!</text>
+
+        <rect x="150" y="248" width="560" height="38" rx="8" fill="#1a0e0e" stroke="#ff7a6b" stroke-width="1.2"/>
+        <text x="430" y="272" text-anchor="middle" fill="#ff7a6b" font-size="12" class="m">TypeError: can't subtract offset-naive and offset-aware datetimes</text>
+
+        <rect x="40" y="304" width="780" height="60" rx="12" fill="#0e1728" stroke="#ff7a6b" stroke-width="1.4"/>
+        <text x="430" y="326" text-anchor="middle" fill="#ff7a6b" font-size="12" class="m" letter-spacing="1">REDUCE — CLOSES THE LOOP ✦</text>
+        <text x="430" y="348" text-anchor="middle" fill="#c6d0e2" font-size="13.5">Walks issue_invoice's callers via the import graph, finds aging.py, patches both in one PR</text>
+      </svg>
+      <figcaption>Fig. 5 — Neither worker did anything wrong; the bug lives at the shard boundary, which only Reduce ever looks across.</figcaption>
+    </figure>
+
+    <p>Neither worker did anything wrong — neither could see the other's file, which is the entire point of sharding. Reduce is the one component that spans shards by design, but re-reading the whole repo would put the pattern right back where it started. What it can do instead: one narrow second deterministic pass. For every changed function, walk the already-built import graph one hop out to its callers, then run a cheap lexical check — <em>does this file do any datetime arithmetic at all</em> — before flagging it for a closer look. On Helios that surfaces roughly 300 second-pass candidates, <span class="k">aging.py</span> among them. It isn't proof that every boundary bug is caught; only whole-program data-flow analysis could promise that, and that's precisely the bill this pattern refuses to pay. Same trade as the file-level pass, one hop further out: bounded and honest about its edges beats exhaustive and unaffordable.</p>
+
+    <p>Same bet as Security Swarm, aimed at a different question: spend agent judgment once — on the selector, the rulebook, and the edges it's known not to reach — then let deterministic code carry that judgment across every file, for free. Verify closes it out the same cheap way: run the patch's tests plus a strict type-checker (which catches exactly this naive/aware class of bug) in a sandbox, and only what passes rides along in the PR.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
     <h2>The mental model to keep</h2>
     <div class="grid3">
       <div class="card"><div class="num">CLASSIC MAPREDUCE</div><h4>Human writes the map</h4><p>Handwritten function, dumb executors, full input processed. Scales computation.</p></div>
@@ -300,7 +416,8 @@
     <p class="src">① Cognition — <a href="https://devin.ai/blog/agentic-map-reduce">Agentic MapReduce</a> (Jul 1, 2026)<br>
     ② Cognition — <a href="https://devin.ai/blog/security-swarm-eval">Evaluating Security Swarm</a> (Jul 2026)<br>
     ③ Zhang et al. — <a href="https://arxiv.org/abs/2606.14066">FastContext</a> (2026): repo exploration consumes ~56% of tool-use turns<br>
-    ④ LangChain's Harrison Chase on programmatic subagent spawning ("dynamic subagents" in deepagents) as a related pattern</p>
+    ④ LangChain's Harrison Chase on programmatic subagent spawning ("dynamic subagents" in deepagents) as a related pattern<br>
+    ⑤ Python — <a href="https://docs.python.org/3/library/datetime.html">datetime — Basic date and time types</a>: <span class="k">utcnow()</span> and <span class="k">utcfromtimestamp()</span> deprecated since 3.12</p>
   </div>
 </section>
 
@@ -319,6 +436,26 @@
     if(rnd()<0.85) dots+=`<rect x="${46+c*22}" y="${74+r*22}" width="12" height="12" rx="2" fill="#22304e"/>`;
   }
   g.innerHTML=dots;
+})();
+
+// render the Helios selector-sweep dots: ~5% of files match, classified by verdict color
+(function(){
+  const g=document.getElementById('sweepdots');
+  if(!g)return;
+  let s=777;const rnd=()=>{s=(s*16807)%2147483647;return s/2147483647};
+  const verdicts=[['#3dd6c3',0.81],['#f2c14e',0.14],['#ff7a6b',0.04],['#8fa1bd',0.01]];
+  function pickColor(){
+    let r=rnd(),acc=0;
+    for(const [c,w] of verdicts){acc+=w; if(r<=acc) return c;}
+    return verdicts[0][0];
+  }
+  let out='';
+  for(let r=0;r<9;r++)for(let c=0;c<21;c++){
+    const x=48+c*18, y=80+r*18;
+    const fill = rnd()<0.05 ? pickColor() : '#1e2c47';
+    out+=`<rect x="${x}" y="${y}" width="11" height="11" rx="2" fill="${fill}"/>`;
+  }
+  g.innerHTML=out;
 })();
 </script>
 </body>
