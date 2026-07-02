@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Streams &amp; Keycards — MCP transport internals</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --bg:#15110E;
+  --bg-raised:#201A16;
+  --bg-card:#241D18;
+  --line:#372E27;
+  --ink:#F3ECE3;
+  --ink-soft:#C8BDB0;
+  --muted:#938576;
+  --coral:#F47A5F;
+  --coral-soft:#FBB29F;
+  --teal:#46C2B8;
+  --teal-soft:#90E1D9;
+  --amber:#E2A23C;
+  --red:#FF5447;
+  --gold:#D9B26A;
+  --maxw:920px;
+}
+
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 70% -10%, rgba(244,122,95,.10), transparent 60%),
+    radial-gradient(900px 500px at -10% 20%, rgba(70,194,184,.08), transparent 55%),
+    var(--bg);
+  color:var(--ink);
+  font-family:'Space Grotesk',system-ui,sans-serif;
+  font-size:17px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
+
+/* ---------- type ---------- */
+h1,h2,h3{font-family:'Fraunces',Georgia,serif;font-weight:600;line-height:1.08;letter-spacing:-.01em;color:var(--ink);}
+.eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--coral);display:inline-flex;align-items:center;gap:.7em;
+}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--coral);display:inline-block;}
+p{color:var(--ink-soft);margin:0 0 1.1em;}
+strong{color:var(--ink);font-weight:600;}
+code{font-family:'JetBrains Mono',monospace;font-size:.86em;background:rgba(255,255,255,.05);
+  border:1px solid var(--line);padding:.08em .42em;border-radius:6px;color:var(--coral-soft);}
+a{color:var(--teal-soft);}
+
+/* ---------- hero ---------- */
+header{padding:96px 0 56px;position:relative;}
+.hero h1{font-size:clamp(46px,9vw,86px);margin:.32em 0 .28em;}
+.hero h1 em{font-style:italic;color:var(--coral);font-weight:500;}
+.hero .lead{font-size:clamp(18px,2.4vw,22px);max-width:30ch;color:var(--ink-soft);}
+.accent-line{margin-top:40px;height:2px;width:100%;
+  background:repeating-linear-gradient(90deg,var(--line) 0 10px,transparent 10px 20px);position:relative;border-radius:2px;}
+.accent-line::after{content:"";position:absolute;top:-3px;left:0;width:8px;height:8px;border-radius:50%;
+  background:var(--coral);box-shadow:0 0 14px var(--coral);animation:run 5.5s cubic-bezier(.55,0,.45,1) infinite;}
+@keyframes run{0%{left:0}50%{left:calc(100% - 8px)}100%{left:0}}
+
+/* ---------- sections ---------- */
+section{padding:54px 0;border-top:1px solid var(--line);}
+section h2{font-size:clamp(30px,5vw,44px);margin:.5em 0 .4em;}
+.kicker{max-width:62ch;}
+.note{
+  background:var(--bg-raised);border:1px solid var(--line);border-left:3px solid var(--teal);
+  border-radius:0 12px 12px 0;padding:16px 20px;margin:26px 0;font-size:15.5px;color:var(--ink-soft);
+}
+.note.warn{border-left-color:var(--amber);}
+.note b{color:var(--ink);}
+.note .tag{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--teal);display:block;margin-bottom:5px;}
+.note.warn .tag{color:var(--amber);}
+
+/* ---------- figure card ---------- */
+.figure{background:var(--bg-card);border:1px solid var(--line);border-radius:18px;
+  padding:26px 22px 22px;margin:30px 0;box-shadow:0 24px 60px -40px #000;}
+.figure svg{display:block;width:100%;height:auto;}
+.fig-cap{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);
+  text-align:center;margin-top:14px;letter-spacing:.04em;}
+
+/* stdio diagram pieces */
+.boxfill{fill:var(--bg-raised);stroke:var(--line);stroke-width:1.5;}
+.box-label{font-family:'Fraunces',serif;font-weight:600;fill:var(--ink);font-size:19px;}
+.box-sub{font-family:'JetBrains Mono',monospace;fill:var(--muted);font-size:11px;letter-spacing:.04em;}
+.chan{stroke-width:2;fill:none;}
+.chan-stdin{stroke:var(--coral);}
+.chan-stdout{stroke:var(--teal);}
+.chan-stderr{stroke:var(--amber);}
+.head-stdin{fill:var(--coral);}
+.head-stdout{fill:var(--teal);}
+.head-stderr{fill:var(--amber);}
+.chan-name{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:15px;}
+.chan-desc{font-family:'JetBrains Mono',monospace;font-size:11px;fill:var(--muted);letter-spacing:.03em;}
+.tray{fill:rgba(226,162,60,.08);stroke:var(--amber);stroke-width:1.4;stroke-dasharray:5 4;}
+.tray-text{font-family:'JetBrains Mono',monospace;font-size:13px;fill:var(--amber);}
+.faint{font-family:'Space Grotesk',sans-serif;font-size:12px;fill:var(--muted);}
+
+.pkt rect{height:24px;rx:12;}
+.pkt text{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;}
+.pkt-stdin rect{fill:rgba(244,122,95,.16);stroke:var(--coral);}
+.pkt-stdin text{fill:var(--coral-soft);}
+.pkt-stdout rect{fill:rgba(70,194,184,.16);stroke:var(--teal);}
+.pkt-stdout text{fill:var(--teal-soft);}
+.pkt-stderr rect{fill:rgba(226,162,60,.16);stroke:var(--amber);height:20px;rx:10;}
+.pkt-stderr text{fill:var(--amber);font-size:10px;}
+.pkt-bad rect{fill:rgba(255,84,71,.2);stroke:var(--red);}
+.pkt-bad text{fill:#ffb4ad;}
+.pkt-bad{opacity:0;}
+
+@keyframes flowR{0%{transform:translate(232px,144px);opacity:0}8%{opacity:1}92%{opacity:1}100%{transform:translate(528px,144px);opacity:0}}
+@keyframes flowL{0%{transform:translate(528px,202px);opacity:0}8%{opacity:1}92%{opacity:1}100%{transform:translate(232px,202px);opacity:0}}
+@keyframes flowD{0%{transform:translate(648px,264px);opacity:0}14%{opacity:1}78%{opacity:1}100%{transform:translate(648px,330px);opacity:0}}
+@keyframes flowBad{0%{transform:translate(528px,202px);opacity:0}10%{opacity:1}100%{transform:translate(232px,202px);opacity:1}}
+
+.pkt-stdin{animation:flowR 4.6s linear infinite;}
+.pkt-stdin.d2{animation-delay:-1.53s}
+.pkt-stdin.d3{animation-delay:-3.06s}
+.pkt-stdout{animation:flowL 4.6s linear infinite;}
+.pkt-stdout.d2{animation-delay:-1.53s}
+.pkt-stdout.d3{animation-delay:-3.06s}
+.pkt-stderr{animation:flowD 3.4s ease-in infinite;}
+.pkt-stderr.d2{animation-delay:-1.7s}
+
+.diagram.is-broken .pkt-bad{animation:flowBad 1.5s ease-in forwards;}
+.client-box{transition:fill .15s,stroke .15s;}
+.diagram.flash .client-box{fill:rgba(255,84,71,.14);stroke:var(--red);}
+.diagram.flash .client-shake{animation:shake .4s ease both;}
+@keyframes shake{0%,100%{transform:translate(0,0)}20%{transform:translate(-4px,0)}40%{transform:translate(4px,0)}60%{transform:translate(-3px,0)}80%{transform:translate(3px,0)}}
+
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:8px;}
+button.ctl{
+  font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;letter-spacing:.02em;
+  background:var(--bg-raised);color:var(--ink);border:1px solid var(--line);
+  padding:9px 15px;border-radius:9px;cursor:pointer;transition:.18s;
+}
+button.ctl:hover{border-color:var(--coral);color:var(--coral-soft);}
+button.ctl:disabled{opacity:.4;cursor:default;}
+button.ctl.primary{background:var(--coral);color:#1b110d;border-color:var(--coral);}
+button.ctl.primary:hover{filter:brightness(1.08);color:#1b110d;}
+button.ctl:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+.status{font-family:'JetBrains Mono',monospace;font-size:13px;margin-left:auto;color:var(--muted);min-height:1.3em;}
+.status.err{color:var(--red);}
+
+/* ---------- credential cards ---------- */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:30px 0;}
+.card{background:var(--bg-card);border:1px solid var(--line);border-radius:16px;padding:22px 20px;display:flex;flex-direction:column;}
+.card .ckey{border-top:3px solid var(--teal);}
+.card .num{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.2em;color:var(--muted);}
+.card .cico{margin:6px 0 10px;}
+.card h3{font-size:23px;margin:.1em 0 .15em;}
+.card .meta{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;}
+.card.api{border-top:3px solid var(--teal);}
+.card.api .meta,.card.api .num strong{color:var(--teal);}
+.card.bearer{border-top:3px solid var(--coral);}
+.card.bearer .meta{color:var(--coral);}
+.card.oauth{border-top:3px solid var(--gold);}
+.card.oauth .meta{color:var(--gold);}
+.card .hotel{font-size:15px;color:var(--ink-soft);margin:0 0 12px;}
+.card .hotel b{color:var(--ink);}
+.card .real{font-size:14.5px;color:var(--muted);margin:0 0 14px;flex:1;}
+.snip{font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.55;background:#100c0a;
+  border:1px solid var(--line);border-radius:9px;padding:11px 12px;color:var(--ink-soft);overflow-x:auto;white-space:pre;}
+.snip .k{color:var(--teal-soft);}
+.snip .v{color:var(--coral-soft);}
+.snip .c{color:var(--muted);}
+
+/* axis callout */
+.axis{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;
+  background:var(--bg-raised);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:24px 0;}
+.axis .side b{display:block;font-family:'Fraunces',serif;font-size:18px;color:var(--ink);margin-bottom:2px;}
+.axis .side span{font-size:13.5px;color:var(--muted);}
+.axis .mid{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);text-align:center;}
+
+/* ---------- oauth sequence ---------- */
+.actor-box{fill:var(--bg-raised);stroke:var(--line);stroke-width:1.4;}
+.actor-name{font-family:'Fraunces',serif;font-weight:600;fill:var(--ink);font-size:15px;}
+.actor-sub{font-family:'JetBrains Mono',monospace;fill:var(--muted);font-size:9.5px;letter-spacing:.04em;}
+.lifeline{stroke:var(--line);stroke-width:1.3;stroke-dasharray:3 6;}
+.seq-step{opacity:.13;transition:opacity .45s;}
+.seq-step.done{opacity:.5;}
+.seq-step.active{opacity:1;}
+.arrowline{stroke:var(--ink-soft);stroke-width:2;fill:none;}
+.arrowhead{fill:var(--ink-soft);}
+.seq-step.active .arrowline{stroke:var(--coral);stroke-width:2.6;}
+.seq-step.active .arrowhead{fill:var(--coral);}
+.seq-step.done .arrowline{stroke:var(--teal);}
+.seq-step.done .arrowhead{fill:var(--teal);}
+.seq-label{font-family:'JetBrains Mono',monospace;font-size:11.5px;fill:var(--ink-soft);
+  paint-order:stroke;stroke:var(--bg-card);stroke-width:4px;stroke-linejoin:round;}
+.seq-step.active .seq-label{fill:var(--ink);}
+.self-rect{fill:var(--bg-raised);stroke:var(--ink-soft);stroke-width:1.4;}
+.seq-step.active .self-rect{stroke:var(--coral);fill:rgba(244,122,95,.07);}
+.seq-step.done .self-rect{stroke:var(--teal);}
+.self-text{font-family:'JetBrains Mono',monospace;font-size:10.5px;fill:var(--ink-soft);}
+.seq-step.active .self-text{fill:var(--ink);}
+.seq-foot{font-family:'JetBrains Mono',monospace;font-size:11px;fill:var(--muted);}
+
+.seq-shell{overflow-x:auto;}
+.seq-shell svg{min-width:680px;}
+.caption{background:#100c0a;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-top:16px;}
+.caption .ctitle{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--coral);margin-bottom:6px;}
+.caption .cbody{font-size:15px;color:var(--ink-soft);margin:0;}
+.counter{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+
+/* ---------- cheat sheet ---------- */
+.cheat{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0 8px;}
+.cheat .col{background:var(--bg-card);border:1px solid var(--line);border-radius:16px;padding:22px;}
+.cheat .col.local{border-top:3px solid var(--amber);}
+.cheat .col.remote{border-top:3px solid var(--coral);}
+.cheat h3{font-size:22px;margin:0 0 4px;}
+.cheat .tl{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+.cheat ul{margin:0;padding:0;list-style:none;}
+.cheat li{font-size:14.5px;color:var(--ink-soft);padding:7px 0 7px 22px;position:relative;border-top:1px solid var(--line);}
+.cheat li:first-child{border-top:none;}
+.cheat li::before{content:"›";position:absolute;left:2px;color:var(--coral);font-weight:700;}
+
+footer{border-top:1px solid var(--line);padding:40px 0 70px;color:var(--muted);font-size:13px;}
+footer .fmono{font-family:'JetBrains Mono',monospace;letter-spacing:.04em;}
+
+@media (max-width:720px){
+  body{font-size:16px;}
+  .cards{grid-template-columns:1fr;}
+  .cheat{grid-template-columns:1fr;}
+  .axis{grid-template-columns:1fr;text-align:left;gap:8px;}
+  .axis .mid{text-align:left;}
+  .status{margin-left:0;width:100%;}
+}
+@media (prefers-reduced-motion:reduce){
+  .pkt-stdin,.pkt-stdout,.pkt-stderr{animation:none;opacity:1;}
+  .pkt-stdin{transform:translate(380px,144px);}
+  .pkt-stdout{transform:translate(380px,202px);}
+  .pkt-stderr{transform:translate(648px,300px);}
+  .accent-line::after{animation:none;}
+  .seq-step{transition:none;}
+  .diagram.flash .client-shake{animation:none;}
+}
+</style>
+</head>
+<body>
+
+<header class="wrap hero">
+  <span class="eyebrow">MCP · transport layer</span>
+  <h1>Streams<br>&amp; <em>Keycards</em></h1>
+  <p class="lead">What stdio's three pipes actually carry — and how an HTTP transport proves who is calling.</p>
+  <div class="accent-line"></div>
+</header>
+
+<main>
+
+<!-- ============ STDIO ============ -->
+<section class="wrap">
+  <span class="eyebrow">Question 1 · stdio</span>
+  <h2>The client launches the server. So the pipes belong to the&nbsp;server.</h2>
+  <p class="kicker">In a stdio connection the client spawns your MCP server as a <strong>subprocess</strong>. That single fact decides everything: <code>stdin</code>, <code>stdout</code> and <code>stderr</code> are the <em style="color:var(--ink)">server's</em> three streams, so name them from the server's point of view and the directions stop being confusing.</p>
+
+  <div class="figure">
+    <div class="diagram" id="stdioDiagram">
+      <svg viewBox="0 0 820 460" role="img" aria-label="Diagram of stdio streams: client writes to the server's stdin, reads from stdout; the server writes logs to stderr.">
+        <!-- client -->
+        <g class="client-shake">
+          <rect class="boxfill client-box" x="56" y="110" width="170" height="150" rx="14"/>
+          <text class="box-label" x="141" y="178" text-anchor="middle">Client</text>
+          <text class="box-sub" x="141" y="200" text-anchor="middle">spawns the process</text>
+        </g>
+        <!-- server -->
+        <rect class="boxfill" x="594" y="110" width="170" height="150" rx="14"/>
+        <text class="box-label" x="679" y="172" text-anchor="middle">Server</text>
+        <text class="box-sub" x="679" y="192" text-anchor="middle">subprocess</text>
+        <text class="box-sub" x="679" y="208" text-anchor="middle">reads in · writes out</text>
+
+        <!-- stdin channel (client -> server) -->
+        <line class="chan chan-stdin" x1="226" y1="156" x2="586" y2="156"/>
+        <path class="head-stdin" d="M586 156 L575 151 L575 161 Z"/>
+        <text class="chan-name chan-stdin" x="246" y="140" fill="var(--coral)">stdin</text>
+        <text class="chan-desc" x="300" y="140">client writes  ·  requests in</text>
+
+        <!-- stdout channel (server -> client) -->
+        <line class="chan chan-stdout" x1="594" y1="214" x2="234" y2="214"/>
+        <path class="head-stdout" d="M234 214 L245 209 L245 219 Z"/>
+        <text class="chan-name chan-stdout" x="478" y="240" fill="var(--teal)" text-anchor="end">stdout</text>
+        <text class="chan-desc" x="246" y="240">server writes  ·  responses out</text>
+
+        <!-- stderr (server -> log tray) -->
+        <line class="chan chan-stderr" x1="679" y1="260" x2="679" y2="354"/>
+        <path class="head-stderr" d="M679 360 L674 349 L684 349 Z"/>
+        <text class="chan-name chan-stderr" x="694" y="300" fill="var(--amber)">stderr</text>
+        <rect class="tray" x="594" y="360" width="170" height="48" rx="10"/>
+        <text class="tray-text" x="679" y="389" text-anchor="middle">logs · diagnostics</text>
+        <text class="faint" x="679" y="432" text-anchor="middle">client may capture, forward, or ignore</text>
+
+        <!-- packets -->
+        <g class="pkt pkt-stdin"><rect width="52"/><text x="26" y="16" text-anchor="middle">{call}</text></g>
+        <g class="pkt pkt-stdin d2"><rect width="52"/><text x="26" y="16" text-anchor="middle">{call}</text></g>
+        <g class="pkt pkt-stdin d3"><rect width="52"/><text x="26" y="16" text-anchor="middle">{call}</text></g>
+
+        <g class="pkt pkt-stdout"><rect width="52"/><text x="26" y="16" text-anchor="middle">{result}</text></g>
+        <g class="pkt pkt-stdout d2"><rect width="52"/><text x="26" y="16" text-anchor="middle">{result}</text></g>
+        <g class="pkt pkt-stdout d3"><rect width="52"/><text x="26" y="16" text-anchor="middle">{result}</text></g>
+
+        <g class="pkt pkt-stderr"><rect width="58"/><text x="29" y="14" text-anchor="middle">· log ·</text></g>
+        <g class="pkt pkt-stderr d2"><rect width="58"/><text x="29" y="14" text-anchor="middle">· log ·</text></g>
+
+        <!-- the offending packet -->
+        <g class="pkt pkt-bad" id="badPkt"><rect width="78"/><text x="39" y="16" text-anchor="middle">print("x")</text></g>
+      </svg>
+    </div>
+    <div class="controls">
+      <button class="ctl primary" id="breakBtn">Send a stray print() down stdout</button>
+      <span class="status" id="stdioStatus">Three streams flowing. stdin in, stdout out, stderr to the side.</span>
+    </div>
+    <div class="fig-cap">Live: requests travel in on stdin, results out on stdout, logs drop into stderr.</div>
+  </div>
+
+  <p><strong>stdin</strong> — the server <em style="color:var(--ink)">reads</em> here, and the client <em style="color:var(--ink)">writes</em> to it. Everything heading <em style="color:var(--ink)">into</em> the server flows down this pipe: JSON-RPC requests and notifications from the client.</p>
+  <p><strong>stdout</strong> — the server <em style="color:var(--ink)">writes</em> here, and the client <em style="color:var(--ink)">reads</em> from it. Everything coming back rides this pipe: responses and server-initiated notifications.</p>
+  <p><strong>stderr</strong> — the server's private side channel for logs and diagnostics. It is free-form text, and the client is allowed to capture it, forward it, or throw it away.</p>
+
+  <div class="note warn">
+    <span class="tag">the one rule that bites everyone</span>
+    <b>stdout is sacred — it may only carry valid MCP messages.</b> Messages are newline-delimited JSON-RPC, one per line, with no embedded newlines. A stray <code>print()</code>, a debug line, or an uncaught traceback landing on stdout is like coughing into an intercom that only accepts a strict format: the client can't parse it, and the connection drops. That is why every log goes to stderr. (Press the button above to watch it happen.)
+  </div>
+
+  <p class="kicker" style="color:var(--muted);font-size:15.5px">The intuition: <strong>stdin/stdout are an official intercom</strong> that only speaks one rigid format, while <strong>stderr is the scratchpad the server mutters onto</strong>. No network, no ports, no auth — when the client exits, the OS reaps the subprocess. That isolation is exactly why stdio is the default for local tools.</p>
+</section>
+
+<!-- ============ AUTH ============ -->
+<section class="wrap">
+  <span class="eyebrow">Question 2 · HTTP auth</span>
+  <h2>API key, Bearer, OAuth — three layers, not three rivals.</h2>
+
+  <div class="note">
+    <span class="tag">a correction worth making first</span>
+    Bearer tokens, OAuth and API keys aren't features of <b>SSE</b> specifically. They're <b>HTTP-layer</b> auth, so they apply to <em style="color:var(--ink)">any</em> HTTP transport — the legacy HTTP+SSE and the current Streamable HTTP alike. stdio skips all of it: a local subprocess just inherits credentials from the environment it was launched in.
+  </div>
+
+  <p class="kicker">The trap is reading these as three competing options. They live at different layers. The cleanest way to feel the difference is a hotel keycard.</p>
+
+  <div class="cards">
+    <div class="card api">
+      <div class="num"><strong>01</strong></div>
+      <div class="meta">what you send</div>
+      <h3>API key</h3>
+      <p class="hotel"><b>The master key you cut yourself</b> and hand to the cleaner. Works forever — until you re-key the locks.</p>
+      <p class="real">A static secret string, usually in a custom header. No expiry by default, no notion of <em>which person</em> is calling unless you map keys to identities. Simplest to ship; riskiest if it leaks.</p>
+      <div class="snip"><span class="k">X-API-Key</span>: <span class="v">sk_live_8f3a9c…</span></div>
+    </div>
+
+    <div class="card bearer">
+      <div class="num"><strong>02</strong></div>
+      <div class="meta">how it travels</div>
+      <h3>Bearer token</h3>
+      <p class="hotel"><b>The hotel keycard.</b> Whoever <em>bears</em> it gets in — the door doesn't re-check your face. Expires at checkout.</p>
+      <p class="real">The standardised envelope: <code>Authorization: Bearer &lt;token&gt;</code>. Often a <strong>JWT</strong> that's self-describing — who you are, which scopes, when it expires. The spec says it goes in the header, never a URL query string.</p>
+      <div class="snip"><span class="k">Authorization</span>: <span class="c">Bearer</span> <span class="v">eyJhbGciOiJI…</span></div>
+    </div>
+
+    <div class="card oauth">
+      <div class="num"><strong>03</strong></div>
+      <div class="meta">how it's issued</div>
+      <h3>OAuth 2.1</h3>
+      <p class="hotel"><b>The front desk.</b> You show your passport once and consent; the desk <em>mints</em> the keycard. The cleaner never sees your passport.</p>
+      <p class="real">Not a credential — a <strong>handshake that produces</strong> a bearer token. An authorization server issues the token after the user logs in and approves scopes. This is what MCP mandates for public remote servers.</p>
+      <div class="snip"><span class="c"># 401 tells the client where to go</span>
+<span class="k">WWW-Authenticate</span>: <span class="c">Bearer</span>
+  <span class="v">resource_metadata="…"</span></div>
+    </div>
+  </div>
+
+  <div class="axis">
+    <div class="side"><b>A static credential you manage</b><span>API key — you cut it, you rotate it, it never expires on its own.</span></div>
+    <div class="mid">— the real axis —</div>
+    <div class="side"><b>A delegated credential a user consents to</b><span>OAuth mints a short-lived bearer token after the human approves.</span></div>
+  </div>
+
+  <h3 style="font-size:25px;margin:38px 0 6px">What the OAuth 2.1 handshake actually does</h3>
+  <p class="kicker" style="font-size:15.5px;color:var(--muted)">This is the dance the front-desk metaphor hides. Step through it — every arrow is a real message in the MCP authorization flow.</p>
+
+  <div class="figure">
+    <div class="seq-shell">
+      <svg viewBox="0 0 820 600" role="img" aria-label="OAuth 2.1 PKCE sequence between MCP client, authorization server, and MCP server.">
+        <!-- actor headers -->
+        <rect class="actor-box" x="55" y="24" width="150" height="46" rx="10"/>
+        <text class="actor-name" x="130" y="46" text-anchor="middle">MCP Client</text>
+        <text class="actor-sub" x="130" y="61" text-anchor="middle">public client</text>
+
+        <rect class="actor-box" x="320" y="24" width="180" height="46" rx="10"/>
+        <text class="actor-name" x="410" y="46" text-anchor="middle">Authorization Server</text>
+        <text class="actor-sub" x="410" y="61" text-anchor="middle">issues tokens</text>
+
+        <rect class="actor-box" x="600" y="24" width="180" height="46" rx="10"/>
+        <text class="actor-name" x="690" y="46" text-anchor="middle">MCP Server</text>
+        <text class="actor-sub" x="690" y="61" text-anchor="middle">resource server</text>
+
+        <!-- lifelines -->
+        <line class="lifeline" x1="130" y1="72" x2="130" y2="548"/>
+        <line class="lifeline" x1="410" y1="72" x2="410" y2="548"/>
+        <line class="lifeline" x1="690" y1="72" x2="690" y2="548"/>
+
+        <!-- 1 client -> mcp -->
+        <g class="seq-step" data-i="0">
+          <line class="arrowline" x1="130" y1="112" x2="684" y2="112"/>
+          <path class="arrowhead" d="M690 112 L679 107 L679 117 Z"/>
+          <text class="seq-label" x="408" y="104" text-anchor="middle">① MCP request — no token</text>
+        </g>
+        <!-- 2 mcp -> client (401) -->
+        <g class="seq-step" data-i="1">
+          <line class="arrowline" x1="690" y1="152" x2="136" y2="152"/>
+          <path class="arrowhead" d="M130 152 L141 147 L141 157 Z"/>
+          <text class="seq-label" x="408" y="144" text-anchor="middle">② 401 + WWW-Authenticate</text>
+        </g>
+        <!-- 3 self: PKCE -->
+        <g class="seq-step" data-i="2">
+          <rect class="self-rect" x="22" y="180" width="216" height="30" rx="8"/>
+          <text class="self-text" x="130" y="199" text-anchor="middle">③ make PKCE: verifier + S256</text>
+        </g>
+        <!-- 4 client -> auth /authorize -->
+        <g class="seq-step" data-i="3">
+          <line class="arrowline" x1="130" y1="242" x2="404" y2="242"/>
+          <path class="arrowhead" d="M410 242 L399 237 L399 247 Z"/>
+          <text class="seq-label" x="270" y="234" text-anchor="middle">④ browser → /authorize + challenge</text>
+        </g>
+        <!-- 5 self auth: consent -->
+        <g class="seq-step" data-i="4">
+          <rect class="self-rect" x="312" y="270" width="196" height="30" rx="8"/>
+          <text class="self-text" x="410" y="289" text-anchor="middle">⑤ user logs in &amp; consents</text>
+        </g>
+        <!-- 6 auth -> client code -->
+        <g class="seq-step" data-i="5">
+          <line class="arrowline" x1="410" y1="332" x2="136" y2="332"/>
+          <path class="arrowhead" d="M130 332 L141 327 L141 337 Z"/>
+          <text class="seq-label" x="270" y="324" text-anchor="middle">⑥ redirect back w/ auth code</text>
+        </g>
+        <!-- 7 client -> auth token req -->
+        <g class="seq-step" data-i="6">
+          <line class="arrowline" x1="130" y1="372" x2="404" y2="372"/>
+          <path class="arrowhead" d="M410 372 L399 367 L399 377 Z"/>
+          <text class="seq-label" x="270" y="364" text-anchor="middle">⑦ token req: code + verifier</text>
+        </g>
+        <!-- 8 auth -> client token -->
+        <g class="seq-step" data-i="7">
+          <line class="arrowline" x1="410" y1="412" x2="136" y2="412"/>
+          <path class="arrowhead" d="M130 412 L141 407 L141 417 Z"/>
+          <text class="seq-label" x="270" y="404" text-anchor="middle">⑧ access token (Bearer)</text>
+        </g>
+        <!-- 9 client -> mcp with token -->
+        <g class="seq-step" data-i="8">
+          <line class="arrowline" x1="130" y1="456" x2="684" y2="456"/>
+          <path class="arrowhead" d="M690 456 L679 451 L679 461 Z"/>
+          <text class="seq-label" x="408" y="448" text-anchor="middle">⑨ request + Authorization: Bearer</text>
+        </g>
+        <!-- 10 self mcp validate -->
+        <g class="seq-step" data-i="9">
+          <rect class="self-rect" x="582" y="484" width="216" height="30" rx="8"/>
+          <text class="self-text" x="690" y="503" text-anchor="middle">⑩ validate issuer/aud/scope/exp</text>
+        </g>
+        <!-- 11 mcp -> client ok -->
+        <g class="seq-step" data-i="10">
+          <line class="arrowline" x1="690" y1="540" x2="136" y2="540"/>
+          <path class="arrowhead" d="M130 540 L141 535 L141 545 Z"/>
+          <text class="seq-label" x="408" y="532" text-anchor="middle">⑪ 200 — tool call runs</text>
+        </g>
+
+        <text class="seq-foot" x="410" y="582" text-anchor="middle">Token in the header, never the URL · the server only trusts tokens minted for itself</text>
+      </svg>
+    </div>
+
+    <div class="caption">
+      <div class="ctitle" id="capTitle">① MCP request — no token</div>
+      <p class="cbody" id="capBody">The client simply tries to call the server with no credentials at all.</p>
+    </div>
+
+    <div class="controls" style="margin-top:14px">
+      <button class="ctl" id="prevBtn">‹ Prev</button>
+      <button class="ctl primary" id="playBtn">▶ Play</button>
+      <button class="ctl" id="nextBtn">Next ›</button>
+      <span class="counter" id="counter">1 / 11</span>
+    </div>
+  </div>
+
+  <div class="note">
+    <span class="tag">how this lands in MCP</span>
+    The spec mandates <b>OAuth 2.1 with PKCE</b> for public remote HTTP servers; a static <b>bearer token or API key</b> is fine for internal and team tools; <b>stdio needs none</b>. Two guardrails the spec is strict about: the token <b>never</b> rides in a URL query string, and the MCP server must validate that a token was issued <b>for itself</b> — it must not blindly forward your token to an upstream API.
+  </div>
+</section>
+
+<!-- ============ CHEAT ============ -->
+<section class="wrap">
+  <span class="eyebrow">The 30-second map</span>
+  <h2>Pick by where the server lives.</h2>
+  <div class="cheat">
+    <div class="col local">
+      <h3>stdio</h3>
+      <div class="tl">local · same machine</div>
+      <ul>
+        <li>Client spawns server as a subprocess</li>
+        <li>stdin = in, stdout = out, stderr = logs</li>
+        <li>stdout carries valid JSON-RPC only</li>
+        <li>No network, no ports, no auth</li>
+        <li>Credentials come from the environment</li>
+      </ul>
+    </div>
+    <div class="col remote">
+      <h3>HTTP (Streamable HTTP)</h3>
+      <div class="tl">remote · across the network</div>
+      <ul>
+        <li>One endpoint, POST + optional SSE stream</li>
+        <li>Auth lives at the HTTP layer</li>
+        <li>Public servers: OAuth 2.1 + PKCE</li>
+        <li>Internal tools: bearer token / API key</li>
+        <li>Bearer header always; never a query string</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <p class="fmono">MCP transport internals · stdio streams &amp; HTTP authorization</p>
+  <p>Reference notes drawn from the Model Context Protocol specification (transports &amp; authorization). Spec details and deprecation timelines move — verify against the current spec before shipping.</p>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- stdio: stray print() ---------- */
+  var diagram = document.getElementById('stdioDiagram');
+  var breakBtn = document.getElementById('breakBtn');
+  var status = document.getElementById('stdioStatus');
+  var badPkt = document.getElementById('badPkt');
+  var busy = false;
+  var defaultMsg = status.textContent;
+
+  function runBreak(){
+    if(busy) return; busy = true;
+    breakBtn.disabled = true;
+    status.classList.remove('err');
+    status.textContent = 'A debug line slips onto stdout…';
+    diagram.classList.add('is-broken');
+
+    var onArrive = function(){
+      badPkt.removeEventListener('animationend', onArrive);
+      diagram.classList.add('flash');
+      status.classList.add('err');
+      status.textContent = '✖ parse error — non-JSON on stdout. Connection dropped.';
+      setTimeout(reset, 3200);
+    };
+
+    if(reduce){
+      // no animation to wait on
+      setTimeout(onArrive, 200);
+    } else {
+      badPkt.addEventListener('animationend', onArrive);
+    }
+  }
+  function reset(){
+    diagram.classList.remove('is-broken','flash');
+    status.classList.remove('err');
+    status.textContent = defaultMsg;
+    breakBtn.disabled = false;
+    busy = false;
+  }
+  breakBtn.addEventListener('click', runBreak);
+
+  /* ---------- oauth stepper ---------- */
+  var steps = Array.prototype.slice.call(document.querySelectorAll('.seq-step'));
+  var titles = [
+    '① MCP request — no token',
+    '② 401 + WWW-Authenticate',
+    '③ generate PKCE',
+    '④ browser → /authorize',
+    '⑤ user logs in & consents',
+    '⑥ authorization code returns',
+    '⑦ token request',
+    '⑧ access token issued',
+    '⑨ request with Bearer token',
+    '⑩ server validates token',
+    '⑪ tool call runs'
+  ];
+  var bodies = [
+    'The client simply tries to call the server with no credentials at all.',
+    'The server refuses with HTTP 401 and, in the WWW-Authenticate header, points to its Protected Resource Metadata — which authorization server to talk to.',
+    'The client invents a random secret (code_verifier) and will only send its SHA-256 hash (code_challenge) now. PKCE is how a public client later proves it started this flow.',
+    'The client opens a browser to the auth server\u2019s /authorize endpoint, carrying the code_challenge.',
+    'The human signs in and approves the requested scopes. This is the consent step — the app never sees the password.',
+    'The auth server redirects back to the client with a short-lived authorization code.',
+    'The client exchanges that code at the /token endpoint, now revealing the original code_verifier.',
+    'The auth server checks the verifier matches the earlier hash, then issues the access token — a bearer token, often a JWT.',
+    'From here on, every MCP request carries Authorization: Bearer <token>.',
+    'Before running anything, the server validates the token: correct issuer, audience is this server, scopes sufficient, not expired.',
+    'Validation passes, the JSON-RPC tool call executes, and normal MCP traffic begins.'
+  ];
+  var N = steps.length;
+  var cur = 0, timer = null, playing = false;
+  var capTitle = document.getElementById('capTitle');
+  var capBody = document.getElementById('capBody');
+  var counter = document.getElementById('counter');
+  var playBtn = document.getElementById('playBtn');
+
+  function render(){
+    steps.forEach(function(el, i){
+      el.classList.remove('active','done');
+      if(i < cur) el.classList.add('done');
+      else if(i === cur) el.classList.add('active');
+    });
+    capTitle.textContent = titles[cur];
+    capBody.textContent = bodies[cur];
+    counter.textContent = (cur+1) + ' / ' + N;
+  }
+  function go(i){ cur = (i + N) % N; render(); }
+  function stop(){ playing = false; clearInterval(timer); timer = null; playBtn.textContent = '▶ Play'; }
+  function play(){
+    if(cur >= N-1) cur = -1;            // replay from start
+    playing = true; playBtn.textContent = '❚❚ Pause';
+    timer = setInterval(function(){
+      if(cur >= N-1){ stop(); render(); return; }
+      cur++; render();
+    }, 2200);
+    // advance immediately if we just reset to -1
+    if(cur === -1){ cur = 0; render(); }
+  }
+  playBtn.addEventListener('click', function(){ playing ? stop() : play(); });
+  document.getElementById('prevBtn').addEventListener('click', function(){ stop(); go(cur-1); });
+  document.getElementById('nextBtn').addEventListener('click', function(){ stop(); go(cur+1); });
+
+  render();
+  if(!reduce){ setTimeout(play, 900); }
+})();
+</script>
+</body>
+</html>

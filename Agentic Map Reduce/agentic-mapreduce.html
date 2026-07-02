@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic MapReduce — How Devin Scales Whole-Codebase Reasoning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b1220;          /* deep navy */
+    --panel:#101a2e;
+    --panel-2:#0e1728;
+    --line:#1e2c47;
+    --ink:#e8edf6;
+    --muted:#8fa1bd;
+    --teal:#3dd6c3;
+    --coral:#ff7a6b;
+    --gold:#f2c14e;
+    --mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:'Space Grotesk',sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:880px;margin:0 auto;padding:0 24px}
+  header{padding:72px 0 48px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:18px}
+  h1{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(34px,5.5vw,54px);line-height:1.08;margin-bottom:20px}
+  h1 em{font-style:italic;color:var(--teal)}
+  .lede{font-size:18px;color:var(--muted);max-width:640px}
+  .lede strong{color:var(--ink);font-weight:500}
+  section{padding:56px 0;border-bottom:1px solid var(--line)}
+  h2{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(24px,3.4vw,32px);margin-bottom:14px}
+  h3{font-family:'Space Grotesk';font-weight:600;font-size:17px;margin:28px 0 8px}
+  p{margin-bottom:14px;color:#c6d0e2}
+  p strong{color:var(--ink)}
+  .k{font-family:var(--mono);font-size:.86em;background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--teal)}
+  .story{background:var(--panel);border-left:3px solid var(--gold);border-radius:0 10px 10px 0;padding:18px 22px;margin:22px 0}
+  .story .tag{font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:8px}
+  figure{margin:30px 0}
+  figure svg{width:100%;height:auto;display:block;background:var(--panel-2);border:1px solid var(--line);border-radius:12px}
+  figcaption{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:10px;text-align:center}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:22px 0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px}
+  .card .num{font-family:var(--mono);color:var(--coral);font-size:12px;letter-spacing:.12em;margin-bottom:8px}
+  .card h4{font-size:15px;margin-bottom:6px}
+  .card p{font-size:14px;color:var(--muted);margin:0}
+  table{width:100%;border-collapse:collapse;margin:22px 0;font-size:14.5px}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+  td{padding:11px 12px;border-bottom:1px solid var(--line);color:#c6d0e2;vertical-align:top}
+  td.yes{color:var(--teal);font-family:var(--mono);font-size:13px}
+  td.no{color:var(--muted);font-family:var(--mono);font-size:13px}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 9px;border-radius:99px;border:1px solid}
+  .pill.a{color:var(--teal);border-color:var(--teal)}
+  .pill.d{color:var(--muted);border-color:var(--line)}
+  .src{font-size:14px}
+  .src a{color:var(--teal);text-decoration:none;border-bottom:1px dotted var(--teal)}
+  footer{padding:44px 0 72px;color:var(--muted);font-size:13px;font-family:var(--mono)}
+  /* SVG text defaults */
+  svg text{font-family:'Space Grotesk',sans-serif}
+  svg .m{font-family:'JetBrains Mono',monospace}
+  @media (prefers-reduced-motion:no-preference){
+    .flow{stroke-dasharray:6 6;animation:dash 1.6s linear infinite}
+    @keyframes dash{to{stroke-dashoffset:-12}}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">Architecture Deep Dive · July 2026</div>
+    <h1>Agentic <em>MapReduce</em></h1>
+    <p class="lede">Cognition's new architecture behind <strong>Devin Security Swarm</strong> — how to make an agent reason about <strong>every file in a 50k-file repo</strong> without paying for an agent to <em>read</em> every file. A two-decade-old distributed-systems idea, with one clever inversion.</p>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>First, feel the problem</h2>
+    <div class="story">
+      <span class="tag">The census analogy</span>
+      <p style="margin:0">Imagine you must count <strong>every house in Sri Lanka with a leaking roof</strong>. You could send one brilliant inspector to wander the island — but she'd spend 90% of her time <em>walking between houses</em>, her notebook would overflow, and when she says "I think I've seen them all," you can't verify it. Or: a planner first pulls the <strong>land registry</strong> (a deterministic list of every house), splits it into districts, sends one inspector per district in parallel, and a supervisor merges their reports. Coverage isn't a feeling — it's <em>guaranteed by the registry</em>.</p>
+    </div>
+    <p>Coding agents have exactly this problem. Point a single grep-and-read agent at a huge repo and ask "find every SQL injection" — three things break:</p>
+    <div class="grid3">
+      <div class="card"><div class="num">FAILURE 01</div><h4>Budget burns on <em>finding</em>, not doing</h4><p>The agent greps, opens wrong files, backtracks. On big repos, selection dominates analysis — one study found reading/searching ate 56% of tool-use turns.</p></div>
+      <div class="card"><div class="num">FAILURE 02</div><h4>Context becomes the bottleneck</h4><p>One long-running agent drags discoveries from file 1 while reasoning about file 4,000. Unrelated evidence competes for attention.</p></div>
+      <div class="card"><div class="num">FAILURE 03</div><h4>No coverage boundary</h4><p>A search agent stops when it <em>feels</em> done — not when a finite work queue is exhausted. "I've looked everywhere" is unfalsifiable.</p></div>
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 860 300" role="img" aria-label="Single agent wandering a large repo versus bounded coverage">
+        <text x="30" y="36" fill="#e8edf6" font-size="15" font-weight="600">Single search-driven agent on a 50k-file repo</text>
+        <!-- repo grid -->
+        <g>
+          <!-- files -->
+          <g fill="#1e2c47">
+            <rect x="30" y="60" width="380" height="200" rx="10" fill="#101a2e" stroke="#1e2c47"/>
+          </g>
+          <g fill="#22304e">
+            <!-- grid of file dots -->
+            <g id="dots"></g>
+          </g>
+          <!-- wandering path -->
+          <path class="flow" d="M60,230 C120,120 90,200 160,110 S240,220 210,140 S320,90 300,210 S380,140 360,230"
+                fill="none" stroke="#ff7a6b" stroke-width="2.5"/>
+          <circle cx="360" cy="230" r="7" fill="#ff7a6b"/>
+          <text x="52" y="252" fill="#8fa1bd" font-size="12" class="m">grep → read → backtrack → grep …</text>
+        </g>
+        <!-- vs -->
+        <text x="430" y="165" fill="#8fa1bd" font-size="20" font-weight="600">vs</text>
+        <!-- bounded coverage -->
+        <g>
+          <rect x="470" y="60" width="360" height="200" rx="10" fill="#101a2e" stroke="#1e2c47"/>
+          <!-- 4 shards -->
+          <rect x="486" y="76" width="158" height="80" rx="7" fill="#0e1f2b" stroke="#3dd6c3"/>
+          <rect x="656" y="76" width="158" height="80" rx="7" fill="#0e1f2b" stroke="#3dd6c3"/>
+          <rect x="486" y="166" width="158" height="80" rx="7" fill="#0e1f2b" stroke="#3dd6c3"/>
+          <rect x="656" y="166" width="158" height="80" rx="7" fill="#0e1f2b" stroke="#3dd6c3"/>
+          <text x="565" y="122" fill="#3dd6c3" font-size="12" text-anchor="middle" class="m">worker 1</text>
+          <text x="735" y="122" fill="#3dd6c3" font-size="12" text-anchor="middle" class="m">worker 2</text>
+          <text x="565" y="212" fill="#3dd6c3" font-size="12" text-anchor="middle" class="m">worker 3</text>
+          <text x="735" y="212" fill="#3dd6c3" font-size="12" text-anchor="middle" class="m">worker 4</text>
+          <text x="650" y="48" fill="#e8edf6" font-size="15" font-weight="600" text-anchor="middle">Bounded shards, parallel focus</text>
+        </g>
+      </svg>
+      <figcaption>Fig. 1 — Wandering search (cost ∝ repo size) vs sharded coverage (cost ∝ relevant code)</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The classic idea, one inversion</h2>
+    <p>Hadoop-era <strong>MapReduce</strong>: shard a giant input, run the same <em>handwritten</em> map function over every shard in parallel, reduce results into one answer. It made cluster-scale data processing affordable.</p>
+    <p><strong>Agentic MapReduce keeps the skeleton but flips who writes the map.</strong> In classic MapReduce, a human writes the instructions and dumb machines execute over everything. Here, <strong>an agent writes a deterministic relevance test (a "selector") for this specific repo and task</strong> — then cheap, model-free code executes it over everything. Reasoning is spent <em>once</em>, when the selector is authored.</p>
+
+    <figure>
+      <svg viewBox="0 0 860 420" role="img" aria-label="Four stage pipeline: Plan, Shard, Map, Reduce">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#8fa1bd"/>
+          </marker>
+        </defs>
+        <!-- PLAN -->
+        <g>
+          <rect x="30" y="40" width="180" height="110" rx="12" fill="#101a2e" stroke="#3dd6c3" stroke-width="1.5"/>
+          <text x="120" y="70" text-anchor="middle" fill="#3dd6c3" font-size="12" class="m" letter-spacing="2">1 · PLAN</text>
+          <text x="120" y="94" text-anchor="middle" fill="#e8edf6" font-size="14" font-weight="600">Agent studies repo,</text>
+          <text x="120" y="112" text-anchor="middle" fill="#e8edf6" font-size="14" font-weight="600">writes selectors</text>
+          <text x="120" y="136" text-anchor="middle" fill="#3dd6c3" font-size="11" class="m">AGENTIC ✦</text>
+        </g>
+        <line x1="210" y1="95" x2="248" y2="95" stroke="#8fa1bd" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- SHARD -->
+        <g>
+          <rect x="252" y="40" width="180" height="110" rx="12" fill="#101a2e" stroke="#1e2c47" stroke-width="1.5"/>
+          <text x="342" y="70" text-anchor="middle" fill="#8fa1bd" font-size="12" class="m" letter-spacing="2">2 · SHARD</text>
+          <text x="342" y="94" text-anchor="middle" fill="#e8edf6" font-size="14" font-weight="600">Selectors run over</text>
+          <text x="342" y="112" text-anchor="middle" fill="#e8edf6" font-size="14" font-weight="600">every file → batches</text>
+          <text x="342" y="136" text-anchor="middle" fill="#8fa1bd" font-size="11" class="m">DETERMINISTIC · no model</text>
+        </g>
+        <line x1="432" y1="95" x2="470" y2="95" stroke="#8fa1bd" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- MAP -->
+        <g>
+          <rect x="474" y="20" width="180" height="150" rx="12" fill="#101a2e" stroke="#3dd6c3" stroke-width="1.5"/>
+          <text x="564" y="46" text-anchor="middle" fill="#3dd6c3" font-size="12" class="m" letter-spacing="2">3 · MAP</text>
+          <!-- parallel workers -->
+          <rect x="492" y="58" width="144" height="26" rx="6" fill="#0e1f2b" stroke="#3dd6c3" stroke-width="1"/>
+          <rect x="492" y="90" width="144" height="26" rx="6" fill="#0e1f2b" stroke="#3dd6c3" stroke-width="1"/>
+          <rect x="492" y="122" width="144" height="26" rx="6" fill="#0e1f2b" stroke="#3dd6c3" stroke-width="1"/>
+          <text x="564" y="75" text-anchor="middle" fill="#c6d0e2" font-size="11" class="m">worker · shard A</text>
+          <text x="564" y="107" text-anchor="middle" fill="#c6d0e2" font-size="11" class="m">worker · shard B</text>
+          <text x="564" y="139" text-anchor="middle" fill="#c6d0e2" font-size="11" class="m">worker · shard C</text>
+        </g>
+        <line x1="654" y1="95" x2="692" y2="95" stroke="#8fa1bd" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- REDUCE -->
+        <g>
+          <rect x="696" y="40" width="140" height="110" rx="12" fill="#101a2e" stroke="#ff7a6b" stroke-width="1.5"/>
+          <text x="766" y="70" text-anchor="middle" fill="#ff7a6b" font-size="12" class="m" letter-spacing="2">4 · REDUCE</text>
+          <text x="766" y="94" text-anchor="middle" fill="#e8edf6" font-size="13" font-weight="600">Dedupe, rank,</text>
+          <text x="766" y="112" text-anchor="middle" fill="#e8edf6" font-size="13" font-weight="600">chain findings</text>
+          <text x="766" y="136" text-anchor="middle" fill="#ff7a6b" font-size="11" class="m">AGENTIC ✦</text>
+        </g>
+        <!-- principle band -->
+        <rect x="30" y="210" width="806" height="70" rx="12" fill="#0e1728" stroke="#1e2c47"/>
+        <text x="433" y="240" text-anchor="middle" fill="#f2c14e" font-size="13" class="m" letter-spacing="1">THE PRINCIPLE</text>
+        <text x="433" y="263" text-anchor="middle" fill="#e8edf6" font-size="15" font-weight="600">Put agents only where reasoning is required. Everything else is deterministic.</text>
+        <!-- selector example -->
+        <rect x="30" y="304" width="806" height="92" rx="12" fill="#0e1728" stroke="#1e2c47"/>
+        <text x="52" y="332" fill="#8fa1bd" font-size="12" class="m">// example selector authored by the Plan agent (runs with no model in the loop)</text>
+        <text x="52" y="356" fill="#3dd6c3" font-size="13" class="m">tree-sitter query: route_decorator ∧ ¬auth_wrapper → emit signal(file, line, evidence)</text>
+        <text x="52" y="380" fill="#8fa1bd" font-size="12" class="m">files with zero signals never reach the expensive Map stage</text>
+      </svg>
+      <figcaption>Fig. 2 — The four-stage pipeline. Agents at Plan, Map, Reduce; the Shard stage is pure deterministic code.</figcaption>
+    </figure>
+
+    <table>
+      <thead><tr><th>Stage</th><th>What happens</th><th>Agentic?</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Plan</strong></td><td>An agent studies the repo and authors <em>selectors</em> — relevance tests concrete enough to run without a model (Tree-sitter queries, compiler symbol queries, import-graph traversals, lexical patterns)</td><td class="yes">YES ✦</td></tr>
+        <tr><td><strong>Shard</strong></td><td>Selectors run deterministically over the <em>entire</em> repo; each match emits a compact <span class="k">signal</span> (location + which selector fired + evidence); matches bucketed into bounded batches</td><td class="no">no</td></tr>
+        <tr><td><strong>Map</strong></td><td>One fresh child agent per batch, in parallel, reads real surrounding code and reaches a verdict per candidate</td><td class="yes">YES ✦</td></tr>
+        <tr><td><strong>Reduce</strong></td><td>An agent consumes workers' <em>compressed conclusions</em> (not transcripts), dedupes, reconciles, and finds cross-shard relationships</td><td class="yes">YES ✦</td></tr>
+      </tbody>
+    </table>
+
+    <div class="story">
+      <span class="tag">Why coverage is now provable</span>
+      <p style="margin:0">The deterministic pass produces a <strong>finite work queue</strong>. Every shard is assigned to a worker; the scan is complete only when the queue is exhausted. The trade-off shifts to <strong>selector recall</strong> — a file matching no selector never reaches a worker. But selectors are an <em>inspectable, version-controlled artifact</em>: you can read them, test them against known examples, and tune them. A search agent's "I've looked everywhere" cannot be audited; a selector can.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>How Devin uses it: Security Swarm</h2>
+    <p>Launched July 1, 2026, <strong>Devin Security Swarm</strong> is the first product built on this pattern — and security scanning is the shape it was designed for: a vulnerability report is only trustworthy if the <em>whole</em> codebase was considered, real bugs are sparse, and the worst exploits <em>chain across files</em> that no single worker sees together. Swarm adds a fifth stage: <strong>Verify</strong>.</p>
+
+    <figure>
+      <svg viewBox="0 0 860 520" role="img" aria-label="Security Swarm five stage flow">
+        <defs>
+          <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#8fa1bd"/>
+          </marker>
+        </defs>
+        <!-- 1 Plan -->
+        <rect x="30" y="30" width="800" height="72" rx="12" fill="#101a2e" stroke="#3dd6c3" stroke-width="1.4"/>
+        <text x="56" y="60" fill="#3dd6c3" font-size="12" class="m" letter-spacing="2">1 · PLAN — THE THREAT MODEL ✦</text>
+        <text x="56" y="84" fill="#c6d0e2" font-size="14">A Devin session writes rules for <tspan font-weight="600" fill="#e8edf6">this repo's</tspan> routes, auth wrappers, data layer, deserialization sinks — surfaced as an editable threat model</text>
+        <line x1="430" y1="102" x2="430" y2="126" stroke="#8fa1bd" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <!-- 2 Shard -->
+        <rect x="30" y="130" width="800" height="66" rx="12" fill="#101a2e" stroke="#1e2c47" stroke-width="1.4"/>
+        <text x="56" y="158" fill="#8fa1bd" font-size="12" class="m" letter-spacing="2">2 · SHARD — SIGNALS &amp; BATCHES (deterministic)</text>
+        <text x="56" y="180" fill="#c6d0e2" font-size="14">Rules run over the whole repo · matches emit signals · silent files are dropped · rest bucketed into bounded batches</text>
+        <line x1="430" y1="196" x2="430" y2="220" stroke="#8fa1bd" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <!-- 3 Map: swarm -->
+        <rect x="30" y="224" width="800" height="96" rx="12" fill="#101a2e" stroke="#3dd6c3" stroke-width="1.4"/>
+        <text x="56" y="252" fill="#3dd6c3" font-size="12" class="m" letter-spacing="2">3 · MAP — THE SWARM ✦</text>
+        <g>
+          <rect x="56" y="266" width="140" height="38" rx="8" fill="#0e1f2b" stroke="#3dd6c3"/>
+          <rect x="208" y="266" width="140" height="38" rx="8" fill="#0e1f2b" stroke="#3dd6c3"/>
+          <rect x="360" y="266" width="140" height="38" rx="8" fill="#0e1f2b" stroke="#3dd6c3"/>
+          <rect x="512" y="266" width="140" height="38" rx="8" fill="#0e1f2b" stroke="#3dd6c3"/>
+          <text x="126" y="290" text-anchor="middle" fill="#c6d0e2" font-size="11" class="m">child devin · b1</text>
+          <text x="278" y="290" text-anchor="middle" fill="#c6d0e2" font-size="11" class="m">child devin · b2</text>
+          <text x="430" y="290" text-anchor="middle" fill="#c6d0e2" font-size="11" class="m">child devin · b3</text>
+          <text x="582" y="290" text-anchor="middle" fill="#c6d0e2" font-size="11" class="m">child devin · b4</text>
+          <text x="700" y="290" fill="#8fa1bd" font-size="13" class="m">… in parallel</text>
+        </g>
+        <line x1="430" y1="320" x2="430" y2="344" stroke="#8fa1bd" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <!-- 4 Reduce -->
+        <rect x="30" y="348" width="800" height="72" rx="12" fill="#101a2e" stroke="#ff7a6b" stroke-width="1.4"/>
+        <text x="56" y="376" fill="#ff7a6b" font-size="12" class="m" letter-spacing="2">4 · REDUCE — TRIAGE &amp; ATTACK CHAINS ✦</text>
+        <text x="56" y="400" fill="#c6d0e2" font-size="14">Dedupe · assign ownership · triage P0/P1/P2 · <tspan fill="#ff7a6b" font-weight="600">chain findings across shards</tspan> (ID leak + ID-gated RCE ⇒ one unauthenticated P0 RCE)</text>
+        <line x1="430" y1="420" x2="430" y2="444" stroke="#8fa1bd" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <!-- 5 Verify -->
+        <rect x="30" y="448" width="800" height="60" rx="12" fill="#101a2e" stroke="#f2c14e" stroke-width="1.4"/>
+        <text x="56" y="474" fill="#f2c14e" font-size="12" class="m" letter-spacing="2">5 · VERIFY — RUNTIME PROOF ✦</text>
+        <text x="56" y="496" fill="#c6d0e2" font-size="14">One sandboxed session per serious finding reproduces it against a running build → Confirmed / False-positive / Inconclusive → Devin opens the fix PR</text>
+      </svg>
+      <figcaption>Fig. 3 — Security Swarm: Agentic MapReduce + a Verify fan-out over findings instead of files</figcaption>
+    </figure>
+
+    <h3>Why the Reduce stage is the quiet hero</h3>
+    <p>Each Map worker only sees its shard. The Reducer holds the <strong>global view no worker had</strong> — so it can compose an unauthenticated ID leak from shard 2 with an ID-gated RCE from shard 7 into a single P0 attack chain. For migrations, the same stage groups affected call sites from many shards under the API change that caused them and emits one migration plan.</p>
+
+    <h3>Why it's cheap — and stays cheap</h3>
+    <p>Cost tracks the amount of <strong>relevant</strong> code, not repo size: tokens are spent only on candidates that survive the selectors, one bounded shard at a time, and the Reducer reasons over compressed conclusions rather than transcripts. On re-runs, the pipeline only touches files changed since the last scanned commit — <strong>you pay for the diff, not a full pass</strong>. Selectors are persisted and reused.</p>
+
+    <h3>Benchmark results</h3>
+    <p>Against a ground-truth set of published CVEs (each pinned to the commit before its fix, across a dozen-plus languages), graded on recall of the same root cause:</p>
+    <table>
+      <thead><tr><th>Scanner</th><th>Recall</th><th>Cost / run</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Devin Security Swarm</strong></td><td style="color:var(--teal)"><strong>72%</strong></td><td>$90</td></tr>
+        <tr><td>Claude Security</td><td>68%</td><td>$132</td></tr>
+        <tr><td>Codex Security</td><td>48%</td><td>—</td></tr>
+        <tr><td>Cursor Security</td><td>26%</td><td>$4.60</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The mental model to keep</h2>
+    <div class="grid3">
+      <div class="card"><div class="num">CLASSIC MAPREDUCE</div><h4>Human writes the map</h4><p>Handwritten function, dumb executors, full input processed. Scales computation.</p></div>
+      <div class="card"><div class="num">NAIVE MULTI-AGENT</div><h4>Agents everywhere</h4><p>Agents search, agents coordinate, agents talk to agents. Expensive, unbounded, unauditable coverage.</p></div>
+      <div class="card"><div class="num">AGENTIC MAPREDUCE</div><h4>Agent writes the map</h4><p>Reasoning spent once on selectors; deterministic pass guarantees coverage; parallel agents only where judgment is needed.</p></div>
+    </div>
+    <p>This also squares with Cognition's earlier "Don't Build Multi-Agents" stance: the pattern works because <strong>workers never coordinate with each other</strong>. They share no context, make no conflicting decisions — the deterministic shard boundary does the coordination, and a single Reducer does the synthesis.</p>
+    <p>It fits any task where <strong>a verdict is only trustworthy if the whole corpus was in view</strong>: security scans, breaking-change detection, code-quality enforcement, large-scale migrations — and beyond code, arguably any bounded-corpus audit.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Sources</h2>
+    <p class="src">① Cognition — <a href="https://devin.ai/blog/agentic-map-reduce">Agentic MapReduce</a> (Jul 1, 2026)<br>
+    ② Cognition — <a href="https://devin.ai/blog/security-swarm-eval">Evaluating Security Swarm</a> (Jul 2026)<br>
+    ③ Zhang et al. — <a href="https://arxiv.org/abs/2606.14066">FastContext</a> (2026): repo exploration consumes ~56% of tool-use turns<br>
+    ④ LangChain's Harrison Chase on programmatic subagent spawning ("dynamic subagents" in deepagents) as a related pattern</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">agentic mapreduce · illustrated explainer · compiled 2 jul 2026</div>
+</footer>
+
+<script>
+// render the "wandering repo" file dots deterministically
+(function(){
+  const g=document.getElementById('dots');
+  if(!g)return;
+  let s=42;const rnd=()=>{s=(s*16807)%2147483647;return s/2147483647};
+  let dots='';
+  for(let r=0;r<8;r++)for(let c=0;c<16;c++){
+    if(rnd()<0.85) dots+=`<rect x="${46+c*22}" y="${74+r*22}" width="12" height="12" rx="2" fill="#22304e"/>`;
+  }
+  g.innerHTML=dots;
+})();
+</script>
+</body>
+</html>
